@@ -1,0 +1,54 @@
+neovim
+
+  https://www.youtube.com/watch?v=w7i4amO_zaE&ab_channel=ThePrimeagen
+  https://github.com/ThePrimeagen/init.lua
+
+  https://github.com/direnv/direnv.vim/ -- looks cool
+	telescope
+
+  move to lua
+  treesitter
+  harpoon?
+  undotree?
+  fugitive?
+  lsp-zero
+    https://github.com/VonHeikemen/lsp-zero.nvim
+	lazygit
+	lsp?
+		nix
+		rust
+
+xmobar
+	battery/wifi options for laptop
+
+srid
+  fira-code font?
+  xclip for screenshots?
+  cache-server thing
+  https://github.com/srid/nixos-config/blob/master/nixos/cache-server.nix
+  https://github.com/srid/nixos-config/blob/master/home/git.nix
+
+nix-serve make am a cache
+
+nix-fmt this repo
+
+xmonad
+	devshell for hls
+		(currently just user shell)
+
+alacrity
+	can you update opacity when floating/sinking?
+
+aspirational
+	tmpfs root insanity
+		try it on the laptop first
+
+skim larbs?
+
+look into vim session a bit
+  maybe per workspace vim sessions would be cool
+
+dmenu by diffs
+  mostly cause it feels weird this is a c repo on github tbh
+
+obsidian?

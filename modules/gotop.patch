@@ -1,0 +1,13 @@
+diff -u -r gotop/termui/table.go gotop_fix/termui/table.go
+--- gotop/termui/table.go	2023-02-13 21:34:22.999826633 -0500
++++ gotop_fix/termui/table.go	2023-02-13 21:35:23.352112689 -0500
+@@ -98,7 +98,7 @@
+ 		if self.ShowCursor {
+ 			if (self.SelectedItem == "" && rowNum == self.SelectedRow) || (self.SelectedItem != "" && self.SelectedItem == row[self.UniqueCol]) {
+ 				style.Fg = self.CursorColor
+-				style.Modifier = ModifierReverse
++				style.Modifier = 1 << 15
+ 				for _, width := range self.ColWidths {
+ 					if width == 0 {
+ 						continue
+Only in gotop_fix/termui: table.go_1

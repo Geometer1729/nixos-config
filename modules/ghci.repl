@@ -1,0 +1,52 @@
+:set prompt "\\>"
+
+import Data.Map qualified as M
+import Data.Set qualified as S
+
+import Control.Monad.State
+-- import Flow
+-- TODO how to I add packages?
+
+:set -XBlockArguments
+:set -XDataKinds
+:set -XDefaultSignatures
+:set -XDeriveAnyClass
+:set -XDerivingStrategies
+:set -XDerivingVia
+:set -XDisambiguateRecordFields
+:set -XDuplicateRecordFields
+:set -XFlexibleInstances
+:set -XFunctionalDependencies
+:set -XGADTs
+:set -XImpredicativeTypes
+:set -XLambdaCase
+:set -XLexicalNegation
+:set -XLiberalTypeSynonyms
+:set -XMonadComprehensions
+:set -XMultiWayIf
+:set -XNegativeLiterals
+:set -XNoStarIsType
+:set -XNondecreasingIndentation
+:set -XNumDecimals
+:set -XOverloadedLabels
+:set -XOverloadedLists
+:set -XOverloadedRecordDot
+:set -XOverloadedStrings
+:set -XPackageImports
+:set -XPartialTypeSignatures
+:set -XPatternSynonyms
+:set -XQualifiedDo
+:set -XQuantifiedConstraints
+:set -XQuasiQuotes
+:set -XRankNTypes
+:set -XRecordWildCards
+:set -XRecursiveDo
+:set -XRoleAnnotations
+:set -XTypeFamilies
+:set -XTypeFamilyDependencies
+:set -XUnicodeSyntax
+:set -XUnliftedFFITypes
+:set -XUnliftedNewtypes
+:set -XViewPatterns
+
+:!clear
