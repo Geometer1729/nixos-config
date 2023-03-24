@@ -2,6 +2,7 @@
 {
     programs.git = {
       enable=true;
+      diff-so-fancy.enable=true;
       userEmail = "16kuhnb@gmail.com";
       userName = "Geometer1729";
       extraConfig = {
@@ -17,6 +18,8 @@
         co = "checkout";
         st = "status";
         s = "switch";
+        d = "diff";
+        a = "add";
       };
     };
 }
