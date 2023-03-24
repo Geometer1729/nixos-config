@@ -81,7 +81,6 @@
           feh #sets background
           playerctl # play pause controls
           zathura # pdf reader
-          obsidian
 
           # TODO move these somewhere
           #scripts
