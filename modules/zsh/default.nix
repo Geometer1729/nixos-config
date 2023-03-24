@@ -70,16 +70,17 @@
           gs="git status";
           dr="direnv reload";
           da="direnv allow";
-          mem="sudo du -hd 1 | sort -h";
           rgi="rg -i";
-          fmt="nix run .#format && git add . && git commit -m format && git push";
+          #fmt="nix run .#format && git add . && git commit -m format && git push";
           ":q"="exit";
+          nixos-rebuild="sudo nixos-rebuild";
+          du="dust";
+          v = "vim";
+          g = "git";
           # helpers
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
-          nixos-rebuild="sudo nixos-rebuild";
-          du="dust";
         };
         shellGlobalAliases = {
           "..."="../..";
