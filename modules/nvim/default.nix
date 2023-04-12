@@ -3,7 +3,7 @@
   programs.neovim =
     { enable = true;
       vimAlias = true;
-      extraConfig = "source ${./init.vim}";
+      extraLuaConfig = builtins.readFile ./init.lua;
 
       coc= {
         enable = true;
@@ -27,6 +27,11 @@
               filetypes= ["hs" "lhs" "haskell" "lhaskell"];
               rootPatterns= ["*.cabal" "stack.yaml" "cabal.project" "package.yaml"  "hie.yaml"];
               initializationOptions.languageServerHaskell.hlintOn=true;
+            };
+            rust= {
+              command = "rust-analyzer";
+              filetypes = ["rust"];
+              rootPatterns = ["Cargo.toml"];
             };
             #nix = { # TODO this doesn't work can I get something good for nix?
             #  command = "rnix-lsp";
@@ -60,6 +65,7 @@
             vim-nix
             vim-j
             telescope-nvim
+            nvim-treesitter
           ];
      };
 }
