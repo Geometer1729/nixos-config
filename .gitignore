@@ -28,3 +28,5 @@ cabal.project.local~
 
 secrets
 todo
+
+.session.vim

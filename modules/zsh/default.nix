@@ -81,6 +81,7 @@
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
+          fg="\\fg || vim -S .session.vim";
         };
         shellGlobalAliases = {
           "..."="../..";

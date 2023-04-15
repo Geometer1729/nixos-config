@@ -108,8 +108,6 @@
         ];
     };
 
-
-
     services ={
       picom ={
         enable = true;

@@ -47,6 +47,8 @@ g['airline#extensions#tabline#left_sep'] = ' '
 g['@p']="O<Enter>"
 g['@c']='\"zdt\"P'
 
+g.mapleader=' '
+
 map('n','<leader>cr','<CMD>CocRestart<CR><CR>')
 map('n','<leader>o','<CMD>Spell<CR>')
 
@@ -64,6 +66,9 @@ end
 vim.cmd('nnoremap S :%s//g<Left><Left>')
 vim.cmd([[cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!]])
 
+map('n','<return>','<cmd>noh<cr>')
+
+map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>')
 
 -- Telescope
 map('n','<leader>ff','<cmd>Telescope git_files<cr>')
