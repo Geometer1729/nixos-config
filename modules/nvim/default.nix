@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ...}:
+{ pkgs, lib, ...}:
 {
   programs.neovim =
     { enable = true;
@@ -47,7 +47,6 @@
             cmp-buffer
             cmp-path
             cmp-cmdline
-
           ];
      };
 }

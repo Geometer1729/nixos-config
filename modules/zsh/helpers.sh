@@ -10,19 +10,6 @@ cd_(){
 	\cd $@  && ls -hN --color=auto --group-directories-first
 }
 
-fg_(){
-  if ( jobs | grep "" || ! [ -f .session.vim ] )
-    then
-      \fg
-    else
-      resVim
-  fi
-}
-
-resVim(){
- vim -S .session.vim -c 'silent exec "!rm .session.vim"'
-}
-
 loop(){
 	while true
 	do

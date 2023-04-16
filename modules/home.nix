@@ -1,4 +1,4 @@
-{ config, pkgs, lib, userName, ... }:
+{ pkgs, ... }:
 {
   home =
     { packages =
@@ -29,16 +29,13 @@
           wget
           direnv
           nix-direnv
+          nil # nix lsp
           rnix-lsp
           (haskell.packages.ghc943.ghcWithPackages
             (pkgs : with pkgs;
               [ flow
                 mtl
                 containers
-                xmonad
-                xmonad-contrib
-                cabal-install
-                haskell-language-server
                 text
                 time
                 generics-sop

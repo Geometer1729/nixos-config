@@ -29,6 +29,7 @@ vim.cmd([[cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit
 map('n','<Leader>pv',vim.cmd.Ex)
 
 map('n','<Return>','<cmd>noh<cr>')
+-- TODO close floating windows too
 
 map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>')
 
@@ -43,5 +44,8 @@ map('n','<Leader>u',vim.cmd.UndotreeToggle)
 --Fugitiv
 map('n','<Leader>gs',vim.cmd.Git)
 
--- LSP
-
+--primagen tweaks
+map('n','J','mzJ`z') -- hold cursor on J
+map('n','n','nzzzv')
+map('n','N','Nzzzv')
+map('n','<leader>d','\"_d')

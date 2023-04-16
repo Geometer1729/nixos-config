@@ -39,15 +39,21 @@
       lib = nixpkgs.lib;
     in {
       devShell.x86_64-linux = pkgs.mkShell
-        {nativeBuildInputs =
-          [ ./modules/xmonad/my-xmonad
-            pkgs.haskellPackages.xmonad
-          ];
+        {nativeBuildInputs = [ ];
           packages = [
-            ./modules/xmonad/my-xmonad
-            pkgs.haskellPackages.xmonad
-            pkgs.haskellPackages.ghc
-            pkgs.haskellPackages.haskell-language-server
+            pkgs.sumneko-lua-language-server # for nvim config stuff
+            (pkgs.haskell.packages.ghc8107.ghcWithPackages
+              (pkgs : with pkgs;
+                # TODO this is repeated
+                [ mtl
+                  containers
+                  xmonad
+                  xmonad-contrib
+                  cabal-install
+                  haskell-language-server
+                ]
+              )
+            )
           ];
         };
       nixosConfigurations =

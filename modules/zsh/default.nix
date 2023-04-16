@@ -61,11 +61,13 @@
           du="dust";
           v = "vim";
           g = "git";
+          fgv = ''
+            vim -S .session.vim -c 'silent exec "!rm .session.vim"'
+          '';
           # helpers
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
-          fg="fg_";
         };
         shellGlobalAliases = {
           "..."="../..";

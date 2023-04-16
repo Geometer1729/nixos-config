@@ -2,7 +2,7 @@
   let
     my-xmonad =
     ((import ./pkg.nix)
-    {inherit config pkgs lib;}
+    {inherit pkgs;}
     ).my-xmonad  ;
   in
 {

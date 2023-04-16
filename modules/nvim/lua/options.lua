@@ -5,12 +5,12 @@ local g = vim.g
 o.shortmess = "I"
 
 vim.cmd.colorscheme('joker')
+vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 
 -- enable mouse
 o.mouse ="a"
 o.clipboard="unnamedplus" -- share system clipboard
 o.number=true
--- o.encoding="utf-8"
 -- scroll when 8 lines from the bottom
 o.so=8
 
@@ -24,6 +24,7 @@ o.expandtab=true
 o.splitbelow=true
 o.splitright=true
 
+-- tab stuff
 o.tabstop=2
 o.softtabstop=0
 o.shiftwidth=2
