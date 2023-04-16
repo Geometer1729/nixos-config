@@ -3,43 +3,13 @@
   programs.neovim =
     { enable = true;
       vimAlias = true;
-      extraLuaConfig = builtins.readFile ./init.lua;
-
-      coc= {
-        enable = true;
-        settings.languageserver= {
-            purescript= {
-              command= "purescript-language-server";
-              args= ["--stdio"];
-              filetypes= ["purescript"];
-              rootPatterns= ["output"];
-              trace.server= "off";
-              settings= {
-                purescript= {
-                  addSpagoSources= true;
-                  addNpmPath= true;
-                };
-              };
-            };
-            haskell= {
-              command= "haskell-language-server";
-              args= ["--lsp"];
-              filetypes= ["hs" "lhs" "haskell" "lhaskell"];
-              rootPatterns= ["*.cabal" "stack.yaml" "cabal.project" "package.yaml"  "hie.yaml"];
-              initializationOptions.languageServerHaskell.hlintOn=true;
-            };
-            rust= {
-              command = "rust-analyzer";
-              filetypes = ["rust"];
-              rootPatterns = ["Cargo.toml"];
-            };
-            #nix = { # TODO this doesn't work can I get something good for nix?
-            #  command = "rnix-lsp";
-            #  filetypes = [ "nix" ];
-            #};
-          };
-        };
-        # TODO look into telescope
+      # builtins.readFile ./lua/init.lua;
+      extraConfig =  
+        lib.strings.concatStrings
+          ( builtins.map
+            (name: "luafile ${./lua}/${name}\n")
+            (builtins.attrNames (builtins.readDir ./lua))
+          );
 
         plugins = with pkgs.vimPlugins;
           let
@@ -51,21 +21,33 @@
                   rev = "dcf2357339fbe1b7ac4125a323dbe0f8ff4937cc";
                   sha256 = "sha256-QSM8tR2RtL34lBqzn3pifO73qsLroZyPEiFsW/Hn/KI=";
                 };
-              };
+              }; # TODO just use default vim-j and set background
           in
-          [ syntastic
-            airline
-            commentary
-            haskell-vim
-            purescript-vim
-            surround
-            nerdtree
-            vimwiki
+          [ airline # status line
+            purescript-vim # there is currently no treesitter purescript
+            telescope-nvim # finder
+            (nvim-treesitter.withPlugins 
+              (p: with p; [ lua vim vimdoc rust haskell nix typescript ])
+            )
+            surround # I should use this more
+            nerdtree # file browser
             hoogle
-            vim-nix
-            vim-j
-            telescope-nvim
-            nvim-treesitter
+            vim-j # my color scheme
+            vimwiki
+            undotree
+            fugitive # :Git thing
+
+            # LSP
+            nvim-lspconfig
+            # cmp
+            nvim-cmp
+            cmp-vsnip
+            vim-vsnip
+            cmp-nvim-lsp
+            cmp-buffer
+            cmp-path
+            cmp-cmdline
+
           ];
      };
 }

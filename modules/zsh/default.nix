@@ -16,22 +16,6 @@
             sha256 = "0za4aiwwrlawnia4f29msk822rj9bgcygw6a8a6iikiwzjjz0g91";
           };
         }
-        #{ name = "zsh-vi-mode" ;
-        #  src = pkgs.fetchFromGitHub {
-        #    owner = "jefferytse";
-        #    repo = "zsh-vi-mode";
-        #    rev = "0.9.0";
-        #    sha256 = "";
-        #  };
-        #}
-        #{ name = "zsh-autosuggestions";
-        #  src = pkgs.fetchFromGitHub {
-        #    owner = "zsh-users";
-        #    repo = "zsh-autosuggestions";
-        #    rev = "a411ef3e0992d4839f0732ebeb9823024afaaaa8";
-        #    sha256 = "sha256-KLUYpUu4DHRumQZ3w59m9aTW6TBKMCXl2UcKi4uMd7w=";
-        #  };
-        #} # Simple plugin installation
       ];
       historySubstringSearch =
         { enable = true;
@@ -81,7 +65,7 @@
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
-          fg="\\fg || vim -S .session.vim";
+          fg="fg_";
         };
         shellGlobalAliases = {
           "..."="../..";
