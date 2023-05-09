@@ -25,6 +25,7 @@
           du-dust
 
           # dev tools
+          tmate
           ripgrep
           wget
           direnv
@@ -78,6 +79,7 @@
           feh #sets background
           playerctl # play pause controls
           zathura # pdf reader
+          imagemagick
 
           # TODO move these somewhere
           #scripts
