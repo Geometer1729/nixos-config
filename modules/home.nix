@@ -10,6 +10,11 @@
           radeontop
           neofetch
 
+          # video
+          ffmpeg
+          youtube-dl
+          vlc
+
           # apps
           discord
           firefox
