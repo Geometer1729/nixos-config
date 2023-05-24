@@ -79,7 +79,6 @@
 
           #misc
           pulsemixer
-          spectacle #screenshots
           #picom #compositer
           feh #sets background
           playerctl # play pause controls
@@ -127,6 +126,22 @@
         # TODO it'd be cool to make a wrapper
         # that tries cursses then uses qt
       };
+      # screenshots
+      flameshot =
+        { enable = true;
+          settings =
+            { General =
+                { savePath = "/home/bbrian/Downloads";
+                  showHelp = false;
+                  uiColor = "#0ce3ff";
+                  contrastOpacity = 188;
+                  buttons= # magic string from gui config editor
+                    ''
+                    @Variant(\0\0\0\x7f\0\0\0\vQList<int>\0\0\0\0\v\0\0\0\0\0\0\0\x1\0\0\0\x2\0\0\0\x3\0\0\0\x4\0\0\0\x5\0\0\0\x6\0\0\0\x12\0\0\0\b\0\0\0\n\0\0\0\v)
+                    '';
+                };
+            };
+        };
     };
 
     home.file.".ghc/ghci.conf".source = ./ghci.repl;
@@ -135,5 +150,7 @@
       accessibility.typeaheadfind.enablesound=false;
       # TODO does this work?
     };
-}
+
+
+  }
 
