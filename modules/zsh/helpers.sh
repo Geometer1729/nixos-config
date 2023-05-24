@@ -41,3 +41,7 @@ memClear(){
 nixos-deploy(){
   \nixos-rebuild --flake ~/conf\#$1 --target-host bbrian@$1 --use-remote-sudo $2
 }
+
+try(){
+  nix-shell -p $1 --command "$@"
+}

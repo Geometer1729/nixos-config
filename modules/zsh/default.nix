@@ -55,9 +55,7 @@
           dr="direnv reload";
           da="direnv allow";
           rgi="rg -i";
-          #fmt="nix run .#format && git add . && git commit -m format && git push";
           ":q"="exit";
-          nixos-rebuild="sudo nixos-rebuild";
           du="dust";
           v = "vim";
           g = "git";
@@ -68,7 +66,14 @@
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
-        };
+        } //
+        ( # always sudo
+          builtins.listToAttrs
+          ( builtins.map
+            (name: {inherit name; value = "sudo ${name}";})
+            [ "dd" "systemctl" "mount" "shutdown" "nixos-rebuild" ]
+          )
+        );
         shellGlobalAliases = {
           "..."="../..";
           "...."="../../..";
@@ -83,9 +88,6 @@
           # TODO auto generate this with nix
         };
     };
-
-  # environment.pathsToLink = [ "/share/zsh" ];
-  # where does this need to go?
 
   programs.starship =
     { enable = true;
