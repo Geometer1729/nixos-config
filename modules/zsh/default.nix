@@ -59,6 +59,7 @@
           du="dust";
           v = "vim";
           g = "git";
+          lg = "lazygit";
           fgv = ''
             vim -S .session.vim -c 'silent exec "!rm .session.vim"'
           '';

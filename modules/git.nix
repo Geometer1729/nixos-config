@@ -16,10 +16,13 @@
       };
       aliases = {
         co = "checkout";
-        st = "status";
-        s = "switch";
+        s = "status";
+        sw = "switch";
         d = "diff";
         a = "add";
       };
+    };
+    programs.lazygit = {
+      enable = true;
     };
 }

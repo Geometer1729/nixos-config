@@ -4,7 +4,7 @@
     { enable = true;
       vimAlias = true;
       # builtins.readFile ./lua/init.lua;
-      extraConfig =  
+      extraConfig =
         lib.strings.concatStrings
           ( builtins.map
             (name: "luafile ${./lua}/${name}\n")
@@ -26,10 +26,11 @@
           [ airline # status line
             purescript-vim # there is currently no treesitter purescript
             telescope-nvim # finder
-            (nvim-treesitter.withPlugins 
+            (nvim-treesitter.withPlugins
               (p: with p; [ lua vim vimdoc rust haskell nix typescript ])
             )
             surround # I should use this more
+            direnv-vim # should make lsp restarts include direnv reloads?
             nerdtree # file browser
             hoogle
             vim-j # my color scheme

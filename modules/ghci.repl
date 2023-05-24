@@ -29,7 +29,6 @@ import Control.Monad.State
 :set -XNondecreasingIndentation
 :set -XNumDecimals
 :set -XOverloadedLabels
-:set -XOverloadedLists
 :set -XOverloadedRecordDot
 :set -XOverloadedStrings
 :set -XPackageImports
