@@ -43,5 +43,7 @@ nixos-deploy(){
 }
 
 try(){
-  nix-shell -p $1 --command "$@"
+  pkg=$1
+  cmd=$@
+  nix-shell -p $pkg --run "${cmd}"
 }
