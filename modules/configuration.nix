@@ -27,6 +27,21 @@
         (old: { patches = [ ./gotop.patch ]; });
         # fix by gardockt on github
       })
+      (final: prev: {
+        flameshot = prev.flameshot.overrideAttrs
+          (old: let
+              version = "11.0.0";
+            in
+            { inherit version;
+              src = final.fetchFromGitHub {
+                owner = "flameshot-org";
+                repo = "flameshot";
+                rev = "v${version}";
+                sha256 = "sha256-SlnEXW3Uhdgl0icwYyYsKQOcYkAtHpAvL6LMXBF2gWM=";
+              };
+            }
+          );
+      })
     ];
 
   #steam needs this
