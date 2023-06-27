@@ -31,6 +31,8 @@
         flameshot = prev.flameshot.overrideAttrs
           (old: let
               version = "11.0.0";
+              # seems to fix clipboard issue
+              # issue is not consistant so it's hard to bisect
             in
             { inherit version;
               src = final.fetchFromGitHub {
