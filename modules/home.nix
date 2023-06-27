@@ -84,6 +84,7 @@
           playerctl # play pause controls
           zathura # pdf reader
           imagemagick
+          calcurse
 
           # TODO move these somewhere
           #scripts
@@ -107,6 +108,9 @@
               -e zsh \
               -c "sudo nixos-rebuild test || zsh"
           '')
+          (writeShellScriptBin "calNext" ''
+            calcurse -n -l 1 | sed '1d;s/^ *//'
+          '') # needs to be an executable for status bar
 
         ];
     };
