@@ -35,6 +35,7 @@
           wget
           direnv
           nix-direnv
+          expect # provides unbuffer
           nil # nix lsp
           rnix-lsp
           (haskell.packages.ghc943.ghcWithPackages
