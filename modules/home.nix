@@ -109,7 +109,11 @@
               -c "sudo nixos-rebuild test || zsh"
           '')
           (writeShellScriptBin "calNext" ''
-            calcurse -n -l 1 | sed '1d;s/^ *//'
+            while true
+            do
+              calcurse -n -l 1 | sed '1d;s/^ *//'
+              sleep 1
+            done
           '') # needs to be an executable for status bar
 
         ];
