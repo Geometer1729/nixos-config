@@ -17,6 +17,7 @@
         [ ./modules/alacritty.nix
           ./modules/sway.nix
           ./modules/home.nix
+          ./modules/scripts
           ./modules/git.nix
           ./modules/nvim
           ./modules/xmobar

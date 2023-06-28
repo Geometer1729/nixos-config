@@ -85,37 +85,6 @@
           zathura # pdf reader
           imagemagick
           calcurse
-
-          # TODO move these somewhere
-          #scripts
-          (writeShellScriptBin "playPause" ''
-            if playerctl status -a  | grep Playing
-            then
-              echo something playing pausing everything
-              playerctl pause -a
-            elif [[ `playerctl -l | wc -l` -ge 2 ]]
-            then
-              echo nothing playing multiple choices prompting user
-              playerctl play -p $(playerctl -l | dmenu)
-            else
-              echo nothing playing one thing to play playing it
-              playerctl play
-            fi
-          '')
-          (writeShellScriptBin "guiRebuild" ''
-            alacritty \
-              -t float \
-              -e zsh \
-              -c "sudo nixos-rebuild test || zsh"
-          '')
-          (writeShellScriptBin "calNext" ''
-            while true
-            do
-              calcurse -n -l 1 | sed '1d;s/^ *//'
-              sleep 1
-            done
-          '') # needs to be an executable for status bar
-
         ];
     };
 
