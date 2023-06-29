@@ -13,27 +13,11 @@
     let
       userName = "bbrian";
       specialArgs = {inherit userName secrets;};
-      homeModules =
-        [ ./modules/alacritty.nix
-          ./modules/sway.nix
-          ./modules/home.nix
-          ./modules/scripts
-          ./modules/git.nix
-          ./modules/nvim
-          ./modules/xmobar
-          ./modules/xmonad/home.nix
-          ./modules/zsh
-        ];
-      nixModules =
-        [ ./modules/boot.nix
-          ./modules/configuration.nix
-          ./modules/xmonad
-          ./modules/work.nix
-        ];
-
+      homeModules = [ ./home ];
+      nixModules = [ ./nix ];
       system = "x86_64-linux";
       stateVersion = "22.05";
-      pkgs = import <nixpkgs> {
+      pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
@@ -93,13 +77,9 @@
           }
         )
         { am = {
-            nixModules =
-              [ ./modules/hardware/am.nix #TODO this could probably be automatic
-                ./modules/perMachine/am.nix
-              ];
-            homeModules =
-              [ ./modules/perMachine/am_home.nix
-              ];
+            #TODO this could probably be automatic
+            nixModules = [ ./machines/am ];
+            homeModules = [ ./machines/am/home.nix ];
             isLaptop = false;
           };
           raptor = {
