@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
   let
     my-xmonad =
     ((import ./pkg.nix)
@@ -6,9 +6,10 @@
     ).my-xmonad  ;
   in
 {
-  home.file.".xinitrc".source = ./xinit;
-
-  home.file.".xmonad/xmonad-x86_64-linux".onChange = "xmonad --restart";
+  home.file = {
+    ".xinitrc".source = ./xinit;
+    ".xmonad/xmonad-x86_64-linux".onChange = "xmonad --restart";
+  };
 
   xsession.windowManager.xmonad =
     { enable = true;

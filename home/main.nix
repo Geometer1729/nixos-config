@@ -4,6 +4,8 @@
     { packages =
         with pkgs;
         [
+          zoom-us
+
           # status tools
           htop
           gotop
@@ -27,7 +29,7 @@
           dmenu
           killall
           xclip
-          du-dust
+          du-dust # disk usage tool
 
           # dev tools
           tmate
@@ -55,14 +57,8 @@
           zplug
           tldr
 
-          # work
-          slack
-          cachix
-          nodePackages.purescript-language-server
-
           # games
           prismlauncher
-
 
           # pass
           pass
@@ -80,7 +76,6 @@
 
           #misc
           pulsemixer
-          #picom #compositer
           feh #sets background
           playerctl # play pause controls
           zathura # pdf reader
@@ -92,10 +87,6 @@
     services ={
       picom ={
         enable = true;
-        #backend = "egl";
-        #activeOpacity = 1;
-        #inactiveOpacity = 0.9;
-        #shadow = true;
         vSync = true;
       };
       gpg-agent = {
