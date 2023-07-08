@@ -27,7 +27,7 @@
             purescript-vim # there is currently no treesitter purescript
             telescope-nvim # finder
             (nvim-treesitter.withPlugins
-              (p: with p; [ lua vim vimdoc rust haskell nix typescript ])
+              (p: with p; [ lua vim vimdoc rust haskell nix typescript markdown ])
             )
             surround # I should use this more
             direnv-vim # should make lsp restarts include direnv reloads?
