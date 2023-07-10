@@ -1,10 +1,10 @@
-{ config, pkgs, lib, userName, ...}:
+{ pkgs, ...}:
 {
   programs.zsh =
     { enable = true;
       enableAutosuggestions = true;
       enableCompletion = true;
-      enableSyntaxHighlighting = true;
+      syntaxHighlighting.enable = true;
       plugins = [
         { # gets nix-shell to use zsh
           name = "zsh-nix-shell";
@@ -37,7 +37,7 @@
         eval "$(direnv hook zsh)"
       '';
       localVariables =
-        { EDITOR = "vim";
+        { EDITOR = "nvim";
           BROWSER="firefox";
           READER="zathura";
           TERM="xterm-88color";

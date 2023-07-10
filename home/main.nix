@@ -4,8 +4,6 @@
     { packages =
         with pkgs;
         [
-          zoom-us
-
           # status tools
           htop
           gotop
