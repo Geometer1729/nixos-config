@@ -21,3 +21,10 @@ g.taskwiki_data_location="~/.local/share/task"
 g.taskwiki_dont_fold="yes"
 g.vimwiki_folding=''
 
+vim.api.nvim_create_autocmd({'BufNewFile'},
+  { pattern = '*Documents/vw/diary/*',
+    command = [[silent :0r !cat ~/Documents/vw/templates/diary.md | sed "s/DATE/$(date '+\%m\/\%d\/\%y\ \%A')/g"]]
+  }
+  )
+
+

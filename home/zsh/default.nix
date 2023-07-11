@@ -25,6 +25,8 @@
       defaultKeymap = "viins";
       profileExtra =
         ''
+        EDITOR=vim
+        # Local variable doesn't work for vim scratchpad
         if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
         then
           startx
@@ -37,7 +39,7 @@
         eval "$(direnv hook zsh)"
       '';
       localVariables =
-        { EDITOR = "nvim";
+        { EDITOR = "vim";
           BROWSER="firefox";
           READER="zathura";
           TERM="xterm-88color";

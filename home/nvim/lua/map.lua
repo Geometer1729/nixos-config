@@ -1,6 +1,5 @@
 local telescope = require('telescope.builtin')
 
-local o = vim.o
 local g = vim.g
 
 local function map(m, k, v)
