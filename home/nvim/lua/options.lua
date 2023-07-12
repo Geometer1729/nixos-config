@@ -35,6 +35,18 @@ o.undofile=true
 -- indent settings
 o.ai=true
 o.si=true
+-- This fixes an issue with comment indetations in nix
+-- it seems to be related to #define in C
+-- I'm not sure what prevents this from being an issue in python or bash
+-- It may be possible to fix this by finding a better nix plugin
+vim.api.nvim_create_autocmd({'FileType'},
+  { pattern = 'nix',
+    callback = function ()
+      o.si=false
+      o.cinkeys="0{,0},!^F,o,O,e"
+      o.cindent=true
+    end
+  })
 
 -- airline
 g['airline#extensions#tabline#enabled'] = 1
