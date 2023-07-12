@@ -47,6 +47,13 @@ import GHC.IO.Handle.Types
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
+import XMonad.Hooks.RefocusLast (refocusLastLogHook)
+import Control.Monad (when)
+import Control.Monad.Extra (unless)
+import XMonad.Hooks.ServerMode (serverModeEventHook', serverModeEventHook, serverModeEventHookF)
+import Extra (sleep)
+import System.Environment (setEnv)
+import Data.Char (toLower)
 
 main :: IO ()
 main = do
@@ -64,9 +71,15 @@ main = do
       ,layoutHook = myLayout
       ,manageHook = hooks <+> manageHook def <+> namedScratchpadManageHook spconf
       ,handleEventHook= handleEventHook def <> modeHook
+        <> serverModeEventHook'
+         (pure
+           [ ("scratchpad action sp" , namedScratchpadAction spconf "sp")
+           ]
+         )
       ,startupHook = myStartupHook <> modeStartHook
       ,focusFollowsMouse = False
       ,logHook = myLogHook h0 <> myLogHook h1
+        <> (refocusLastLogHook >> nsHideOnFocusLoss spconf)
       ,modMask = modm
     }
 
@@ -182,7 +195,7 @@ launchBindings =
         screen <- curScreenId
         spawn $ "dmenu_run -i -m " <> show (toInteger screen)
       )
-    , ((modShift , xK_r      ), spawn "guiRebuild")
+    , ((modShift , xK_r      ), rebuild)
     , ((modShift , xK_s      ), spawn "sudo zsh -c \"echo mem > /sys/power/state\"")
     -- TODO systemctl sleep or so?
     ]
@@ -225,6 +238,23 @@ toggleFloat = withFocused
           (W.RationalRect (1 % 4) (1 % 4) (1 % 2) (1 % 2))
   )
 
+-- TODO It's probably best to just fork the scratchpad library
+-- and add non-toggle focus and hide actions
+rebuild :: X ()
+rebuild = withFocused $ \windowId -> do
+  floats <- gets (W.floating . windowset)
+  withDisplay $ \display ->
+    withWindowAttributes display windowId
+      $ \attrs -> do
+        -- TODO get from spconf
+        isSp <- runQuery (className =? snd myTerminal <&&> title =? "sp") windowId
+        unless isSp $ namedScratchpadAction spconf "sp"
+        liftIO $ setEnv "HIDE_SP_AFTER_REBUILD" (toLower <$> show (not isSp))
+        spawn "tmuxRebuild || (sleep 0.1 && tmuxRebuild)"
+          -- if the scratch pad was spawned by the previous line
+          -- the tmux session may not exist in time
+          -- so the delayed retry is needed
+
 spconf :: [NamedScratchpad]
 spconf = sp: (forApp <$> extraSps)
 
@@ -233,7 +263,7 @@ extraSps = ["vim","ghci","calcurse"]
 
 sp :: NamedScratchpad
 sp = NS "sp"
-  (fst myTerminal ++ " -t sp")
+  (fst myTerminal ++ " -t sp -e tmux new-session -s sp")
   (className =? snd myTerminal <&&> title =? "sp")
   (doRectFloat $ W.RationalRect (1%4) (1%4) (1%2) (1%2))
 

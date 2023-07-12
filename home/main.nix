@@ -31,6 +31,7 @@
 
           # dev tools
           tmate
+          tmux
           ripgrep
           wget
           direnv
@@ -79,6 +80,7 @@
           zathura # pdf reader
           imagemagick
           calcurse
+          xmonadctl # xmonad server mode control
         ];
     };
 
