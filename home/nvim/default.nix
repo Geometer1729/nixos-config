@@ -22,6 +22,15 @@
                   sha256 = "sha256-QSM8tR2RtL34lBqzn3pifO73qsLroZyPEiFsW/Hn/KI=";
                 };
               }; # TODO just use default vim-j and set background
+            nvim-luaref = pkgs.vimUtils.buildVimPlugin
+              { name = "nvim-luaref";
+                src = pkgs.fetchFromGitHub {
+                  owner = "milisims";
+                  repo = "nvim-luaref";
+                  rev = "dc40d606549db7df1a6e23efa743c90c178333d4";
+                  sha256 = "sha256-GscwQpo0stDLkcfeeLhjciT/y7k2u0CO9vaGswazISo=";
+                };
+              };
           in
           [ airline # status line
             purescript-vim # there is currently no treesitter purescript
@@ -36,6 +45,7 @@
             vim-j # my color scheme
             undotree
             fugitive # :Git thing
+            nvim-luaref
 
             # wiki
             vimwiki

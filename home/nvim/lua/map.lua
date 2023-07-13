@@ -23,7 +23,12 @@ map('t','<C-n>','<C-\\><C-n>')
 --map('n','S','<CMD>%s//g<Left><Left>')
 --cmd without cr is not allowed
 vim.cmd('nnoremap S :%s//g<Left><Left>')
-vim.cmd([[cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!]])
+vim.api.nvim_create_user_command('W'
+  ,[[
+  silent! write !sudo tee % >/dev/null
+  edit!
+  ]],{})
+
 
 map('n','<Leader>pv',vim.cmd.Ex)
 
@@ -36,6 +41,7 @@ map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>')
 map('n','<Leader>ff',telescope.live_grep)
 map('n','<Leader>fg',telescope.git_files)
 map('n','<Leader>fa',telescope.find_files)
+map('n','<Leader>fh',telescope.help_tags)
 
 -- UndoTree
 map('n','<Leader>u',vim.cmd.UndotreeToggle)
