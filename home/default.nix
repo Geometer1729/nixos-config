@@ -2,11 +2,12 @@
 {
   imports =
     [ ./alacritty.nix
-      ./sway.nix
-      ./main.nix
       ./git.nix
-      ./scripts
+      ./main.nix
       ./nvim
+      ./scripts
+      ./sway.nix
+      ./tmux.nix
       ./xmobar
       ./xmonad
       ./zsh

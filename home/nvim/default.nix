@@ -41,11 +41,12 @@
             surround # I should use this more
             direnv-vim # should make lsp restarts include direnv reloads?
             nerdtree # file browser
-            hoogle
+            hoogle # TODO actually install hoogle
             vim-j # my color scheme
             undotree
             fugitive # :Git thing
-            nvim-luaref
+            nvim-luaref # adds lua reference to help pages
+            vim-tmux-navigator
 
             # wiki
             vimwiki
