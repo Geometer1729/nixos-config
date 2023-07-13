@@ -47,6 +47,7 @@
             fugitive # :Git thing
             nvim-luaref # adds lua reference to help pages
             vim-tmux-navigator
+            vim-startify
 
             # wiki
             vimwiki

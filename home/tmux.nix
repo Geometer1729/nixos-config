@@ -3,8 +3,8 @@
   programs.tmux={
     enable = true;
     plugins = with pkgs.tmuxPlugins;
-      [catppuccin
-       vim-tmux-navigator
+      [ vim-tmux-navigator
+        yank
       ];
     mouse = true;
     keyMode="vi";

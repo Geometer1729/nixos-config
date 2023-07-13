@@ -20,6 +20,7 @@ g.taskwiki_data_location="~/.local/share/task"
 -- No folds
 g.taskwiki_dont_fold="yes"
 g.vimwiki_folding=''
+g.foldenable=false
 
 vim.api.nvim_create_autocmd({'BufNewFile'},
   { pattern = '*Documents/vw/diary/*',

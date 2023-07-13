@@ -52,7 +52,7 @@
           )
 
           # shell
-          starship
+          starship #prompt
           zplug
           tldr
 
@@ -79,7 +79,7 @@
           playerctl # play pause controls
           zathura # pdf reader
           imagemagick
-          calcurse
+          calcurse # calandar
           xmonadctl # xmonad server mode control
         ];
     };
