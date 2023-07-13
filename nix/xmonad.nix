@@ -1,4 +1,4 @@
-{ config, pkgs, userName, ... }:
+{ userName, ... }:
 {
   services.getty.autologinUser = userName;
   services.xserver = {

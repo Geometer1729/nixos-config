@@ -51,7 +51,6 @@ import XMonad.Hooks.RefocusLast (refocusLastLogHook)
 import Control.Monad (when)
 import Control.Monad.Extra (unless)
 import XMonad.Hooks.ServerMode (serverModeEventHook', serverModeEventHook, serverModeEventHookF)
-import Extra (sleep)
 import System.Environment (setEnv)
 import Data.Char (toLower)
 
@@ -250,10 +249,7 @@ rebuild = withFocused $ \windowId -> do
         isSp <- runQuery (className =? snd myTerminal <&&> title =? "sp") windowId
         unless isSp $ namedScratchpadAction spconf "sp"
         liftIO $ setEnv "HIDE_SP_AFTER_REBUILD" (toLower <$> show (not isSp))
-        spawn "tmuxRebuild || (sleep 0.1 && tmuxRebuild)"
-          -- if the scratch pad was spawned by the previous line
-          -- the tmux session may not exist in time
-          -- so the delayed retry is needed
+        spawn "tmuxRebuild"
 
 spconf :: [NamedScratchpad]
 spconf = sp: (forApp <$> extraSps)
