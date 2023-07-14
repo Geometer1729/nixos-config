@@ -259,7 +259,7 @@ extraSps = ["vim","ghci","calcurse"]
 
 sp :: NamedScratchpad
 sp = NS "sp"
-  (fst myTerminal ++ " -t sp -e tmux new-session -s sp")
+  (fst myTerminal ++ " -t sp -e tmux new-session -A -s sp")
   (className =? snd myTerminal <&&> title =? "sp")
   (doRectFloat $ W.RationalRect (1%4) (1%4) (1%2) (1%2))
 

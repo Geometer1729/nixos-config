@@ -1,6 +1,7 @@
 local telescope = require('telescope.builtin')
 
 local g = vim.g
+local o = vim.o
 
 local function map(m, k, v)
     vim.keymap.set(m, k, v, { silent = true })
@@ -8,7 +9,13 @@ end
 
 g.mapleader=' '
 
-map('n','<Leader>o','<CMD>Spell<CR>')
+map('n','<Leader>o',
+  function ()
+    o.spell=true
+    o.spelllang="en_us"
+    vim.cmd.highlight({"SpellBad","cterm=undercurl"})
+  end
+  )
 
 local dirKeys = "hjkl"
 for i = 1,#dirKeys do
