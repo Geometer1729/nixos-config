@@ -83,13 +83,8 @@
             isLaptop = false;
           };
           raptor = {
-            nixModules =
-              [ ./modules/hardware/raptor.nix
-                ./modules/perMachine/raptor.nix
-              ];
-            homeModules =
-              [ ./modules/perMachine/raptor_home.nix
-              ];
+            nixModules = [ ./machines/raptor ];
+            homeModules = [ ./machines/raptor/home.nix ];
             isLaptop = true;
           };
         } ;
