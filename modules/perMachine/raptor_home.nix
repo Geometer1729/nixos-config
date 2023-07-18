@@ -4,7 +4,7 @@
       enable = true;
       matchBlocks = {
         am = {
-          hostname = "10.0.0.249";
+          hostname = "10.0.0.248";
           user = userName;
           identityFile = "~/.ssh/id_ed25519";
         };

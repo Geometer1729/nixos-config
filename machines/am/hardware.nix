@@ -36,4 +36,6 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  # Not sure why but am needs this and it breaks raptor
+  boot.loader.efi.efiSysMountPoint = "/boot/efi";
 }

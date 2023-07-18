@@ -11,8 +11,9 @@ in
     };
     distributedBuilds = true;
     buildMachines =
-      [ { hostName = "10.0.0.249";
-          sshUser = "nix-serve";
+      [ { hostName = "am";
+        #"10.0.0.248";
+          sshUser = "bbrian";
           system = "x86_64-linux";
           sshKey = "/home/${userName}/.ssh/id_ed25519";
           maxJobs = 40;

@@ -1,6 +1,6 @@
 { config, pkgs, userName, hostName, ... }:
 let
-  keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF9YiFsgrTPccRtLyzhVrSn9zfxIjySXZjPDe8aJ8vg/ bbrian@raptor" ];
+  keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMpgCGhWC4LE+vpiA+QydG8sg6TTbpRlJDCmPX3JfO+Z bbrian@raptor" ];
 in
 {
   nix = {
