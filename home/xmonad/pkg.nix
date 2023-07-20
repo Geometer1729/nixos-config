@@ -2,7 +2,7 @@
 {
   my-xmonad =
     pkgs.haskellPackages.developPackage {
-      root = ./my-xmonad;
+      root = ./.;
       modifier = drv:
         pkgs.haskell.lib.addBuildTools drv (with pkgs.haskellPackages;
           [ cabal-install

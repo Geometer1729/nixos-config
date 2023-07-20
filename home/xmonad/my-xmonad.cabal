@@ -6,6 +6,7 @@ executable my-xmonad
   main-is:          Main.hs
   build-depends:
     , my-xmonad
+    , extra
     , base
     , xmonad
     , xmonad-contrib
@@ -17,9 +18,11 @@ executable my-xmonad
   default-language: Haskell2010
 
 library
-  hs-source-dirs:  lib
+  hs-source-dirs:
+    , lib
+    , ./.
   exposed-modules:
-    MyMain
+    Config
     Modes
   build-depends:
     , extra

@@ -20,7 +20,7 @@
   xsession.windowManager.xmonad =
     { enable = true;
       enableContribAndExtras = true;
-      config = ./my-xmonad/Main.hs;
+      config = ./Main.hs;
       extraPackages = haskellPackages : with haskellPackages ;
         [ my-xmonad
           extra

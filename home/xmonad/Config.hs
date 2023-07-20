@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-} -- Annoying for the layout type
-module MyMain (main) where
+module Config (main) where
 
 --import XMonad.Actions.Commands
 --import XMonad.Actions.FloatKeys
