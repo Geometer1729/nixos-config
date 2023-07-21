@@ -28,6 +28,8 @@
           killall
           xclip
           du-dust # disk usage tool
+          nix-du # makes a graph of the nix store dependencies
+          graphviz # renders graphs (like the nix-du ones)
 
           # dev tools
           tmate
@@ -35,7 +37,9 @@
           ripgrep
           wget
           direnv
-          nix-direnv
+          #nix-direnv
+          # seems to cause issues with gcroots
+
           expect # provides unbuffer
           nil # nix lsp
           rnix-lsp
@@ -76,6 +80,7 @@
           #misc
           pulsemixer
           feh #sets background
+          sxiv # simple x image viewer
           playerctl # play pause controls
           zathura # pdf reader
           imagemagick

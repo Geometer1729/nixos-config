@@ -75,6 +75,8 @@
     };
     gc = {
       automatic = true;
+      options="--delete-older-than 21d";
+      # cleans up old home-manager genrations
       dates = "daily";
     };
   };

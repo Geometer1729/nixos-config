@@ -70,6 +70,7 @@
           zathura="zathura_";
           rm="rm_";
           cd="cd_";
+          nix-du="\\nix-du  -s=500mb | dot -Tpng > /tmp/store.png && sxiv /tmp/store.png";
         } //
         ( # always sudo
           builtins.listToAttrs
