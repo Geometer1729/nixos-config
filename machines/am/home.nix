@@ -1,4 +1,4 @@
-{ config, pkgs, lib, userName, ... }:
+{ userName, ... }:
 {
     programs.ssh = {
       enable = true;
@@ -6,6 +6,11 @@
         raptor = {
           hostname = "10.0.0.29";
           user = userName;
+          identityFile = "~/.ssh/id_ed25519";
+        };
+        am = {
+          hostname = "localhost";
+          #user = userName;
           identityFile = "~/.ssh/id_ed25519";
         };
         tub = {

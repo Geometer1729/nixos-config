@@ -8,6 +8,11 @@
           user = userName;
           identityFile = "~/.ssh/id_ed25519";
         };
+        raptor = {
+          hostname = "localhost";
+          user = userName;
+          identityFile = "~/.ssh/id_ed25519";
+        };
       };
     };
     home.packages = with pkgs;

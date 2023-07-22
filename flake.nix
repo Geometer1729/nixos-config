@@ -6,25 +6,62 @@
         url = "github:nix-community/home-manager";
         inputs.nixpkgs.follows = "nixpkgs";
       };
+      deploy-rs = {
+        url = "github:serokell/deploy-rs";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
       secrets.url = "path:/etc/nixos/secrets" ;
     };
 
-  outputs = { self, nixpkgs, home-manager, secrets }:
+  outputs = { self, nixpkgs, home-manager, deploy-rs, secrets }:
     let
       userName = "bbrian";
-      specialArgs = {inherit userName secrets;};
-      homeModules = [ ./home ];
-      nixModules = [ ./nix ];
       system = "x86_64-linux";
-      stateVersion = "22.05";
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
-      lib = nixpkgs.lib;
+      machines =
+        { am = {
+            #TODO this could probably be automatic
+            nixModules = [ ./machines/am ];
+            homeModules = [ ./machines/am/home.nix ];
+            isLaptop = false;
+          };
+          raptor = {
+            nixModules = [ ./machines/raptor ];
+            homeModules = [ ./machines/raptor/home.nix ];
+            isLaptop = true;
+          };
+        } ;
+      nixosConfigurations =
+        (import ./builder.nix)
+        { inherit userName nixpkgs home-manager secrets machines; };
+      deploy.nodes =
+        #{ am =
+        #  { hostname = "am";
+        #    profiles.am = {
+        #      user = "root";
+        #      path =
+        #      deploy-rs.lib.x86_64-linux.activate.nixos
+        #      nixosConfigurations.am ;
+        #    };
+        #  };
+        #}
+        builtins.mapAttrs
+        ( name : conf :
+          { hostname = name;
+            profiles.${name} = {
+              user = "root";
+              path = deploy-rs.lib.x86_64-linux.activate.nixos conf ;
+            };
+          }
+        ) nixosConfigurations
+        ;
     in {
+      inherit nixosConfigurations deploy;
       devShell.x86_64-linux = pkgs.mkShell
-        {nativeBuildInputs = [ ];
+        {nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [
             pkgs.sumneko-lua-language-server # for nvim config stuff
             (pkgs.haskell.packages.ghc8107.ghcWithPackages
@@ -41,52 +78,5 @@
             )
           ];
         };
-      nixosConfigurations =
-        builtins.mapAttrs
-        ( hostName : ops :
-          let
-            user = {
-              imports = homeModules ++ ops.homeModules;
-              home = {inherit stateVersion;} ;
-              programs.home-manager.enable = true;
-              };
-          in
-          { nixConfig = {
-              extra-substituters = [];
-            };
-          } //
-          lib.nixosSystem
-          { specialArgs =
-              specialArgs
-              // {inherit hostName;}
-              // ops;
-            modules = nixModules ++ ops.nixModules ++
-             [ {system = {inherit stateVersion;};}
-               home-manager.nixosModules.home-manager {
-                 home-manager ={
-                   extraSpecialArgs = specialArgs;
-                   useGlobalPkgs = true;
-                   useUserPackages = true;
-                   users = {
-                     root = user;
-                     ${userName} = user;
-                   };
-                 };
-               }
-             ];
-          }
-        )
-        { am = {
-            #TODO this could probably be automatic
-            nixModules = [ ./machines/am ];
-            homeModules = [ ./machines/am/home.nix ];
-            isLaptop = false;
-          };
-          raptor = {
-            nixModules = [ ./machines/raptor ];
-            homeModules = [ ./machines/raptor/home.nix ];
-            isLaptop = true;
-          };
-        } ;
     } ;
 }
