@@ -37,6 +37,7 @@
           ripgrep
           wget
           direnv
+          deploy-rs
           #nix-direnv
           # seems to cause issues with gcroots
 
