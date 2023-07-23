@@ -1,16 +1,16 @@
 {nixpkgs,home-manager,machines,userName,secrets}:
     let
-      specialArgs = {inherit userName secrets machines;};
+      commonSpecialArgs = {inherit userName secrets;};
       homeModules = [ ./home ];
       nixModules = [ ./nix ];
       stateVersion = "22.05";
       lib = nixpkgs.lib;
     in
   builtins.mapAttrs
-    ( hostName : ops :
+    ( hostName : opts :
       let
         user = {
-          imports = homeModules ++ ops.homeModules;
+          imports = homeModules ++ opts.homeModules;
           home = {inherit stateVersion;} ;
           programs.home-manager.enable = true;
           };
@@ -20,11 +20,11 @@
         };
       } //
       lib.nixosSystem
-      { specialArgs =
-          specialArgs
-          // {inherit hostName;}
-          // ops;
-        modules = nixModules ++ ops.nixModules ++
+      (
+       let specialArgs = commonSpecialArgs // {inherit hostName opts machines;};
+       in
+      { inherit specialArgs;
+        modules = nixModules ++ opts.nixModules ++
          [ {system = {inherit stateVersion;};}
            home-manager.nixosModules.home-manager {
              home-manager ={
@@ -39,4 +39,5 @@
            }
          ];
       }
+      )
     ) machines

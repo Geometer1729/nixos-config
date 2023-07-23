@@ -26,28 +26,22 @@
             #TODO this could probably be automatic
             nixModules = [ ./machines/am ];
             homeModules = [ ./machines/am/home.nix ];
-            isLaptop = false;
+            ip = "10.0.0.248";
+            builder = true;
+            wifi = false;
           };
           raptor = {
             nixModules = [ ./machines/raptor ];
             homeModules = [ ./machines/raptor/home.nix ];
-            isLaptop = true;
+            ip = "10.0.0.29";
+            builder = false;
+            wifi = true;
           };
         } ;
       nixosConfigurations =
         (import ./builder.nix)
         { inherit userName nixpkgs home-manager secrets machines; };
       deploy.nodes =
-        #{ am =
-        #  { hostname = "am";
-        #    profiles.am = {
-        #      user = "root";
-        #      path =
-        #      deploy-rs.lib.x86_64-linux.activate.nixos
-        #      nixosConfigurations.am ;
-        #    };
-        #  };
-        #}
         builtins.mapAttrs
         ( name : conf :
           { hostname = name;

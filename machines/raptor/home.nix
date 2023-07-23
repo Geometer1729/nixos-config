@@ -1,20 +1,5 @@
-{ config, pkgs, lib, userName, ... }:
+{ pkgs, ... }:
 {
-    programs.ssh = {
-      enable = true;
-      matchBlocks = {
-        am = {
-          hostname = "10.0.0.248";
-          user = userName;
-          identityFile = "~/.ssh/id_ed25519";
-        };
-        raptor = {
-          hostname = "localhost";
-          user = userName;
-          identityFile = "~/.ssh/id_ed25519";
-        };
-      };
-    };
     home.packages = with pkgs;
     [ wpa_supplicant
       wpa_supplicant_gui
