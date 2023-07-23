@@ -1,5 +1,4 @@
-{ secrets, pkgs, userName, opts, ... }:
-if !opts.wifi then {} else
+{ secrets, pkgs, ... }:
 {
   networking.wireless = {
       enable = true;

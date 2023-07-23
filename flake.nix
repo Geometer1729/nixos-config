@@ -29,6 +29,7 @@
             ip = "10.0.0.248";
             builder = true;
             wifi = false;
+            system = "x86_64-linux";
           };
           raptor = {
             nixModules = [ ./machines/raptor ];
@@ -36,6 +37,7 @@
             ip = "10.0.0.29";
             builder = false;
             wifi = true;
+            system = "x86_64-linux";
           };
         } ;
       nixosConfigurations =
