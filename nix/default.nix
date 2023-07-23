@@ -5,5 +5,6 @@
       ./main.nix
       ./xmonad.nix
       ./ssh.nix
+      ./wifi.nix
     ];
 }
