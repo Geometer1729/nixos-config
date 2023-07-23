@@ -21,25 +21,7 @@
         inherit system;
         config.allowUnfree = true;
       };
-      machines =
-        { am = {
-            #TODO this could probably be automatic
-            nixModules = [ ./machines/am ];
-            homeModules = [ ./machines/am/home.nix ];
-            ip = "10.0.0.248";
-            builder = true;
-            wifi = false;
-            system = "x86_64-linux";
-          };
-          raptor = {
-            nixModules = [ ./machines/raptor ];
-            homeModules = [ ./machines/raptor/home.nix ];
-            ip = "10.0.0.29";
-            builder = false;
-            wifi = true;
-            system = "x86_64-linux";
-          };
-        } ;
+      machines = import ./machines;
       nixosConfigurations =
         (import ./builder.nix)
         { inherit userName nixpkgs home-manager secrets machines; };
