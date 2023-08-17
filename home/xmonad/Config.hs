@@ -266,7 +266,8 @@ sp = NS "sp"
 
 forApp :: String -> NamedScratchpad
 forApp s = NS s
-  (fst myTerminal <> " -t " <> s <> " -e " <> s)
+  (fst myTerminal <> " -t " <> s <> " -e "
+    <> "tmux new-session -e " <> s <> " -A -s " <> s <> " " <> s)
   (className =? snd myTerminal <&&> title =? s)
   (doRectFloat $ W.RationalRect (1%4) (1%4) (1%2) (1%2))
 
