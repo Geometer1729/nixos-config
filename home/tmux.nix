@@ -70,6 +70,8 @@
       unbind '"'
       bind v split-window -h
 
+      bind a attach-session -c "#{pane_current_path}"
+
       set-option -g @tmux-autoreload-configs '/home/bbrian/.config/tmux/tmux.conf'
 
       #continuum settings
