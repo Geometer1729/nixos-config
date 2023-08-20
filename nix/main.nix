@@ -62,10 +62,9 @@
     # build machines for raptor
     # ssh store
     settings = {
-      substituters = [  "https://mlabs.cachix.org" ];
-      trusted-substituters = [ "https://mlabs.cachix.org" ];
-      trusted-public-keys =
-        [ "mlabs.cachix.org-1:gStKdEqNKcrlSQw5iMW6wFCj3+b+1ASpBVY2SYuNV2M=" ];
+      substituters = [ "https://cache.nixos.org" ];
+      trusted-substituters = [ "https://cache.nixos.org" ];
+      trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
       warn-dirty = false;
       #accept-flake-config = true;
       log-lines = 25;
