@@ -44,10 +44,13 @@
             hoogle # TODO actually install hoogle
             vim-j # my color scheme
             undotree
-            fugitive # :Git thing
             nvim-luaref # adds lua reference to help pages
             vim-tmux-navigator
             vim-startify
+
+            # Git
+            lazygit-nvim
+            fugitive # adds :Git
 
             # wiki
             vimwiki
@@ -73,4 +76,14 @@
 
    # basically part of vim?
    programs.taskwarrior.enable = true;
+
+   home.packages = with pkgs; [ neovim-remote ];
+
+   home.file.".config/lazygit/config.yml".text =
+     ''
+     os:
+      edit: "nvr -cc vsplit --remote-wait +'set bufhidden=wipe' {{filename}}"
+      editAtLine: "nvr -cc vsplit --remote-wait  +'{{line}}' +'set bufhidden=wipe' {{filename}}"
+      editInTerminal: false
+     '';
 }

@@ -55,3 +55,7 @@ g['airline#extensions#tabline#left_sep'] = ' '
 -- macros
 g['@p']="O<Enter>"
 g['@c']=[["zdt"P]]
+
+vim.cmd([[let $GIT_EDITOR = "nvr -cc split --remote-wait +'set bufhidden=wipe'"]])
+-- TODO figure out why this doesn't work and fix it
+-- o['$GIT_EDITOR']=[[nvr -cc split --remote-wait +'set bufhidden=wipe']]
