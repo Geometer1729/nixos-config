@@ -38,7 +38,6 @@
         source ${./viCursor.sh}
         eval "$(direnv hook zsh)"
         bindkey  clear-screen
-        [ -z $TMUX ] && exec tmux
       ''; #If this gets any more substantial it may be time for a file
       localVariables =
         { EDITOR = "vim";

@@ -16,6 +16,7 @@
     };
 
     env.TERM = "xterm-256color";
+    shell.program = "tmux";
     colors = {
       primary = {
         background = "#000000";
