@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ...}:
+{...}:
 {
   programs.xmobar =
     { enable = true;

@@ -51,6 +51,7 @@ vim.api.nvim_create_autocmd({'FileType'},
 -- airline
 g['airline#extensions#tabline#enabled'] = 1
 g['airline#extensions#tabline#left_sep'] = ' '
+o.laststatus=3
 
 -- macros
 g['@p']="O<Enter>"
