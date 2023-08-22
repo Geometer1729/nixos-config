@@ -91,6 +91,9 @@
 
       set -g default-terminal tmux-256color
       set -ag terminal-overrides ",xterm-256color:RGB"
+
+      # Fixes escape being slow in vim (when in tmux)
+      set -sg escape-time 0
       '';
   };
 }
