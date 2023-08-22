@@ -44,7 +44,6 @@
         { EDITOR = "vim";
           BROWSER="firefox";
           READER="zathura";
-          TERM="xterm-256color";
           REPORTTIME=1;
         };
       shellAliases =

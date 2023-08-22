@@ -15,6 +15,7 @@
       };
     };
 
+    env.TERM = "xterm-256color";
     colors = {
       primary = {
         background = "#000000";
