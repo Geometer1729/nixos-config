@@ -42,6 +42,7 @@
       ''; #If this gets any more substantial it may be time for a file
       localVariables =
         { EDITOR = "vim";
+          TERM="xterm-256color";
           BROWSER="firefox";
           READER="zathura";
           REPORTTIME=1;
