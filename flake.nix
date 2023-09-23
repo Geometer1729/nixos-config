@@ -22,11 +22,15 @@
         config.allowUnfree = true;
       };
       machines = import ./machines;
-      nixosConfigurations =
-        (import ./builder.nix)
-        { inherit userName nixpkgs home-manager secrets machines; };
+      inherit
+        ((import ./builder.nix)
+        { inherit userName nixpkgs home-manager secrets machines system pkgs; }
+        )
+        nixosConfigurations
+        homeConfigurations
+        ;
       deploy.nodes =
-        builtins.mapAttrs
+        (builtins.mapAttrs
         ( name : conf :
           { hostname = name;
             profiles.${name} = {
@@ -34,10 +38,10 @@
               path = deploy-rs.lib.x86_64-linux.activate.nixos conf ;
             };
           }
-        ) nixosConfigurations
+        ) nixosConfigurations)
         ;
     in {
-      inherit nixosConfigurations deploy;
+      inherit nixosConfigurations homeConfigurations deploy;
       devShell.x86_64-linux = pkgs.mkShell
         {nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [

@@ -1,11 +1,12 @@
-{nixpkgs,home-manager,machines,userName,secrets}:
-    let
-      commonSpecialArgs = {inherit userName secrets;};
-      homeModules = [ ./home ];
-      nixModules = [ ./nix ];
-      stateVersion = "22.05";
-      lib = nixpkgs.lib;
-    in
+{nixpkgs,home-manager,machines,userName,secrets,system,pkgs}:
+let
+  commonSpecialArgs = {inherit userName secrets machines;};
+  homeModules = [ ./home ];
+  nixModules = [ ./nix ];
+  stateVersion = "22.05";
+  lib = nixpkgs.lib;
+in
+{ nixosConfigurations =
   builtins.mapAttrs
     ( hostName : opts :
       let
@@ -21,7 +22,7 @@
       } //
       lib.nixosSystem
       (
-       let specialArgs = commonSpecialArgs // {inherit hostName opts machines;};
+       let specialArgs = commonSpecialArgs // {inherit hostName opts;};
        in
       { inherit specialArgs;
         modules = nixModules ++ opts.nixModules ++
@@ -40,4 +41,21 @@
          ];
       }
       )
-    ) machines
+    ) machines;
+  homeConfigurations.${userName} =
+    home-manager.lib.homeManagerConfiguration
+      { inherit pkgs ;
+        extraSpecialArgs = commonSpecialArgs //
+          { hostName = "";
+            hasWifi = false;
+          };
+        modules = homeModules ++
+          # some options seem to be required only for standalone home-manager
+          [  { home =
+              { username = userName;
+                homeDirectory = "/home/${userName}";
+                inherit stateVersion;
+              };
+          }];
+      };
+}
