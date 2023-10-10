@@ -11,6 +11,7 @@
       ./tmux.nix
       ./xmobar
       ./xmonad
+      ./zathura.nix
       ./zsh
     ];
 }

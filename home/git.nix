@@ -9,6 +9,7 @@
         push.autoSetupRemote=true;
         merge.conflictstyle="diff3";
         branch.autoSetupMerge=true;
+        credential.helper = "store";
       };
       signing = {
         signByDefault = true;
