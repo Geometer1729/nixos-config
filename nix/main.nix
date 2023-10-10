@@ -120,8 +120,8 @@
       steam
       steam-run
       libgdiplus
-      bumblebee
-      glxinfo
+      #bumblebee
+      #glxinfo
     ];
   };
 
