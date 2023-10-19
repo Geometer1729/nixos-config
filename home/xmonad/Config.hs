@@ -172,6 +172,7 @@ layoutBindings =
     , ((modm    , xK_bracketright  ), onNextNeighbour def W.view)
     , ((modShift, xK_bracketright  ), onNextNeighbour def W.shift)
     , ((noMask  , xK_Print         ), spawn "flameshot gui -c")
+    --, ((noMask  , xK_Caps_Lock     ), spawn "echo hi | dmenu")
     ] ++
     [ ((mask,key),action dir False)
     | (mask,action) <- [(modm,windowGo),(modShift,windowSwap)]

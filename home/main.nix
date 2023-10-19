@@ -84,6 +84,7 @@
           calcurse # calandar
           xmonadctl # xmonad server mode control
           ranger # tui file browser
+          xdotool
         ];
     };
 
