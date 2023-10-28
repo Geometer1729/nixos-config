@@ -53,7 +53,7 @@ grabKeys = do
       Nothing -> return ()
       Just boundKeys -> do
           -- This block is a modification of grabKeys from Main.hs in xmonad
-          -- it instead grabs onl the keys bound in the current mode
+          -- it instead grabs only the keys bound in the current mode
           XConf{display = dpy,theRoot = rootw} <- ask
           let grab kc m = io $ grabKey dpy kc m rootw True grabModeAsync grabModeAsync
           let (minCode, maxCode) = displayKeycodes dpy

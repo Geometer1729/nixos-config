@@ -1,24 +1,6 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-} -- Annoying for the layout type
 module Config (main) where
 
---import XMonad.Actions.Commands
---import XMonad.Actions.FloatKeys
---import XMonad.Actions.Search
---import XMonad.Actions.WindowBringer
---import XMonad.Actions.WindowGo
---import XMonad.Config.Prime (runQuery)
---import XMonad.Hooks.PositionStoreHooks
---import XMonad.Layout.Decoration
---import XMonad.Layout.IndependentScreens
---import XMonad.Layout.LayoutModifier
---import XMonad.Layout.MultiToggle
---import XMonad.Layout.SimpleDecoration
---import XMonad.Layout.ThreeColumns
---import XMonad.Prompt.Window
---import XMonad.Util.Dmenu
---import XMonad.Util.Dzen
---import XMonad.Util.NamedWindows (getName)
---import XMonad.Layout.Gaps
 import XMonad
 import XMonad.Actions.GridSelect
 import XMonad.Actions.Navigation2D
@@ -53,6 +35,7 @@ import Control.Monad.Extra (unless)
 import XMonad.Hooks.ServerMode (serverModeEventHook', serverModeEventHook, serverModeEventHookF)
 import System.Environment (setEnv)
 import Data.Char (toLower)
+import XMonad.Actions.WorkspaceCursors (getFocus)
 
 main :: IO ()
 main = do
@@ -172,7 +155,6 @@ layoutBindings =
     , ((modm    , xK_bracketright  ), onNextNeighbour def W.view)
     , ((modShift, xK_bracketright  ), onNextNeighbour def W.shift)
     , ((noMask  , xK_Print         ), spawn "flameshot gui -c")
-    --, ((noMask  , xK_Caps_Lock     ), spawn "echo hi | dmenu")
     ] ++
     [ ((mask,key),action dir False)
     | (mask,action) <- [(modm,windowGo),(modShift,windowSwap)]
