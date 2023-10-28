@@ -1,8 +1,8 @@
 {
   nixModules = [ ./hardware.nix ];
   homeModules = [ ];
-  ip = "10.0.0.248";
+  ip = "192.168.1.147";
   builder = true;
-  wifi = false;
+  wifi = true;
   system = "x86_64-linux";
 }
