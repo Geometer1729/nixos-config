@@ -46,7 +46,7 @@
         {nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [
             pkgs.sumneko-lua-language-server # for nvim config stuff
-            (pkgs.haskell.packages.ghc8107.ghcWithPackages
+            (pkgs.haskell.packages.ghc943.ghcWithPackages
               (pkgs : with pkgs;
                 # TODO this is repeated
                 [ mtl
