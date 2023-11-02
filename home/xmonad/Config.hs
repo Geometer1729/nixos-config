@@ -14,7 +14,7 @@ import XMonad.Hooks.Minimize
 import XMonad.Layout.BinarySpacePartition
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SubLayouts
-import XMonad.Util.NamedScratchpad
+import NamedScratchpad
 import XMonad.Util.Run
 import XMonad.Util.PureX
 import XMonad.Layout.Fullscreen
@@ -55,7 +55,8 @@ main = do
       ,handleEventHook= handleEventHook def <> modeHook
         <> serverModeEventHook'
          (pure
-           [ ("scratchpad action sp" , namedScratchpadAction spconf "sp")
+           [ ("scratchpad action sp"
+              ,namedScratchpadAction spconf (Set False) "sp")
            ]
          )
       ,startupHook = myStartupHook <> modeStartHook
@@ -201,10 +202,10 @@ mediaKeys =
 
 scratchPads :: Bindings
 scratchPads =
-    [ ((modm,xK_n),namedScratchpadAction spconf "sp")
-    , ((modm,xK_m),namedScratchpadAction spconf "ghci")
-    , ((modm,xK_v),namedScratchpadAction spconf "vim")
-    , ((modm,xK_c),namedScratchpadAction spconf "calcurse")
+    [ ((modm,xK_n),namedScratchpadAction spconf Toggle "sp" )
+    , ((modm,xK_m),namedScratchpadAction spconf Toggle "ghci" )
+    , ((modm,xK_v),namedScratchpadAction spconf Toggle "vim" )
+    , ((modm,xK_c),namedScratchpadAction spconf Toggle "calcurse")
     ]
 
 toggleMute :: X()
@@ -220,8 +221,6 @@ toggleFloat = withFocused
           (W.RationalRect (1 % 4) (1 % 4) (1 % 2) (1 % 2))
   )
 
--- TODO It's probably best to just fork the scratchpad library
--- and add non-toggle focus and hide actions
 rebuild :: X ()
 rebuild = withFocused $ \windowId -> do
   floats <- gets (W.floating . windowset)
@@ -230,7 +229,7 @@ rebuild = withFocused $ \windowId -> do
       $ \attrs -> do
         -- TODO get from spconf
         isSp <- runQuery (className =? snd myTerminal <&&> title =? "sp") windowId
-        unless isSp $ namedScratchpadAction spconf "sp"
+        namedScratchpadAction spconf (Set True) "sp"
         liftIO $ setEnv "HIDE_SP_AFTER_REBUILD" (toLower <$> show (not isSp))
         spawn "tmuxRebuild"
 

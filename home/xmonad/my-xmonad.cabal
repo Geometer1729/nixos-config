@@ -24,6 +24,7 @@ library
   exposed-modules:
     Config
     Modes
+    NamedScratchpad
   build-depends:
     , extra
     , base

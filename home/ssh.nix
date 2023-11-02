@@ -8,6 +8,11 @@
           user = userName;
           identityFile = "~/.ssh/id_ed25519";
         };
+        vesta = {
+          hostname = "192.168.1.41";
+          user = "vesta";
+          identityFile = "~/.ssh/id_ed25519";
+        };
       }
       //
       ( builtins.mapAttrs
