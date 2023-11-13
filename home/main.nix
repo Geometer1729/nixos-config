@@ -85,6 +85,8 @@
           xmonadctl # xmonad server mode control
           ranger # tui file browser
           xdotool
+          arp-scan # network scaner
+          cloc # count lines of code
         ];
     };
 
