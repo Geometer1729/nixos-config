@@ -27,9 +27,8 @@
        , overrideRedirect = True
        , sepChar = "%"
        , alignSep = "}{"
-			 -- %battery% for battery
        , template = " %cpu% | %memory% | %multicoretemp% | %UnsafeStdinReader% }\
-                 \{ ${ when opts.wifi "%wlp3s0wi% | "} ${ when opts.battery "%battery% | "} %alsa:default:Master%| %date% "
+                 \{ ${when opts.wifi.enable ("%" + opts.wifi.interface + "wi% | ")} ${ when opts.battery "%battery% | "} %alsa:default:Master%| %date% "
        , commands =
           [ Run UnsafeStdinReader
           , Run Cpu ["-L","5","-H","70",
@@ -56,10 +55,11 @@
                             , "-i"	, "<fc=#006000>Charged</fc>"
                   ] 50
           , Run Alsa "default" "Master" ["--template", "<volume>% <status>"]
-          , Run Wireless "wlp3s0" [] 10
+          ${when opts.wifi.enable (", Run Wireless \"" +  opts.wifi.interface + "\" [] 10")}
           ]
 	    }
       '';
 
     };
+
 }

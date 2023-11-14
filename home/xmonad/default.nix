@@ -14,7 +14,10 @@
       then {}
       # don't restart xmonad while root
       # it fails because root has no xsession
-      else { ".xmonad/xmonad-x86_64-linux".onChange = "xmonad --restart"; }
+      else {
+        ".xmonad/xmonad-x86_64-linux".onChange = "xmonad --restart";
+        # TODO find the xmobar config and restart on that too
+      }
     );
 
   xsession.windowManager.xmonad =

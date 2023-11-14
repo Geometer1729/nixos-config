@@ -6,7 +6,7 @@
       ./xmonad.nix
       ./ssh.nix
     ]
-    ++ (if opts.wifi then [ ./wifi.nix ] else [])
+    ++ (if opts.wifi.enable then [ ./wifi.nix ] else [])
     ++ (if opts.builder then [ ./builder.nix ] else [ ./useBuilders.nix ])
     ;
 }

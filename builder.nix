@@ -47,7 +47,7 @@ in
       { inherit pkgs ;
         extraSpecialArgs = commonSpecialArgs //
           { hostName = "";
-            hasWifi = false;
+            wifi.enable = false;
           };
         modules = homeModules ++
           # some options seem to be required only for standalone home-manager
