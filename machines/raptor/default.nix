@@ -1,5 +1,8 @@
 {
-  nixModules = [ ./hardware.nix ];
+  nixModules =
+    [ ./hardware.nix
+      ./home-assistant
+    ];
   homeModules = [ ];
   ip = "192.168.1.109";
   builder = false;

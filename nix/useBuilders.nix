@@ -2,7 +2,7 @@
 {
   nix = {
     settings = {
-      max-jobs = 0;
+      max-jobs = 4;
       builders-use-substitutes = true;
     };
     distributedBuilds = true;
