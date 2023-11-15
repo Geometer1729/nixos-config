@@ -1,5 +1,8 @@
 {
-  nixModules = [ ./hardware.nix ];
+  nixModules =
+    [ ./hardware.nix
+      ./hosting.nix
+    ];
   homeModules = [ ];
   ip = "192.168.1.176";
   builder = true;
