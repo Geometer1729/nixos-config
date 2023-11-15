@@ -1,7 +1,7 @@
 {
   nixModules =
     [ ./hardware.nix
-      ./home-assistant
+      ./home-assistant.nix
     ];
   homeModules = [ ];
   ip = "192.168.1.109";

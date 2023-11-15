@@ -28,7 +28,7 @@
        , sepChar = "%"
        , alignSep = "}{"
        , template = " %cpu% | %memory% | %multicoretemp% | %UnsafeStdinReader% }\
-                 \{ ${when opts.wifi.enable ("%" + opts.wifi.interface + "wi% | ")} ${ when opts.battery "%battery% | "} %alsa:default:Master%| %date% "
+                 \{ ${when opts.wifi.enable (" %" + opts.wifi.interface + "wi% |")} ${ when opts.battery " %battery% |"} %alsa:default:Master%| %date% "
        , commands =
           [ Run UnsafeStdinReader
           , Run Cpu ["-L","5","-H","70",
