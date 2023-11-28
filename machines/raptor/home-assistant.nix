@@ -31,23 +31,57 @@
       # Example configuration.yaml entry
       sensor = {
         platform = "arest";
-        resource = "http://192.168.1.176:8080/arest";
+        resource = "http://192.168.1.131:8080/arest";
         name = "Vesta";
         monitored_variables = {
-          var_0 = {};
-          var_1 = {};
-          var_2 = {};
-          var_3 = {};
+          Basement_Temp = {};
+          Main_Floor_Temp = {};
+          Tank_kbtu = {};
+          Top_Floor_Nominal = {};
         };
       };
       rest_command = {
-        post_var_0 = {
-          url = "http://192.168.1.176:8080/value_by_name/var_0";
+        post_top_floor_nominal = {
+          url = "http://192.168.1.131:8080/value_by_name/Top_Floor_Nominal";
           method = "PUT";
-          payload = ''{"value": "{{ states('input_number.test_input') | float }}" }'';
+          payload = ''{"value": "{{ states('input_number.top_floor_nominal') | float }}" }'';
           content_type= "application/json";
         };
       };
+      input_number = {
+        top_floor_nominal = {
+          name = "top floor nominal";
+          initial = 70;
+          min = 40;
+          max = 85;
+          step = 1;
+        };
+      };
+      automation =
+      [
+      {
+        name = "top_floor_nominal set";
+        trigger = {
+          platform = "state";
+          entity_id = "input_number.top_floor_nominal";
+        };
+        action = {
+          service = "rest_command.post_top_floor_nominal";
+        };
+      }
+      {
+        name = "top_floor_nominal get";
+        trigger = {
+          platform = "state";
+          entity_id = "sensor.vesta_top_floor_nominal";
+        };
+        action = {
+          service = "input_number.set_value";
+          target.entity_id = "input_number.top_floor_nominal";
+          data.value = "{{ states('sensor.vesta_top_floor_nominal') | float}}";
+        };
+      }
+      ];
     };
   };
 

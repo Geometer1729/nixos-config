@@ -87,6 +87,7 @@
           xdotool
           arp-scan # network scaner
           cloc # count lines of code
+          okteta # hex editor
         ];
     };
 

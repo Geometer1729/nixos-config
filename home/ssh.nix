@@ -13,6 +13,11 @@
           user = "vesta";
           identityFile = "~/.ssh/id_ed25519";
         };
+        bbb = {
+          hostname = "192.168.1.131";
+          user = "vesta";
+          identityFile = "~/.ssh/id_ed25519";
+        };
       }
       //
       ( builtins.mapAttrs
