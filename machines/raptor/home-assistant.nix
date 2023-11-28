@@ -19,26 +19,27 @@
       # Includes dependencies for a basic setup
       # https://www.home-assistant.io/integrations/default_config/
       default_config = {};
-      input_number = {
-        test_input = {
-          name = "Test input name";
-          min = 0;
-          max = 10;
-          step = 1;
-          icon = "mdi:target";
-        };
-      };
-      # Example configuration.yaml entry
-      sensor = {
-        platform = "arest";
-        resource = "http://192.168.1.131:8080/arest";
-        name = "Vesta";
-        monitored_variables = {
-          Basement_Temp = {};
-          Main_Floor_Temp = {};
-          Tank_kbtu = {};
-          Top_Floor_Nominal = {};
-        };
+      rest = {
+        resource = "http://192.168.1.131:8080/rest";
+        scan_interval = 10;
+        sensor = [
+        { name = "Basement_Temp";
+          value_template = "{{ value_json.Basement_Temp }}";
+          force_update = true;
+        }
+        { name = "Main_Floor_Temp";
+          value_template = "{{ value_json.Main_Floor_Temp }}";
+          force_update = true;
+        }
+        { name = "Tank_kbtu";
+          value_template = "{{ value_json.Tank_kbtu }}";
+          force_update = true;
+        }
+        { name = "Top_Floor_Nominal";
+          value_template = "{{ value_json.Top_Floor_Nominal }}";
+          force_update = true;
+        }
+        ];
       };
       rest_command = {
         post_top_floor_nominal = {
@@ -60,7 +61,7 @@
       automation =
       [
       {
-        name = "top_floor_nominal set";
+        #name = "top_floor_nominal_set";
         trigger = {
           platform = "state";
           entity_id = "input_number.top_floor_nominal";
@@ -70,15 +71,15 @@
         };
       }
       {
-        name = "top_floor_nominal get";
+        #name = "top_floor_nominal_get";
         trigger = {
           platform = "state";
-          entity_id = "sensor.vesta_top_floor_nominal";
+          entity_id = "sensor.top_floor_nominal";
         };
         action = {
           service = "input_number.set_value";
           target.entity_id = "input_number.top_floor_nominal";
-          data.value = "{{ states('sensor.vesta_top_floor_nominal') | float}}";
+          data.value = "{{ states('sensor.top_floor_nominal') | float}}";
         };
       }
       ];
