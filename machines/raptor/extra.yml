@@ -1,0 +1,64 @@
+default_config: {}
+automation:
+  - alias: Ping when flue is hot
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.flue_hot
+      above: 0
+    action:
+      service: notify.notify
+      target: {}
+      data:
+        message: FLUE HOT
+        title: FLUE HOT
+  - alias: Ping when fire low
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.combustion_temp
+      below : 800
+      above : 300 # TODO ideally don't ping when first starting though
+      for:
+        minutes : 10
+    action :
+      service: notify.notify
+      target: {}
+      data :
+        message: You may want to add more wood
+        title: Fire bellow 800
+  - alias: Ping when tank cooling
+    trigger :
+      platform: numeric_state
+      entity_id: sensor.tank_kbtu
+      below : 100
+      for:
+        hours : 1
+    action:
+      service: notify.notify
+      target: {}
+      data :
+        message: Tank is cooling
+        title: You may want to start a fire soon
+  - alias: Ping when tank cold
+    trigger :
+      platform: numeric_state
+      entity_id: sensor.tank_kbtu
+      below : 0
+      for:
+        hours : 1
+    action :
+      service: notify.notify
+      target: {}
+      data :
+        message: Tank is cold
+        title: You probably want to start a fire soon
+  - alias: Ping when buzzer
+    trigger :
+      platform: numeric_state
+      entity_id: sensor.buzzer
+      above : 0
+    action :
+      service: notify.notify
+      target: {}
+      data :
+        message: Vesta alarm
+        title: The vesta triggered the buzzer

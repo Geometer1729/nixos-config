@@ -1,89 +1,85 @@
-{...}:
+{lib,pkgs,...}:
+let
+recursiveMerge = with lib; attrList:
+  let f = attrPath:
+    lib.zipAttrsWith (n: values:
+      if tail values == []
+        then head values
+      else if all isList values
+        then unique (concatLists values)
+      else if all isAttrs values
+        then f (attrPath ++ [n]) values
+      else last values
+    );
+  in f [] attrList;
+importYaml = file: builtins.fromJSON
+  (builtins.readFile
+    (pkgs.runCommandNoCC "converted-yaml.json" {}
+     ''${pkgs.yj}/bin/yj < "${file}" > "$out"''
+    ));
+in
 {
   services.home-assistant = {
     enable = true;
     extraComponents = [
-      # Components required to complete the onboarding
-      "esphome"
       "met"
-      "radio_browser"
-      "arest"
       "rest"
+      "calendar"
+      "local_calendar"
+      "time_date"
+      "radio_browser"
     ];
+    customLovelaceModules =
+      [ (import ./stack-in-card.nix {inherit lib pkgs;})
+        pkgs.home-assistant-custom-lovelace-modules.mini-media-player
+      ];
     extraPackages = python3Packages: with python3Packages; [
       gtts
     ];
     openFirewall = true;
     configWritable = true;
-    config = {
-      # Includes dependencies for a basic setup
-      # https://www.home-assistant.io/integrations/default_config/
-      default_config = {};
-      rest = {
-        resource = "http://192.168.1.131:8080/rest";
-        scan_interval = 10;
-        sensor = [
-        { name = "Basement_Temp";
-          value_template = "{{ value_json.Basement_Temp }}";
-          force_update = true;
-        }
-        { name = "Main_Floor_Temp";
-          value_template = "{{ value_json.Main_Floor_Temp }}";
-          force_update = true;
-        }
-        { name = "Tank_kbtu";
-          value_template = "{{ value_json.Tank_kbtu }}";
-          force_update = true;
-        }
-        { name = "Top_Floor_Nominal";
-          value_template = "{{ value_json.Top_Floor_Nominal }}";
-          force_update = true;
-        }
-        ];
-      };
-      rest_command = {
-        post_top_floor_nominal = {
-          url = "http://192.168.1.131:8080/value_by_name/Top_Floor_Nominal";
-          method = "PUT";
-          payload = ''{"value": "{{ states('input_number.top_floor_nominal') | float }}" }'';
-          content_type= "application/json";
-        };
-      };
-      input_number = {
-        top_floor_nominal = {
-          name = "top floor nominal";
-          initial = 70;
-          min = 40;
-          max = 85;
-          step = 1;
-        };
-      };
-      automation =
-      [
-      {
-        #name = "top_floor_nominal_set";
-        trigger = {
-          platform = "state";
-          entity_id = "input_number.top_floor_nominal";
-        };
-        action = {
-          service = "rest_command.post_top_floor_nominal";
-        };
+    #lovelaceConfig = importYaml ./lovelace.yml;
+    config = recursiveMerge [
+      (importYaml ./extra.yml)
+      { #lovelace.mode = "yaml";
       }
-      {
-        #name = "top_floor_nominal_get";
-        trigger = {
-          platform = "state";
-          entity_id = "sensor.top_floor_nominal";
-        };
-        action = {
-          service = "input_number.set_value";
-          target.entity_id = "input_number.top_floor_nominal";
-          data.value = "{{ states('sensor.top_floor_nominal') | float}}";
-        };
-      }
+      (import ./mk-hm.nix
+        {
+        #real vesta
+        vesta_addr = "http://192.168.1.41:8080";
+        #bbb
+        #vesta_addr = "http://192.168.1.131:8080";
+         readable =
+           [ "Basement_Temp"
+             "Main_Floor_Temp"
+             "Master_BR_Temp"
+             "Guest_Room_Temp"
+             "Tank_kbtu"
+             "Combustion_Temp"
+             "Buzzer"
+             "Flue_Hot"
+             #"hm_test_var"
+           ];
+         setable = [
+           { name = "Top_Floor_Nominal";
+             min = 55;
+             max = 80;
+             step = 1;
+           }
+           { name = "Main_Floor_Nominal";
+             min = 55;
+             max = 80;
+             step = 1;
+           }
+           { name = "Basement_Nominal";
+             min = 55;
+             max = 80;
+             step = 1;
+           }
+         ];
+         inherit lib;
+        })
       ];
-    };
   };
 
 }

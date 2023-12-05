@@ -38,4 +38,9 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   # Not sure why but am needs this and it breaks raptor
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+
+  # doesn't fix wifi driver issue
+  # https://github.com/morrownr/7612u/issues/19
+  # boot.kernelPackages = pkgs.linuxPackages_5_10;
 }
