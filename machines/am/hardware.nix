@@ -39,17 +39,4 @@
   # Not sure why but am needs this and it breaks raptor
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-
-  # seems to fix wifi driver issue
-  # https://github.com/morrownr/7612u/issues/19
-  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
-      argsOverride = rec {
-        src = pkgs.fetchurl {
-              url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-              sha256 = "sha256-rSydEvw24t3keWo+7I9N3KLieAmPTlVbbm9fA+9pZM4=";
-        };
-        version = "6.1.61";
-        modDirVersion = version;
-        };
-    });
 }
