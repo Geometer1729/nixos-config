@@ -1,7 +1,7 @@
 { lib, vesta_addr , setable , readable } :
 {
   rest = {
-    resource = vesta_addr + "/rest";
+    resource = vesta_addr + "/all";
     scan_interval = 10;
     sensor =
     builtins.map
@@ -19,7 +19,7 @@
      ({name,...}:
       {name = "post_" + lib.toLower name;
        value =
-        { url = vesta_addr + "/value_by_name/" + name;
+        { url = vesta_addr + "/variables/" + name;
           method = "PUT";
           payload = ''{"value":"{{ states('input_number.${name}') | float }}"}'';
           content_type= "application/json";

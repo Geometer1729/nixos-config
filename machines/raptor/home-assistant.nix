@@ -58,6 +58,38 @@ in
              "Combustion_Temp"
              "Buzzer"
              "Flue_Hot"
+             "Flue_Temp"
+             "Zone_Return_Temp"
+             "Wood_Out_Temp"
+             "Wood_In_Temp"
+             "DHW"
+             "Tank_Circ"
+             "Wood_Boiler_Recirc"
+             "Wood_Recirc_Enabled"
+             "DHW_Zone_Valve"
+             "Tank_Zone_Valve"
+             "Preheat_Timer"
+             "Phase_I_Timer"
+             "Phase_II_Timer"
+             "Phase_III_Timer"
+             "Burn_Out_Timer"
+             "Combustion_Warm"
+             "Fire_Near_Target"
+             "Flue_Warm"
+             "Wood_Boiler_Active"
+             "Wood_Boiler_Warm"
+             "Wood_Boiler_Hot"
+             "Wood_Boiler_Too_Hot"
+             "Wood_Boiler_Scavenge"
+             "Cool_Return"
+             "Top_Floor_ZV"
+             "Main_Floor_ZV"
+             "Basement_ZV"
+             "Tank_Bottom_Temp"
+             "Tank_Middle_Temp"
+             "Tank_Top_Temp"
+             "Zone_Inhibit"
+             "Wood_Boiler_Circ"
              #"hm_test_var"
            ];
          setable = [
@@ -74,6 +106,11 @@ in
            { name = "Basement_Nominal";
              min = 55;
              max = 80;
+             step = 1;
+           }
+           { name = "Wood_Boiler_Fan";
+             min = 0;
+             max = 100;
              step = 1;
            }
          ];
