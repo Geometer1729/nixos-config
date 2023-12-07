@@ -18,6 +18,7 @@
           # apps
           discord
           firefox
+          brave
           spotify
           signal-desktop
 
