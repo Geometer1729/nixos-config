@@ -42,7 +42,7 @@
           expect # provides unbuffer
           nil # nix lsp
           rnix-lsp
-          (haskell.packages.ghc943.ghcWithPackages
+          (haskell.packages.ghc94.ghcWithPackages
             (pkgs : with pkgs;
               [ flow
                 mtl
