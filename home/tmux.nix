@@ -70,7 +70,7 @@
       unbind '"'
       bind v split-window -h
 
-      bind a attach-session -c "#{pane_current_path}"
+      bind a attach-session -c "#{pane_current_path}" \; rename-session "#{pane_current_path}" \; new-window
 
       set-option -g @tmux-autoreload-configs '/home/bbrian/.config/tmux/tmux.conf'
 
