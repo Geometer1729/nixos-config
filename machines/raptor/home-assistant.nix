@@ -19,6 +19,11 @@ importYaml = file: builtins.fromJSON
     ));
 in
 {
+  # openssl-1.1 is in EOL but
+  # ha still needs it
+  nixpkgs.config.permittedInsecurePackages = [
+    "openssl-1.1.1w"
+  ];
   services.home-assistant = {
     enable = true;
     extraComponents = [
@@ -111,6 +116,11 @@ in
            { name = "Wood_Boiler_Fan";
              min = 0;
              max = 100;
+             step = 1;
+           }
+           { name = "Fossil_Setback";
+             min = 0;
+             max = 20;
              step = 1;
            }
          ];

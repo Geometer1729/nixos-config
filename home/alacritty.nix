@@ -6,7 +6,6 @@
       #normal.family = "xft:Fira Mono";
       size = 12;
     };
-    draw_bold_text_with_bright_colors = true;
     window = {
       opacity=0.9;
       padding ={
@@ -18,6 +17,7 @@
     env.TERM = "xterm-256color";
     shell.program = "tmux";
     colors = {
+      draw_bold_text_with_bright_colors = true;
       primary = {
         background = "#000000";
       };

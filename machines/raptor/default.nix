@@ -4,7 +4,7 @@
       ./home-assistant.nix
     ];
   homeModules = [ ];
-  ip = "192.168.1.109";
+  ip = "192.168.1.106";
   builder = false;
   wifi = {
     enable = true;
