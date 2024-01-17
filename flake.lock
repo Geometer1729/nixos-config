@@ -84,8 +84,8 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1705173189,
-        "narHash": "sha256-Wh6g++r7E5OCkzylhg4yrR2Z4irxD5VA96i78i8X7ro=",
+        "lastModified": 1705514249,
+        "narHash": "sha256-AF8gusm60gRDvu+UTghzSol3oxWg2egkDyMls8eRrlk=",
         "path": "/etc/nixos/secrets",
         "type": "path"
       },

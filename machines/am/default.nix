@@ -9,7 +9,7 @@
   builder = true;
   wifi = {
     enable = true;
-    interface = "wlp2s0f0u4";
+    interface = "wlp13s0f3u2";
   };
   battery = false;
   system = "x86_64-linux";
