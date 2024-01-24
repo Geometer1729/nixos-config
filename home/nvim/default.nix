@@ -2,6 +2,7 @@
 {
   programs.neovim =
     { enable = true;
+      viAlias = true;
       vimAlias = true;
       # builtins.readFile ./lua/init.lua;
       extraConfig =

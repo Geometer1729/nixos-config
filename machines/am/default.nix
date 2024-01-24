@@ -5,7 +5,7 @@
       ./wifi.nix
     ];
   homeModules = [ ];
-  ip = "192.168.1.176";
+  ip = "192.168.1.180";
   builder = true;
   wifi = {
     enable = true;
