@@ -76,7 +76,15 @@
           builtins.listToAttrs
           ( builtins.map
             (name: {inherit name; value = "sudo ${name}";})
-            [ "dd" "systemctl" "mount" "umount" "shutdown" "nixos-rebuild" "eject" ]
+            [ "dd"
+              "systemctl"
+              "mount"
+              "umount"
+              "shutdown"
+              "nixos-rebuild"
+              "eject"
+              "arp-scan"
+            ]
           )
         );
         shellGlobalAliases = {
