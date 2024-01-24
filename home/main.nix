@@ -31,7 +31,7 @@
           du-dust # disk usage tool
           nix-du # makes a graph of the nix store dependencies
           graphviz # renders graphs (like the nix-du ones)
-          yubikey-manager
+
 
           # dev tools
           tmate
@@ -67,6 +67,7 @@
           pass
           gnupg
           pinentry
+          yubikey-manager
 
           # mouse thing
           piper
@@ -90,6 +91,7 @@
           arp-scan # network scaner
           cloc # count lines of code
           okteta # hex editor
+          zoom-us # video calls
         ];
     };
 
