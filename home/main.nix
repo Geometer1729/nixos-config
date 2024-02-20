@@ -17,6 +17,7 @@
 
           # apps
           discord
+          element-desktop # matrix client
           firefox
           brave
           spotify
