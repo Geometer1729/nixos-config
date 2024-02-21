@@ -3,7 +3,6 @@ module Config (main) where
 
 import XMonad
 import XMonad.Actions.GridSelect
-import XMonad.Actions.Navigation2D
 import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.WorkspaceNames
 import XMonad.Hooks.DynamicLog
@@ -11,13 +10,13 @@ import XMonad.Hooks.EwmhDesktops(ewmh)
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.Minimize
-import XMonad.Layout.BinarySpacePartition
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SubLayouts
 import NamedScratchpad
 import XMonad.Util.Run
 import XMonad.Util.PureX
 import XMonad.Layout.Fullscreen
+import XMonad.Actions.Navigation2D
 
 
 import Modes
@@ -36,6 +35,9 @@ import XMonad.Hooks.ServerMode (serverModeEventHook', serverModeEventHook, serve
 import System.Environment (setEnv)
 import Data.Char (toLower)
 import XMonad.Actions.WorkspaceCursors (getFocus)
+import XMonad.Layout.Grid
+import XMonad.Layout.Named (named)
+import XMonad.StackSet (RationalRect)
 
 main :: IO ()
 main = do
@@ -75,18 +77,14 @@ myTerminal = ("alacritty","Alacritty")
 
 myStartupHook :: X ()
 myStartupHook = do
+  spawn "pgrep picom || picom"
   spawn "pgrep firefox || firefox"
   spawn "pgrep Discord || discord"
-  -- spawn "~/scripts/startup"
-  --viewScreen def (P 0)
-  --windows (W.greedyView "1")
-  --viewScreen def (P 1)
-  --windows (W.greedyView "2")
 
 myLogHook :: Handle -> X ()
 myLogHook pipe = workspaceNamesPP xmobarPP {
    ppOutput = hPutStrLn pipe
-  ,ppLayout=const""
+  ,ppLayout= id -- const""
   ,ppHidden= \w->if w=="NSP"then""else w
   ,ppSep = " | "
   } >>= dynamicLogWithPP
@@ -94,26 +92,22 @@ myLogHook pipe = workspaceNamesPP xmobarPP {
 hooks :: ManageHook
 hooks = manageDocks <> composeAll
    [
-   (title <&> (`elem` ("sp":extraSps)))
-   <&&> (className =? snd myTerminal)
-   --> doRectFloat (W.RationalRect (1%4) (1%4) (1%2) (1%2))
+   ((title <&> (`elem` ("sp":extraSps)))
+    <&&> (className =? snd myTerminal))
+    <||> title =? "float"
+    --> floatCenter
    ,className =? "discord" --> doShift "21"
-   --,className =? "Steam" <&&> (title <&> isPrefix "Steam - News")
-   --       --> doCenterFloat
    ,className =? "Steam" <&&> title =? "Steam" --> do
       doShift "10"
       doSink
-   ,title =? "float" -->
-      doRectFloat (W.RationalRect (1%4) (1%4) (1%2) (1%2))
-      -- TODO factor out as floatCenter or something
    ]
 
 isPrefix :: String -> String -> Bool
 isPrefix =  fmap (fmap and) (zipWith (==))
 
 myLayout = smartBorders $
-  avoidStruts emptyBSP
-  ||| fullscreenFocus  (avoidStruts Full)
+  named "Def" (fullscreenFocus  (avoidStruts Full))
+  ||| avoidStruts Grid
   ||| fullscreenFocus  Full
 
 type Bindings = [((ButtonMask,KeySym),X())]
@@ -126,8 +120,8 @@ noMask   = 0
 hookAndKeys :: (X(),M.Map (ButtonMask,KeySym) (X ()))
 hookAndKeys = usingModes
         [("Start" ,startMode )
-        ,("resize",resize )
         ]
+-- TODO do I actually want any modes?
 
 startMode :: Bindings
 startMode = concat
@@ -136,18 +130,15 @@ startMode = concat
     , mediaKeys
     , scratchPads
     , layoutBindings
-    ] ++ [((modm , xK_r),modeSwitch "resize")]
+    ]
 
 layoutBindings :: Bindings
 layoutBindings =
     [ ((modm    , xK_q             ), kill) -- close focused window
     , ((modShift, xK_q             ), liftIO exitSuccess ) -- close xmonad
-    , ((modm    , xK_w             ), sendMessage NextLayout)
-    , ((modShift, xK_w             ), sendMessage FirstLayout)
-    , ((modm    , xK_h             ), sendMessage Shrink)
-    , ((modm    , xK_y             ), sendMessage FocusParent)
-    , ((modm    , xK_u             ), sendMessage Rotate)
-    , ((modm    , xK_i             ), sendMessage Swap)
+    , ((modm    , xK_w             ), sendMessage (JumpToLayout "Def"))
+    , ((modm    , xK_g             ), sendMessage (JumpToLayout "Grid"))
+    , ((modm    , xK_f             ), sendMessage (JumpToLayout "Full"))
     , ((modm    , xK_Tab           ), windows W.focusUp)
     , ((modShift, xK_Tab           ), windows W.focusDown)
     , ((modm    , xK_space         ), toggleFloat)
@@ -162,17 +153,9 @@ layoutBindings =
     , (key,dir) <- [(xK_h,L),(xK_j,D),(xK_k,U),(xK_l,R)]
     ]
 
-resize :: Bindings
-resize =
-    ((noMask , xK_Escape ), modeSwitch "Start"):
-    [ ((mask,key),sendMessage $ action dir)
-    | (mask,action) <- [(noMask,ExpandTowards),(shiftMask,ShrinkFrom)]
-    , (key ,dir   ) <- [(xK_h,L),(xK_j,D),(xK_k,U),(xK_l,R)]
-    ]
-
 launchBindings :: Bindings
 launchBindings =
-    [ ((modm     , xK_Return ), spawn $ fst myTerminal ) -- launch a terminal
+    [ ((modm     , xK_Return ), spawn $ fst myTerminal )
     , ((modm     , xK_d      ),
       do
         screen <- curScreenId
@@ -182,6 +165,10 @@ launchBindings =
     , ((modShift , xK_s      ), spawn "sudo zsh -c \"echo mem > /sys/power/state\"")
     -- TODO systemctl sleep or so?
     ]
+-- TODO
+-- dmenu all the machines with ssh config entries and
+-- launch a terminal sshing into one
+-- without (local) tmux
 
 workSpaces :: Bindings
 workSpaces =
@@ -217,8 +204,7 @@ toggleFloat = withFocused
       floats <- gets (W.floating . windowset)
       if windowId `M.member` floats
         then withFocused $ windows . W.sink
-        else windows $ W.float windowId
-          (W.RationalRect (1 % 4) (1 % 4) (1 % 2) (1 % 2))
+        else windows $ W.float windowId center
   )
 
 rebuild :: X ()
@@ -255,3 +241,9 @@ forApp s = NS s
 
 myWorkspaces :: [String]
 myWorkspaces = map show [1..22 :: Int]
+
+floatCenter :: ManageHook
+floatCenter = doRectFloat center
+
+center :: RationalRect
+center = W.RationalRect (1%4) (1%4) (1%2) (1%2)
