@@ -1,4 +1,4 @@
-{ pkgs, ...}:
+{ pkgs, nixpkgs, ...}:
 {
   imports = [ ./starship.nix ./direnv.nix ];
   programs.zsh =
@@ -102,4 +102,11 @@
           # TODO auto generate this with nix
         };
     };
+  programs.command-not-found.enable = true;
+  # This requires root to have an apropriate nix channel
+  # `nix-channel --add https://nixos.org/channels/nixos-unstable nixos`
+  # `nix-channel --update`
+  # I'm not sure if or how that can be controlled from the flake
+  # or what workaround might be possible
+  # https://discourse.nixos.org/t/command-not-found-unable-to-open-database/3807/3
 }
