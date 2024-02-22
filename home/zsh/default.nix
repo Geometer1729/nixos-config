@@ -1,4 +1,4 @@
-{ pkgs, nixpkgs, ...}:
+{ pkgs, ...}:
 {
   imports = [ ./starship.nix ./direnv.nix ];
   programs.zsh =
@@ -26,8 +26,6 @@
       defaultKeymap = "viins";
       profileExtra =
         ''
-        EDITOR=vim
-        # Local variable doesn't work for vim scratchpad
         if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
         then
           startx
@@ -102,11 +100,15 @@
           # TODO auto generate this with nix
         };
     };
-  programs.command-not-found.enable = true;
-  # This requires root to have an apropriate nix channel
-  # `nix-channel --add https://nixos.org/channels/nixos-unstable nixos`
-  # `nix-channel --update`
-  # I'm not sure if or how that can be controlled from the flake
-  # or what workaround might be possible
-  # https://discourse.nixos.org/t/command-not-found-unable-to-open-database/3807/3
+  home.sessionVariables = {
+    EDITOR = "vim";
+    NIX_AUTO_RUN = 1;
+
+  };
+  programs.nix-index = {
+    enable = true;
+    # AFAICT The zsh integration is less usefull
+    # than the default command-not-found
+    enableZshIntegration = false;
+  };
 }
