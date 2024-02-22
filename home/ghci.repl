@@ -4,8 +4,7 @@ import Data.Map qualified as M
 import Data.Set qualified as S
 
 import Control.Monad.State
--- import Flow
--- TODO how to I add packages?
+import Flow
 
 :set -XBlockArguments
 :set -XDataKinds
@@ -48,4 +47,6 @@ import Control.Monad.State
 :set -XUnliftedNewtypes
 :set -XViewPatterns
 
-:!clear
+:def hoogle \args -> pure $ ":!hoogle " ++ show args
+:def clear \_ -> pure ":!clear"
+:clear

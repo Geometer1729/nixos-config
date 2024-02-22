@@ -42,7 +42,7 @@
             surround # I should use this more
             direnv-vim # should make lsp restarts include direnv reloads?
             nerdtree # file browser
-            hoogle # TODO actually install hoogle
+            hoogle # adds :Hoogle
             vim-j # my color scheme
             undotree
             fugitive # :Git thing

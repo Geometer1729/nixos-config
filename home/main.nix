@@ -56,6 +56,7 @@
               ]
             )
           )
+          haskellPackages.hoogle
 
           # shell
           starship #prompt
