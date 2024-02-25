@@ -107,7 +107,7 @@ isPrefix =  fmap (fmap and) (zipWith (==))
 
 myLayout = smartBorders $
   named "Def" (fullscreenFocus  (avoidStruts Full))
-  ||| avoidStruts Grid
+  ||| named "Grid" (avoidStruts (GridRatio (8/9)))
   ||| fullscreenFocus  Full
 
 type Bindings = [((ButtonMask,KeySym),X())]
@@ -137,6 +137,7 @@ layoutBindings =
     [ ((modm    , xK_q             ), kill) -- close focused window
     , ((modShift, xK_q             ), liftIO exitSuccess ) -- close xmonad
     , ((modm    , xK_w             ), sendMessage (JumpToLayout "Def"))
+    , ((modShift, xK_w             ), sendMessage NextLayout)
     , ((modm    , xK_g             ), sendMessage (JumpToLayout "Grid"))
     , ((modm    , xK_f             ), sendMessage (JumpToLayout "Full"))
     , ((modm    , xK_Tab           ), windows W.focusUp)
