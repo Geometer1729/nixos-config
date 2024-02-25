@@ -103,7 +103,6 @@
   home.sessionVariables = {
     EDITOR = "vim";
     NIX_AUTO_RUN = 1;
-
   };
   programs.nix-index = {
     enable = true;
