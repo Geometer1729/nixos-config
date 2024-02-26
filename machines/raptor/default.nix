@@ -1,15 +1,21 @@
+{inputs}:
 {
-  nixModules =
-    [ ./hardware.nix
-      ./home-assistant.nix
+	nixModules =
+		[ ./hardware.nix
+      ./impermanence.nix
+      inputs.disko.nixosModules.default
+      inputs.impermanence.nixosModules.impermanence
+		];
+	homeModules =
+    [ ./home-impermanence.nix
+      inputs.impermanence.nixosModules.home-manager.impermanence
     ];
-  homeModules = [ ];
-  ip = "192.168.1.106";
-  builder = false;
-  wifi = {
-    enable = true;
-    interface = "wlp3s0";
-  };
-  battery = true;
-  system = "x86_64-linux";
+	ip = "192.168.1.107";
+	builder = false;
+	wifi = {
+		enable = true;
+		interface = "wlp3s0";
+	};
+	battery = true;
+	system = "x86_64-linux";
 }

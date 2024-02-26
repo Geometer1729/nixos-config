@@ -22,6 +22,26 @@
         "type": "github"
       }
     },
+    "disko": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1708564520,
+        "narHash": "sha256-juduDTYBhGN6jNfQ5RMDpbQF+MkO0pj3k7XGDSTjAbs=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "23d308f0059955e3719efc81a34d1fc0369fbb74",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "disko",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -58,6 +78,21 @@
         "type": "github"
       }
     },
+    "impermanence": {
+      "locked": {
+        "lastModified": 1706639736,
+        "narHash": "sha256-CaG4j9+UwBDfinxxvJMo6yOonSmSo0ZgnbD7aj2Put0=",
+        "owner": "nix-community",
+        "repo": "impermanence",
+        "rev": "cd13c2917eaa68e4c49fea0ff9cada45440d7045",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "impermanence",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1708296515,
@@ -77,20 +112,22 @@
     "root": {
       "inputs": {
         "deploy-rs": "deploy-rs",
+        "disko": "disko",
         "home-manager": "home-manager",
+        "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
         "secrets": "secrets"
       }
     },
     "secrets": {
       "locked": {
-        "lastModified": 1705514249,
+        "lastModified": 1708913137,
         "narHash": "sha256-AF8gusm60gRDvu+UTghzSol3oxWg2egkDyMls8eRrlk=",
-        "path": "/etc/nixos/secrets",
+        "path": "/persist/secrets",
         "type": "path"
       },
       "original": {
-        "path": "/etc/nixos/secrets",
+        "path": "/persist/secrets",
         "type": "path"
       }
     },

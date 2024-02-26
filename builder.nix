@@ -1,4 +1,4 @@
-{nixpkgs,home-manager,machines,userName,secrets,system,pkgs}:
+{nixpkgs,home-manager,machines,userName,secrets,system,pkgs,inputs}:
 let
   commonSpecialArgs = {inherit userName secrets machines;};
   homeModules = [ ./home ];

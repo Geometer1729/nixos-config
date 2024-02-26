@@ -10,10 +10,20 @@
         url = "github:serokell/deploy-rs";
         inputs.nixpkgs.follows = "nixpkgs";
       };
-      secrets.url = "path:/etc/nixos/secrets" ;
+
+	    disko = {
+	      url = "github:nix-community/disko";
+	      inputs.nixpkgs.follows = "nixpkgs";
+	    };
+
+	    impermanence = {
+	      url = "github:nix-community/impermanence";
+	    };
+
+      secrets.url = "path:/persist/secrets" ;
     };
 
-  outputs = { self, nixpkgs, home-manager, deploy-rs, secrets }:
+  outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:
     let
       userName = "bbrian";
       system = "x86_64-linux";
@@ -21,10 +31,10 @@
         inherit system;
         config.allowUnfree = true;
       };
-      machines = import ./machines;
+      machines = import ./machines {inherit inputs;} ;
       inherit
         ((import ./builder.nix)
-        { inherit userName nixpkgs home-manager secrets machines system pkgs; }
+        { inherit userName nixpkgs home-manager secrets machines system pkgs inputs; }
         )
         nixosConfigurations
         homeConfigurations
