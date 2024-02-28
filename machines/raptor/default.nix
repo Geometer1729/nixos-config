@@ -1,19 +1,11 @@
-{inputs}:
 {
 	nixModules =
 		[ ./hardware.nix
-      ./impermanence.nix
-      inputs.disko.nixosModules.default
-      inputs.impermanence.nixosModules.impermanence
 		];
-	homeModules =
-    [ ./home-impermanence.nix
-      ./firefox.nix
-      inputs.impermanence.nixosModules.home-manager.impermanence
-      inputs.nur.nixosModules.nur
-    ];
+	homeModules = [ ];
 	ip = "192.168.1.106";
 	builder = false;
+  drive = "/dev/sda";
 	wifi = {
 		enable = true;
 		interface = "wlp3s0";

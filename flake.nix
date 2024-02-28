@@ -36,7 +36,7 @@
         inherit system;
         config.allowUnfree = true;
       };
-      machines = import ./machines {inherit inputs;} ;
+      machines = import ./machines;
       inherit
         ((import ./builder.nix)
         { inherit userName nixpkgs home-manager secrets machines system pkgs inputs; }

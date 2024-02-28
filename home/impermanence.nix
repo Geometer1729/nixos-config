@@ -11,8 +11,6 @@
       ".local/share/direnv"
       ".mozilla/firefox/default/"
       ".ssh"
-      ".zsh_history"
-      ".zshrc"
       "Code"
       "Documents"
       "Pictures"
@@ -20,6 +18,9 @@
       "memes"
       "password-store"
     ];
+    files = [
+      ".zsh_history"
+      ];
     allowOther = true;
   };
   home.sessionVariables.NIXOS_CONFIG="/home/${userName}/conf/flake.nix";

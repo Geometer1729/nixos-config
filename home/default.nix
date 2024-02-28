@@ -1,4 +1,4 @@
-{...}:
+{inputs,...}:
 {
   imports =
     [ ./alacritty.nix
@@ -13,5 +13,9 @@
       ./xmonad
       ./zathura.nix
       ./zsh
+      ./firefox.nix
+      ./impermanence.nix
+      inputs.impermanence.nixosModules.home-manager.impermanence
+      inputs.nur.nixosModules.nur
     ];
 }

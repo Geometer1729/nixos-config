@@ -6,6 +6,7 @@
     ];
   homeModules = [ ];
   ip = "192.168.1.180";
+  drive = "/dev/nvme0n1";
   builder = true;
   wifi = {
     enable = true;

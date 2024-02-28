@@ -1,8 +1,5 @@
 {lib,...}:
 {
-	imports =
-		[ (import ./disko.nix { device = "/dev/sda"; })
-		];
   programs.fuse.userAllowOther = true;
 	environment.persistence."/persist/system" = {
 		hideMounts = true;
