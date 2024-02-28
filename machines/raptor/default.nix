@@ -8,9 +8,11 @@
 		];
 	homeModules =
     [ ./home-impermanence.nix
+      ./firefox.nix
       inputs.impermanence.nixosModules.home-manager.impermanence
+      inputs.nur.nixosModules.nur
     ];
-	ip = "192.168.1.107";
+	ip = "192.168.1.106";
 	builder = false;
 	wifi = {
 		enable = true;

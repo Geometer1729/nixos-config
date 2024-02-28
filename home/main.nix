@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, userName, ... }:
 {
   home =
     { packages =
@@ -18,7 +18,6 @@
           # apps
           discord
           element-desktop # matrix client
-          firefox
           brave
           spotify
           signal-desktop
@@ -129,11 +128,6 @@
 
     home.file.".ghc/ghci.conf".source = ./ghci.repl;
 
-    programs.firefox.profiles.default.settings = {
-      accessibility.typeaheadfind.enablesound=false;
-      # TODO does this work?
-    };
-
-
-  }
+    home.sessionVariables.PASSWORD_STORE_DIR="/home/${userName}/password-store";
+}
 

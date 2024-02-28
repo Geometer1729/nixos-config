@@ -19,6 +19,11 @@
 	    impermanence = {
 	      url = "github:nix-community/impermanence";
 	    };
+      nur.url = "github:nix-community/NUR";
+      firefox-addons = {
+        url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
 
       secrets.url = "path:/persist/secrets" ;
     };

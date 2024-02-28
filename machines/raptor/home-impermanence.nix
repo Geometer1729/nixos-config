@@ -1,25 +1,26 @@
-{userName,...}:
+{userName,config,...}:
 {
-  home.persistence."/persist/${userName}" = {
+  home.persistence."/persist/${config.home.username}" = {
     directories = [
-      "Documents"
-      "Code"
-      "Pictures"
-      ".gnupg"
-      ".ssh"
-      ".local/share/direnv"
-      ".local/share/Steam"
-      ".local/share/PrismLauncher"
-      "password-store"
-      "memes"
-      ".zsh_history"
-      ".hoogle"
-      ".mozila"
-      ".config/discord"
       ".config/BraveSoftware/Brave-Browser"
+      ".config/discord"
+      ".gnupg"
+      ".hoogle"
+      ".local/share/PrismLauncher"
+      ".local/share/Steam"
+      ".local/share/direnv"
+      ".mozilla/firefox/default/"
+      ".ssh"
+      ".zsh_history"
+      ".zshrc"
+      "Code"
+      "Documents"
+      "Pictures"
       "conf"
+      "memes"
+      "password-store"
     ];
     allowOther = true;
   };
-  home.sessionVariables.NIXOS_CONFIG="/home/bbrian/conf/flake.nix";
+  home.sessionVariables.NIXOS_CONFIG="/home/${userName}/conf/flake.nix";
 }

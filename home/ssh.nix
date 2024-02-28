@@ -36,6 +36,8 @@
            user = userName;
            identityFile = "/home/${userName}/.ssh/id_ed25519";
            # Using ~ makes the path wrong for root
+           proxyJump = "boiler";
+           # hopefully temporary fix to weird network issue
          }
         ) machines
       )

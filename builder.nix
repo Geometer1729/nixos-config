@@ -1,6 +1,6 @@
 {nixpkgs,home-manager,machines,userName,secrets,system,pkgs,inputs}:
 let
-  commonSpecialArgs = {inherit userName secrets machines;};
+  commonSpecialArgs = {inherit userName secrets machines inputs;};
   homeModules = [ ./home ];
   nixModules = [ ./nix ];
   stateVersion = "22.05";
