@@ -20,6 +20,7 @@
     ];
     files = [
       ".zsh_history"
+      ".config/lazygit/state.yml"
       ];
     allowOther = true;
   };

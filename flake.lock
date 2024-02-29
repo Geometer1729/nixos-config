@@ -176,8 +176,8 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1708913137,
-        "narHash": "sha256-AF8gusm60gRDvu+UTghzSol3oxWg2egkDyMls8eRrlk=",
+        "lastModified": 1709150883,
+        "narHash": "sha256-4TKbnIVjXnVpmG2iIJEsanhghjRE4VvWkIT1gSzZdmo=",
         "path": "/persist/secrets",
         "type": "path"
       },
