@@ -1,4 +1,4 @@
-{ pkgs, userName, hostName, secrets, ... }:
+{ pkgs, userName, hostName, secrets, config, ... }:
 
 {
 
@@ -54,7 +54,9 @@
       extraPackages32 = with pkgs.pkgsi686Linux; [ libva amdvlk ];
     };
   };
-
+  security.pam.loginLimits = [
+    { domain = "*"; item = "nofile"; type = "-"; value = "1048576"; }
+  ];
 
   #downloads as a tmpfs
   fileSystems."/home/${userName}/Downloads" =
