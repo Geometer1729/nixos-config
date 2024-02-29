@@ -114,8 +114,12 @@
   };
 
 
-  users.users.root.shell = pkgs.zsh;
+  users.users.root = {
+    inherit (secrets) hashedPassword;
+    shell = pkgs.zsh;
+  };
   users.users.${userName} = {
+    inherit (secrets) hashedPassword;
     isNormalUser = true;
     description = userName;
     shell = pkgs.zsh; # TODO can home-manager do this?
