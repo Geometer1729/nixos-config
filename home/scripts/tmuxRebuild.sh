@@ -1,3 +1,6 @@
+export HISTFILE=/dev/null
+# The rebuild script can break home-manager
+# by creating a new .zsh_history
 tmux kill-window -t rebuild || true
 # kill any previous failed rebuilds
 # this errors if there are no previous
