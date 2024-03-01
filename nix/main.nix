@@ -55,7 +55,7 @@
     };
   };
   security.pam.loginLimits = [
-    { domain = "*"; item = "nofile"; type = "-"; value = "1048576"; }
+    { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
   ];
 
   #downloads as a tmpfs
@@ -131,8 +131,7 @@
       steam
       steam-run
       libgdiplus
-      #bumblebee
-      #glxinfo
+      glxinfo
     ];
   };
 

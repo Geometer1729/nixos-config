@@ -53,7 +53,6 @@
 
             # wiki
             vimwiki
-            taskwiki
 
             # LSP
             nvim-lspconfig
@@ -66,13 +65,5 @@
             cmp-path
             cmp-cmdline
           ];
-        extraPython3Packages = ps : with ps;
-          [ tasklib
-            six
-            packaging
-          ];
      };
-
-   # basically part of vim?
-   programs.taskwarrior.enable = true;
 }

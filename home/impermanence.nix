@@ -1,4 +1,4 @@
-{userName,config,...}:
+{lib,config,...}:
 {
   home.persistence."/persist/${config.home.username}" = {
     directories = [
@@ -9,6 +9,7 @@
       ".local/share/PrismLauncher"
       ".local/share/Steam"
       ".local/share/direnv"
+      ".local/share/task"
       ".mozilla/firefox/default/"
       ".ssh"
       "Code"
@@ -17,6 +18,7 @@
       "conf"
       "memes"
       "password-store"
+      ".local/state/nvim/undo"
     ];
     files = [
       ".zsh_history"
@@ -24,5 +26,18 @@
       ];
     allowOther = true;
   };
-  home.sessionVariables.NIXOS_CONFIG="/home/${userName}/conf/flake.nix";
+
+  # It's fairly commony for a new
+  # .zsh_history to apear at the wrong
+  # time and break the activation
+  # so just delete it when that happens
+  home.activation.shell-hist-fix =
+    lib.hm.dag.entryBefore
+    [ "checkLinkTargets" ]
+    ''
+    if [ -e .zsh_history ]
+    then
+      rm .zsh_history
+    fi
+    '';
 }
