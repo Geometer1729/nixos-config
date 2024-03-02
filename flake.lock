@@ -162,6 +162,18 @@
         "type": "github"
       }
     },
+    "persist-retro": {
+      "locked": {
+        "lastModified": 1709337154,
+        "narHash": "sha256-A8dQmwXswWh2/rdOIXsE6xCLmvKxjlTFkRryUcT/uyE=",
+        "path": "/home/bbrian/Code/persist-retro",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/bbrian/Code/persist-retro",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "deploy-rs": "deploy-rs",
@@ -171,6 +183,7 @@
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
         "nur": "nur",
+        "persist-retro": "persist-retro",
         "secrets": "secrets"
       }
     },

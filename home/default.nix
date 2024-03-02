@@ -16,9 +16,9 @@
       ./xmonad
       ./zathura.nix
       ./zsh
-      ./persist.nix
 
       inputs.impermanence.nixosModules.home-manager.impermanence
       inputs.nur.nixosModules.nur
+      inputs.persist-retro.nixosModules.home-manager.persist-retro
     ];
 }
