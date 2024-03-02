@@ -1,7 +1,6 @@
 {
   nixModules =
     [ ./hardware.nix
-      ./hosting.nix
       ./wifi.nix
     ];
   homeModules = [ ];
