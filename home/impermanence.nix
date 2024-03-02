@@ -4,6 +4,7 @@
     directories = [
       ".config/BraveSoftware/Brave-Browser"
       ".config/discord"
+      ".config/Signal"
       ".gnupg"
       ".hoogle"
       ".local/share/PrismLauncher"

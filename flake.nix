@@ -26,7 +26,8 @@
       };
 
       secrets.url = "path:/persist/secrets" ;
-      persist-retro.url = "path:/home/bbrian/Code/persist-retro";
+      persist-retro.url = "github:Geometer1729/persist-retro";
+      #persist-retro.url = "path:/home/bbrian/Code/persist-retro";
     };
 
   outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:
