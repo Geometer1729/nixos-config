@@ -1,25 +1,38 @@
 {lib,config,...}:
 {
-  home.persistence."/persist/${config.home.username}" = {
+  home.persistence."/persist/${config.home.username}" =
+    if config.home.username == "root"
+    then
+      { directories = [
+          ".ssh"
+          ".local/state/nvim"
+          ".local/share/direnv"
+        ];
+        files = [ ".zsh_history" ];
+        allowOther = false;
+      }
+    else
+  {
     directories = [
       ".config/BraveSoftware/Brave-Browser"
-      ".config/discord"
       ".config/Signal"
+      ".config/discord"
       ".gnupg"
       ".hoogle"
       ".local/share/PrismLauncher"
       ".local/share/Steam"
       ".local/share/direnv"
       ".local/share/task"
-      ".mozilla/firefox/default/"
+      ".local/state/nvim"
+      ".mozilla/firefox/default"
       ".ssh"
+      ".tldrc"
       "Code"
       "Documents"
       "Pictures"
       "conf"
       "memes"
       "password-store"
-      ".local/state/nvim/undo"
     ];
     files = [
       ".zsh_history"
