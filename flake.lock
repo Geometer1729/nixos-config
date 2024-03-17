@@ -164,17 +164,14 @@
     },
     "persist-retro": {
       "locked": {
-        "lastModified": 1709428720,
-        "narHash": "sha256-j/EK7gaJniCKswuBB/E3UIg4sCLluLYCV7dlB4pd/r8=",
-        "owner": "Geometer1729",
-        "repo": "persist-retro",
-        "rev": "ea67b5cd0d1f46d6f3d9a43e757bfbdc9dee6640",
-        "type": "github"
+        "lastModified": 1709763046,
+        "narHash": "sha256-zo4Cw1BQciJxr3xbeN41I+w2ZKGn/jwDpl10DqJ8u+8=",
+        "path": "/home/bbrian/Code/persist-retro",
+        "type": "path"
       },
       "original": {
-        "owner": "Geometer1729",
-        "repo": "persist-retro",
-        "type": "github"
+        "path": "/home/bbrian/Code/persist-retro",
+        "type": "path"
       }
     },
     "root": {

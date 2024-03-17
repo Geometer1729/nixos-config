@@ -41,6 +41,26 @@
             }
           );
       })
+      (final: prev: {
+        # Taskopen was rewritten in nim
+        # so it's easier to start from scratch than overrideAttrs
+        # Once I know everything works I should update it in nixpkgs too
+        taskopen =
+          let
+            version = "2.0.1";
+            src = pkgs.fetchFromGitHub {
+              owner = "ValiValpas";
+              repo = "taskopen";
+              rev = "v${version}";
+              sha256 = "sha256-Gy0QS+FCpg5NGSctVspw+tNiBnBufw28PLqKxnaEV7I=";
+            };
+          in
+          pkgs.buildNimPackage
+          { name = "task-open";
+            src = "${src}/src";
+            nimbleFile = "${src}/taskopen.nimble";
+          };
+      })
     ];
 
   #steam needs this
@@ -56,6 +76,40 @@
   };
   security.pam.loginLimits = [
     { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
+  ];
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+
+    # Add any missing dynamic libraries for unpackaged programs
+
+    # here, NOT in environment.systemPackages
+    # common requirement for several games
+    stdenv.cc.cc.lib
+
+    # from https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/games/steam/fhsenv.nix#L72-L79
+    xorg.libXcomposite
+    xorg.libXtst
+    xorg.libXrandr
+    xorg.libXext
+    xorg.libX11
+    xorg.libXfixes
+    libGL
+    libva
+
+    # from https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/games/steam/fhsenv.nix#L124-L136
+    fontconfig
+    freetype
+    xorg.libXt
+    xorg.libXmu
+    libogg
+    libvorbis
+    SDL
+    SDL2_image
+    glew110
+    libdrm
+    libidn
+    tbb
+
   ];
 
   #downloads as a tmpfs

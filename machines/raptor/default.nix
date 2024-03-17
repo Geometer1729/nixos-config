@@ -3,7 +3,7 @@
 		[ ./hardware.nix
 		];
 	homeModules = [ ];
-	ip = "192.168.1.106";
+	ip = "192.168.1.107";
 	builder = false;
   drive = "/dev/sda";
 	wifi = {

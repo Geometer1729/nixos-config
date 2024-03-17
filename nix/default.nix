@@ -3,7 +3,7 @@
   imports =
     [ inputs.disko.nixosModules.default
       inputs.impermanence.nixosModules.impermanence
-      inputs.persist-retro.nixosModules.persist-retro
+      #inputs.persist-retro.nixosModules.persist-retro
       ./boot.nix
       ./main.nix
       ./xmonad.nix

@@ -64,3 +64,11 @@ map('n','<leader>d','\"_d')
 
 --vimtex
 map('n','<Leader>ll',vim.cmd.VimtexCompile)
+
+-- task link
+map('v','<Leader>t',
+  function ()
+  vim.cmd([[:'<,'>w !gen-task-link]]);
+  vim.cmd([[:r /tmp/task-link]]);
+  end
+  )

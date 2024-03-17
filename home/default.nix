@@ -10,7 +10,7 @@
       ./scripts
       ./ssh.nix
       ./sway.nix
-      ./tasks.nix
+      ./tasks
       ./tmux.nix
       ./xmobar
       ./xmonad

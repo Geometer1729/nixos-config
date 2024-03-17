@@ -4,6 +4,7 @@
     if config.home.username == "root"
     then
       { directories = [
+          # Ideally automate sharing this key with root
           ".ssh"
           ".local/state/nvim"
           ".local/share/direnv"
@@ -17,6 +18,7 @@
       ".config/BraveSoftware/Brave-Browser"
       ".config/Signal"
       ".config/discord"
+      ".config/spotify"
       ".gnupg"
       ".hoogle"
       ".local/share/PrismLauncher"
@@ -41,7 +43,7 @@
     allowOther = true;
   };
 
-  # It's fairly commony for a new
+  # It's fairly common for a new
   # .zsh_history to apear at the wrong
   # time and break the activation
   # so just delete it when that happens

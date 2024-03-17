@@ -194,6 +194,7 @@ scratchPads =
     , ((modm,xK_m),namedScratchpadAction spconf Toggle "ghci" )
     , ((modm,xK_v),namedScratchpadAction spconf Toggle "vim" )
     , ((modm,xK_c),namedScratchpadAction spconf Toggle "calcurse")
+    , ((modm,xK_b),namedScratchpadAction spconf Toggle "vit")
     ]
 
 toggleMute :: X()
@@ -224,7 +225,7 @@ spconf :: [NamedScratchpad]
 spconf = sp: (forApp <$> extraSps)
 
 extraSps :: [String]
-extraSps = ["vim","ghci","calcurse"]
+extraSps = ["vim","ghci","calcurse","vit"]
 
 sp :: NamedScratchpad
 sp = NS "sp"

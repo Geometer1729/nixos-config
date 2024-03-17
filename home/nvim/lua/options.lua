@@ -1,8 +1,9 @@
 local o = vim.o
 local g = vim.g
 
--- block global message
-o.shortmess = "I"
+-- I blocks global message
+-- W shortens write messages
+o.shortmess = "IW"
 
 vim.cmd.colorscheme('joker')
 vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
