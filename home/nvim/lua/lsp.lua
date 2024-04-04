@@ -13,6 +13,7 @@ lsp.purescriptls.setup {}
 lsp.rust_analyzer.setup {}
 lsp.tsserver.setup {} -- typescript
 lsp.nil_ls.setup {}
+lsp.ocamllsp.setup{}
 lsp.lua_ls.setup {
   settings = {
     Lua = {

@@ -43,7 +43,7 @@
 
           expect # provides unbuffer
           nil # nix lsp
-          rnix-lsp
+          #rnix-lsp unmaintained? TODO replace this I guess
           (haskell.packages.ghc94.ghcWithPackages
             (pkgs : with pkgs;
               [ flow
@@ -104,7 +104,7 @@
       };
       gpg-agent = {
         enable = true;
-        pinentryFlavor = "qt" ;
+        pinentryPackage = pkgs.pinentry-qt ;
         # TODO it'd be cool to make a wrapper
         # that tries cursses then uses qt
       };
