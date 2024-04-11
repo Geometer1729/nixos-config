@@ -16,6 +16,7 @@
       ./xmonad
       ./zathura.nix
       ./zsh
+      ./mime.nix
 
       inputs.impermanence.nixosModules.home-manager.impermanence
       inputs.nur.nixosModules.nur

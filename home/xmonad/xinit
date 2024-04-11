@@ -26,5 +26,5 @@ dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XA
 
 
 #dbus-launch breaks steam somehow?
-#exec dbus-launch ${WM:-xmonad}
-exec ${WM:-xmonad}
+#exec ${WM:-xmonad}
+exec dbus-launch ${WM:-xmonad}
