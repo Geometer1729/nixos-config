@@ -21,8 +21,12 @@
       ".config/spotify"
       ".gnupg"
       ".hoogle"
-      ".local/share/PrismLauncher"
-      ".local/share/Steam"
+      { directory = ".local/share/PrismLauncher";
+        method = "symlink";
+      }
+      { directory = ".local/share/Steam";
+        method = "symlink";
+      }
       ".local/share/direnv"
       ".local/share/task"
       ".local/state/nvim"
