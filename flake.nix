@@ -1,7 +1,8 @@
 {
   description = "Brian's nixos config";
   inputs = {
-      nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+      #nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+      nixpkgs.url = "path:/home/bbrian/Code/nixpkgs";
       home-manager = {
         url = "github:nix-community/home-manager";
         inputs.nixpkgs.follows = "nixpkgs";
@@ -26,8 +27,8 @@
       };
 
       secrets.url = "path:/persist/secrets" ;
-      #persist-retro.url = "github:Geometer1729/persist-retro";
-      persist-retro.url = "path:/home/bbrian/Code/persist-retro";
+      persist-retro.url = "github:Geometer1729/persist-retro";
+      #persist-retro.url = "path:/home/bbrian/Code/persist-retro";
     };
 
   outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:
