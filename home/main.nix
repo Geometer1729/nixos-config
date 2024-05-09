@@ -40,6 +40,7 @@
           ripgrep
           wget
           deploy-rs
+          nh # nic helper
 
           expect # provides unbuffer
           nil # nix lsp
@@ -128,6 +129,9 @@
 
     home.file.".ghc/ghci.conf".source = ./ghci.repl;
 
-    home.sessionVariables.PASSWORD_STORE_DIR="/home/${userName}/password-store";
+    home.sessionVariables = {
+      FLAKE = "/home/${userName}/conf";
+      PASSWORD_STORE_DIR="/home/${userName}/password-store";
+    };
 }
 
