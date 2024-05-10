@@ -41,7 +41,8 @@
           ripgrep
           wget
           deploy-rs
-          nh # nic helper
+          nh # nix helper
+          nixpkgs-fmt
 
           expect # provides unbuffer
           nil # nix lsp
