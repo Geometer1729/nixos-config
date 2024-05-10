@@ -6,7 +6,7 @@
         [
           # status tools
           htop
-          gotop
+          btop
           radeontop
           neofetch
 

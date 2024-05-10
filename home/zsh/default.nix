@@ -3,7 +3,7 @@
   imports = [ ./starship.nix ./direnv.nix ];
   programs.zsh =
     { enable = true;
-      enableAutosuggestions = true;
+      autosuggestion.enable = true;
       enableCompletion = true;
       syntaxHighlighting.enable = true;
       plugins = [
@@ -108,6 +108,6 @@
     enable = true;
     # AFAICT The zsh integration is less usefull
     # than the default command-not-found
-    enableZshIntegration = false;
+    enableZshIntegration = true;
   };
 }

@@ -43,6 +43,7 @@
     files = [
       ".zsh_history"
       ".config/lazygit/state.yml"
+      ".cache/nix-index/files"
       ];
     allowOther = true;
   };
