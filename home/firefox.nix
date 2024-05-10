@@ -47,11 +47,54 @@ programs.firefox =
             };
             "NixOS Wiki" = {
               urls =
-                [{ template = "https://nixos.wiki/index.php?search={searchTerms}"; }
-                ];
+                [{ template = "https://nixos.wiki/index.php";
+                   params = [  { name = "search"; value = "{searchTerms}"; } ];
+                }];
               iconUpdateURL = "https://nixos.wiki/favicon.png";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@nw" ];
+            };
+            "Homemanager Options" = {
+              urls =
+                [{ template = "https://home-manager-options.extranix.com";
+                   params = [  { name = "query"; value = "{searchTerms}"; }
+                               { name = "release"; value = "master";}
+                            ];
+                }];
+              iconUpdateURL = "https://nixos.wiki/favicon.png";
+              updateInterval = 24 * 60 * 60 * 1000;
+              definedAliases = [ "@hm" ];
+            };
+            "AoN" = {
+              urls =
+                [{ template = "https://2e.aonprd.com/Search.aspx";
+                   params = [  { name = "q"; value = "{searchTerms}"; } ];
+                }
+                ];
+              iconUpdateURL = "https://2e.aonprd.com/favicon.ico";
+              updateInterval = 24 * 60 * 60 * 1000;
+              definedAliases = [ "@an" ];
+            };
+            "Minecraft wiki" = {
+              urls =
+                [{ template = "https://minecraft.wiki/w/Special:Search";
+                   params = [  { name = "search"; value = "{searchTerms}"; } ];
+                }];
+              iconUpdateURL = "https://minecraft.wiki/favicon.ico";
+              updateInterval = 24 * 60 * 60 * 1000;
+              definedAliases = [ "@mcw" ];
+            };
+            "SMBC" = {
+              urls =
+                [{ template = "https://www.ohnorobot.com/index.php";
+                   params = [  { name = "s"; value = "{searchTerms}"; }
+                               { name = "comic"; value = "137"; }
+                               { name = "Search"; value = "Search"; }
+                            ];
+                }];
+              iconUpdateURL = "https://www.smbc-comics.com/favicon.ico";
+              updateInterval = 24 * 60 * 60 * 1000;
+              definedAliases = [ "@smbc" ];
             };
             "Google".metaData.hidden = true;
             "Bing".metaData.hidden = true;
