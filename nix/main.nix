@@ -1,4 +1,4 @@
-{ pkgs, userName, hostName, secrets, config, ... }:
+{ inputs, pkgs, userName, hostName, secrets, config, system, ... }:
 
 {
 
@@ -61,6 +61,13 @@
             nimbleFile = "${src}/taskopen.nimble";
           };
       })
+      (final: prev: {
+       discord = let
+        master = import inputs.nixpkgs-master
+          { inherit system; config.allowUnfree = true;}
+          ;
+        in master.discord;
+       })
     ];
 
   #steam needs this

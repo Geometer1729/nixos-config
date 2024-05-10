@@ -1,8 +1,9 @@
 {
   description = "Brian's nixos config";
   inputs = {
-      #nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-      nixpkgs.url = "path:/home/bbrian/Code/nixpkgs";
+      nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+      nixpkgs-master.url = "github:nixos/nixpkgs/master";
+      #nixpkgs.url = "path:/home/bbrian/Code/nixpkgs";
       home-manager = {
         url = "github:nix-community/home-manager";
         inputs.nixpkgs.follows = "nixpkgs";
