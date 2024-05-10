@@ -1,6 +1,6 @@
 { ... }:
 {
-  boot= {
+  boot = {
     tmp.cleanOnBoot = true;
     loader = {
       efi.canTouchEfiVariables = true;

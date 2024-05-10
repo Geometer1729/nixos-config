@@ -1,13 +1,15 @@
-{ pkgs, ...}:
+{ pkgs, ... }:
 {
   imports = [ ./starship.nix ./direnv.nix ];
   programs.zsh =
-    { enable = true;
+    {
+      enable = true;
       autosuggestion.enable = true;
       enableCompletion = true;
       syntaxHighlighting.enable = true;
       plugins = [
-        { # gets nix-shell to use zsh
+        {
+          # gets nix-shell to use zsh
           name = "zsh-nix-shell";
           file = "nix-shell.plugin.zsh";
           src = pkgs.fetchFromGitHub {
@@ -19,17 +21,18 @@
         }
       ];
       historySubstringSearch =
-        { enable = true;
+        {
+          enable = true;
           #searchUpKey="^K";
         };
       autocd = true;
       defaultKeymap = "viins";
       profileExtra =
         ''
-        if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
-        then
-          startx
-        fi
+          if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
+          then
+            startx
+          fi
         '';
       initExtra = ''
         source ${./helpers.sh}
@@ -38,26 +41,28 @@
         bindkey  clear-screen
       ''; #If this gets any more substantial it may be time for a file
       localVariables =
-        { EDITOR = "vim";
-          TERM="xterm-256color";
-          BROWSER="firefox";
-          READER="zathura";
-          REPORTTIME=1;
+        {
+          EDITOR = "vim";
+          TERM = "xterm-256color";
+          BROWSER = "firefox";
+          READER = "zathura";
+          REPORTTIME = 1;
         };
       shellAliases =
-        { rs="exec zsh";
-          ls="ls -hN --color=auto --group-directories-first";
-          grep="grep -E --color=auto";
-          sed="sed -E";
-          la="ls -A";
-          ll="ls -Al";
-          mv="mv -i";
-          gs="git status";
-          dr="direnv reload";
-          da="direnv allow";
-          rgi="rg -i";
-          ":q"="exit";
-          du="dust";
+        {
+          rs = "exec zsh";
+          ls = "ls -hN --color=auto --group-directories-first";
+          grep = "grep -E --color=auto";
+          sed = "sed -E";
+          la = "ls -A";
+          ll = "ls -Al";
+          mv = "mv -i";
+          gs = "git status";
+          dr = "direnv reload";
+          da = "direnv allow";
+          rgi = "rg -i";
+          ":q" = "exit";
+          du = "dust";
           v = "vim";
           g = "git";
           lg = "lazygit";
@@ -65,40 +70,41 @@
             vim -S .session.vim -c 'silent exec "!rm .session.vim"'
           '';
           # helpers
-          zathura="zathura_";
-          rm="rm_";
-          cd="cd_";
-          nix-du="\\nix-du  -s=500mb | dot -Tpng > /tmp/store.png && sxiv /tmp/store.png";
-          xclip="xclip -selection clipboard";
+          zathura = "zathura_";
+          rm = "rm_";
+          cd = "cd_";
+          nix-du = "\\nix-du  -s=500mb | dot -Tpng > /tmp/store.png && sxiv /tmp/store.png";
+          xclip = "xclip -selection clipboard";
         } //
-        ( # always sudo
+        (# always sudo
           builtins.listToAttrs
-          ( builtins.map
-            (name: {inherit name; value = "sudo ${name}";})
-            [ "dd"
-              "systemctl"
-              "mount"
-              "umount"
-              "shutdown"
-              "nixos-rebuild"
-              "eject"
-              "arp-scan"
-            ]
-          )
+            (builtins.map
+              (name: { inherit name; value = "sudo ${name}"; })
+              [
+                "dd"
+                "systemctl"
+                "mount"
+                "umount"
+                "shutdown"
+                "nixos-rebuild"
+                "eject"
+                "arp-scan"
+              ]
+            )
         );
-        shellGlobalAliases = {
-          "..."="../..";
-          "...."="../../..";
-          "....."="../../../..";
-          "......"="../../../../..";
-          "......."="../../../../../..";
-          "........"="../../../../../../..";
-          "........."="../../../../../../../..";
-          ".........."="../../../../../../../../..";
-          "..........."="../../../../../../../../../..";
-          "............"="../../../../../../../../../../..";
-          # TODO auto generate this with nix
-        };
+      shellGlobalAliases = {
+        "..." = "../..";
+        "...." = "../../..";
+        "....." = "../../../..";
+        "......" = "../../../../..";
+        "......." = "../../../../../..";
+        "........" = "../../../../../../..";
+        "........." = "../../../../../../../..";
+        ".........." = "../../../../../../../../..";
+        "..........." = "../../../../../../../../../..";
+        "............" = "../../../../../../../../../../..";
+        # TODO auto generate this with nix
+      };
     };
   home.sessionVariables = {
     EDITOR = "vim";

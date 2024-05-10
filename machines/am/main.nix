@@ -1,3 +1,4 @@
-{...}:
-{ # woo empty
+{ ... }:
+{
+  # woo empty
 }

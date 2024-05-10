@@ -3,7 +3,8 @@
   home.packages = with pkgs;
     (builtins.map
       (name: writeShellApplication
-        { name = builtins.replaceStrings [".sh"] [""] name;
+        {
+          name = builtins.replaceStrings [ ".sh" ] [ "" ] name;
           text = builtins.readFile ./${name};
         }
       )

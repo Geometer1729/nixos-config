@@ -5,8 +5,9 @@
       root = ./.;
       modifier = drv:
         pkgs.haskell.lib.addBuildTools drv (with pkgs.haskellPackages;
-          [ cabal-install
-            haskell-language-server
-          ]);
+        [
+          cabal-install
+          haskell-language-server
+        ]);
     };
 }

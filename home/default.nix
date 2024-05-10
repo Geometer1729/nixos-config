@@ -1,7 +1,8 @@
-{inputs,...}:
+{ inputs, ... }:
 {
   imports =
-    [ ./alacritty.nix
+    [
+      ./alacritty.nix
       ./firefox.nix
       ./git.nix
       ./impermanence.nix

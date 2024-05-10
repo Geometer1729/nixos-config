@@ -8,5 +8,5 @@ in
 {
   users.users.${userName}.openssh.authorizedKeys.keys = keys;
   users.users.root.openssh.authorizedKeys.keys = keys;
-  nix.sshServe.keys = if opts.builder then keys else [];
+  nix.sshServe.keys = if opts.builder then keys else [ ];
 }

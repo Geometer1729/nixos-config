@@ -1,4 +1,4 @@
-{opts,... }:
+{ opts, ... }:
 let device = opts.drive; in
 {
   disko.devices = {
@@ -49,7 +49,7 @@ let device = opts.drive; in
             size = "100%FREE";
             content = {
               type = "btrfs";
-              extraArgs = ["-f"];
+              extraArgs = [ "-f" ];
 
               subvolumes = {
                 "/root" = {
@@ -57,12 +57,12 @@ let device = opts.drive; in
                 };
 
                 "/persist" = {
-                  mountOptions = ["subvol=persist" "noatime"];
+                  mountOptions = [ "subvol=persist" "noatime" ];
                   mountpoint = "/persist";
                 };
 
                 "/nix" = {
-                  mountOptions = ["subvol=nix" "noatime"];
+                  mountOptions = [ "subvol=nix" "noatime" ];
                   mountpoint = "/nix";
                 };
               };

@@ -1,14 +1,14 @@
-{lib,...}:
+{ lib, ... }:
 {
   programs.fuse.userAllowOther = true;
-	environment.persistence."/persist/system" = {
-		hideMounts = true;
-		directories = [
-			"/var/log"
-			"/var/lib/nixos"
-			"/var/lib/systemd/coredump"
+  environment.persistence."/persist/system" = {
+    hideMounts = true;
+    directories = [
+      "/var/log"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
       "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
-		];
+    ];
     files = [
       "/etc/ssh/ssh_host_ed25519_key"
       "/etc/ssh/ssh_host_ed25519_key.pub"
@@ -16,9 +16,9 @@
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/machine-id"
     ];
-	};
+  };
 
-	fileSystems."/persist".neededForBoot = true;
+  fileSystems."/persist".neededForBoot = true;
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     mkdir /btrfs_tmp
     mount /dev/root_vg/root /btrfs_tmp

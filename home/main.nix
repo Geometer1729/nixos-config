@@ -1,7 +1,8 @@
 { pkgs, userName, ... }:
 {
   home =
-    { packages =
+    {
+      packages =
         with pkgs;
         [
           # status tools
@@ -46,14 +47,15 @@
           nil # nix lsp
           #rnix-lsp unmaintained? TODO replace this I guess
           (haskell.packages.ghc94.ghcWithPackages
-            (pkgs : with pkgs;
-              [ flow
-                mtl
-                containers
-                text
-                time
-                generics-sop
-              ]
+            (pkgs: with pkgs;
+            [
+              flow
+              mtl
+              containers
+              text
+              time
+              generics-sop
+            ]
             )
           )
           haskellPackages.hoogle
@@ -98,40 +100,43 @@
         ];
     };
 
-    services ={
-      picom ={
+  services = {
+    picom = {
+      enable = true;
+      vSync = true;
+    };
+    gpg-agent = {
+      enable = true;
+      pinentryPackage = pkgs.pinentry-qt;
+      # TODO it'd be cool to make a wrapper
+      # that tries cursses then uses qt
+    };
+    # screenshots
+    flameshot =
+      {
         enable = true;
-        vSync = true;
-      };
-      gpg-agent = {
-        enable = true;
-        pinentryPackage = pkgs.pinentry-qt ;
-        # TODO it'd be cool to make a wrapper
-        # that tries cursses then uses qt
-      };
-      # screenshots
-      flameshot =
-        { enable = true;
-          settings =
-            { General =
-                { savePath = "/home/bbrian/Downloads";
-                  showHelp = false;
-                  uiColor = "#0ce3ff";
-                  contrastOpacity = 188;
-                  buttons= # magic string from gui config editor
-                    ''
+        settings =
+          {
+            General =
+              {
+                savePath = "/home/bbrian/Downloads";
+                showHelp = false;
+                uiColor = "#0ce3ff";
+                contrastOpacity = 188;
+                buttons = # magic string from gui config editor
+                  ''
                     @Variant(\0\0\0\x7f\0\0\0\vQList<int>\0\0\0\0\v\0\0\0\0\0\0\0\x1\0\0\0\x2\0\0\0\x3\0\0\0\x4\0\0\0\x5\0\0\0\x6\0\0\0\x12\0\0\0\b\0\0\0\n\0\0\0\v)
-                    '';
-                };
-            };
-        };
-    };
+                  '';
+              };
+          };
+      };
+  };
 
-    home.file.".ghc/ghci.conf".source = ./ghci.repl;
+  home.file.".ghc/ghci.conf".source = ./ghci.repl;
 
-    home.sessionVariables = {
-      FLAKE = "/home/${userName}/conf";
-      PASSWORD_STORE_DIR="/home/${userName}/password-store";
-    };
+  home.sessionVariables = {
+    FLAKE = "/home/${userName}/conf";
+    PASSWORD_STORE_DIR = "/home/${userName}/password-store";
+  };
 }
 

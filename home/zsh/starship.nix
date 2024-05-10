@@ -1,29 +1,34 @@
-{...}:
+{ ... }:
 {
   programs.starship =
-    { enable = true;
+    {
+      enable = true;
       enableZshIntegration = true;
       settings = {
         add_newline = false;
         format =
-        "$status$username$hostname$directory$git_branch$git_status$memory_usage$time$nix_shell\n$character";
+          "$status$username$hostname$directory$git_branch$git_status$memory_usage$time$nix_shell\n$character";
         character.format = "[❯](bold green)";
-        status.disabled=false;
+        status.disabled = false;
         nix_shell =
-          { format= "[$symbol]($style) ";
-            style="bold cyan";
+          {
+            format = "[$symbol]($style) ";
+            style = "bold cyan";
           };
         directory =
-          { truncation_length = 5;
+          {
+            truncation_length = 5;
             format = "[$path]($style)[$lock_symbol]($lock_style) ";
           };
         git_branch =
-          { format = "[$symbol$branch(:$remote_branch)]($style) ";
+          {
+            format = "[$symbol$branch(:$remote_branch)]($style) ";
             style = "bold yellow";
             symbol = "🏷 ";
           };
         git_status =
-          { conflicted = "⚔️";
+          {
+            conflicted = "⚔️";
             ahead = "🏎️ 💨 \${count}";
             behind = "🐢 ×\${count}";
             diverged = "🔱 🏎️ 💨 \${ahead_count} 🐢 \${behind_count}";
@@ -39,15 +44,17 @@
           };
 
         username =
-          { style_root="bold red";
-            style_user="bold green";
-            format="[$user]($style)[@](bold white)";
-            show_always=true;
-            disabled=false;
+          {
+            style_root = "bold red";
+            style_user = "bold green";
+            format = "[$user]($style)[@](bold white)";
+            show_always = true;
+            disabled = false;
           };
 
         hostname =
-          { ssh_only = false;
+          {
+            ssh_only = false;
             format = "[$hostname]($style)[:](bold white)";
             trim_at = "-";
             style = "bold yellow";
@@ -55,15 +62,17 @@
           };
 
         memory_usage =
-          { threshold=50;
-            format="[\${ram_pct}]($style)[$symbol]($style)";
-            disabled=false;
+          {
+            threshold = 50;
+            format = "[\${ram_pct}]($style)[$symbol]($style)";
+            disabled = false;
           };
 
         time =
-          { format="[\${time}]($style)";
-            disabled=false;
+          {
+            format = "[\${time}]($style)";
+            disabled = false;
           };
+      };
     };
-  };
 }

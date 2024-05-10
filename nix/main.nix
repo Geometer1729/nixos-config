@@ -5,9 +5,9 @@
   networking = {
     inherit hostName;
     hosts =
-    {
-      "${secrets.jsh.ip}" = [ "jsh.gov" ] ;
-    };
+      {
+        "${secrets.jsh.ip}" = [ "jsh.gov" ];
+      };
   };
 
   time.timeZone = "America/New_York";
@@ -15,23 +15,26 @@
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays =
-    [ (final: prev: {
+    [
+      (final: prev: {
         dmenu = prev.dmenu.overrideAttrs
-          (old: {src = ./dmenu-4.9 ;});
+          (old: { src = ./dmenu-4.9; });
       })
       (final: prev: {
         gotop = prev.gotop.overrideAttrs
-        (old: { patches = [ ./gotop.patch ]; });
+          (old: { patches = [ ./gotop.patch ]; });
         # fix by gardockt on github
       })
       (final: prev: {
         flameshot = prev.flameshot.overrideAttrs
-          (old: let
+          (old:
+            let
               version = "11.0.0";
               # seems to fix clipboard issue
               # issue is not consistant so it's hard to bisect
             in
-            { inherit version;
+            {
+              inherit version;
               src = final.fetchFromGitHub {
                 owner = "flameshot-org";
                 repo = "flameshot";
@@ -56,31 +59,34 @@
             };
           in
           pkgs.buildNimPackage
-          { name = "task-open";
-            src = "${src}/src";
-            nimbleFile = "${src}/taskopen.nimble";
-          };
+            {
+              name = "task-open";
+              src = "${src}/src";
+              nimbleFile = "${src}/taskopen.nimble";
+            };
       })
       (final: prev: {
-       discord = let
-        master = import inputs.nixpkgs-master
-          { inherit system; config.allowUnfree = true;}
-          ;
-        in master.discord;
-       })
+        discord =
+          let
+            master = import inputs.nixpkgs-master
+              { inherit system; config.allowUnfree = true; }
+            ;
+          in
+          master.discord;
+      })
     ];
 
   #steam needs this
   hardware =
-  {
-    pulseaudio.support32Bit = true;
-    opengl = {
-      driSupport = true;
-      driSupport32Bit = true;
-      extraPackages = [ pkgs.amdvlk ];
-      extraPackages32 = with pkgs.pkgsi686Linux; [ libva amdvlk ];
+    {
+      pulseaudio.support32Bit = true;
+      opengl = {
+        driSupport = true;
+        driSupport32Bit = true;
+        extraPackages = [ pkgs.amdvlk ];
+        extraPackages32 = with pkgs.pkgsi686Linux; [ libva amdvlk ];
+      };
     };
-  };
   security.pam.loginLimits = [
     { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
   ];
@@ -121,11 +127,12 @@
 
   #downloads as a tmpfs
   fileSystems."/home/${userName}/Downloads" =
-    { device = "none";
+    {
+      device = "none";
       fsType = "tmpfs";
     };
 
-  nix={
+  nix = {
     # TODO extra platforms for am
     # build machines for raptor
     # ssh store
@@ -142,7 +149,7 @@
     };
     gc = {
       automatic = true;
-      options="--delete-older-than 21d";
+      options = "--delete-older-than 21d";
       # cleans up old home-manager genrations
       dates = "weekly";
     };
@@ -156,7 +163,7 @@
   security.sudo.wheelNeedsPassword = false;
 
   # services
-  services ={
+  services = {
     openssh = {
       enable = true;
       settings.PasswordAuthentication = false;

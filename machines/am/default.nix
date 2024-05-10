@@ -1,6 +1,7 @@
 {
   nixModules =
-    [ ./hardware.nix
+    [
+      ./hardware.nix
       # ./wifi.nix
     ];
   homeModules = [ ];

@@ -1,4 +1,4 @@
-{...}:
+{ ... }:
 {
   programs.direnv = {
     enable = true;
@@ -6,5 +6,5 @@
     nix-direnv.enable = true;
     #may cause gc issues
   };
-  home.sessionVariables.DIRENV_LOG_FORMAT="";
+  home.sessionVariables.DIRENV_LOG_FORMAT = "";
 }

@@ -1,4 +1,4 @@
-{pkgs,userName,...}:
+{ pkgs, userName, ... }:
 let
   # The wifi driver seems to crash every ~5 minutes
   # but it will often take several hours for the first crash
@@ -6,15 +6,16 @@ let
   # service periodicly when the logs indicate
   # a recent crash seems to help a lot
   wifi_fix = pkgs.writeShellApplication
-    { name = "wifi_fix";
+    {
+      name = "wifi_fix";
       text =
         ''
-        if journalctl -rb | grep wpa_supplicant | \
-         { head -n 1; cat > /dev/null; } | grep BEACON-LOSS
-        then
-          sudo systemctl restart wpa_supplicant.service
-          sudo systemctl restart dhcpcd.service
-        fi
+          if journalctl -rb | grep wpa_supplicant | \
+           { head -n 1; cat > /dev/null; } | grep BEACON-LOSS
+          then
+            sudo systemctl restart wpa_supplicant.service
+            sudo systemctl restart dhcpcd.service
+          fi
         '';
     };
 in

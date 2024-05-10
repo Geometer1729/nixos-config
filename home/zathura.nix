@@ -1,13 +1,13 @@
-{...}:
+{ ... }:
 {
   # pdf reader
-  programs.zathura= {
+  programs.zathura = {
     enable = true;
     options = {
-      recolor=true;
+      recolor = true;
       # darkmode
-      recolor-darkcolor="#dcdccc";
-      recolor-lightcolor="#1f1f1f";
+      recolor-darkcolor = "#dcdccc";
+      recolor-lightcolor = "#1f1f1f";
     };
   };
 }

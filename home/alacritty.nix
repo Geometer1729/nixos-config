@@ -1,4 +1,4 @@
-{...}:
+{ ... }:
 {
   programs.alacritty.enable = true;
   programs.alacritty.settings = {
@@ -7,8 +7,8 @@
       size = 12;
     };
     window = {
-      opacity=0.9;
-      padding ={
+      opacity = 0.9;
+      padding = {
         x = 3;
         y = 3;
       };
