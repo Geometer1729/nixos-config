@@ -42,6 +42,7 @@
           wget
           deploy-rs
           nh # nix helper
+          nom
           nixpkgs-fmt
 
           expect # provides unbuffer
