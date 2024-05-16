@@ -9,11 +9,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1711973905,
-        "narHash": "sha256-UFKME/N1pbUtn+2Aqnk+agUt8CekbpuqwzljivfIme8=",
+        "lastModified": 1715699772,
+        "narHash": "sha256-sKhqIgucN5sI/7UQgBwsonzR4fONjfMr9OcHK/vPits=",
         "owner": "serokell",
         "repo": "deploy-rs",
-        "rev": "88b3059b020da69cbe16526b8d639bd5e0b51c8b",
+        "rev": "b3ea6f333f9057b77efd9091119ba67089399ced",
         "type": "github"
       },
       "original": {
@@ -29,11 +29,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715217706,
-        "narHash": "sha256-yEB5SEHc+o3WJpUPw455OdLy9A+gffvCJX8DZ7NCkuo=",
+        "lastModified": 1715822638,
+        "narHash": "sha256-Z4ZoyK8jYRmBZwMaEZLEmAilrfdpekwwwohliqC14/E=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "8eb1b315eef89f3bdc5c9814d1b207c6d64f0046",
+        "rev": "476eef8d85aa09389ae7baf6e6b60357f6a01432",
         "type": "github"
       },
       "original": {
@@ -51,11 +51,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1715359851,
-        "narHash": "sha256-yGdBqEO6kYOYRoDj+l6DGyCYkrX7u2Zi2KulRjq4wws=",
+        "lastModified": 1715745804,
+        "narHash": "sha256-icHowawJTeJ+5m4VnSbUICosUkQsGg/TcuVNJdySGqU=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "929f7e7c87912a9b1579eac1bfd96aea37c14b18",
+        "rev": "2c3918e617647325fe41cb5324e4b4b61287b601",
         "type": "gitlab"
       },
       "original": {
@@ -103,11 +103,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715359697,
-        "narHash": "sha256-FJYyXqulIbCdsUCTFBTu/bIH4aN+7jzjQAn52Qc6qPg=",
+        "lastModified": 1715486357,
+        "narHash": "sha256-4pRuzsHZOW5W4CsXI9uhKtiJeQSUoe1d2M9mWU98HC4=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f2c5ba5e720fd584d83f2f97399dac0d26ae60b9",
+        "rev": "44677a1c96810a8e8c4ffaeaad10c842402647c1",
         "type": "github"
       },
       "original": {
@@ -133,11 +133,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1715266358,
-        "narHash": "sha256-doPgfj+7FFe9rfzWo1siAV2mVCasW+Bh8I1cToAXEE4=",
+        "lastModified": 1715534503,
+        "narHash": "sha256-5ZSVkFadZbFP1THataCaSf0JH2cAH3S29hU9rrxTEqk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f1010e0469db743d14519a1efd37e23f8513d714",
+        "rev": "2057814051972fa1453ddfb0d98badbea9b83c06",
         "type": "github"
       },
       "original": {
@@ -149,27 +149,27 @@
     },
     "nixpkgs-master": {
       "locked": {
-        "lastModified": 1715365759,
-        "narHash": "sha256-cT1aqBb3mh4IOFkFhcvLa2+GVdWEe1LDB9AhDQejbyc=",
-        "owner": "nixos",
+        "lastModified": 1715816215,
+        "narHash": "sha256-3aIoLUV/HzsLf6qh1TZz+0nek8UMxXcHzgb1VNPEen8=",
+        "owner": "r-ryantm",
         "repo": "nixpkgs",
-        "rev": "44615ede3861a0cbfd1353458ba24c073ac5b5a5",
+        "rev": "30b57e5a6514ffb6c39250208d2673043b36b597",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "master",
+        "owner": "r-ryantm",
+        "ref": "auto-update/discord",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "nur": {
       "locked": {
-        "lastModified": 1715366693,
-        "narHash": "sha256-/lWCH/zdSDUERVjH2YQc/+he9NyW2p+LkNPRrOJUWco=",
+        "lastModified": 1715825919,
+        "narHash": "sha256-llRiIBSDKThwXxW2nmEVFq1uzjlG4xLZI4hBdgghi34=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "b726f9263bd1ff38314ef4e64fbc229487914eb2",
+        "rev": "cd63dc42b54a59c422abaa9a4b07731537dbdfa9",
         "type": "github"
       },
       "original": {
@@ -209,8 +209,8 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1715798709,
-        "narHash": "sha256-e21OY0hN56gxviey5xI5GgySVkL2b16ZyJqy3axpawU=",
+        "lastModified": 1715798831,
+        "narHash": "sha256-Xi2MOl4yFgZ3s8nCzZBhYsSv+3+bDWAsfpNLdlF7QIk=",
         "path": "/persist/secrets",
         "type": "path"
       },
