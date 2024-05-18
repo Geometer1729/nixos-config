@@ -5,7 +5,7 @@
       # ./wifi.nix
     ];
   homeModules = [ ];
-  ip = "192.168.1.5";
+  ip = "192.168.1.6";
   drive = "/dev/nvme0n1";
   builder = true;
   wifi = {

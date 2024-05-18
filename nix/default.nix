@@ -11,6 +11,7 @@
       ./ssh.nix
       ./disko.nix
       ./impermanence.nix
+      ./dns.nix
     ]
     ++ (if opts.wifi.enable then [ ./wifi.nix ] else [ ])
     ++ (if opts.builder then [ ./builder.nix ] else [ ./useBuilders.nix ])

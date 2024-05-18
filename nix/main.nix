@@ -7,6 +7,7 @@
     hosts =
       {
         "${secrets.jsh.ip}" = [ "jsh.gov" ];
+        # "72.231.188.127" = [ "foundry.anthonyrinaldo.com" ];
       };
   };
 

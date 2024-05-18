@@ -42,7 +42,7 @@
           wget
           deploy-rs
           nh # nix helper
-          nom
+          nix-output-monitor
           nixpkgs-fmt
 
           expect # provides unbuffer
@@ -98,7 +98,7 @@
           arp-scan # network scaner
           cloc # count lines of code
           okteta # hex editor
-          zoom-us # video calls
+          #zoom-us # video calls
         ];
     };
 
