@@ -28,6 +28,12 @@
     secrets.url = "path:/persist/secrets";
     persist-retro.url = "github:Geometer1729/persist-retro";
     #persist-retro.url = "path:/home/bbrian/Code/persist-retro";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    stylix.url = "github:danth/stylix";
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:

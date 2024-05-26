@@ -2,7 +2,7 @@
   nixModules =
     [
       ./hardware.nix
-      # ./wifi.nix
+      ./wifi.nix
     ];
   homeModules = [ ];
   ip = "192.168.1.6";

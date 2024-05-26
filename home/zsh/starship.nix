@@ -35,9 +35,9 @@
             untracked = "🛤️  \${count}";
             stashed = "📦";
             modified = "📝 ×\${count}";
-            staged = "🗃️  ×\${count}";
-            renamed = "📛 ×\${count}";
-            #renamed = "[➡](bold green) × \${count}";
+            staged = "🗃️ ×\${count}";
+            #renamed = "📛 ×\${count}";
+            renamed = "[➡](bold green) × \${count}";
             deleted = "🗑️ ×\${count}";
             style = "bright-white";
             format = "$all_status$ahead_behind ";

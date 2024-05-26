@@ -10,5 +10,6 @@ g.startify_lists = {
   }
 g.startify_bookmarks =
   { {c='~/conf/flake.nix'},
+    {x='~/conf/home/xmonad/Config.hs'},
     {w='~/Documents/vw/index.md'}
   }

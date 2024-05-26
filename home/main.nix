@@ -22,6 +22,7 @@
           brave
           spotify
           signal-desktop
+          zathura # pdf
 
           # system
           home-manager

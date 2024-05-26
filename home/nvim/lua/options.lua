@@ -4,9 +4,9 @@ local g = vim.g
 -- I blocks global message
 -- W shortens write messages
 o.shortmess = "IW"
+vim.api.nvim_set_hl(0,"Normal", { bg = "none" })
+vim.api.nvim_set_hl(0,"NormalFloat", { bg = "none" })
 
-vim.cmd.colorscheme('joker')
-vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 
 -- enable mouse
 o.mouse ="a"
@@ -36,7 +36,9 @@ o.undofile=true
 -- indent settings
 o.ai=true
 o.si=true
--- This fixes an issue with comment indetations in nix
+-- This somewhat fixes an issue with comment indetations in nix
+-- Without this comments are always the start of the line
+-- With this they seem to be indented just one less?
 -- it seems to be related to #define in C
 -- I'm not sure what prevents this from being an issue in python or bash
 -- It may be possible to fix this by finding a better nix plugin
@@ -48,10 +50,6 @@ vim.api.nvim_create_autocmd({'FileType'},
       o.cindent=true
     end
   })
-
--- airline
-g['airline#extensions#tabline#enabled'] = 1
-g['airline#extensions#tabline#left_sep'] = ' '
 
 -- only one status bar
 o.laststatus=3

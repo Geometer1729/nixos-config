@@ -25,8 +25,8 @@
   };
   programs.lazygit = {
     enable = true;
+    settings = {
+      promptToReturnFromSubprocess = false;
+    };
   };
-  home.file.".config/lazygit/config.yml".text =
-    ''promptToReturnFromSubprocess: false
-   '';
 }

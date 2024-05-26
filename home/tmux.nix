@@ -68,9 +68,6 @@
     keyMode = "vi";
     extraConfig =
       ''
-        set -g pane-active-border-style fg=cyan
-        #set -g pane-border-style fg=cyan
-
         # better splits
         unbind %
         bind h split-window -v

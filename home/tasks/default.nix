@@ -68,7 +68,7 @@ in
       [keybinding]
       o = :!wr taskopen {TASK_UUID}<Enter>
       [vit]
-      theme = classic
+      #theme = classic
     '';
   programs.zsh.shellAliases =
     {
