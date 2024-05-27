@@ -20,6 +20,7 @@
       fugitive.enable = true;
       startify.enable = true;
       vimtex.enable = true;
+      tmux-navigator.enable = true;
       treesitter = {
         enable = true;
         nixvimInjections = true;

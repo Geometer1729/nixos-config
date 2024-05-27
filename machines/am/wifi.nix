@@ -11,7 +11,8 @@ let
       text =
         ''
           if journalctl -rb | grep wpa_supplicant | \
-           { head -n 1; cat > /dev/null; } | grep BEACON-LOSS
+           { head -n 1; cat > /dev/null; } | grep BEACON-LOSS \
+            || (( $# >= 1 ))
           then
             sudo systemctl restart wpa_supplicant.service
             sudo systemctl restart dhcpcd.service

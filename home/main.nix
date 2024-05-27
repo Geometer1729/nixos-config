@@ -110,7 +110,7 @@
     };
     gpg-agent = {
       enable = true;
-      pinentryPackage = pkgs.pinentry-qt;
+      pinentryPackage = pkgs.pinentry-rofi;
       # TODO it'd be cool to make a wrapper
       # that tries cursses then uses qt
     };
