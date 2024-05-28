@@ -18,10 +18,6 @@
   nixpkgs.overlays =
     [
       (final: prev: {
-        dmenu = prev.dmenu.overrideAttrs
-          (old: { src = ./dmenu-4.9; });
-      })
-      (final: prev: {
         gotop = prev.gotop.overrideAttrs
           (old: { patches = [ ./gotop.patch ]; });
         # fix by gardockt on github

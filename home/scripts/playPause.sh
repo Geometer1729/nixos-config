@@ -5,7 +5,7 @@ then
 elif [[ "$(playerctl -l | wc -l)" -ge 2 ]]
 then
   echo nothing playing multiple choices prompting user
-  playerctl play -p "$(playerctl -l | dmenu)"
+  playerctl play -p "$(playerctl -l | rofi -dmenu)"
 else
   echo nothing playing one thing to play playing it
   playerctl play

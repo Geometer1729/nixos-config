@@ -160,16 +160,17 @@ launchBindings =
     , ((modm     , xK_d      ),
       do
         screen <- curScreenId
-        spawn $ "dmenu_run -i -m " <> show (toInteger screen)
+        spawn $ "rofi -show run -monitor " <> show (toInteger screen -1)
+      )
+    , ((modm     , xK_s      ),
+      do
+        screen <- curScreenId
+        spawn $ "rofi -show ssh -monitor " <> show (toInteger screen -1)
       )
     , ((modShift , xK_r      ), rebuild)
     , ((modShift , xK_s      ), spawn "sudo zsh -c \"echo mem > /sys/power/state\"")
     -- TODO systemctl sleep or so?
     ]
--- TODO
--- dmenu all the machines with ssh config entries and
--- launch a terminal sshing into one
--- without (local) tmux
 
 workSpaces :: Bindings
 workSpaces =

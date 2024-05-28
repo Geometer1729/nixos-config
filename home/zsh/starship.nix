@@ -30,15 +30,15 @@
           {
             conflicted = "⚔️";
             ahead = "🏎️ 💨 \${count}";
-            behind = "🐢 ×\${count}";
-            diverged = "🔱 🏎️ 💨 \${ahead_count} 🐢 \${behind_count}";
-            untracked = "🛤️  \${count}";
+            behind = "🐢×\${count} ";
+            diverged = "🔱 🏎️💨\${ahead_count} 🐢\${behind_count} ";
+            untracked = "🛤️\${count} ";
             stashed = "📦";
-            modified = "📝 ×\${count}";
-            staged = "🗃️ ×\${count}";
+            modified = "📝×\${count}";
+            staged = "🗃️×\${count}";
             #renamed = "📛 ×\${count}";
-            renamed = "[➡](bold green) × \${count}";
-            deleted = "🗑️ ×\${count}";
+            renamed = "[➡](bold green)×\${count}";
+            deleted = "🗑️×\${count}";
             style = "bright-white";
             format = "$all_status$ahead_behind ";
           };

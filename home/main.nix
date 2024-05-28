@@ -27,7 +27,6 @@
           # system
           home-manager
           openssh
-          dmenu
           killall
           xclip
           du-dust # disk usage tool
@@ -110,7 +109,9 @@
     };
     gpg-agent = {
       enable = true;
-      pinentryPackage = pkgs.pinentry-rofi;
+      # TODO why doesn't this work?
+      #pinentryPackage = pkgs.pinentry-rofi;
+      pinentryPackage = pkgs.pinentry-qt;
       # TODO it'd be cool to make a wrapper
       # that tries cursses then uses qt
     };
@@ -140,6 +141,12 @@
   home.sessionVariables = {
     FLAKE = "/home/${userName}/conf";
     PASSWORD_STORE_DIR = "/home/${userName}/password-store";
+  };
+
+  programs.rofi = {
+    enable = true;
+    pass.enable = true;
+    terminal = "alacritty"; # not working
   };
 }
 
