@@ -1,5 +1,6 @@
 { inputs, pkgs, ... }:
 {
+  stylix.targets.firefox.profileNames = [ "default" ];
   programs.firefox =
     {
       enable = true;
@@ -111,10 +112,7 @@
         settings = {
           "accessibility.typeaheadfind.enablesound" = false;
           "browser.compactmode.show" = true;
-          "browser.theme.content-theme" = 0;
-          "browser.theme.toolbar-theme" = 0;
           "browser.startup.page" = 1;
-          "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
           "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
           "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
           "browser.newtabpage.activity-stream.feeds.topsites" = false;

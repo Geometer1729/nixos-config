@@ -7,7 +7,6 @@
         [
           # status tools
           htop
-          btop
           radeontop
           neofetch
 
@@ -148,5 +147,7 @@
     pass.enable = true;
     terminal = "alacritty"; # not working
   };
+
+  programs.btop.enable = true;
 }
 
