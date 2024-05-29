@@ -149,5 +149,7 @@
   };
 
   programs.btop.enable = true;
+  # TODO hide repeated disks in btop
+
 }
 
