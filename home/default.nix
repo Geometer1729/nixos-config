@@ -17,6 +17,7 @@
       ./xmobar
       ./xmonad
       ./zsh
+      ./work.nix
 
       inputs.impermanence.nixosModules.home-manager.impermanence
       inputs.nur.nixosModules.nur

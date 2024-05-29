@@ -20,6 +20,7 @@
           ".config/Signal"
           ".config/discord"
           ".config/spotify"
+          ".config/Slack"
           ".gnupg"
           ".hoogle"
           {

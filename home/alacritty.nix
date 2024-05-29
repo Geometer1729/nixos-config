@@ -9,7 +9,6 @@
           y = 3;
         };
       };
-      env.TERM = "xterm-256color";
       shell.program = "tmux";
     };
   };

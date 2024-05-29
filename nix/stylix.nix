@@ -1,4 +1,4 @@
-{pkgs,...}:
+{pkgs,config,...}:
 let
   solarized-dark =
 {
@@ -32,7 +32,7 @@ in
     # tmux
     # xmobar
     stylix.image = ./grub/sand.jpg;
-    stylix.opacity.terminal = 0.8;
+    stylix.opacity.terminal = 0.85;
     stylix.polarity = "dark";
     stylix.base16Scheme = solarized-dark // { base0F = "982ee6"; };
     stylix.fonts = {
@@ -53,4 +53,24 @@ in
         name = "Hack Nerd Font";
       };
   };
+  stylix.targets.console.enable = false;
+
+  #config.console.colors = with config.lib.stylix.colors; [
+  #  base00-hex
+  #  base08-hex
+  #  base0B-hex
+  #  base0A-hex
+  #  base0D-hex
+  #  base0E-hex
+  #  base0C-hex
+  #  base05-hex
+  #  base03-hex
+  #  base09-hex
+  #  base01-hex
+  #  base02-hex
+  #  base04-hex
+  #  base06-hex
+  #  base0F-hex
+  #  base07-hex
+  #];
 }

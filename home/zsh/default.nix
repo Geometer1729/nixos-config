@@ -43,7 +43,6 @@
       localVariables =
         {
           EDITOR = "vim";
-          TERM = "xterm-256color";
           BROWSER = "firefox";
           READER = "zathura";
           REPORTTIME = 1;
