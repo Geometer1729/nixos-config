@@ -53,26 +53,26 @@ in
         name = "Hack Nerd Font";
       };
   };
-  stylix.targets.console.enable = false;
+  #stylix.targets.console.enable = false;
 
-  # It's better to just repeat the colory part imo
-  console.colors = with config.lib.stylix.colors; [
-    base00-hex
-    red
-    green
-    yellow
-    blue
-    magenta
-    cyan
-    base07-hex
+  ## It's better to just repeat the colory part imo
+  #console.colors = with config.lib.stylix.colors; [
+  #  base00-hex
+  #  red
+  #  green
+  #  yellow
+  #  blue
+  #  magenta
+  #  cyan
+  #  base07-hex
 
-    base00-hex
-    red
-    green
-    yellow
-    blue
-    magenta
-    cyan
-    base07-hex
-  ];
+  #  base00-hex
+  #  red
+  #  green
+  #  yellow
+  #  blue
+  #  magenta
+  #  cyan
+  #  base07-hex
+  #];
 }

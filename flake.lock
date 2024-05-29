@@ -661,17 +661,17 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1716744577,
-        "narHash": "sha256-YvYYKLuf+SNj129k6SS/bhVybaLYgUlnznTa7rKv904=",
-        "owner": "danth",
-        "repo": "stylix",
-        "rev": "00a11ba2f0b52f761c0bc77daebb00cb4d44ba09",
-        "type": "github"
+        "lastModified": 1716949649,
+        "narHash": "sha256-wu7m0vJDAWSOd+/pvY94sBoPA4Js7rFTQ37xuo8XYFQ=",
+        "ref": "refs/heads/master",
+        "rev": "a87e02f45547d2f5ad4dbaa755b8c107756e608b",
+        "revCount": 354,
+        "type": "git",
+        "url": "file:///home/bbrian/Code/stylix"
       },
       "original": {
-        "owner": "danth",
-        "repo": "stylix",
-        "type": "github"
+        "type": "git",
+        "url": "file:///home/bbrian/Code/stylix"
       }
     },
     "systems": {

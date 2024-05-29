@@ -33,7 +33,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    stylix.url = "github:danth/stylix";
+    #stylix.url = "github:danth/stylix";
+    stylix.url = "/home/bbrian/Code/stylix";
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:
