@@ -1,25 +1,24 @@
 {pkgs,config,...}:
 let
-  solarized-dark =
+  gotham =
 {
   #https://tinted-theming.github.io/base16-gallery/
-  base00 =  "002b36";
-  base01 =  "073642";
-  base02 =  "586e75";
-  base03 =  "657b83";
-  base04 =  "839496";
-  base05 =  "93a1a1";
-  base06 =  "eee8d5";
-  base07 =  "fdf6e3";
-  base08 =  "dc322f";
-  base09 =  "cb4b16";
-  base0A =  "b58900";
-  base0B =  "859900";
-  base0C =  "2aa198";
-  base0D =  "268bd2";
-  base0E =  "6c71c4";
-  base0F =  "d33682";
-
+  base00 = "0c1014";
+  base01 = "11151c";
+  base02 = "091f2e";
+  base03 = "0a3749";
+  base04 = "245361";
+  base05 = "599cab";
+  base06 = "99d1ce";
+  base07 = "d3ebe9";
+  base08 = "c23127";
+  base09 = "d26937";
+  base0A = "edb443";
+  base0B = "33859E";
+  base0C = "2aa889";
+  base0D = "195466";
+  base0E = "888ca6";
+  base0F = "4e5166";
 };
 in
 {
@@ -34,7 +33,7 @@ in
     stylix.image = ./grub/sand.jpg;
     stylix.opacity.terminal = 0.85;
     stylix.polarity = "dark";
-    stylix.base16Scheme = solarized-dark // { base0F = "982ee6"; };
+    stylix.base16Scheme = gotham ;#// { base0F = "982ee6"; };
     stylix.fonts = {
       serif = {
         package = pkgs.nerdfonts;
