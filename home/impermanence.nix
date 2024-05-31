@@ -35,6 +35,7 @@
           ".local/share/task"
           ".local/state/nvim"
           ".mozilla/firefox/default"
+          ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
           ".ssh"
           ".tldrc"
           "Code"
