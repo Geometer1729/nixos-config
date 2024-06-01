@@ -85,7 +85,11 @@
               ]
               )
             )
-          ];
+          ] ++ (with nixosConfigurations.am.pkgs;
+          [ zsh
+            neovim
+          ])
+          ;
         };
     };
 }
