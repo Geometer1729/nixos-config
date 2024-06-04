@@ -5,7 +5,10 @@ local g = vim.g
 -- W shortens write messages
 o.shortmess = "IW"
 vim.api.nvim_set_hl(0,"Normal", { bg = "none" })
+vim.api.nvim_set_hl(0,"NormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0,"NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0,"Pmenu", { bg = "none" })
+vim.api.nvim_set_hl(0,"LineNR", { bg = "none" , fg = 1000 })
 
 
 -- enable mouse

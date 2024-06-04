@@ -13,13 +13,13 @@ with config.lib.stylix.colors.withHashtag;
 Config
  { font = "${font}"
  , additionalFonts = []
- , borderColor = "${base07}"
+ , borderColor = "${base01}"
  , border = TopB
- , bgColor = "${base01}"
- , fgColor = "${base07}"
+ , bgColor = "${base00}"
+ , fgColor = "${base05}"
  , alpha = 255
  , position = Bottom
- , textOffset = 1
+ , textOffset = -1
  , iconOffset = -1
  , lowerOnStart = True
  , pickBroadest = False

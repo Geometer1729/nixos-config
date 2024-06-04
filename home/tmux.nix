@@ -7,20 +7,20 @@
         vim-tmux-navigator
         yank
         plumb
-        (
-          let name = "themepack"; in
-          mkTmuxPlugin {
-            inherit name;
-            pluginName = name;
-            src = pkgs.fetchFromGitHub
-              {
-                repo = "tmux-" + name;
-                owner = "jimeh";
-                rev = "7c59902f64dcd7ea356e891274b21144d1ea5948";
-                sha256 = "sha256-c5EGBrKcrqHWTKpCEhxYfxPeERFrbTuDfcQhsUAbic4=";
-              };
-          }
-        )
+        #(
+        #  let name = "themepack"; in
+        #  mkTmuxPlugin {
+        #    inherit name;
+        #    pluginName = name;
+        #    src = pkgs.fetchFromGitHub
+        #      {
+        #        repo = "tmux-" + name;
+        #        owner = "jimeh";
+        #        rev = "7c59902f64dcd7ea356e891274b21144d1ea5948";
+        #        sha256 = "sha256-c5EGBrKcrqHWTKpCEhxYfxPeERFrbTuDfcQhsUAbic4=";
+        #      };
+        #  }
+        #)
         (
           let name = "resurrect"; in
           mkTmuxPlugin {

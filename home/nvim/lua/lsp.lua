@@ -9,6 +9,7 @@ end
 vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 
 lsp.hls.setup { cmd = { "haskell-language-server", "--lsp" } }
+lsp.leanls.setup{}
 lsp.purescriptls.setup {}
 lsp.rust_analyzer.setup {}
 lsp.tsserver.setup {} -- typescript

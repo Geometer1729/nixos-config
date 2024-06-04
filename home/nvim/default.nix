@@ -11,8 +11,7 @@
           (builtins.attrNames (builtins.readDir ./lua))
         );
     plugins = {
-      # TODO configure lightline a bit
-      lightline. enable = true;
+      lualine.enable = true;
       telescope.enable = true;
       surround.enable = true;
       direnv.enable = true;
@@ -36,6 +35,7 @@
           "markdown"
           "c"
           "ocaml"
+          "lean"
           ];
       };
     };
