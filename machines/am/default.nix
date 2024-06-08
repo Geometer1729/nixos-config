@@ -5,11 +5,11 @@
       ./wifi.nix
     ];
   homeModules = [ ];
-  ip = "192.168.1.85";
+  ip = "10.144.25.173";
   drive = "/dev/nvme0n1";
   builder = true;
   wifi = {
-    enable = true;
+    enable = false;
     interface = "wlp2s0f0u4";
   };
   battery = false;
