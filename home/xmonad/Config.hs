@@ -36,7 +36,7 @@ import System.Environment (setEnv)
 import Data.Char (toLower)
 import XMonad.Actions.WorkspaceCursors (getFocus)
 import XMonad.Layout.Grid
-import XMonad.Layout.Named (named)
+import XMonad.Layout.Renamed (named)
 import XMonad.StackSet (RationalRect)
 
 main :: IO ()
@@ -137,9 +137,9 @@ layoutBindings =
     [ ((modm    , xK_q             ), kill) -- close focused window
     , ((modShift, xK_q             ), liftIO exitSuccess ) -- close xmonad
     , ((modm    , xK_w             ), sendMessage (JumpToLayout "Def"))
-    , ((modShift, xK_w             ), sendMessage NextLayout)
     , ((modm    , xK_g             ), sendMessage (JumpToLayout "Grid"))
     , ((modm    , xK_f             ), sendMessage (JumpToLayout "Full"))
+    , ((modShift, xK_w             ), sendMessage NextLayout)
     , ((modm    , xK_Tab           ), windows W.focusUp)
     , ((modShift, xK_Tab           ), windows W.focusDown)
     , ((modm    , xK_space         ), toggleFloat)
@@ -181,25 +181,30 @@ workSpaces =
 mediaKeys :: Bindings
 mediaKeys =
     -- volume
-    [ ((0,0x1008ff13), spawn "pulsemixer --change-volume +1" )
-    , ((0,0x1008ff11), spawn "pulsemixer --change-volume -1" )
-    , ((0,0x1008ff12), toggleMute )
+    [ ((0,0x1008ff13), volUp)
+    , ((0,0x1008ff11), volDown)
+    , ((0,0x1008ff12), toggleMute)
     --playerctl
     , ((modm .|. shiftMask, xK_p), spawn "playPause")
+    , ((0,0x1008ff14),spawn "playPause")
     , ((modm,xK_o), spawn "playerctl next -a")
+    , ((0, 0x1008ff17), spawn "playerctl next -a")
     ]
+    where
+      volUp = spawn "pulsemixer --change-volume +1"
+      volDown = spawn "pulsemixer --change-volume -1"
+      toggleMute = spawn "pulsemixer --toggle-mute"
 
 scratchPads :: Bindings
 scratchPads =
-    [ ((modm,xK_n),namedScratchpadAction spconf Toggle "sp" )
-    , ((modm,xK_m),namedScratchpadAction spconf Toggle "ghci" )
-    , ((modm,xK_v),namedScratchpadAction spconf Toggle "vim" )
-    , ((modm,xK_c),namedScratchpadAction spconf Toggle "calcurse")
-    , ((modm,xK_b),namedScratchpadAction spconf Toggle "vit")
+    [ ((modm,xK_n),toggle "sp" )
+    , ((modm,xK_m),toggle "ghci" )
+    , ((modm,xK_v),toggle "vim" )
+    , ((modm,xK_c),toggle "calcurse")
+    , ((modm,xK_b),toggle "vit")
     ]
-
-toggleMute :: X()
-toggleMute = spawn "pulsemixer --toggle-mute"
+    where
+      toggle = namedScratchpadAction spconf Toggle
 
 toggleFloat :: X ()
 toggleFloat = withFocused

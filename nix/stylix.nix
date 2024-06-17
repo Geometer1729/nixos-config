@@ -52,5 +52,10 @@ in
         name = "Hack Nerd Font";
       };
     };
+  cursor = {
+    package = pkgs.simp1e-cursors;
+    name = "simp1e-dark";
+    size = 24;
+  };
   };
 }

@@ -43,6 +43,7 @@
           nh # nix helper
           nix-output-monitor
           nixpkgs-fmt
+          xorg.xev # x event viewer (sometimes needed for xmonad dev)
 
           expect # provides unbuffer
           nil # nix lsp
