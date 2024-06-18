@@ -30,6 +30,7 @@ let
 in
 {
   stylix = {
+    enable = true;
     image = ./grub/sand.jpg;
     opacity.terminal = 0.9;
     polarity = "dark";
