@@ -2,16 +2,15 @@
   nixModules =
     [
       ./hardware.nix
-      #./wifi.nix
     ];
   homeModules = [ ];
-  ip = "10.144.25.173";
-  drive = "/dev/nvme0n1";
+  ip = "10.144.176.131";
   builder = true;
+  drive = "/dev/nvme0n1";
   wifi = {
     enable = true;
-    interface = "wlp2s0f0u4";
+    interface = "wlp3s0";
   };
-  battery = false;
+  battery = true;
   system = "x86_64-linux";
 }
