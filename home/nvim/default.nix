@@ -11,7 +11,6 @@
           (builtins.attrNames (builtins.readDir ./lua))
         );
     plugins = {
-      lualine.enable = true;
       telescope.enable = true;
       surround.enable = true;
       direnv.enable = true;
@@ -20,6 +19,15 @@
       startify.enable = true;
       vimtex.enable = true;
       tmux-navigator.enable = true;
+      lualine = {
+        enable = true;
+        sections.lualine_c = [{
+          name = "filename";
+          extraConfig = {
+              path = 1;
+          };
+        }];
+      };
       treesitter = {
         enable = true;
         nixvimInjections = true;

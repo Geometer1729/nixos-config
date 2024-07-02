@@ -15,6 +15,7 @@
       ./dns.nix
       ./stylix.nix
       ./work.nix
+      ./bt.nix
     ]
     ++ (if opts.wifi.enable then [ ./wifi.nix ] else [ ])
     ++ (if opts.builder then [ ./builder.nix ] else [ ./useBuilders.nix ])

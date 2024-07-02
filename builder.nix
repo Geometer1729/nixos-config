@@ -34,6 +34,7 @@ in
                 {
                   home-manager = {
                     extraSpecialArgs = specialArgs;
+                    sharedModules = [];
                     useGlobalPkgs = true;
                     useUserPackages = true;
                     users = {

@@ -44,11 +44,13 @@
           "conf"
           "memes"
           "password-store"
+          ".tldrc"
         ];
         files = [
           ".zsh_history"
           ".config/lazygit/state.yml"
           ".cache/nix-index/files"
+          ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ];
         allowOther = true;
       };
