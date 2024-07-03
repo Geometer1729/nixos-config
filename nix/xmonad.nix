@@ -9,5 +9,4 @@
     xkb.layout = "us";
   };
   console.useXkbConfig = true;
-  hardware.opengl.enable = true;
 }

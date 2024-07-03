@@ -77,9 +77,9 @@
   hardware =
     {
       pulseaudio.support32Bit = true;
-      opengl = {
-        driSupport = true;
-        driSupport32Bit = true;
+      graphics = {
+        enable = true;
+        #driSupport32Bit = true;
         extraPackages = [ pkgs.amdvlk ];
         extraPackages32 = with pkgs.pkgsi686Linux; [ libva amdvlk ];
       };

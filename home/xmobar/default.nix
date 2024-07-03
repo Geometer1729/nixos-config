@@ -1,10 +1,13 @@
-{ config, opts, ... }:
+{ pkgs, config, opts, ... }:
 let
   when = cond: val: if cond then val else "";
   font =  config.stylix.fonts.monospace.name;
 in
 with config.lib.stylix.colors.withHashtag;
 {
+  # required for the volume display to work
+  # maybe I should make a pr to add `withAlsa` as an option in home-manager
+  home.packages = [ pkgs.alsa-utils ];
   programs.xmobar =
     {
       enable = true;
