@@ -79,9 +79,11 @@
       pulseaudio.support32Bit = true;
       graphics = {
         enable = true;
-        #driSupport32Bit = true;
-        extraPackages = [ pkgs.amdvlk ];
-        extraPackages32 = with pkgs.pkgsi686Linux; [ libva amdvlk ];
+        enable32Bit = true;
+      };
+      amdgpu.amdvlk= {
+        enable = true;
+        support32Bit.enable = true;
       };
     };
   security.pam.loginLimits = [
