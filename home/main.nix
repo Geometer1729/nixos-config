@@ -12,7 +12,6 @@
 
           # video
           ffmpeg
-          youtube-dl
           vlc
 
           # apps

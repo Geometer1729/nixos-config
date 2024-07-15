@@ -16,6 +16,38 @@
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/machine-id"
     ];
+    users.bbrian = {
+      directories = [
+          ".config/BraveSoftware/Brave-Browser"
+          ".config/Signal"
+          ".config/discord"
+          ".config/spotify"
+          ".config/Slack"
+          ".gnupg"
+          ".hoogle"
+          ".local/share/PrismLauncher"
+          ".local/share/Steam"
+          ".local/share/direnv"
+          ".local/share/task"
+          ".local/state/nvim"
+          ".mozilla/firefox/default"
+          ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
+          ".ssh"
+          ".tldrc"
+          "Code"
+          "Documents"
+          "Pictures"
+          "conf"
+          "memes"
+          "password-store"
+        ];
+      files = [
+          ".zsh_history"
+          ".config/lazygit/state.yml"
+          ".cache/nix-index/files"
+          ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
+        ];
+    };
   };
 
   fileSystems."/persist".neededForBoot = true;
