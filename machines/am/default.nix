@@ -14,4 +14,5 @@
   };
   battery = false;
   system = "x86_64-linux";
+  amd = true;
 }

@@ -1,4 +1,4 @@
-{ inputs, pkgs, userName, hostName, secrets, config, system, ... }:
+{ inputs, pkgs, userName, hostName, secrets, opts, system, ... }:
 
 {
 
@@ -81,11 +81,14 @@
         enable = true;
         enable32Bit = true;
       };
-      amdgpu.amdvlk= {
-        enable = true;
-        support32Bit.enable = true;
-      };
-    };
+    } // (if opts.amd then
+      {
+        amdgpu.amdvlk= {
+          enable = true;
+          support32Bit.enable = true;
+        };
+      } else {});
+
   security.pam.loginLimits = [
     { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
   ];
@@ -124,13 +127,6 @@
 
   ];
 
-  #downloads as a tmpfs
-  fileSystems."/home/${userName}/Downloads" =
-    {
-      device = "none";
-      fsType = "tmpfs";
-    };
-
   nix = {
     # TODO extra platforms for am
     # build machines for raptor
@@ -154,10 +150,6 @@
     };
   };
 
-  # Sound
-  #sound.enable = true;
-  #hardware.pulseaudio.enable = false;
-
   security.rtkit.enable = true;
   security.sudo.wheelNeedsPassword = false;
 
@@ -177,6 +169,7 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
+    # config tool for mice
     ratbagd.enable = true;
     xserver = {
       # system just feels a bit more responsive

@@ -32,19 +32,22 @@
         enable = true;
         nixvimInjections = true;
         indent = true;
-        ensureInstalled = [
-          "lua"
-          "vim"
-          "vimdoc"
-          "rust"
-          "haskell"
-          "nix"
-          "typescript"
-          "markdown"
-          "c"
-          "ocaml"
-          "lean"
-          ];
+        folding = false;
+        settings = {
+          ensureInstalled = [
+            "lean"
+            "lua"
+            "vim"
+            "vimdoc"
+            "rust"
+            "haskell"
+            "nix"
+            "typescript"
+            "markdown"
+            "c"
+            "ocaml"
+            ];
+        };
       };
     };
       extraPlugins =  with pkgs.vimPlugins;

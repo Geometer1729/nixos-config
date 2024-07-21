@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<leader>r',
       function ()
         print("Restarting")
-        vim.lsp.stop_client(vim.lsp.get_active_clients())
+        vim.lsp.stop_client(vim.lsp.get_clients())
         vim.cmd('e')
       end
       , opts)
