@@ -31,6 +31,7 @@
           nix-du # makes a graph of the nix store dependencies
           graphviz # renders graphs (like the nix-du ones)
           unzip
+          arandr # xrandr gui
 
 
           # dev tools
@@ -46,8 +47,7 @@
 
           expect # provides unbuffer
           nil # nix lsp
-          #rnix-lsp unmaintained? TODO replace this I guess
-          (haskell.packages.ghc94.ghcWithPackages
+          (haskell.packages.ghc982.ghcWithPackages
             (pkgs: with pkgs;
             [
               flow
