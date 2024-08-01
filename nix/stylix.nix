@@ -8,24 +8,24 @@
 # vit (not really, needs a stylix module)
 {pkgs,...}:
 let
-  #https://tinted-theming.github.io/base16-gallery/
-  solarized-dark = {
-    base00 = "002b36";
-		base01 = "073642";
-		base02 = "586e75";
-		base03 = "657b83";
-		base04 = "839496";
-		base05 = "93a1a1";
-		base06 = "eee8d5";
-		base07 = "fdf6e3";
-		base08 = "dc322f";
-		base09 = "cb4b16";
-		base0A = "b58900";
-		base0B = "859900";
-		base0C = "2aa198";
-		base0D = "268bd2";
-		base0E = "6c71c4";
-		base0F = "d33682";
+    isotope =
+    {
+      base00 = "000000";
+      base01 = "404040";
+      base02 = "606060";
+      base03 = "808080";
+      base04 = "c0c0c0";
+      base05 = "d0d0d0";
+      base06 = "e0e0e0";
+      base07 = "ffffff";
+      base08 = "ff0000";
+      base09 = "ff9900";
+      base0A = "ff0099";
+      base0B = "33ff00";
+      base0C = "00ffff";
+      base0D = "0066ff";
+      base0E = "cc00ff";
+      base0F = "3300ff";
     };
 in
 {
@@ -34,7 +34,18 @@ in
     image = ./grub/sand.jpg;
     opacity.terminal = 0.9;
     polarity = "dark";
-    base16Scheme = solarized-dark;
+    #https://tinted-theming.github.io/base16-gallery/
+    base16Scheme = isotope //
+    {
+      #base08 = ""; #red
+      #base09 = ""; #orange
+      base0A = "#ffff00"; #yellow
+      base0B = "#58FF1E"; # green
+      #base0C = ""; # cyan
+      #base0D = "#ffffff"; # blue
+      base0E = "#bd93f9"; # purple?
+      base0F = "#5f875f"; # brown (cringe) blue
+    };
     fonts = {
       serif = {
         package = pkgs.nerdfonts;
@@ -53,10 +64,10 @@ in
         name = "Hack Nerd Font";
       };
     };
-  cursor = {
-    package = pkgs.simp1e-cursors;
-    name = "simp1e-dark";
-    size = 24;
-  };
+    cursor = {
+      package = pkgs.simp1e-cursors;
+      name = "simp1e-dark";
+      size = 24;
+    };
   };
 }

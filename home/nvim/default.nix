@@ -31,8 +31,8 @@
       treesitter = {
         enable = true;
         nixvimInjections = true;
-        indent = true;
         folding = false;
+        indent = true;
         settings = {
           ensureInstalled = [
             "lean"

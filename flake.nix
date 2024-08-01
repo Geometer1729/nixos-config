@@ -67,7 +67,7 @@
     in
     {
       inherit nixosConfigurations homeConfigurations deploy;
-      devShells.x86_64-.defaultlinux = pkgs.mkShell
+      devShells.x86_64-linux.default = pkgs.mkShell
         {
           nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [

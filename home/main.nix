@@ -44,6 +44,8 @@
           nix-output-monitor
           nixpkgs-fmt
           xorg.xev # x event viewer (sometimes needed for xmonad dev)
+          neovim-remote
+          postman # rest-api tool of some sort
 
           expect # provides unbuffer
           nil # nix lsp
@@ -122,7 +124,8 @@
           {
             General =
               {
-                savePath = "/home/bbrian/Downloads";
+                #this breaks something now?
+                #savePath = "/home/bbrian/Downloads/";
                 showHelp = false;
                 uiColor = "#0ce3ff";
                 contrastOpacity = 188;

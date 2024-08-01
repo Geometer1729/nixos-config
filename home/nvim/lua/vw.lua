@@ -14,12 +14,6 @@ o.concealcursor=""
 -- Tells task wiki not to break this
 g.taskwiki_disable_concealcursor=1
 
-vim.cmd.highlight({"link","VimWikiHeader1","Identifier"})
-vim.cmd.highlight({"link","VimWikiHeader2","Identifier"})
-vim.cmd.highlight({"link","VimWikiHeader3","Identifier"})
-vim.cmd.highlight({"link","VimWikiHeader4","Identifier"})
-vim.cmd.highlight({"link","VimWikiHeader5","Identifier"})
-
 -- Default used by `task` command
 g.taskwiki_data_location="~/.local/share/task"
 
