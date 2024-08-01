@@ -5,6 +5,7 @@
     hideMounts = true;
     directories = [
       "/var/log"
+      "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
