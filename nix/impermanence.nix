@@ -5,6 +5,7 @@
     hideMounts = true;
     directories = [
       "/var/log"
+      "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
@@ -32,6 +33,8 @@
           ".local/state/nvim"
           ".mozilla/firefox/default"
           ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
+          ".cache/rofi-2.sshcache"
+          ".cache/rofi-3.runcache"
           ".ssh"
           ".tldrc"
           "Code"
