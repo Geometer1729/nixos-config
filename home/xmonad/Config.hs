@@ -168,7 +168,7 @@ launchBindings =
         spawn $ "rofi -show ssh -monitor " <> show (toInteger screen -1)
       )
     , ((modShift , xK_r      ), rebuild)
-    , ((modShift , xK_s      ), spawn "sudo zsh -c \"echo mem > /sys/power/state\"")
+    , ((modShift , xK_s      ), spawn "sudo systemctl sleep")
     -- TODO systemctl sleep or so?
     ]
 

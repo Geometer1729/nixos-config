@@ -74,7 +74,9 @@
         unbind '"'
         bind v split-window -h
 
-        bind a attach-session -c "#{pane_current_path}" \; rename-session "#{pane_current_path}" \; new-window
+        bind g popup -h 90% -w 90% 'EDITOR=nvim lazygit'
+        bind a rename-session "#{b:pane_current_path}"
+        set-hook -g session-renamed 'attach-session -c "#{pane_current_path}"'
 
         set-option -g @tmux-autoreload-configs '/home/bbrian/.config/tmux/tmux.conf'
 

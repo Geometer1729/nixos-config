@@ -21,6 +21,7 @@
       sw = "switch";
       d = "diff";
       a = "add";
+      clean = "clean -fdX"; # this doesn't work :(
     };
   };
   programs.lazygit = {

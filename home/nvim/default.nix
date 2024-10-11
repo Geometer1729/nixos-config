@@ -18,6 +18,7 @@
       fugitive.enable = true;
       startify.enable = true;
       vimtex.enable = true;
+      trouble.enable=true;
       tmux-navigator.enable = true;
       lualine = {
         enable = true;

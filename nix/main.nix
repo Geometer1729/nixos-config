@@ -131,6 +131,7 @@
     # TODO extra platforms for am
     # build machines for raptor
     # ssh store
+    package = pkgs.nixVersions.latest;
     settings = {
       substituters = [ "https://cache.nixos.org" ];
       trusted-substituters = [ "https://cache.nixos.org" ];
