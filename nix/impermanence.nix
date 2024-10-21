@@ -45,7 +45,7 @@
           "password-store"
         ];
       files = [
-          ".zsh_history"
+          ".zsh_history" # This seems to not work, and causes some sort of permissions error
           ".config/lazygit/state.yml"
           ".cache/nix-index/files"
           ".local/share/nix/trusted-settings.json" # stop having to retrust flakes

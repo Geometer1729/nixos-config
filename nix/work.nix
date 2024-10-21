@@ -28,6 +28,26 @@ let
 
 in
 {
+  services.postgresql = {
+    enable = true;
+    #authentication = pkgs.lib.mkOverride 10 ''
+    #  #type database  DBuser  auth-method
+    #  local all       all     trust
+    #'';
+    # this probably doesn't help either tbh
+    settings = {
+      listen_addresses = pkgs.lib.mkOverride 10 "*";
+    };
+      # doesn't work
+      #initialScript = pkgs.writeText "init-sql-script"
+      #''
+      #  alter user postgres with password 'postgres';
+      #'';
+  };
+  #users.users.postgres.password = "postgres";
+
+  #users.users.postgres.password = "";
+
   virtualisation.docker.enable = true;
   users.users.bbrian.extraGroups = [ "docker" ];
   users.users.bbrian.packages = [ ledger-live-desktop clorio ];

@@ -20,6 +20,15 @@
           };
         }
       ];
+      history = {
+        append = true;
+        path = "/persist/system/home/bbrian/.zsh_history";
+        # I can't figure out why, but something about the wya it's mounted
+        # causes constant failure with
+        # zsh: can't rename /home/bbrian/.zsh_history.new to $HISTFILE
+        # AFAICT append should mean it never tries to do this anyway
+        # but that must not be true
+      };
       historySubstringSearch =
         {
           enable = true;
