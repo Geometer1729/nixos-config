@@ -4,7 +4,7 @@
       ./hardware.nix
     ];
   homeModules = [ ];
-  ip = "10.144.176.137";
+  ip = "10.144.176.134";
   builder = true;
   drive = "/dev/nvme0n1";
   wifi = {

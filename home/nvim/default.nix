@@ -25,10 +25,10 @@
         enable = true;
         settings = {
           sections = {
-            name = "filename";
-            extraConfig = {
-                path = 1;
-            };
+            lualine_c = [
+              "filename"
+              { path = 1; }
+            ];
           };
         };
       };
