@@ -13,8 +13,29 @@ lsp.leanls.setup{}
 lsp.purescriptls.setup {}
 lsp.rust_analyzer.setup {}
 lsp.tsserver.setup {} -- typescript
-lsp.nil_ls.setup {}
 lsp.ocamllsp.setup{}
+lsp.nixd.setup({
+  cmd = { "nixd" },
+  settings = {
+    nixd = {
+      nixpkgs = {
+        expr = "import <nixpkgs> { }",
+      },
+      formatting = {
+        command = { "alejandra" }, -- or nixfmt or nixpkgs-fmt
+      },
+      -- options = {
+      --   nixos = {
+      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").nixosConfigurations.CONFIGNAME.options',
+      --   },
+      --   home_manager = {
+      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").homeConfigurations.CONFIGNAME.options',
+      --   },
+      -- },
+    },
+  }
+})
+
 lsp.lua_ls.setup {
   settings = {
     Lua = {

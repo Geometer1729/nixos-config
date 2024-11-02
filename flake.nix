@@ -36,7 +36,7 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, deploy-rs, secrets, ... }:
+  outputs = inputs@{ nixpkgs, home-manager, deploy-rs, secrets, ... }:
     let
       userName = "bbrian";
       system = "x86_64-linux";

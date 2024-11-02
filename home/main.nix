@@ -48,7 +48,7 @@
           postman # rest-api tool of some sort
 
           expect # provides unbuffer
-          nil # nix lsp
+          nixd # nix lsp
           (haskell.packages.ghc982.ghcWithPackages
             (pkgs: with pkgs;
             [
@@ -151,7 +151,13 @@
     terminal = "alacritty"; # not working
   };
 
-  programs.btop.enable = true;
+  programs.btop = {
+    enable = true;
+    settings = {
+      proc_sorting = "memory";
+      show_swap = true;
+    };
+  };
   # TODO hide repeated disks in btop
 
 }

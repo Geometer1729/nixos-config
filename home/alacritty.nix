@@ -9,7 +9,7 @@
           y = 3;
         };
       };
-      shell.program = "tmux";
+      terminal.shell = "tmux";
     };
   };
 }

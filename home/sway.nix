@@ -1,16 +1,17 @@
-{ config, pkgs, lib, ... }:
+{ ... }:
 {
   wayland.windowManager.sway = {
     enable = true;
     #wrapperFeatures.base = true;
     wrapperFeatures.gtk = true;
     config = {
-      modifier = "Mod1";
+      modifier = "Mod2";
       terminal = "alacritty";
       startup = [
         {
           command = ''
             sway output HDMI-A-1 pos 0 0
+            exec steam
           '';
         }
       ];

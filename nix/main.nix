@@ -18,30 +18,6 @@
   nixpkgs.overlays =
     [
       (final: prev: {
-        gotop = prev.gotop.overrideAttrs
-          (old: { patches = [ ./gotop.patch ]; });
-        # fix by gardockt on github
-      })
-      (final: prev: {
-        flameshot = prev.flameshot.overrideAttrs
-          (old:
-            let
-              version = "11.0.0";
-              # seems to fix clipboard issue
-              # issue is not consistant so it's hard to bisect
-            in
-            {
-              inherit version;
-              src = final.fetchFromGitHub {
-                owner = "flameshot-org";
-                repo = "flameshot";
-                rev = "v${version}";
-                sha256 = "sha256-SlnEXW3Uhdgl0icwYyYsKQOcYkAtHpAvL6LMXBF2gWM=";
-              };
-            }
-          );
-      })
-      (final: prev: {
         # Taskopen was rewritten in nim
         # so it's easier to start from scratch than overrideAttrs
         # Once I know everything works I should update it in nixpkgs too
@@ -62,15 +38,15 @@
               nimbleFile = "${src}/taskopen.nimble";
             };
       })
-      (final: prev: {
-        discord =
-          let
-            master = import inputs.nixpkgs-master
-              { inherit system; config.allowUnfree = true; }
-            ;
-          in
-          master.discord;
-      })
+      #(final: prev: {
+      #  discord =
+      #    let
+      #      master = import inputs.nixpkgs-master
+      #        { inherit system; config.allowUnfree = true; }
+      #      ;
+      #    in
+      #    master.discord;
+      #})
     ];
 
   #steam needs this
@@ -131,6 +107,7 @@
     # TODO extra platforms for am
     # build machines for raptor
     # ssh store
+    nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
     package = pkgs.nixVersions.latest;
     settings = {
       substituters = [ "https://cache.nixos.org" ];

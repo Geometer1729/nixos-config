@@ -30,10 +30,12 @@ in
 {
   services.postgresql = {
     enable = true;
-    #authentication = pkgs.lib.mkOverride 10 ''
-    #  #type database  DBuser  auth-method
-    #  local all       all     trust
-    #'';
+    authentication = pkgs.lib.mkOverride 10 ''
+      #type database  DBuser  ADDRESS METHOD
+      local all all trust
+      host  all all 0.0.0.0/0 trust
+      host  all all ::0/0 trust
+    '';
     # this probably doesn't help either tbh
     settings = {
       listen_addresses = pkgs.lib.mkOverride 10 "*";
