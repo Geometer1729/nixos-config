@@ -107,7 +107,8 @@
     # TODO extra platforms for am
     # build machines for raptor
     # ssh store
-    nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
+    # imrpoves nixlsp but breaks nix-shell -p
+    #nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
     package = pkgs.nixVersions.latest;
     settings = {
       substituters = [ "https://cache.nixos.org" ];
@@ -119,6 +120,7 @@
       auto-optimise-store = true;
       experimental-features = [ "nix-command" "flakes" "ca-derivations" "recursive-nix" ];
       trusted-users = [ "root" userName ];
+      keep-outputs = true;
     };
     gc = {
       automatic = true;

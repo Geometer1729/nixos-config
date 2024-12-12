@@ -3,8 +3,8 @@
 # xinitrc runs automatically when you run startx.
 
 
-xrandr --output HDMI-A-0 --mode 2560x1440 --rate 60 --primary
-xrandr --output DisplayPort-0 --mode 1920x1080 --rate 60 --right-of HDMI-A-0
+xrandr --output HDMI-1 --mode 2560x1440 --rate 60 --primary
+xrandr --output DP-1 --mode 1920x1080 --rate 60 --right-of HDMI-1
 
 #xrdb ~/.Xrescources
 

@@ -18,7 +18,7 @@
       ./zsh
       ./work.nix
 
-      inputs.nur.nixosModules.nur
+      inputs.nur.modules.homeManager.default
       inputs.nixvim.homeManagerModules.nixvim
     ];
 }
