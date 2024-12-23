@@ -2,6 +2,8 @@
 let
   when = cond: val: if cond then val else "";
   font =  config.stylix.fonts.monospace.name;
+  wifi = when opts.wifi.enable (" %" + opts.wifi.interface + "wi% |");
+  battery = when opts.battery "%battery% |";
 in
 with config.lib.stylix.colors.withHashtag;
 {
@@ -33,13 +35,14 @@ Config
  , overrideRedirect = True
  , sepChar = "%"
  , alignSep = "}{"
- , template = " %cpu% | %memory% | %multicoretemp% | %UnsafeStdinReader% }\
-           \{ ${when opts.wifi.enable (" %" + opts.wifi.interface + "wi% |")} ${ when opts.battery "%battery% |"}%alsa:default:Master%| %date% "
+ , template = " %cpu% | %memory%:%swap% | %multicoretemp% | %UnsafeStdinReader% }\
+           \{ ${wifi} ${battery}%alsa:default:Master%| %date% "
  , commands =
     [ Run UnsafeStdinReader
     , Run Cpu ["-L","5","-H","70",
                "--normal","${green}","--high","${red}"] 10
     , Run Memory ["-t","Mem: <usedratio>%"] 10
+    , Run Swap ["-t","<usedratio>%"] 10
     , Run Date "%m-%d-%y : %a : %H:%M:%S" "date" 10
     , Run CatInt 0 "/sys/class/backlight/intel_backlight/brightness" [] 50
     , Run MultiCoreTemp ["-t", "Temp: <avg>°C (<avgpc>%)",

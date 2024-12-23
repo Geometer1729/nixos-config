@@ -61,6 +61,16 @@
           purescript-vim
           (pkgs.vimUtils.buildVimPlugin
             {
+              name = "telescope-vimwiki";
+              src = pkgs.fetchFromGitHub {
+                owner = "ElPiloto";
+                repo = "telescope-vimwiki.nvim";
+                rev = "13a83b6107da17af9eb8a1d8e0fe49e1004dfeb4";
+                sha256 = "sha256-46N1vMSu1UuzPFFe6Yt39s3xlKPOTErhPJbfaBQgq7g=";
+              };
+            })
+          (pkgs.vimUtils.buildVimPlugin
+            {
               name = "nvim-luaref";
               src = pkgs.fetchFromGitHub {
                 owner = "milisims";

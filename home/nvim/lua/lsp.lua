@@ -12,7 +12,7 @@ lsp.hls.setup { cmd = { "haskell-language-server", "--lsp" } }
 lsp.leanls.setup{}
 lsp.purescriptls.setup {}
 lsp.rust_analyzer.setup {}
-lsp.tsserver.setup {} -- typescript
+lsp.ts_ls.setup {} -- typescript
 lsp.ocamllsp.setup{}
 lsp.nixd.setup({
   cmd = { "nixd" },

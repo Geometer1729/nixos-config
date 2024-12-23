@@ -69,23 +69,12 @@
       inherit nixosConfigurations homeConfigurations deploy;
       devShells.x86_64-linux.default = pkgs.mkShell
         {
-          nativeBuildInputs = [ pkgs.deploy-rs ];
+          #nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [
             pkgs.sumneko-lua-language-server # for nvim config stuff
-            (pkgs.haskell.packages.ghc94.ghcWithPackages
-              (pkgs: with pkgs;
-              # TODO this is repeated
-              [
-                mtl
-                containers
-                xmonad
-                xmonad-contrib
-                cabal-install
-                haskell-language-server
-              ]
-              )
-            )
           ];
-        };
+        }
+        // ((import ./home/xmonad/pkg.nix) {inherit pkgs;}).my-xmonad
+        ;
     };
 }

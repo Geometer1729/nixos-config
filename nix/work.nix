@@ -50,10 +50,10 @@ in
 
   #users.users.postgres.password = "";
 
-  virtualisation.virtualbox.host.enable = true;
+  #virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "bbrian" ];
-  virtualisation.vmware.host.enable = true;
-  virtualisation.vmware.guest.enable = true;
+  #virtualisation.vmware.host.enable = true;
+  #virtualisation.vmware.guest.enable = true;
   virtualisation.docker.enable = true;
   users.users.bbrian.extraGroups = [ "docker" ];
   #users.users.bbrian.packages = [ ledger-live-desktop clorio ];

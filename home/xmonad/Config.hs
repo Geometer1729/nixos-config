@@ -18,7 +18,6 @@ import XMonad.Util.PureX
 import XMonad.Layout.Fullscreen
 import XMonad.Actions.Navigation2D
 
-
 import Modes
 import Data.Ratio
 import Data.List(intercalate)
@@ -97,10 +96,15 @@ hooks = manageDocks <> composeAll
     <||> title =? "float"
     --> floatCenter
    ,className =? "discord" --> doShift "21"
+   ,className =? ".blueman-manager-wrapped" --> floatCenter
+   ,className =? ".blueman-applet-wrapped" --> doKill
    ,className =? "Steam" <&&> title =? "Steam" --> do
       doShift "10"
       doSink
    ]
+
+doKill :: ManageHook
+doKill = ask >>= liftX . killWindow >> return mempty
 
 isPrefix :: String -> String -> Bool
 isPrefix =  fmap (fmap and) (zipWith (==))
