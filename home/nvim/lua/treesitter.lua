@@ -1,5 +1,1 @@
---require'nvim-treesitter.configs'.setup {
---  highlight = {
---    enable = true,
---  },
---}
+vim.treesitter.language.register("markdown","vimwiki")

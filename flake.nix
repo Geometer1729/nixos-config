@@ -67,14 +67,15 @@
     in
     {
       inherit nixosConfigurations homeConfigurations deploy;
-      devShells.x86_64-linux.default = pkgs.mkShell
+      devShells.x86_64-linux.default =
+        ((import ./home/xmonad/pkg.nix) {inherit pkgs;}).my-xmonad //
+        pkgs.mkShell
         {
           #nativeBuildInputs = [ pkgs.deploy-rs ];
           packages = [
             pkgs.sumneko-lua-language-server # for nvim config stuff
           ];
         }
-        // ((import ./home/xmonad/pkg.nix) {inherit pkgs;}).my-xmonad
         ;
     };
 }

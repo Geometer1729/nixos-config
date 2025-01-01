@@ -21,6 +21,7 @@
       vimtex.enable = true;
       trouble.enable=true;
       tmux-navigator.enable = true;
+      lazygit.enable = true;
       lualine = {
         enable = true;
         settings = {
@@ -48,6 +49,7 @@
             "nix"
             "typescript"
             "markdown"
+            "markdown_inline"
             "c"
             "ocaml"
             ];

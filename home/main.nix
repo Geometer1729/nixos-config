@@ -117,6 +117,7 @@
               notify-send "swap flushed"
               '';
           })
+          cloudflared
       ];
     };
 

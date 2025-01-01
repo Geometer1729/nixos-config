@@ -76,31 +76,28 @@ map('v','<Leader>t',
   end
   )
 
-
 local function toggle_nerdtree_with_buffers()
-    if fn.exists("g:NERDTree") == 1 and fn['g:NERDTree.IsOpen']() == 1 then
-        vim.cmd('NERDTreeClose')
-    else
-        vim.cmd('NERDTree')
-        vim.cmd('wincmd p')
-        local buffers = vim.tbl_filter(function(b)
-            return vim.api.nvim_buf_get_option(b, 'buflisted')
-        end, vim.api.nvim_list_bufs())
+      local buffers = vim.tbl_filter(function(b)
+          return vim.api.nvim_get_option_value('buflisted',{buf=b})
+      end, vim.api.nvim_list_bufs())
 
-        for _, buf in ipairs(buffers) do
-            local bufname = fn.fnamemodify(fn.bufname(buf), ':p')
-            vim.cmd('NERDTreeFind ' .. bufname)
-        end
-        vim.cmd('wincmd p')
-    end
+      for _, buf in ipairs(buffers) do
+          local bufname = fn.fnamemodify(fn.bufname(buf), ':p')
+          vim.cmd('NERDTreeFind ' .. bufname)
+      end
+      vim.cmd('NERDTreeToggle')
 end
 
 
-map('n','<Leader>tt',toggle_nerdtree_with_buffers, { noremap = true, silent = true })
+map('n','<Leader>tt',toggle_nerdtree_with_buffers)
 
 vim.api.nvim_create_autocmd("BufEnter", {
   callback = function()
-    if vim.fn.bufname('#') ~= "" and vim.fn.bufname('#'):match('NERD_tree_%d+') and vim.fn.bufname('%'):match('NERD_tree_%d+') == nil and vim.fn.winnr('$') > 1 then
+    if vim.fn.bufname('#') ~= "" and
+       vim.fn.bufname('#'):match('NERD_tree_%d+') and
+       vim.fn.bufname('%'):match('NERD_tree_%d+') == nil and
+       vim.fn.winnr('$') > 1
+    then
       local buf = vim.fn.bufnr()
       vim.cmd('buffer#')
       vim.cmd('execute "normal! \\<C-W>w"')

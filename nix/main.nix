@@ -157,6 +157,24 @@
       autoRepeatDelay = 400;
     };
     # TODO try adding picom blur and reducing alacrity opacity
+    cron = {
+      enable = true;
+      systemCronJobs = [
+        "0 18 * * 4 /home/bbrian/Documents/P1-wiki/pullscript.sh"
+        "0 23 * * 4 /home/bbrian/Documents/P1-wiki/pushscript.sh"
+      ];
+    };
+
+    cloudflare-warp.enable = true;
+    cloudflared = {
+      enable = true;
+      tunnels = {
+        "3981fa82-1e49-4e4c-8df9-962a244d988a" = {
+          credentialsFile = "/etc/cloudflared-cert.json";
+          default = "http_status:404";
+        };
+      };
+    };
   };
 
 
@@ -176,10 +194,12 @@
       steam-run
       libgdiplus
       glxinfo
+      cloudflare-warp
     ];
   };
 
   programs.zsh.enable = true;
   # required for nix tab completion
+
 
 }

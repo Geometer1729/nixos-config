@@ -16,6 +16,7 @@
       "/etc/ssh/ssh_host_rsa_key"
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/machine-id"
+      "/etc/cloudflared-cert.json"
     ];
     users.bbrian = {
       directories = [
@@ -49,6 +50,7 @@
           ".config/lazygit/state.yml"
           ".cache/nix-index/files"
           ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
+          ".git-credentials"
         ];
     };
   };
