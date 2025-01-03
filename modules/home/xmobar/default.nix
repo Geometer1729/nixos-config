@@ -1,16 +1,31 @@
-{ pkgs, config, opts, ... }:
+{ pkgs, config, ... }:
 let
+  inherit (pkgs) lib;
   when = cond: val: if cond then val else "";
   font =  config.stylix.fonts.monospace.name;
-  wifi = when opts.wifi.enable (" %" + opts.wifi.interface + "wi% |");
-  battery = when opts.battery "%battery% |";
+  wifi = when config.wifi.enable (" %" + config.wifi.interface + "wi% |");
+  battery = when config.battery "%battery% |";
 in
 with config.lib.stylix.colors.withHashtag;
 {
+  options.wifi.enable = lib.mkOption {
+    type = lib.types.bool;
+    description = "show wifi on the status bar";
+    default = false;
+  };
+  options.wifi.interface = lib.mkOption {
+    type = lib.types.str;
+    description = "name of wifi interface";
+  };
+  options.battery = lib.mkOption {
+    type = lib.types.bool;
+    description = "show battery on the status bar";
+    default = false;
+  };
   # required for the volume display to work
   # maybe I should make a pr to add `withAlsa` as an option in home-manager
-  home.packages = [ pkgs.alsa-utils ];
-  programs.xmobar =
+  config.home.packages = [ pkgs.alsa-utils ];
+  config.programs.xmobar =
     {
       enable = true;
       extraConfig =
@@ -64,7 +79,7 @@ Config
                       , "-i"	, "<fc=${yellow}>Charged</fc>"
             ] 50
     , Run Alsa "default" "Master" ["--template", "<volume>% <status>"]
-    ${when opts.wifi.enable (", Run Wireless \"" +  opts.wifi.interface + "\" [] 10")}
+    ${when config.wifi.enable (", Run Wireless \"" +  config.wifi.interface + "\" [] 10")}
     ]
 }
 '';

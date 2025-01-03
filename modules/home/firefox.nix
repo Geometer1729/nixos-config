@@ -1,4 +1,7 @@
-{ inputs, pkgs, ... }:
+{ flake, pkgs, ... }:
+let
+  inherit (flake) inputs;
+in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
   programs.firefox =

@@ -1,0 +1,11 @@
+# .sops.yaml
+
+keys:
+  - &am age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
+  - &torag age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
+creation_rules:
+  - path_regex: modules/nixos/secrets.yaml
+    key_groups:
+    - age:
+      - *am
+      - *torag

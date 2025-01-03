@@ -1,4 +1,4 @@
-{ pkgs, userName, ... }:
+{ config,pkgs, ... }:
 {
   home =
     {
@@ -160,8 +160,8 @@
   home.file.".ghc/ghci.conf".source = ./ghci.repl;
 
   home.sessionVariables = {
-    FLAKE = "/home/${userName}/conf";
-    PASSWORD_STORE_DIR = "/home/${userName}/password-store";
+    FLAKE = "${config.home.homeDirectory}/conf";
+    PASSWORD_STORE_DIR = "${config.home.homeDirectory}/password-store";
   };
 
   programs.rofi = {

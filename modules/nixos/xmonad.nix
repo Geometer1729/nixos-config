@@ -1,6 +1,6 @@
-{ userName, ... }:
+{ config, ... }:
 {
-  services.getty.autologinUser = userName;
+  services.getty.autologinUser = config.mainUser;
   services.xserver = {
     enable = true;
     displayManager.startx.enable = true;

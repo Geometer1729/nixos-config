@@ -1,4 +1,4 @@
-{ secrets, pkgs, ... }:
+{ config,pkgs, ... }:
 {
   networking.wireless = {
     enable = true;
@@ -6,7 +6,7 @@
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
       update_config=1
     '';
-    networks = secrets.wifi;
+    secretsFile = config.sops.secrets.wifi.path;
   };
   environment.systemPackages = with pkgs;
     [
