@@ -2,7 +2,7 @@
 
 keys:
   - &am age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
-  - &torag age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
+  - &torag age14hrt2y2xr4jejp4p6jcms62m2f5sy6w6sr3g6yw8lvl6wtpy9f0s0r7df0
 creation_rules:
   - path_regex: modules/nixos/secrets.yaml
     key_groups:

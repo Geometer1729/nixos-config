@@ -1,14 +1,15 @@
-{ ... }:
+{ pkgs,... }:
 let
   me = {
     user = "bbrian";
-    identityFile = "~/.ssh/id_ed25519";
+    identityFile = "/home/bbrian/.ssh/id_ed25519";
   };
   cloudflare = {
       proxyCommand = "cloudflared access ssh --hostname %h";
   };
 in
 {
+  home.packages = [ pkgs.cloudflared ];
   programs.ssh = {
     enable = true;
     matchBlocks = {

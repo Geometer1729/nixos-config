@@ -1,14 +1,14 @@
 {config,...}:
 let
-  owned = { owner = config.mainUser; };
+  owned = { owner = config.mainUser; path = "/test-path"; };
 in
 {
   sops = {
     defaultSopsFile = ./secrets.yaml;
     defaultSopsFormat = "yaml";
     age = {
-      keyFile = "/home/${config.mainUser}/.config/sops/age/keys.txt";
-      sshKeyPaths = [ "/home/${config.mainUser}/.ssh/ed_25519" ];
+      keyFile = "/persist/system/home/${config.mainUser}/.config/sops/age/keys.txt";
+      sshKeyPaths = [ "/persist/system/home/${config.mainUser}/.ssh/id_ed25519" ];
       generateKey = true;
     };
 

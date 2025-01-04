@@ -1,23 +1,17 @@
-{ userName, machines, ... }:
+{ ... }:
 {
   nix = {
     settings = {
       builders-use-substitutes = true;
     };
     distributedBuilds = true;
-    buildMachines =
-      builtins.map
-        ({ hostName, system, ... }:
-          {
-            inherit hostName system;
-            sshUser = userName;
-            sshKey = "/home/${userName}/.ssh/id_ed25519";
-            maxJobs = 40;
-          })
-        (builtins.filter ({ builder, ... }: builder)
-          (builtins.attrValues
-            (builtins.mapAttrs (name: rest: rest // { hostName = name; })
-              machines
-            )));
+    buildMachines = [
+      { hostName = "am";
+        maxJobs = 40;
+        sshKey = "/home/bbrian/.ssh/id_ed25519";
+        sshUser = "bbrian";
+        system = "x86_64-linux";
+      }
+    ];
   };
 }

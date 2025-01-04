@@ -1,15 +1,15 @@
-{flake,config,pkgs,...}:
+{flake,config,...}:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
-  inherit (pkgs) lib;
-  system = "x86_64-linux";
 in
 {
 
+  networking.hostName = "am";
   amd = true;
   mainUser = "bbrian";
   drive = "/dev/nvme0n1";
+  cloudflare-id = "3981fa82-1e49-4e4c-8df9-962a244d988a";
   system.stateVersion = "22.05";
 
   home-manager.users.${config.mainUser} = {
@@ -42,5 +42,6 @@ in
       work
       xmonad
       main
+      cloudflare
     ];
 }

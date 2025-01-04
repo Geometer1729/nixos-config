@@ -14,6 +14,7 @@ in
     nvim
     tmux
     zsh
+    ssh
   ];
 
 }

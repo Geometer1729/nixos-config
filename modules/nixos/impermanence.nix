@@ -55,6 +55,12 @@
     };
   };
 
+  # duplicates
+  fileSystems."/root/.ssh" =  {
+    device = "/persist/system/home/bbrian/.ssh";
+    options = [ "bind" ];
+  };
+
   fileSystems."/persist".neededForBoot = true;
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     mkdir /btrfs_tmp

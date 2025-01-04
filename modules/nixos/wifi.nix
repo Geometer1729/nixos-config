@@ -1,12 +1,28 @@
 { config,pkgs, ... }:
+let
+  inherit (pkgs) lib;
+in
 {
   networking.wireless = {
     enable = true;
+    secretsFile = config.sops.secrets.wifi.path;
     extraConfig = ''
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
       update_config=1
     '';
-    secretsFile = config.sops.secrets.wifi.path;
+    networks =
+      lib.attrsets.foldAttrs (l: r: l) {}
+      (
+      builtins.map (name : { ${name}.pskRaw = "ext:${name}";})
+        [ "My love"
+          "the_dojo"
+          "ASUS"
+          "WiliamHowardTaftMemorialNetwork"
+          "FASBOOKS WIFI_5GEXT"
+          "binaup"
+          "WhiteSky-Slate"
+        ]
+      );
   };
   environment.systemPackages = with pkgs;
     [

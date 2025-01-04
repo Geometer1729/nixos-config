@@ -46,6 +46,7 @@
           xorg.xev # x event viewer (sometimes needed for xmonad dev)
           neovim-remote
           postman # rest-api tool of some sort
+          sops # needed to edit sops-nix secrets
 
           expect # provides unbuffer
           nixd # nix lsp

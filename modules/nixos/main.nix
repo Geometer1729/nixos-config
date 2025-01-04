@@ -172,17 +172,6 @@ in
           "0 23 * * 4 /home/bbrian/Documents/P1-wiki/pushscript.sh"
         ];
       };
-
-      cloudflare-warp.enable = true;
-      cloudflared = {
-        enable = true;
-        tunnels = {
-          "3981fa82-1e49-4e4c-8df9-962a244d988a" = {
-            credentialsFile = "/etc/cloudflared-cert.json";
-            default = "http_status:404";
-          };
-        };
-      };
     };
 
 
