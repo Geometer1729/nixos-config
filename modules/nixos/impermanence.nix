@@ -25,6 +25,7 @@
           ".config/discord"
           ".config/spotify"
           ".config/Slack"
+          ".config/sops/age"
           ".gnupg"
           ".hoogle"
           ".local/share/PrismLauncher"

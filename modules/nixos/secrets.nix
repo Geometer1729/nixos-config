@@ -1,6 +1,6 @@
 {config,...}:
 let
-  owned = { owner = config.mainUser; path = "/test-path"; };
+  owned = { owner = config.mainUser;};
 in
 {
   sops = {
@@ -12,8 +12,16 @@ in
       generateKey = true;
     };
 
-    secrets.hosts = owned;
     secrets.wifi = owned;
     secrets.hashedPassword = owned // { neededForUsers = true ; };
+    secrets.hosts = owned;
+  };
+  # secret hosts
+  environment.etc.hosts.mode = "0644";
+  system.activationScripts.hosts = {
+    deps = [ "setupSecrets" "etc" ];
+    text = ''
+      cat /run/secrets/hosts >> /etc/hosts
+    '';
   };
 }

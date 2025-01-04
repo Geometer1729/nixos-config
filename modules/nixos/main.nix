@@ -1,4 +1,4 @@
-{ inputs, pkgs, system, config,... }:
+{ pkgs, config,... }:
 let
   inherit (pkgs) lib;
 in
@@ -17,16 +17,8 @@ in
     };
   };
 
+
   config = {
-
-    networking = {
-      hostFiles = let hostsPath = config.sops.secrets.hosts.path; in
-        # unfortunately this takes 2 rebuilds to take effect/update
-        # it's not ideal but I don't know a better way to have this work with
-        # sops-nix
-        lib.optional (builtins.pathExists hostsPath) hostsPath;
-    };
-
     time.timeZone = "America/New_York";
     i18n.defaultLocale = "en_US.utf8";
 
