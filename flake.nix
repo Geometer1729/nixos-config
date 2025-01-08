@@ -28,6 +28,8 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nur.url = "github:nix-community/NUR";
     nur.inputs.nixpkgs.follows = "nixpkgs";
+    homeassistant-smartrent.url = "github:ZacheryThomas/homeassistant-smartrent";
+    homeassistant-smartrent.flake = false;
   };
 
   # Wired using https://nixos-unified.org/autowiring.html

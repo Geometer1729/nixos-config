@@ -8,7 +8,9 @@
       "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
+      "/var/lib/hass"
       "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
+      "/home/easyftp"
     ];
     files = [
       "/etc/ssh/ssh_host_ed25519_key"

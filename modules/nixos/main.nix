@@ -166,6 +166,8 @@ in
       };
     };
 
+    boot.kernel.sysctl."vm.swappiness" = 0;
+
 
     users.users.root = {
       hashedPasswordFile = config.sops.secrets.hashedPassword.path;

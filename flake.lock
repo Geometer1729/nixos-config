@@ -400,6 +400,22 @@
         "type": "github"
       }
     },
+    "homeassistant-smartrent": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1733415784,
+        "narHash": "sha256-FIfTrbIGP7FztvifI9wVLtepQZKwd70xImncmoYGu6k=",
+        "owner": "ZacheryThomas",
+        "repo": "homeassistant-smartrent",
+        "rev": "9e91b0979e5029e2b1eddf0fb1b85df735c83c91",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ZacheryThomas",
+        "repo": "homeassistant-smartrent",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "locked": {
         "lastModified": 1734772301,
@@ -628,6 +644,7 @@
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
+        "homeassistant-smartrent": "homeassistant-smartrent",
         "impermanence": "impermanence",
         "nix-darwin": "nix-darwin",
         "nix-index-database": "nix-index-database",

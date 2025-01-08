@@ -43,5 +43,7 @@ in
       xmonad
       main
       cloudflare
+      #just am
+      home
     ];
 }
