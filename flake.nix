@@ -30,6 +30,10 @@
     nur.inputs.nixpkgs.follows = "nixpkgs";
     homeassistant-smartrent.url = "github:ZacheryThomas/homeassistant-smartrent";
     homeassistant-smartrent.flake = false;
+    haskell-flake.url = "github:Srid/haskell-flake";
+    git-hooks.url = "github:cachix/git-hooks.nix";
+    git-hooks.flake = false;
+
   };
 
   # Wired using https://nixos-unified.org/autowiring.html

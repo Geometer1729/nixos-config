@@ -270,6 +270,22 @@
       }
     },
     "git-hooks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1735882644,
+        "narHash": "sha256-3FZAG+pGt3OElQjesCAWeMkQ7C/nB1oTHLRQ8ceP110=",
+        "owner": "cachix",
+        "repo": "git-hooks.nix",
+        "rev": "a5a961387e75ae44cc20f0a57ae463da5e959656",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cachix",
+        "repo": "git-hooks.nix",
+        "type": "github"
+      }
+    },
+    "git-hooks_2": {
       "inputs": {
         "flake-compat": [
           "nixvim",
@@ -335,6 +351,21 @@
         "owner": "GNOME",
         "ref": "47.2",
         "repo": "gnome-shell",
+        "type": "github"
+      }
+    },
+    "haskell-flake": {
+      "locked": {
+        "lastModified": 1735436109,
+        "narHash": "sha256-WIn6GVY+UiaCL+kUeF8cfPXE5kxF4UPcFGx62U3kmAE=",
+        "owner": "Srid",
+        "repo": "haskell-flake",
+        "rev": "207b1d67106a799df892b380ed9dc7578746fbc1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Srid",
+        "repo": "haskell-flake",
         "type": "github"
       }
     },
@@ -570,7 +601,7 @@
         "flake-parts": [
           "flake-parts"
         ],
-        "git-hooks": "git-hooks",
+        "git-hooks": "git-hooks_2",
         "home-manager": "home-manager_2",
         "nix-darwin": "nix-darwin_2",
         "nixpkgs": [
@@ -643,6 +674,8 @@
         "disko": "disko",
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
+        "git-hooks": "git-hooks",
+        "haskell-flake": "haskell-flake",
         "home-manager": "home-manager",
         "homeassistant-smartrent": "homeassistant-smartrent",
         "impermanence": "impermanence",

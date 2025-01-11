@@ -24,14 +24,14 @@ lsp.nixd.setup({
       formatting = {
         command = { "alejandra" }, -- or nixfmt or nixpkgs-fmt
       },
-      -- options = {
-      --   nixos = {
-      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").nixosConfigurations.CONFIGNAME.options',
-      --   },
-      --   home_manager = {
-      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").homeConfigurations.CONFIGNAME.options',
-      --   },
-      -- },
+      options = {
+        nixos = {
+            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.am.options',
+        },
+        home_manager = {
+            expr = '(builtins.getFlake "/home/bbrian/conf").legacyPackages.x86_64-linux.homeConfigurations.bbrian.options',
+        },
+      },
     },
   }
 })

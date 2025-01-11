@@ -1,6 +1,11 @@
 cabal-version:      3.0
 name:               my-xmonad
 version:            0.1.0.0
+category:           System
+maintainer:         Brian Kuhns
+synopsis:           My xmonad config
+description:        My xmonad config built with cabal for convenience
+license:            BSD-3-Clause
 
 executable my-xmonad
   main-is:          Main.hs
@@ -20,7 +25,7 @@ executable my-xmonad
 library
   hs-source-dirs:
     , lib
-    , ./.
+    , .
   exposed-modules:
     Config
     Modes
@@ -34,5 +39,5 @@ library
     , containers
     , text
     , time
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded
   default-language: Haskell2010
