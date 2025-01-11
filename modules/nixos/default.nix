@@ -1,24 +1,41 @@
-{ opts, inputs, ... }:
+{flake,config,...}:
+let
+  inherit (flake) inputs;
+  inherit (inputs) self;
+in
 {
+
+  mainUser = "bbrian";
+  system.stateVersion = "22.05";
+
+  home-manager.users.${config.mainUser} = {
+    imports = [ (self + /configurations/home/bbrian.nix) ];
+  };
+  home-manager.users.root = {
+    imports = [ (self + /configurations/home/root.nix) ];
+  };
+
   imports =
+    with self.nixosModules;
     [
+      #inputs
       inputs.disko.nixosModules.default
       inputs.impermanence.nixosModules.impermanence
       inputs.stylix.nixosModules.stylix
-      #inputs.persist-retro.nixosModules.persist-retro
-      ./boot.nix
-      ./main.nix
-      ./xmonad.nix
-      ./ssh.nix
-      ./disko.nix
-      ./impermanence.nix
-      ./dns.nix
-      ./stylix.nix
-      ./work.nix
-      ./bt.nix
-      ./useBuilders.nix
-    ]
-    ++ (if opts.wifi.enable then [ ./wifi.nix ] else [ ])
-    ++ (if opts.builder then [ ./builder.nix ] else [ ])
-  ;
+      inputs.sops-nix.nixosModules.sops
+      #self
+      secrets
+      boot
+      bt
+      builder
+      disko
+      impermanence
+      ssh
+      stylix
+      wifi
+      work
+      xmonad
+      main
+      cloudflare
+    ];
 }
