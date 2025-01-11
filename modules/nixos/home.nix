@@ -6,12 +6,12 @@ let
     rev = "main";
     sha256 = "sha256-FIfTrbIGP7FztvifI9wVLtepQZKwd70xImncmoYGu6k=";
   };
-  smartrent-py =
+  smartrent = python3Packages: with python3Packages;
     let
       pname = "smartrent-py";
       version = "0.4.5";
     in
-    pkgs.buildPythonPackage {
+    buildPythonPackage {
       inherit pname version;
       src = pkgs.fetchPypi {
         inherit pname version;
@@ -33,7 +33,7 @@ in
       govee-ble
       websockets
       #pyicloud
-      smartrent-py
+      (smartrent python3Packages)
     ];
     configWritable = true;
     lovelaceConfigWritable = true;
