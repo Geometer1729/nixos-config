@@ -1,11 +1,11 @@
-{ pkgs,... }:
+{ pkgs, ... }:
 let
   me = {
     user = "bbrian";
     identityFile = "/home/bbrian/.ssh/id_ed25519";
   };
   cloudflare = {
-      proxyCommand = "cloudflared access ssh --hostname %h";
+    proxyCommand = "cloudflared access ssh --hostname %h";
   };
 in
 {
@@ -15,7 +15,7 @@ in
     matchBlocks = {
       tub = me // {
         hostname = "jsh.gov";
-      } ;
+      };
       torag = me // cloudflare // {
         hostname = "torag.bbrian.xyz";
       };

@@ -2,6 +2,7 @@
 {
   imports = [
     (inputs.git-hooks + /flake-module.nix)
+    inputs.fourmolu-nix.flakeModule
   ];
 
   perSystem = { config, pkgs, ... }: {
@@ -20,8 +21,14 @@
 
     };
 
-    pre-commit.settings = {
-      hooks.nixpkgs-fmt.enable = true;
+    pre-commit.settings.hooks = {
+      nixpkgs-fmt.enable = true;
+      cabal-fmt.enable = true;
+      fourmolu = {
+        enable = true;
+        package = config.fourmolu.wrapper;
+      };
+      hlint.enable = true;
     };
   };
 }

@@ -1,4 +1,4 @@
-{config,pkgs,...}:
+{ config, pkgs, ... }:
 let
   inherit (pkgs) lib;
 in
@@ -9,8 +9,8 @@ in
     default = null;
   };
   config.services = {
-      cloudflare-warp.enable = true;
-      cloudflared = lib.mkIf (config.cloudflare-id != null)
+    cloudflare-warp.enable = true;
+    cloudflared = lib.mkIf (config.cloudflare-id != null)
       {
         enable = true;
         tunnels = {

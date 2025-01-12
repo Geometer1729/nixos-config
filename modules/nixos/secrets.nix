@@ -1,6 +1,6 @@
-{config,...}:
+{ config, ... }:
 let
-  owned = { owner = config.mainUser;};
+  owned = { owner = config.mainUser; };
 in
 {
   sops = {
@@ -13,7 +13,7 @@ in
     };
 
     secrets.wifi = owned;
-    secrets.hashedPassword = owned // { neededForUsers = true ; };
+    secrets.hashedPassword = owned // { neededForUsers = true; };
     secrets.hosts = owned;
   };
   # secret hosts

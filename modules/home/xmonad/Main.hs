@@ -1,1 +1,1 @@
-import Config(main)
+import Config (main)

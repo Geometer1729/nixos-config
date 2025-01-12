@@ -6,7 +6,7 @@
 # tmux
 # xmobar (mostly needs a fix for the part from xmonad)
 # vit (not really, needs a stylix module)
-{pkgs,...}:
+{ pkgs, ... }:
 {
   stylix = {
     enable = true;
@@ -14,8 +14,8 @@
     opacity.terminal = 0.9;
     polarity = "dark"; # TODO this doesn't seem to work
     #https://tinted-theming.github.io/base16-gallery/
-    base16Scheme ="${pkgs.base16-schemes}/share/themes/isotope.yaml";
-      #isotope //
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/isotope.yaml";
+    #isotope //
     override =
       {
         base0A = "#ffff00"; #yellow

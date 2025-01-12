@@ -33,6 +33,7 @@
     haskell-flake.url = "github:Srid/haskell-flake";
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.flake = false;
+    fourmolu-nix.url = "github:jedimahdi/fourmolu-nix";
 
   };
 

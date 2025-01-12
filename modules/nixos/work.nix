@@ -1,4 +1,4 @@
-{pkgs,...}:
+{ pkgs, ... }:
 let
   # Probably don't need this but it's at least nice as an app image template
   #ledger-live-desktop =
@@ -40,11 +40,11 @@ in
     settings = {
       listen_addresses = pkgs.lib.mkOverride 10 "*";
     };
-      # doesn't work
-      #initialScript = pkgs.writeText "init-sql-script"
-      #''
-      #  alter user postgres with password 'postgres';
-      #'';
+    # doesn't work
+    #initialScript = pkgs.writeText "init-sql-script"
+    #''
+    #  alter user postgres with password 'postgres';
+    #'';
   };
   #users.users.postgres.password = "postgres";
 
@@ -60,10 +60,10 @@ in
   nix.settings = {
     extra-substituters = [ "https://storage.googleapis.com/mina-nix-cache" ];
     extra-trusted-public-keys = [
-        "nix-cache.minaprotocol.org:fdcuDzmnM0Kbf7yU4yywBuUEJWClySc1WIF6t6Mm8h4="
-        "nix-cache.minaprotocol.org:D3B1W+V7ND1Fmfii8EhbAbF1JXoe2Ct4N34OKChwk2c="
-        "mina-nix-cache-1:djtioLfv2oxuK2lqPUgmZbf8bY8sK/BnYZCU2iU5Q10="
-      ];
+      "nix-cache.minaprotocol.org:fdcuDzmnM0Kbf7yU4yywBuUEJWClySc1WIF6t6Mm8h4="
+      "nix-cache.minaprotocol.org:D3B1W+V7ND1Fmfii8EhbAbF1JXoe2Ct4N34OKChwk2c="
+      "mina-nix-cache-1:djtioLfv2oxuK2lqPUgmZbf8bY8sK/BnYZCU2iU5Q10="
+    ];
   };
 
 }

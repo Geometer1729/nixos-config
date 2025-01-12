@@ -6,9 +6,9 @@
     nix-direnv.enable = true;
     #may cause gc issues
     stdlib =
-    ''
-    tmux rename-session "#{b:pane_current_path}"
-    '';
+      ''
+        tmux rename-session "#{b:pane_current_path}"
+      '';
   };
   home.sessionVariables.DIRENV_LOG_FORMAT = "";
 }

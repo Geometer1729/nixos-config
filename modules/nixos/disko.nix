@@ -1,12 +1,14 @@
-{ config, pkgs,... }:
+{ config, pkgs, ... }:
 let
   device = config.drive;
   inherit (pkgs) lib;
 in
-{ options.drive = lib.mkOption
-  { type = lib.types.str;
-    description = "the drive to mount with disko.nix";
-  };
+{
+  options.drive = lib.mkOption
+    {
+      type = lib.types.str;
+      description = "the drive to mount with disko.nix";
+    };
   config = {
     disko.devices = {
       disk.main = {

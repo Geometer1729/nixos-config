@@ -1,4 +1,4 @@
-{ pkgs, config,... }:
+{ pkgs, config, ... }:
 let
   inherit (pkgs) lib;
 in
@@ -59,11 +59,11 @@ in
         };
       } // (if config.amd then
         {
-          amdgpu.amdvlk= {
+          amdgpu.amdvlk = {
             enable = true;
             support32Bit.enable = true;
           };
-        } else {});
+        } else { });
 
     security.pam.loginLimits = [
       { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
@@ -139,7 +139,7 @@ in
         enable = true;
         settings = {
           PasswordAuthentication = false;
-          X11Forwarding=true;
+          X11Forwarding = true;
           X11USeLocalhost = true;
         };
       };

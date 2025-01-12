@@ -1,4 +1,4 @@
-{ config,pkgs, ... }:
+{ config, pkgs, ... }:
 let
   inherit (pkgs) lib;
 in
@@ -11,18 +11,19 @@ in
       update_config=1
     '';
     networks =
-      lib.attrsets.foldAttrs (l: r: l) {}
-      (
-      builtins.map (name : { ${name}.pskRaw = "ext:${name}";})
-        [ "My love"
-          "the_dojo"
-          "ASUS"
-          "WiliamHowardTaftMemorialNetwork"
-          "FASBOOKS WIFI_5GEXT"
-          "binaup"
-          "WhiteSky-Slate"
-        ]
-      );
+      lib.attrsets.foldAttrs (l: r: l) { }
+        (
+          builtins.map (name: { ${name}.pskRaw = "ext:${name}"; })
+            [
+              "My love"
+              "the_dojo"
+              "ASUS"
+              "WiliamHowardTaftMemorialNetwork"
+              "FASBOOKS WIFI_5GEXT"
+              "binaup"
+              "WhiteSky-Slate"
+            ]
+        );
   };
   environment.systemPackages = with pkgs;
     [

@@ -6,7 +6,8 @@
     };
     distributedBuilds = true;
     buildMachines = [
-      { hostName = "am";
+      {
+        hostName = "am";
         maxJobs = 40;
         sshKey = "/home/bbrian/.ssh/id_ed25519";
         sshUser = "bbrian";

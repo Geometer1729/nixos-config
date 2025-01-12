@@ -1,4 +1,4 @@
-{...}:
+{ ... }:
 {
   services.pixiecore = {
     enable = true;

@@ -22,44 +22,44 @@
     ];
     users.bbrian = {
       directories = [
-          ".config/BraveSoftware/Brave-Browser"
-          ".config/Signal"
-          ".config/discord"
-          ".config/spotify"
-          ".config/Slack"
-          ".config/sops/age"
-          ".gnupg"
-          ".hoogle"
-          ".local/share/PrismLauncher"
-          ".local/share/Steam"
-          ".local/share/direnv"
-          ".local/share/task"
-          ".local/state/nvim"
-          ".mozilla/firefox/default"
-          ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
-          ".cache/rofi-2.sshcache"
-          ".cache/rofi-3.runcache"
-          ".ssh"
-          ".tldrc"
-          "Code"
-          "Documents"
-          "Pictures"
-          "conf"
-          "memes"
-          "password-store"
-        ];
+        ".config/BraveSoftware/Brave-Browser"
+        ".config/Signal"
+        ".config/discord"
+        ".config/spotify"
+        ".config/Slack"
+        ".config/sops/age"
+        ".gnupg"
+        ".hoogle"
+        ".local/share/PrismLauncher"
+        ".local/share/Steam"
+        ".local/share/direnv"
+        ".local/share/task"
+        ".local/state/nvim"
+        ".mozilla/firefox/default"
+        ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
+        ".cache/rofi-2.sshcache"
+        ".cache/rofi-3.runcache"
+        ".ssh"
+        ".tldrc"
+        "Code"
+        "Documents"
+        "Pictures"
+        "conf"
+        "memes"
+        "password-store"
+      ];
       files = [
-          ".zsh_history" # This seems to not work, and causes some sort of permissions error
-          ".config/lazygit/state.yml"
-          ".cache/nix-index/files"
-          ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
-          ".git-credentials"
-        ];
+        ".zsh_history" # This seems to not work, and causes some sort of permissions error
+        ".config/lazygit/state.yml"
+        ".cache/nix-index/files"
+        ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
+        ".git-credentials"
+      ];
     };
   };
 
   # duplicates
-  fileSystems."/root/.ssh" =  {
+  fileSystems."/root/.ssh" = {
     device = "/persist/system/home/bbrian/.ssh";
     options = [ "bind" ];
   };
