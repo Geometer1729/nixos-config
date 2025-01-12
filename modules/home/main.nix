@@ -1,4 +1,4 @@
-{ config,pkgs, ... }:
+{ config, pkgs, ... }:
 {
   home =
     {
@@ -109,20 +109,21 @@
           dunst # notifcation manager for xorg
           libnotify # notify-send
           (pkgs.writeShellApplication
-          {
-            name = "flushSwap";
-            text =
-              ''
-              sudo swapoff -a
-              sudo swapon -a
-              notify-send "swap flushed"
-              '';
-          })
+            {
+              name = "flushSwap";
+              text =
+                ''
+                  sudo swapoff -a
+                  sudo swapon -a
+                  notify-send "swap flushed"
+                '';
+            })
           cloudflared
-      ];
+        ];
     };
 
   services = {
+    dunst.enable = true;
     systembus-notify.enable = true;
     picom = {
       enable = true;

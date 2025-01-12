@@ -1,4 +1,4 @@
-{flake,config,...}:
+{ flake, config, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -6,6 +6,7 @@ in
 {
 
   mainUser = "bbrian";
+  nixos-unified.sshTarget = "${config.mainUser}@${config.networking.hostName}";
   system.stateVersion = "22.05";
 
   home-manager.users.${config.mainUser} = {
