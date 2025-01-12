@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ flake, pkgs, config, ... }:
 let
   isRoot = config.home.username == "root";
   my-xmonad =
@@ -28,7 +28,7 @@ in
       config = ./Main.hs;
       extraPackages = haskellPackages: with haskellPackages ;
         [
-          my-xmonad
+          flake.inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.my-xmonad
           extra
         ];
     };

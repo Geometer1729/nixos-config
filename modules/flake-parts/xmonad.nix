@@ -22,7 +22,8 @@
 
       settings = {
         my-xmonad = {
-          stan = true;
+          stan = false;
+          # Ideally enable this at some point
           haddock = false;
         };
       };
