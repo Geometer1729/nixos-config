@@ -16,6 +16,7 @@
 
           # apps
           discord
+          whatsapp-for-linux
           element-desktop # matrix client
           brave
           spotify

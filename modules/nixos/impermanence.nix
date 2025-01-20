@@ -34,6 +34,7 @@
         ".local/share/Steam"
         ".local/share/direnv"
         ".local/share/task"
+        ".local/share/wasistlos"
         ".local/state/nvim"
         ".mozilla/firefox/default"
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?

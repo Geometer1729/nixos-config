@@ -65,6 +65,8 @@ map('n','n','nzzzv')
 map('n','N','Nzzzv')
 map('n','<leader>d','\"_d')
 
+map('n','<Leader>jq','<cmd>.!jq<cr>')
+
 --vimtex
 map('n','<Leader>ll',vim.cmd.VimtexCompile)
 
