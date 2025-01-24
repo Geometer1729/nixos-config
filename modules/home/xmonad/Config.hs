@@ -1,3 +1,4 @@
+{-# LANGUAGE NamedFieldPuns #-}
 -- Annoying for the layout type
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
@@ -31,7 +32,9 @@ import Control.Monad (when)
 import Control.Monad.Extra (unless)
 import Data.Char (toLower)
 import qualified Data.Map as M
+import Data.Maybe (catMaybes)
 import System.Environment (setEnv)
+import System.Process.Extra (readProcess)
 import XMonad.Actions.WorkspaceCursors (getFocus)
 import XMonad.Hooks.RefocusLast (refocusLastLogHook)
 import XMonad.Hooks.ServerMode (serverModeEventHook, serverModeEventHook', serverModeEventHookF)
@@ -42,6 +45,13 @@ import qualified XMonad.StackSet as W
 
 main :: IO ()
 main = do
+  normalBorderColor <- liftIO $ init <$> runProcessWithInput "xrdb" ["-get", "color8"] ""
+  focusedBorderColor <- liftIO $ init <$> runProcessWithInput "xrdb" ["-get", "color4"] ""
+  yellow <- liftIO $ init <$> runProcessWithInput "xrdb" ["-get", "color3"] ""
+  green <- liftIO $ init <$> runProcessWithInput "xrdb" ["-get", "color2"] ""
+  -- colors based on these
+  -- https://stylix.danth.me/styling.html?highlight=yellow#images
+  -- https://github.com/danth/stylix/blob/master/modules/xresources/hm.nix
   h0 <- spawnPipe $ retry "xmobar -x 0"
   h1 <- spawnPipe $ retry "xmobar -x 1"
   let (modeStartHook, myKeys) = hookAndKeys
@@ -51,8 +61,8 @@ main = do
         def
           { terminal = fst myTerminal
           , borderWidth = 1
-          , normalBorderColor = "#000044"
-          , focusedBorderColor = "#8080ff"
+          , normalBorderColor
+          , focusedBorderColor
           , workspaces = myWorkspaces
           , keys = const myKeys
           , layoutHook = myLayout
@@ -71,8 +81,8 @@ main = do
           , startupHook = myStartupHook <> modeStartHook
           , focusFollowsMouse = False
           , logHook =
-              myLogHook h0
-                <> myLogHook h1
+              myLogHook h0 yellow green
+                <> myLogHook h1 yellow green
                 <> (refocusLastLogHook >> nsHideOnFocusLoss spconf)
           , modMask = modm
           }
@@ -90,14 +100,16 @@ myStartupHook = do
   spawn "pgrep firefox || firefox"
   spawn "pgrep Discord || discord"
 
-myLogHook :: Handle -> X ()
-myLogHook pipe =
+myLogHook :: Handle -> String -> String -> X ()
+myLogHook pipe yellow green =
   workspaceNamesPP
     xmobarPP
       { ppOutput = hPutStrLn pipe
       , ppLayout = id -- const""
       , ppHidden = \w -> if w == "NSP" then "" else w
       , ppSep = " | "
+      , ppCurrent = xmobarColor yellow "" . wrap "[" "]"
+      , ppTitle = xmobarColor green "" . shorten 40
       }
     >>= dynamicLogWithPP
 

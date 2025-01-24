@@ -1,17 +1,20 @@
-{ flake, pkgs, config, ... }:
-let
-  isRoot = config.home.username == "root";
-in
+{ flake, pkgs, lib, config, ... }:
 {
-  home.file = {
-    ".xinitrc".source = ./xinit;
+  options.xrander = lib.mkOption {
+    type = lib.types.string;
+    description = "xrander commands to run in ./xinitrc";
+    default = "";
+  };
+
+  config.home.file = {
+    ".xinitrc".text = config.xrander + builtins.readFile ./xinit;
     ".xmonad/xmonad-x86_64-linux".onChange =
       "pgrep xmonad && xmonad --restart";
     # TODO find the xmobar config and restart on that too
     # There's an error with that
   };
 
-  xsession.windowManager.xmonad =
+  config.xsession.windowManager.xmonad =
     {
       enable = true;
       enableContribAndExtras = true;

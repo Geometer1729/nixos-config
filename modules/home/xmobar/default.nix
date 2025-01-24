@@ -78,7 +78,11 @@ with config.lib.stylix.colors.withHashtag;
                                 -- charged status
                                 , "-i"	, "<fc=${yellow}>Charged</fc>"
                       ] 50
-              , Run Alsa "default" "Master" ["--template", "<volume>% <status>"]
+              , Run Alsa "default" "Master"
+                [ "--template", "<volume>% <status>", "--"
+                ,"--offc","${red}"
+                ,"--onc","${green}"
+                ]
               ${when config.wifi.enable (", Run Wireless \"" +  config.wifi.interface + "\" [] 10")}
               ]
           }
