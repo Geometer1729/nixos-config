@@ -113,9 +113,10 @@ in
           };
         };
         settings = {
+          "browser.sessionstore.resume_from_crash" = true;
+          "browser.startup.page" = 3;
           "accessibility.typeaheadfind.enablesound" = false;
           "browser.compactmode.show" = true;
-          "browser.startup.page" = 1;
           "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
           "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
           "browser.newtabpage.activity-stream.feeds.topsites" = false;

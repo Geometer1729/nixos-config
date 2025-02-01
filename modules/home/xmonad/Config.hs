@@ -99,6 +99,7 @@ myStartupHook = do
   spawn "pgrep picom || picom"
   spawn "pgrep firefox || firefox"
   spawn "pgrep Discord || discord"
+  spawn "echo \"connect 60:AB:D2:42:5E:19\" | bluetoothctl"
 
 myLogHook :: Handle -> String -> String -> X ()
 myLogHook pipe yellow green =

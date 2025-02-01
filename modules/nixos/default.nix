@@ -25,18 +25,19 @@ in
       inputs.stylix.nixosModules.stylix
       inputs.sops-nix.nixosModules.sops
       #self
-      secrets
       boot
       bt
       builder
+      cloudflare
       disko
       impermanence
+      main
+      secrets
       ssh
       stylix
       wifi
       work
       xmonad
-      main
-      cloudflare
+      yubikey
     ];
 }

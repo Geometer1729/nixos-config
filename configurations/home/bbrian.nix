@@ -26,6 +26,7 @@ in
     work
     xmobar
     xmonad
+    yubikey
     zsh
   ];
 
