@@ -18,8 +18,8 @@
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/atelier-forest.yaml";
     # AYU is pretty good
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    #base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/deep-oceanic-next.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/gotham.yaml";
     #"${pkgs.base16-schemes}/share/themes/isotope.yaml";
