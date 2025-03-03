@@ -1,4 +1,4 @@
-{ flake, config, ... }:
+{ pkgs, flake, config, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -15,6 +15,8 @@ in
       interface = "wlp0s20f3";
     };
     battery = true;
+    programs.alacritty.settings.font.size
+      = pkgs.lib.mkForce 9;
   };
 
   imports =
