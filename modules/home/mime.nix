@@ -4,7 +4,8 @@ let
     {
       name = "pick-browser";
       text =
-        ''if [[ $1 =~ (youtube\.com|youtu\.be) ]]
+        ''
+          if [ "$#" -ge 1 ] && [[ $1 =~ (youtube\.com|youtu\.be) ]]
           then
             exec brave "$@"
           else

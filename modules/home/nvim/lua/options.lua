@@ -3,7 +3,9 @@ local g = vim.g
 
 -- I blocks global message
 -- W shortens write messages
-o.shortmess = "IW"
+-- c alegedly reduce press enter to continue insanity
+-- o I don't even know
+o.shortmess = "IWco"
 vim.api.nvim_set_hl(0,"Normal", { bg = "none" })
 vim.api.nvim_set_hl(0,"NormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0,"NormalFloat", { bg = "none" })
@@ -60,3 +62,13 @@ o.laststatus=3
 -- macros
 g['@p']="O<Enter>"
 g['@c']=[["zdt"P]]
+
+
+
+-- May also reduce press enter to continue
+vim.api.nvim_create_autocmd({"CmdlineEnter"}, {
+  callback = function() vim.o.cmdheight = 3 end
+})
+vim.api.nvim_create_autocmd({"CmdlineLeave"}, {
+  callback = function() vim.o.cmdheight = 1 end
+})
