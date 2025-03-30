@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ flake, pkgs, config, system, ... }:
 let
   inherit (pkgs) lib;
 in
@@ -109,7 +109,8 @@ in
       # ssh store
       # imrpoves nixlsp but breaks nix-shell -p
       #nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
-      package = pkgs.nixVersions.latest;
+      package = flake.inputs.nix.packages."x86_64-linux".nix;
+      #package = pkgs.nixVersions.latest;
       settings = {
         substituters = [ "https://cache.nixos.org" ];
         trusted-substituters = [ "https://cache.nixos.org" ];

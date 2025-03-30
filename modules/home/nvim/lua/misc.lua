@@ -22,3 +22,13 @@ require('lualine').setup {
     lualine_z = {}
   },
 };
+
+-- Temporary function
+local function gvsplit_develop()
+  local pos = vim.fn.getpos('.')
+  vim.cmd('Gvsplit develop:%')
+  vim.fn.setpos('.', pos)
+end
+
+-- Bind the command to <leader>d
+vim.keymap.set('n', '<leader>de', gvsplit_develop, { desc = 'Git Diff Split with develop branch' })

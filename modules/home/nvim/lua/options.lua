@@ -66,9 +66,9 @@ g['@c']=[["zdt"P]]
 
 
 -- May also reduce press enter to continue
-vim.api.nvim_create_autocmd({"CmdlineEnter"}, {
-  callback = function() vim.o.cmdheight = 3 end
-})
-vim.api.nvim_create_autocmd({"CmdlineLeave"}, {
-  callback = function() vim.o.cmdheight = 1 end
-})
+--vim.api.nvim_create_autocmd({"CmdlineEnter"}, {
+--  callback = function() vim.o.cmdheight = 3 end
+--})
+--vim.api.nvim_create_autocmd({"CmdlineLeave"}, {
+--  callback = function() vim.o.cmdheight = 1 end
+--})

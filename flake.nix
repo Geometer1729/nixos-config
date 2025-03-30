@@ -12,6 +12,8 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     # Software inputs
+    nix.url = "github:NixOS/nix/2.21.5";
+
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.url = "github:nix-community/nixvim";

@@ -48,6 +48,7 @@
           neovim-remote
           postman # rest-api tool of some sort
           sops # needed to edit sops-nix secrets
+          gh
 
           expect # provides unbuffer
           nixd # nix lsp
