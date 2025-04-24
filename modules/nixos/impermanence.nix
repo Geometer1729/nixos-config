@@ -55,6 +55,7 @@
         ".cache/nix-index/files"
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ".git-credentials"
+        ".config/gh/hosts.yml"
       ];
     };
   };

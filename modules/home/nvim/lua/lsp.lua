@@ -99,6 +99,9 @@ vim.diagnostic.config({
     signs = true,
     underline = true,
     severity_sort = true,
+    float = {
+      wrap = true,
+    }
 })
 
 -- TODO use autocmd syntax

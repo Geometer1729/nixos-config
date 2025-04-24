@@ -32,3 +32,11 @@ end
 
 -- Bind the command to <leader>d
 vim.keymap.set('n', '<leader>de', gvsplit_develop, { desc = 'Git Diff Split with develop branch' })
+
+-- Define the function
+local function source_file_if_exists(filepath)
+    local status, _ = pcall(vim.cmd, "source " .. filepath)
+end
+
+-- Call the function
+source_file_if_exists(".vim/vimrc.local")

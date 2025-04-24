@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   programs.git = {
     enable = true;
@@ -9,11 +9,12 @@
       push.autoSetupRemote = true;
       merge.conflictstyle = "diff3";
       branch.autoSetupMerge = true;
-      credential.helper = "store";
+      credential."https://github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
+      credential."https://gitst.github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
     };
     signing = {
-      signByDefault = true;
-      key = "79C7B4461F8AA7D7CE6239E47889938835D9DD8E";
+      #signByDefault = true;
+      #key = "79C7B4461F8AA7D7CE6239E47889938835D9DD8E";
     };
     aliases = {
       co = "checkout";

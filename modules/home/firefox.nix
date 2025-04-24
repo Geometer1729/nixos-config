@@ -12,8 +12,8 @@ in
         id = 0;
         isDefault = true;
         search = {
-          default = "DuckDuckGo";
-          order = [ "DuckDuckGo" ];
+          default = "ddg";
+          order = [ "ddg" ];
           force = true;
           engines = {
             "Hoogle" = {
@@ -23,7 +23,7 @@ in
                   params = [{ name = "hoogle"; value = "{searchTerms}"; }];
                 }
               ];
-              iconUpdateURL = "https://hoogle.haskell.org/favicon.png";
+              icon = "https://hoogle.haskell.org/favicon.png";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@h" ];
             };
@@ -59,7 +59,7 @@ in
                   template = "https://nixos.wiki/index.php";
                   params = [{ name = "search"; value = "{searchTerms}"; }];
                 }];
-              iconUpdateURL = "https://nixos.wiki/favicon.png";
+              icon = "https://nixos.wiki/favicon.png";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@nw" ];
             };
@@ -70,7 +70,7 @@ in
                   params = [{ name = "query"; value = "{searchTerms}"; }
                     { name = "release"; value = "master"; }];
                 }];
-              iconUpdateURL = "https://nixos.wiki/favicon.png";
+              icon = "https://nixos.wiki/favicon.png";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@hm" ];
             };
@@ -80,7 +80,7 @@ in
                   template = "https://2e.aonprd.com/Search.aspx";
                   params = [{ name = "q"; value = "{searchTerms}"; }];
                 }];
-              iconUpdateURL = "https://2e.aonprd.com/favicon.ico";
+              icon = "https://2e.aonprd.com/favicon.ico";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@an" ];
             };
@@ -90,7 +90,7 @@ in
                   template = "https://minecraft.wiki/w/Special:Search";
                   params = [{ name = "search"; value = "{searchTerms}"; }];
                 }];
-              iconUpdateURL = "https://minecraft.wiki/favicon.ico";
+              icon = "https://minecraft.wiki/favicon.ico";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@mcw" ];
             };
@@ -102,14 +102,14 @@ in
                     { name = "comic"; value = "137"; }
                     { name = "Search"; value = "Search"; }];
                 }];
-              iconUpdateURL = "https://www.smbc-comics.com/favicon.ico";
+              icon = "https://www.smbc-comics.com/favicon.ico";
               updateInterval = 24 * 60 * 60 * 1000;
               definedAliases = [ "@smbc" ];
             };
-            "Google".metaData.hidden = true;
-            "Bing".metaData.hidden = true;
-            "eBay".metaData.hidden = true;
-            "Amazon.com".metaData.hidden = true;
+            "google".metaData.hidden = true;
+            "bing".metaData.hidden = true;
+            "ebay".metaData.hidden = true;
+            "amazondotcom-us".metaData.hidden = true;
           };
         };
         settings = {

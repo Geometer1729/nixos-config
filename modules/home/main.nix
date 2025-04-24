@@ -81,7 +81,6 @@
           pass
           gnupg
           pinentry
-          yubikey-manager
 
           # mouse thing
           piper

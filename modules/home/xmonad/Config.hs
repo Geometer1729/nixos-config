@@ -185,6 +185,7 @@ layoutBindings =
   , ((modm, xK_bracketright), onNextNeighbour def W.view)
   , ((modShift, xK_bracketright), onNextNeighbour def W.shift)
   , ((noMask, xK_Print), spawn "flameshot gui -c")
+  , ((modShift, xK_b), spawn "echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl")
   ]
     ++ [ ((mask, key), action dir False)
        | (mask, action) <- [(modm, windowGo), (modShift, windowSwap)]
