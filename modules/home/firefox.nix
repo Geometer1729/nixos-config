@@ -122,7 +122,7 @@ in
           "browser.newtabpage.activity-stream.feeds.topsites" = false;
           "toolkit.telemetry.pioneer-new-studies-available" = false;
         };
-        extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
+        extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
           vimium
         ];
       };
