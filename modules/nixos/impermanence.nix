@@ -11,6 +11,7 @@
       "/var/lib/hass"
       "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
       "/home/easyftp"
+      "/root/.ssh"
     ];
     files = [
       "/etc/ssh/ssh_host_ed25519_key"
@@ -58,12 +59,6 @@
         ".config/gh/hosts.yml"
       ];
     };
-  };
-
-  # duplicates
-  fileSystems."/root/.ssh" = {
-    device = "/persist/system/home/bbrian/.ssh";
-    options = [ "bind" ];
   };
 
   fileSystems."/persist".neededForBoot = true;
