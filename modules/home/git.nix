@@ -11,6 +11,7 @@
       branch.autoSetupMerge = true;
       credential."https://github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
       credential."https://gitst.github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
+      credential.helper = "store";
     };
     signing = {
       #signByDefault = true;

@@ -163,7 +163,7 @@
   home.file.".ghc/ghci.conf".source = ./ghci.repl;
 
   home.sessionVariables = {
-    FLAKE = "${config.home.homeDirectory}/conf";
+    NH_FLAKE = "${config.home.homeDirectory}/conf";
     PASSWORD_STORE_DIR = "${config.home.homeDirectory}/password-store";
   };
 

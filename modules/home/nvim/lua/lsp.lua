@@ -112,3 +112,14 @@ vim.cmd([[autocmd CursorMoved * lua vim.diagnostic.open_float(nil, {focus=false}
 -- remove trailing white spece
 vim.cmd([[autocmd BufWritePre * %s/\s\+$//e]])
 
+
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+  vim.lsp.handlers.hover,
+  { border = "rounded" }
+)
+
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+  vim.lsp.handlers.signature_help,
+  { border = "rounded" }
+)
