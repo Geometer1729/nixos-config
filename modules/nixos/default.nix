@@ -39,5 +39,6 @@ in
       work
       xmonad
       #yubikey
+      gh-noto
     ];
 }

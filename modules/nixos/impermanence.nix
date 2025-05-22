@@ -29,6 +29,7 @@
         ".config/spotify"
         ".config/Slack"
         ".config/sops/age"
+        ".config/clorio-wallet"
         ".gnupg"
         ".hoogle"
         ".local/share/PrismLauncher"

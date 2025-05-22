@@ -13,18 +13,27 @@ let
   #      sha256 = "sha256-dnlIIOOYmCN209avQFMcoekB7nJpc2dJnS2OBI+dq7E=";
   #    };
   #  };
-  #clorio =
-  #  let
-  #    version = "2.1.2";
-  #  in pkgs.appimageTools.wrapType1
-  #  {
-  #    name = "clorio";
-  #    inherit version;
-  #    src = pkgs.fetchurl {
-  #      url = "https://github.com/nerdvibe/clorio-client/releases/download/v${version}/Clorio.Wallet-${version}.AppImage";
-  #      sha256 = "sha256-U/4lOkLhnii40WqVUwFHota9Hu3g4vjSiMFW+mgoGN4=";
-  #    };
-  #  };
+  clorio =
+    let
+      version = "2.1.6";
+    in
+    pkgs.appimageTools.wrapType1
+      {
+        name = "clorio";
+        inherit version;
+        pname = "clorio-client";
+        src = pkgs.fetchurl {
+          url = "https://github.com/nerdvibe/clorio-client/releases/download/v${version}/Clorio.Wallet-${version}.AppImage";
+          sha256 = "sha256-gktMqIRAkqX3BsZG0hdFqTsBmhd9841HTUYauEJLWao=";
+        };
+
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        extraInstallCommands = ''
+          wrapProgram $out/bin/clorio-client \
+            --set ELECTRON_DISABLE_CLIPBOARD_SANDBOX 1 \
+            --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.xclip ]}
+        '';
+      };
 
 in
 {
@@ -56,7 +65,7 @@ in
   #virtualisation.vmware.guest.enable = true;
   virtualisation.docker.enable = true;
   users.users.bbrian.extraGroups = [ "docker" ];
-  #users.users.bbrian.packages = [ ledger-live-desktop clorio ];
+  users.users.bbrian.packages = [ clorio ];
   nix.settings = {
     extra-substituters = [ "https://storage.googleapis.com/mina-nix-cache" ];
     extra-trusted-public-keys = [
