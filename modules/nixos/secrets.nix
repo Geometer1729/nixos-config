@@ -12,9 +12,12 @@ in
       generateKey = true;
     };
 
-    secrets.wifi = owned;
-    secrets.hashedPassword = owned // { neededForUsers = true; };
-    secrets.hosts = owned;
+    secrets = {
+      wifi = owned;
+      hashedPassword = owned // { neededForUsers = true; };
+      hosts = owned;
+      anthropic_key = owned;
+    };
   };
   # secret hosts
   environment.etc.hosts.mode = "0644";

@@ -23,7 +23,12 @@
     lualine.enable = true;
     avante = {
       enable = true;
-      settings = { };
+      settings = {
+        provider = "claude";
+        claude = {
+          api_key_name = "cmd:cat /run/secrets/anthropic_key";
+        };
+      };
     };
     treesitter = {
       enable = true;
