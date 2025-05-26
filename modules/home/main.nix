@@ -20,6 +20,7 @@
           element-desktop # matrix client
           brave
           spotify
+          ncspot
           signal-desktop
           zathura # pdf
 

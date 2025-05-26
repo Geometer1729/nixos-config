@@ -30,6 +30,7 @@
         ".config/Slack"
         ".config/sops/age"
         ".config/clorio-wallet"
+        ".config/ncspot"
         ".gnupg"
         ".hoogle"
         ".local/share/PrismLauncher"
