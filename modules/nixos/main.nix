@@ -20,7 +20,7 @@ in
 
   config = {
     time.timeZone = "America/New_York";
-    i18n.defaultLocale = "en_US.utf8";
+    i18n.defaultLocale = "en_US.UTF-8";
 
     nixpkgs.config.allowUnfree = true;
     # TODO move to overlays

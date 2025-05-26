@@ -50,6 +50,7 @@
           postman # rest-api tool of some sort
           sops # needed to edit sops-nix secrets
           gh
+          just
 
           expect # provides unbuffer
           nixd # nix lsp
