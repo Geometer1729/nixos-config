@@ -1,4 +1,4 @@
-{ flake, pkgs, config, system, ... }:
+{ flake, pkgs, config, ... }:
 let
   inherit (pkgs) lib;
 in
@@ -16,7 +16,6 @@ in
       description = "main user of the system";
     };
   };
-
 
   config = {
     time.timeZone = "America/New_York";
@@ -49,87 +48,6 @@ in
         })
       ];
 
-    #steam needs this
-    hardware =
-      {
-        pulseaudio.support32Bit = true;
-        graphics = {
-          enable = true;
-          enable32Bit = true;
-        };
-      } // (if config.amd then
-        {
-          amdgpu.amdvlk = {
-            enable = true;
-            support32Bit.enable = true;
-          };
-        } else { });
-
-    security.pam.loginLimits = [
-      { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
-    ];
-    programs.nix-ld.enable = true;
-    programs.nix-ld.libraries = with pkgs; [
-
-      # Add any missing dynamic libraries for unpackaged programs
-
-      # here, NOT in environment.systemPackages
-      # common requirement for several games
-      stdenv.cc.cc.lib
-
-      # from https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/games/steam/fhsenv.nix#L72-L79
-      xorg.libXcomposite
-      xorg.libXtst
-      xorg.libXrandr
-      xorg.libXext
-      xorg.libX11
-      xorg.libXfixes
-      libGL
-      libva
-
-      # from https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/games/steam/fhsenv.nix#L124-L136
-      fontconfig
-      freetype
-      xorg.libXt
-      xorg.libXmu
-      libogg
-      libvorbis
-      SDL
-      SDL2_image
-      glew110
-      libdrm
-      libidn
-      tbb
-
-    ];
-
-    nix = {
-      # TODO extra platforms for am
-      # build machines for raptor
-      # ssh store
-      # imrpoves nixlsp but breaks nix-shell -p
-      #nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
-      package = flake.inputs.nix.packages."x86_64-linux".nix;
-      #package = pkgs.nixVersions.latest;
-      settings = {
-        substituters = [ "https://cache.nixos.org" ];
-        trusted-substituters = [ "https://cache.nixos.org" ];
-        trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-        warn-dirty = false;
-        #accept-flake-config = true;
-        log-lines = 25;
-        auto-optimise-store = true;
-        experimental-features = [ "nix-command" "flakes" "ca-derivations" "recursive-nix" ];
-        trusted-users = [ "root" config.mainUser ];
-        keep-outputs = true;
-      };
-      gc = {
-        automatic = true;
-        options = "--delete-older-than 21d";
-        # cleans up old home-manager genrations
-        dates = "weekly";
-      };
-    };
 
     security.rtkit.enable = true;
     security.sudo.wheelNeedsPassword = false;
@@ -168,8 +86,6 @@ in
     };
 
     boot.kernel.sysctl."vm.swappiness" = 1;
-
-
     users.users.root = {
       hashedPasswordFile = config.sops.secrets.hashedPassword.path;
       shell = pkgs.zsh;
@@ -182,17 +98,11 @@ in
       extraGroups = [ "networkmanager" "wheel" ];
       packages = with pkgs; [
         picom # afaict this is needed for picom to work
-        steam
-        steam-run
-        libgdiplus
-        glxinfo
         cloudflare-warp
       ];
     };
 
     programs.zsh.enable = true;
     # required for nix tab completion
-
-
   };
 }

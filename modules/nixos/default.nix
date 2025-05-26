@@ -30,15 +30,18 @@ in
       builder
       cloudflare
       disko
+      gh-noto
       impermanence
       main
+      nix
       secrets
       ssh
+      steam
       stylix
       wifi
       work
       xmonad
+
       #yubikey
-      gh-noto
     ];
 }
