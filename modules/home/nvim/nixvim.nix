@@ -21,6 +21,10 @@
     tmux-navigator.enable = true;
     lazygit.enable = true;
     lualine.enable = true;
+    avante = {
+      enable = true;
+      settings = { };
+    };
     treesitter = {
       enable = true;
       nixvimInjections = true;

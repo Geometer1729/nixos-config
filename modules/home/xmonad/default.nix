@@ -1,5 +1,12 @@
 { flake, pkgs, lib, config, ... }:
 {
+  config.home.packages = with pkgs; [
+    xorg.xev # x event viewer (sometimes needed for xmonad dev)
+    xmonadctl # xmonad server mode control
+    xdotool
+    arandr # xrandr gui
+  ];
+
   options.xrander = lib.mkOption {
     type = lib.types.string;
     description = "xrander commands to run in ./xinitrc";

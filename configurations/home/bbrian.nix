@@ -12,20 +12,31 @@ in
     inputs.nur.modules.homeManager.default
     inputs.nixvim.homeManagerModules.nixvim
 
+    # GUI applications
     alacritty
     firefox
+    sway
+    xmobar
+    xmonad
+
+    # System configuration
+    system
+    desktop
+    development
+    media
+    communication
+    password
+    gaming
+
+    # Core functionality
     git
-    main
     mime
     nvim
     scripts
     ssh
-    sway
     tasks
     tmux
     work
-    xmobar
-    xmonad
     #yubikey
     zsh
   ];
