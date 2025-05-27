@@ -85,7 +85,6 @@ in
       };
     };
 
-    boot.kernel.sysctl."vm.swappiness" = 1;
     users.users.root = {
       hashedPasswordFile = config.sops.secrets.hashedPassword.path;
       shell = pkgs.zsh;

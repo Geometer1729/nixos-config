@@ -97,7 +97,7 @@ myTerminal = ("alacritty", "Alacritty")
 myStartupHook :: X ()
 myStartupHook = do
   spawn "pgrep picom || picom"
-  spawn "pgrep firefox || firefox"
+  spawn "pgrep firefox || (sleep 10s ; firefox)"
   spawn "pgrep Discord || discord"
   spawn "echo \"connect 60:AB:D2:42:5E:19\" | bluetoothctl"
 

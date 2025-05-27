@@ -9,6 +9,8 @@ license:       BSD-3-Clause
 
 executable my-xmonad
   main-is:          Main.hs
+
+  --TODO use a common block
   build-depends:
     , base
     , containers

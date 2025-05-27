@@ -1,4 +1,21 @@
-{ ... }:
+{ config, lib, ... }:
+let
+  wait = {
+    after = [ "network-online.target" "dhcpcd.service" ];
+    wants = [ "network-online.target" "dhcpcd.service" ];
+  };
+  waitAndRestart = wait // {
+    serviceConfig = {
+      # Force cloudflared to wait until DHCP and DNS are fully operational
+      ExecStartPre = "/run/current-system/sw/bin/sleep 5"; # Optional buffer
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
+  dontWaitFor = {
+    wantedBy = lib.mkForce [ ];
+  };
+in
 {
   boot = {
     #kernel.sysctl = {
@@ -8,10 +25,33 @@
     tmp.cleanOnBoot = true;
     loader = {
       efi.canTouchEfiVariables = true;
+      timeout = 1;
       systemd-boot = {
         enable = true;
         configurationLimit = 20;
       };
     };
+  };
+
+
+  # Boot faster
+  networking = {
+    dhcpcd.enable = true;
+    dhcpcd.wait = "background";
+    dhcpcd.extraConfig = ''
+      timeout 1
+      noarp
+      nodelay
+    '';
+  };
+  systemd.targets = {
+    home-assistant = dontWaitFor;
+  };
+  systemd.services = {
+    ntpd = waitAndRestart;
+    sshd = wait;
+    home-assistant = waitAndRestart;
+    "cloudflared-tunnel-${config.cloudflare-id}" = waitAndRestart // dontWaitFor;
+    cloudflare-warp = dontWaitFor;
   };
 }
