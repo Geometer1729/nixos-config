@@ -49,6 +49,7 @@
           "markdown_inline"
           "c"
           "ocaml"
+          "dhall"
         ];
       };
     };
