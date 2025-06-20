@@ -1,4 +1,4 @@
-{ flake, config, ... }:
+{ config, pkgs, ... }:
 {
   nix = {
     # TODO extra platforms for am
@@ -6,8 +6,8 @@
     # ssh store
     # imrpoves nixlsp but breaks nix-shell -p
     #nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
-    package = flake.inputs.nix.packages."x86_64-linux".nix;
-    #package = pkgs.nixVersions.latest;
+    #package = flake.inputs.nix.packages."x86_64-linux".nix;
+    package = pkgs.nixVersions.latest;
     settings = {
       substituters = [ "https://cache.nixos.org" ];
       trusted-substituters = [ "https://cache.nixos.org" ];

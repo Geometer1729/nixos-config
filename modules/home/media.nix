@@ -22,5 +22,7 @@
 
     # Calendar
     calcurse
+
+    anki
   ];
 }
