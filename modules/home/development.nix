@@ -23,6 +23,9 @@
     tldr
     killall
     ripgrep
+    moreutils # more gnu utils like sponge
+
+    claude-code
 
     # Haskell development
     (haskell.packages.ghc982.ghcWithPackages
