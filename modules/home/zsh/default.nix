@@ -46,7 +46,7 @@
             exec tmux new-session -A -s ssh
           fi
         '';
-      initExtra = ''
+      initContent = ''
         source ${./helpers.sh}
         source ${./viCursor.sh}
         source ${./notify.sh}

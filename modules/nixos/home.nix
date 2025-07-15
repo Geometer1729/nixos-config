@@ -13,6 +13,8 @@ let
     in
     buildPythonPackage {
       inherit pname version;
+      pyproject = true;
+      build-system = [ poetry-core setuptools ];
       src = pkgs.fetchPypi {
         inherit pname version;
         sha256 = "sha256-128T4CtMVTUoQK0V71xk888CP3foBjfYDGeGFWbivdM=";
@@ -33,7 +35,7 @@ in
       govee-ble
       websockets
       #pyicloud
-      (smartrent python3Packages)
+      #(smartrent python3Packages)  # Temporarily disabled - poetry build issues
     ];
     configWritable = true;
     lovelaceConfigWritable = true;

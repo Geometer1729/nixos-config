@@ -15,7 +15,7 @@
     feh # sets background
     sxiv # simple x image viewer
     imagemagick
-    gimp
+    #gimp  # Temporarily disabled - build issues in latest nixpkgs
 
     # Document viewing
     zathura # pdf

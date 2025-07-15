@@ -16,7 +16,7 @@
     undotree.enable = true;
     fugitive.enable = true;
     startify.enable = true;
-    vimtex.enable = true;
+    #vimtex.enable = true;  # Temporarily disabled - clisp/xindy build issues
     trouble.enable = true;
     tmux-navigator.enable = true;
     lazygit.enable = true;

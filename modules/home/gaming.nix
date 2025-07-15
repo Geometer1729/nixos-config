@@ -2,7 +2,7 @@
 {
   home.packages = with pkgs; [
     # Games
-    prismlauncher
+    #prismlauncher  # Temporarily disabled - OpenJDK circular dependency
   ];
 
   # Some mods require nss this overlay fixes it

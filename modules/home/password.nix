@@ -12,7 +12,7 @@
     enable = true;
     # TODO why doesn't this work?
     #pinentryPackage = pkgs.pinentry-rofi;
-    pinentryPackage = pkgs.pinentry-qt;
+    pinentry.package = pkgs.pinentry-qt;
     # TODO it'd be cool to make a wrapper
     # that tries cursses then uses qt
   };
