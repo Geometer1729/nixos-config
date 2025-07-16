@@ -44,6 +44,14 @@ The repository uses nixos-unified for configuration management with:
 - Modular approach with reusable modules in `modules/`
 - Host-specific configurations in `configurations/`
 
+#### Modular Design Guidelines
+- **Modules should be general and reusable**: Code in `modules/` should not contain hostname conditionals or machine-specific logic
+- **Machine-specific configuration belongs in `configurations/`**: Any configuration that depends on the hostname or is specific to a machine should be placed in `configurations/nixos/[hostname]/` or `configurations/home/[username].nix`
+- **No hostname conditionals in modules**: Avoid `if config.networking.hostName == "..."` patterns in modules as they break modularity and reusability
+- **Composition over conditionals**: Let machine configurations compose and override module defaults rather than embedding conditionals in shared modules
+
+This ensures modules remain clean, testable, and reusable across different machines while keeping machine-specific details properly isolated.
+
 ### Machine Configurations
 - `am` - Primary desktop with AMD GPU, dual monitor setup (HDMI-1 primary 2560x1440, DP-2 secondary 1920x1080)
 - `torag` - Secondary machine configuration

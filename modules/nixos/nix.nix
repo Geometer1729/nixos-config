@@ -1,13 +1,13 @@
 { config, pkgs, ... }:
 {
   nix = {
-    # TODO extra platforms for am
-    # build machines for raptor
-    # ssh store
-    # imrpoves nixlsp but breaks nix-shell -p
-    #nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
-    #package = flake.inputs.nix.packages."x86_64-linux".nix;
+    # TODO make am work as a build machines for torag
+    # TODO make am an ssh store
+    # TODO setting nixpath imrpoves nixlsp but breaks nix-shell -p
+    # nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
+
     package = pkgs.nixVersions.latest;
+    #package = flake.inputs.nix.packages."x86_64-linux".nix;
     settings = {
       substituters = [ "https://cache.nixos.org" ];
       trusted-substituters = [ "https://cache.nixos.org" ];

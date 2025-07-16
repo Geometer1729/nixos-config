@@ -1,10 +1,6 @@
 local lsp = require('lspconfig')
 
 local signs = { Error = "E", Warn = "W", Hint = "H", Info = "I" }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
 
 vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 
@@ -96,7 +92,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 vim.diagnostic.config({
     virtual_text = true,
-    signs = true,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = signs.Error,
+            [vim.diagnostic.severity.WARN] = signs.Warn,
+            [vim.diagnostic.severity.HINT] = signs.Hint,
+            [vim.diagnostic.severity.INFO] = signs.Info,
+        }
+    },
     underline = true,
     severity_sort = true,
     float = {

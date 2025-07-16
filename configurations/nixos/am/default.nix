@@ -11,6 +11,11 @@ in
   cloudflare-id = "3981fa82-1e49-4e4c-8df9-962a244d988a";
   system.stateVersion = "22.05";
 
+  # Machine-specific Nix configuration for cross-compilation
+  # TODO verify this works
+  nix.settings.extra-platforms = [ "i686-linux" "aarch64-linux" ];
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   home-manager.users.bbrian.xrander = ''
     xrandr --output HDMI-1 --mode 2560x1440 --rate 60 --primary
     xrandr --output DP-2 --mode 1920x1080 --rate 60 --right-of HDMI-1

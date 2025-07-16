@@ -41,8 +41,16 @@ vim.api.nvim_create_user_command('W'
 
 map('n','<Leader>pv',vim.cmd.Ex)
 
-map('n','<Return>','<cmd>noh<cr>')
--- TODO close floating windows too
+map('n','<Return>', function()
+  vim.cmd('noh')
+  -- Close floating windows
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local config = vim.api.nvim_win_get_config(win)
+    if config.relative ~= '' then
+      vim.api.nvim_win_close(win, false)
+    end
+  end
+end)
 
 map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>')
 

@@ -104,19 +104,15 @@
               ]
             )
         );
-      shellGlobalAliases = {
-        "..." = "../..";
-        "...." = "../../..";
-        "....." = "../../../..";
-        "......" = "../../../../..";
-        "......." = "../../../../../..";
-        "........" = "../../../../../../..";
-        "........." = "../../../../../../../..";
-        ".........." = "../../../../../../../../..";
-        "..........." = "../../../../../../../../../..";
-        "............" = "../../../../../../../../../../..";
-        # TODO auto generate this with nix
-      };
+      shellGlobalAliases =
+        builtins.listToAttrs (
+          builtins.map
+            (n: {
+              name = builtins.concatStringsSep "" (builtins.genList (_: ".") (n + 2));
+              value = builtins.concatStringsSep "/" (builtins.genList (_: "..") n);
+            })
+            (builtins.genList (n: n + 1) 10)
+        );
     };
   home.sessionVariables = {
     EDITOR = "vim";

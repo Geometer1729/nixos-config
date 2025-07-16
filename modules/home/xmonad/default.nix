@@ -18,7 +18,7 @@
     ".xmonad/xmonad-x86_64-linux".onChange =
       "pgrep xmonad && xmonad --restart";
     # TODO find the xmobar config and restart on that too
-    # There's an error with that
+    # Need to find alternative approach - programs.xmobar manages .config/xmobar/.xmobarrc
   };
 
   config.xsession.windowManager.xmonad =

@@ -117,28 +117,6 @@ in
     # Ensure libnotify is available for notify-send
     libnotify
 
-    # Create a wrapper script for Claude Code notifications
-    # TODO remove?
-    (pkgs.writeShellApplication {
-      name = "claude-notify";
-      text = ''
-        # Claude Code notification helper
-        # Usage: claude-notify <title> <message> [urgency]
-
-        TITLE="''${1:-Claude Code}"
-        MESSAGE="''${2:-Needs user input}"
-        URGENCY="''${3:-normal}"
-
-        # Send notification with Claude Code branding
-        notify-send \
-          --urgency="$URGENCY" \
-          --icon=dialog-information \
-          --app-name="Claude Code" \
-          --expire-time=10000 \
-          "$TITLE" \
-          "$MESSAGE"
-      '';
-    })
 
     # Create specific notification for user input requests
     (pkgs.writeShellApplication {

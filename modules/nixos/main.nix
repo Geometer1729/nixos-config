@@ -93,7 +93,8 @@ in
       hashedPasswordFile = config.sops.secrets.hashedPassword.path;
       isNormalUser = true;
       description = config.mainUser;
-      shell = pkgs.zsh; # TODO can home-manager do this?
+      shell = pkgs.zsh; # TODO: can home-manager do this? (currently here as workaround for completion issues)
+      # https://github.com/nix-community/home-manager/issues/2562
       extraGroups = [ "networkmanager" "wheel" ];
       packages = with pkgs; [
         picom # afaict this is needed for picom to work
