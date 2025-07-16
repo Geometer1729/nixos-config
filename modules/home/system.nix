@@ -35,9 +35,9 @@
     settings = {
       proc_sorting = "memory";
       show_swap = true;
+      disks_filter = "/persist";
     };
   };
-  # TODO hide repeated disks in btop
 
   # Session variables
   home.sessionVariables = {

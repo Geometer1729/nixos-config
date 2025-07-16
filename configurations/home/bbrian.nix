@@ -39,6 +39,7 @@ in
     work
     #yubikey
     zsh
+    claude
   ];
 
 }
