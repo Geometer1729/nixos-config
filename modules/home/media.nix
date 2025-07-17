@@ -16,6 +16,7 @@
     sxiv # simple x image viewer
     imagemagick
     #gimp  # Temporarily disabled - build issues in latest nixpkgs
+    #fixed in https://github.com/NixOS/nixpkgs/pull/425710
 
     # Document viewing
     zathura # pdf
