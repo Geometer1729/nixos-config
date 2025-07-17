@@ -47,7 +47,7 @@ Don't mark work as complete if the configuration doesn't build or if functionali
 ### Key Files
 - `flake.nix` - Main flake configuration with inputs and outputs
 - `modules/home/xmonad/Config.hs` the xmonad configuration
-- `modules/home/neovim/nixvim.nix` the main neovim configuration
+- `modules/home/nvim/nixvim.nix` the main neovim configuration
 
 ### Configuration Pattern
 The repository uses nixos-unified for configuration management with:

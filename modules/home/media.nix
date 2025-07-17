@@ -24,6 +24,6 @@
     # Calendar
     calcurse
 
-    anki
+    anki # flashcards
   ];
 }

@@ -24,6 +24,7 @@
     killall
     ripgrep
     moreutils # more gnu utils like sponge
+    wmctrl # window manager control tool
 
     claude-code
 
