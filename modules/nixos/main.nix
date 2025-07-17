@@ -22,31 +22,6 @@ in
     i18n.defaultLocale = "en_US.UTF-8";
 
     nixpkgs.config.allowUnfree = true;
-    # TODO move to overlays
-    nixpkgs.overlays =
-      [
-        (final: prev: {
-          # Taskopen was rewritten in nim
-          # so it's easier to start from scratch than overrideAttrs
-          # Once I know everything works I should update it in nixpkgs too
-          taskopen =
-            let
-              version = "2.0.1";
-              src = pkgs.fetchFromGitHub {
-                owner = "ValiValpas";
-                repo = "taskopen";
-                rev = "v${version}";
-                sha256 = "sha256-Gy0QS+FCpg5NGSctVspw+tNiBnBufw28PLqKxnaEV7I=";
-              };
-            in
-            pkgs.buildNimPackage
-              {
-                name = "task-open";
-                src = "${src}/src";
-                nimbleFile = "${src}/taskopen.nimble";
-              };
-        })
-      ];
 
 
     security.rtkit.enable = true;

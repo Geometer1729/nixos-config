@@ -24,9 +24,12 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
 .direnv/
+
 secrets
 todo
+
 .session.vim
 modules/nvim/lua/.luarc.json
 *.luarc.json

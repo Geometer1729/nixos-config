@@ -1,4 +1,4 @@
-{ flake, config, ... }:
+{ flake, config, lib, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -9,6 +9,7 @@ in
   nixos-unified.sshTarget = "${config.mainUser}@${config.networking.hostName}";
   system.stateVersion = "22.05";
 
+  nixpkgs.overlays = lib.attrValues self.overlays;
   home-manager.users.${config.mainUser} = {
     imports = [ (self + /configurations/home/bbrian.nix) ];
   };

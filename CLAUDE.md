@@ -23,6 +23,16 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 - Rebuild scripts are located in `modules/home/scripts/` and use `nh os test` with output redirection to `~/Downloads/nixerr`
 - Test configurations before applying with `nh os test`
 
+## Testing Changes
+
+Always verify changes work before considering them complete:
+
+1. **Build check**: Run `nh os build` to ensure configuration builds
+2. **Test changes**: Run `nh os test` to switch to the configuration (doesn't set as default boot)
+3. **Verify functionality**: Test that your changes work as expected or outline what should be tested manually
+
+Don't mark work as complete if the configuration doesn't build or if functionality is broken.
+
 ## Architecture
 
 ### Directory Structure
@@ -36,6 +46,8 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 
 ### Key Files
 - `flake.nix` - Main flake configuration with inputs and outputs
+- `modules/home/xmonad/Config.hs` the xmonad configuration
+- `modules/home/neovim/nixvim.nix` the main neovim configuration
 
 ### Configuration Pattern
 The repository uses nixos-unified for configuration management with:
