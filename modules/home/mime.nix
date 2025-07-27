@@ -1,18 +1,5 @@
 { pkgs, ... }:
 let
-  pick-browser = pkgs.writeShellApplication
-    {
-      name = "pick-browser";
-      text =
-        ''
-          if [ "$#" -ge 1 ] && [[ $1 =~ (youtube\.com|youtu\.be) ]]
-          then
-            exec brave "$@"
-          else
-            exec firefox "$@"
-          fi
-        '';
-    };
   # XDG doesn't work for terminal apps
   # Aparently this is an ancient bug
   # https://gitlab.freedesktop.org/xdg/xdg-utils/-/issues/84
@@ -56,14 +43,6 @@ in
               exec = wrap "nvim";
               mimeType = [ "text/plain" ];
             };
-          pick-browser =
-            {
-              type = "Application";
-              name = "pick-browser";
-              comment = "Picks a browser to launch based on domain";
-              exec = "${pick-browser}/bin/pick-browser";
-              mimeType = [ "x-scheme-handler/https" "x-scheme-handler/http" ];
-            };
         };
       mimeApps =
         {
@@ -71,10 +50,9 @@ in
           defaultApplications =
             {
               "text/html" = [ "firefox.desktop" ];
-              "x-scheme-handler/https" = [ "pick-browser.desktop" ];
-              "x-scheme-handler/http" = [ "pick-browser.desktop" ];
+              "x-scheme-handler/https" = [ "firefox.desktop" ];
+              "x-scheme-handler/http" = [ "firefox.desktop" ];
               "x-scheme-handler/spotify" = [ "spotify.desktop" ];
-              "x-scheme-handler/youtube" = [ "brave.desktop" ];
               "text/plain" = [ "vim-wrapped.desktop" ];
               "inode/directory" = [ "ranger-wrapped.desktop" ];
             };

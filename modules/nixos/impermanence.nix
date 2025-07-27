@@ -23,7 +23,6 @@
     ];
     users.bbrian = {
       directories = [
-        ".config/BraveSoftware/Brave-Browser"
         ".config/Signal"
         ".config/discord"
         ".config/spotify"

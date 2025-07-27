@@ -7,8 +7,5 @@
     element-desktop # matrix client
     signal-desktop
     # zoom-us # video calls
-
-    # Web browser
-    brave
   ];
 }
