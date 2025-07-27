@@ -39,6 +39,7 @@
         ".local/share/task"
         ".local/share/wasistlos"
         ".local/state/nvim"
+        ".claude" # Claude Code state and configuration
         ".mozilla/firefox/default"
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
         ".cache/rofi-2.sshcache"
@@ -59,6 +60,7 @@
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ".git-credentials"
         ".config/gh/hosts.yml"
+        ".claude.json"
       ];
     };
   };

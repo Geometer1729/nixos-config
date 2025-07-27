@@ -108,10 +108,10 @@
         builtins.listToAttrs (
           builtins.map
             (n: {
-              name = builtins.concatStringsSep "" (builtins.genList (_: ".") (n + 2));
+              name = builtins.concatStringsSep "" (builtins.genList (_: ".") (n + 1));
               value = builtins.concatStringsSep "/" (builtins.genList (_: "..") n);
             })
-            (builtins.genList (n: n + 1) 10)
+            (builtins.tail (builtins.genList (n: n + 1) 10))
         );
     };
   home.sessionVariables = {

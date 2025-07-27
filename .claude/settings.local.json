@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(nh os build)",
+      "Bash(nix eval:*)",
+      "Bash(nix search:*)",
+      "WebFetch(domain:discourse.nixos.org)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:nix-community.github.io)",
+      "WebFetch(domain:nixos-unified.org)"
+    ],
+    "deny": []
+  }
+}

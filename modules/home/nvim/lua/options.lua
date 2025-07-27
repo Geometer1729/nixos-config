@@ -38,6 +38,20 @@ o.smarttab=true
 
 o.undofile=true
 
+-- swap file UX improvements
+o.autoread=true -- automatically reload files changed outside vim
+o.updatetime=1000 -- write swap files more frequently (default 4000ms)
+
+-- auto-save on shutdown (but not for :q!)
+vim.api.nvim_create_autocmd({"VimLeave"}, {
+  callback = function()
+    -- Only save if not force-quitting
+    if vim.v.dying == 0 then
+      vim.cmd("silent! wa") -- write all modified buffers
+    end
+  end
+})
+
 -- indent settings
 o.ai=true
 o.si=true

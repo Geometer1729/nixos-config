@@ -12,7 +12,7 @@
     enable = true;
     image = ./grub/sand.jpg;
     opacity.terminal = 0.9;
-    polarity = "dark"; # TODO this doesn't seem to work
+    polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
     #https://tinted-theming.github.io/base16-gallery/
     # I don't hate atelier forest
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/atelier-forest.yaml";
