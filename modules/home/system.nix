@@ -15,8 +15,9 @@
 
     # Monitoring and status tools
     htop
-    radeontop
     neofetch
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+    radeontop # Linux only - AMD GPU monitoring
 
     # Custom utilities
     (pkgs.writeShellApplication {

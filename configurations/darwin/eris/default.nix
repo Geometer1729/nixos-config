@@ -96,6 +96,7 @@ in
 
         # Use Darwin-specific nvim module (without stylix)
         ../../../modules/home/nvim-darwin.nix
+        system
       ];
     };
   };
