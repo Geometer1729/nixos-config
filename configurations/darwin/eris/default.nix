@@ -1,0 +1,57 @@
+{ pkgs, ... }:
+{
+  # Set the system platform
+  nixpkgs.hostPlatform = "aarch64-darwin";
+  
+  # Set the hostname
+  networking.hostName = "eris";
+
+  # Set primary user for system defaults
+  system.primaryUser = "bbrian";
+
+  # Configure Nix settings
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "@admin" ];
+  };
+
+  # Fix GID mismatch for nixbld group
+  ids.gids.nixbld = 350;
+
+  # System packages
+  environment.systemPackages = with pkgs; [
+    git
+    vim
+    curl
+    wget
+  ];
+
+  # Enable touch ID for sudo (if supported)
+  # security.pam.enableSudoTouchId = true;
+
+  # Configure the dock
+  system.defaults = {
+    dock = {
+      autohide = true;
+      orientation = "bottom";
+      show-recents = false;
+      tilesize = 48;
+    };
+    
+    finder = {
+      AppleShowAllExtensions = true;
+      ShowPathbar = true;
+      ShowStatusBar = true;
+    };
+    
+    NSGlobalDomain = {
+      # Enable dark mode
+      AppleInterfaceStyle = "Dark";
+      # Show all file extensions
+      AppleShowAllExtensions = true;
+    };
+  };
+
+  # Used for backwards compatibility, please read the changelog before changing
+  system.stateVersion = 4;
+}
