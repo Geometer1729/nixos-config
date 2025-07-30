@@ -114,10 +114,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    # Ensure libnotify is available for notify-send
-    libnotify
-
-
     # Create specific notification for user input requests
     (pkgs.writeShellApplication {
       name = "claude-user-input";

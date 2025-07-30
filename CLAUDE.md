@@ -19,8 +19,9 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 
 ### System Operations
 - `just update` - Update the system configuration and commit changes
-- `nh os switch` - Switch to the current configuration
-- `nh os test` - Test the configuration without switching (used by rebuild scripts)
+- `nh os switch` - Switch to the current configuration (NixOS)
+- `nh os test` - Test the configuration without switching (used by rebuild scripts, NixOS)
+- `nh darwin switch .` - Switch to the current Darwin configuration
 - `nixpkgs-fmt` - Format Nix files using nixpkgs-fmt
 
 ### Development

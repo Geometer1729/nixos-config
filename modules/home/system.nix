@@ -16,7 +16,12 @@
     # Monitoring and status tools
     htop
     neofetch
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+    # Darwin-compatible notify-send
+    (import ./notify-send-darwin.nix { inherit pkgs; })
   ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+    # Linux notification support
+    libnotify
     radeontop # Linux only - AMD GPU monitoring
 
     # Custom utilities

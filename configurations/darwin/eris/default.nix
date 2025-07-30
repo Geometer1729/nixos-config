@@ -6,6 +6,7 @@ in
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
+    self.darwinModules.cloudflare
   ];
 
   # Set the system platform
@@ -16,6 +17,9 @@ in
 
   # Set the hostname
   networking.hostName = "eris";
+
+  # Cloudflare tunnel configuration
+  cloudflare-id = "your-tunnel-id-here";
 
   # Set primary user for system defaults
   system.primaryUser = "bbrian";
@@ -69,6 +73,14 @@ in
       AppleInterfaceStyle = "Dark";
       # Show all file extensions
       AppleShowAllExtensions = true;
+    };
+
+    # Custom preferences for disabling data detectors
+    CustomUserPreferences = {
+      "NSGlobalDomain" = {
+        # Disable data detectors (yellow highlighting) system-wide
+        WebAutomaticDataDetectionEnabled = false;
+      };
     };
 
   };
