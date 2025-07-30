@@ -1,5 +1,13 @@
-{ pkgs, ... }:
+{ flake, pkgs, ... }:
+let
+  inherit (flake) inputs;
+  inherit (inputs) self;
+in
 {
+  imports = [
+    inputs.home-manager.darwinModules.home-manager
+  ];
+
   # Set the system platform
   nixpkgs.hostPlatform = "aarch64-darwin";
   
@@ -49,6 +57,21 @@
       AppleInterfaceStyle = "Dark";
       # Show all file extensions
       AppleShowAllExtensions = true;
+    };
+  };
+
+  # Home Manager integration
+  users.users.bbrian.home = "/Users/bbrian";
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = { inherit inputs; };
+    users.bbrian = { ... }: {
+      home.stateVersion = "22.05";
+      imports = [
+        inputs.nixvim.homeManagerModules.nixvim
+        ../../../modules/home/nvim-darwin.nix
+      ];
     };
   };
 
