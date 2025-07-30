@@ -43,6 +43,12 @@ in
   # Enable touch ID for sudo (if supported)
   # security.pam.enableSudoTouchId = true;
 
+  # Keyboard configuration - swap caps lock and escape
+  system.keyboard = {
+    enableKeyMapping = true;
+    remapCapsLockToEscape = true;
+  };
+
   # Configure the dock
   system.defaults = {
     dock = {
@@ -64,6 +70,7 @@ in
       # Show all file extensions
       AppleShowAllExtensions = true;
     };
+
   };
 
   # Home Manager integration
