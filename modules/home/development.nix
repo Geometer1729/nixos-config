@@ -6,9 +6,7 @@
     nix-output-monitor
     nixpkgs-fmt
     neovim-remote
-    postman # rest-api tool
     nixd # nix lsp
-    okteta # hex editor
 
     # Command line utilities
     ranger # tui file browser
@@ -24,7 +22,6 @@
     killall
     ripgrep
     moreutils # more gnu utils like sponge
-    wmctrl # window manager control tool
 
     claude-code
 
@@ -43,6 +40,11 @@
       ])
     )
     haskellPackages.hoogle
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    # Linux-only packages
+    postman # rest-api tool
+    okteta # hex editor
+    wmctrl # window manager control tool
   ];
 
   # GHC configuration

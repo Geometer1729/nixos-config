@@ -10,7 +10,7 @@ in
 
   # Set the system platform
   nixpkgs.hostPlatform = "aarch64-darwin";
-  
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -74,86 +74,22 @@ in
     extraSpecialArgs = { inherit inputs; };
     users.bbrian = { ... }: {
       home.stateVersion = "22.05";
-      imports = [
+      home.username = "bbrian";
+      home.homeDirectory = "/Users/bbrian";
+
+      imports = with self.homeModules; [
         inputs.nixvim.homeManagerModules.nixvim
-        ../../../modules/home/nvim-darwin.nix
-        ../../../modules/home/git.nix
-      ];
 
-      # Core development tools
-      home.packages = with pkgs; [
-        ripgrep
-        fd
-        dust
-        bat
-        gh
-        curl
-        wget
-        tree
-        htop
-        jq
-        claude-code
+        # Reuse existing modules
+        git
+        development
         tmux
-        just
+        zsh
+        claude
+
+        # Use Darwin-specific nvim module (without stylix)
+        ../../../modules/home/nvim-darwin.nix
       ];
-
-      # Zsh configuration (simplified for Darwin)
-      programs.zsh = {
-        enable = true;
-        autosuggestion.enable = true;
-        enableCompletion = true;
-        syntaxHighlighting.enable = true;
-        autocd = true;
-        defaultKeymap = "viins";
-        history = {
-          append = true;
-          path = "$HOME/.zsh_history";
-        };
-        historySubstringSearch.enable = true;
-
-        localVariables = {
-          EDITOR = "nvim";
-          BROWSER = "firefox";
-          REPORTTIME = 1;
-        };
-
-        shellAliases = {
-          rs = "exec zsh";
-          ls = "ls -hN --color=auto";
-          grep = "grep -E --color=auto";
-          sed = "sed -E";
-          la = "ls -A";
-          ll = "ls -Al";
-          mv = "mv -i";
-          gs = "git status";
-          rgi = "rg -i";
-          ":q" = "exit";
-          du = "dust";
-          v = "nvim";
-          vim = "nvim";
-          vi = "nvim";
-          g = "git";
-          lg = "lazygit";
-        };
-
-        initExtra = ''
-          # Basic vi cursor shapes
-          bindkey -v
-          bindkey '^R' history-incremental-search-backward
-        '';
-      };
-
-      # Direnv
-      programs.direnv = {
-        enable = true;
-        nix-direnv.enable = true;
-      };
-
-      # Set session variables
-      home.sessionVariables = {
-        EDITOR = "nvim";
-        NIX_AUTO_RUN = 1;
-      };
     };
   };
 
