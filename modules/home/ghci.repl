@@ -5,6 +5,7 @@ import Data.Set qualified as S
 
 import Control.Monad.State
 import Flow
+import Data.Function
 
 :set -XBlockArguments
 :set -XDataKinds
