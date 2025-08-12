@@ -11,7 +11,11 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:nix-community.github.io)",
       "WebFetch(domain:nixos-unified.org)",
-      "WebFetch(domain:mynixos.com)"
+      "WebFetch(domain:mynixos.com)",
+      "Bash(nh darwin switch:*)",
+      "Bash(nh darwin:*)",
+      "Bash(cat:*)",
+      "Bash(/usr/bin/log:*)"
     ],
     "deny": []
   }

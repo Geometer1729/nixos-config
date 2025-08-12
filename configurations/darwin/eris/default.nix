@@ -35,15 +35,6 @@ in
 
   # Fix GID mismatch for nixbld group
   ids.gids.nixbld = 350;
-
-  # System packages
-  environment.systemPackages = with pkgs; [
-    git
-    vim
-    curl
-    wget
-  ];
-
   # Enable touch ID for sudo (if supported)
   # security.pam.enableSudoTouchId = true;
 
@@ -100,6 +91,7 @@ in
         inputs.nixvim.homeManagerModules.nixvim
 
         # Reuse existing modules
+        alacritty
         git
         development
         tmux
