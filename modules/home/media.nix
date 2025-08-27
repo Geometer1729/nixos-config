@@ -24,6 +24,6 @@
     # Calendar
     calcurse
 
-    anki # flashcards
+    anki-bin # flashcards (binary version avoids build issues)
   ];
 }
