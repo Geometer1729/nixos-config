@@ -174,4 +174,31 @@ in
 
   # Create Claude Code settings configuration
   home.file.".claude/settings.json".source = settingsJson;
+
+  # Manage Claude.md instructions file
+  home.file."CLAUDE.md".text = ''
+    # Global Claude Instructions
+
+
+    ## Testing and Verification Requirements
+
+    **CRITICAL: Never claim a fix works without testing it first.**
+
+    - ALWAYS run the failing command/test after making changes to verify the fix actually works
+    - If you can't test immediately, say "This change should help" or "Let me test this" instead of "Fixed!"
+    - Only claim something is "Fixed" after verifying the original problem no longer occurs
+     - When debugging, test each hypothesis before moving to the next one
+     - Show the test results that prove the fix works
+    - When the test fails try something else don't give up
+
+    ## Communication Style
+    - Be honest about uncertainty
+    - Distinguish between theory and verified results
+    - Test before claiming success
+
+    ## Nixos
+    - This machine uses nixos and nix heavily
+    - Expect projects to use nix
+    - Expect commands to require `nix develop`
+  '';
 }
