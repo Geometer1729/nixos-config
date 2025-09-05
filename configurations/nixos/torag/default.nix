@@ -15,8 +15,7 @@ in
       interface = "wlp0s20f3";
     };
     battery = true;
-    programs.alacritty.settings.font.size
-      = pkgs.lib.mkForce 9;
+    programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
   };
 
   imports =
@@ -24,6 +23,7 @@ in
     [
       ./hardware.nix
       default
+
       useBuilders
     ];
 }

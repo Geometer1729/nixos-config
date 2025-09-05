@@ -50,7 +50,6 @@ in
         autoRepeatInterval = 20;
         autoRepeatDelay = 400;
       };
-      # TODO try adding picom blur and reducing alacrity opacity
       cron = {
         enable = true;
         systemCronJobs = [

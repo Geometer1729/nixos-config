@@ -28,7 +28,6 @@ in
       #self
       boot
       bt
-      builder
       cloudflare
       disko
       gh-noto

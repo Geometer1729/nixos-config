@@ -1,11 +1,20 @@
-{ ... }:
+{ config, pkgs, ... }:
 {
   nix = {
     settings = {
-      allowed-users = [ "nix-serve" ];
-      trusted-users = [ "nix-serve" ];
+      # Explicitly set system features for remote building
+      system-features = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
     };
     sshServe.enable = true;
-    settings.max-jobs = 40;
   };
+
+  # Enable nix-serve for binary cache
+  services.nix-serve = {
+    enable = true;
+    port = 5000;
+    secretKeyFile = "/var/cache-priv-key.pem";
+  };
+
+  # Open firewall for nix-serve
+  networking.firewall.allowedTCPPorts = [ 5000 ];
 }

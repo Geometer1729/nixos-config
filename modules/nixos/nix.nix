@@ -1,10 +1,7 @@
-{ config, pkgs, ... }:
+{ flake, config, pkgs, ... }:
 {
   nix = {
-    # TODO make am work as a build machines for torag
-    # TODO make am an ssh store
-    # TODO setting nixpath imrpoves nixlsp but breaks nix-shell -p
-    # nixPath = [ "nixpkgs-=${inputs.nixpkgs}" ];
+    nixPath = [ "nixpkgs=${flake.inputs.nixpkgs}" ];
 
     package = pkgs.nixVersions.latest;
     #package = flake.inputs.nix.packages."x86_64-linux".nix;

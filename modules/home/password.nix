@@ -10,8 +10,6 @@
   # GPG agent configuration
   services.gpg-agent = {
     enable = true;
-    # TODO why doesn't this work?
-    #pinentryPackage = pkgs.pinentry-rofi;
     pinentry.package = pkgs.pinentry-qt;
     # TODO it'd be cool to make a wrapper
     # that tries cursses then uses qt

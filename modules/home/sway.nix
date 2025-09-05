@@ -1,4 +1,4 @@
-{ ... }:
+{ osConfig, ... }:
 {
   wayland.windowManager.sway = {
     enable = true;
@@ -18,10 +18,9 @@
     };
     extraConfig = ''
       input "type:keyboard" {
-        xkb_options caps:swapescape
+        xkb_options ${osConfig.services.xserver.xkb.options}
       }
     '';
-    # TODO can this inherit from xkb config like console?
   };
 
 }
