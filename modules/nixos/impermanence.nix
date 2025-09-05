@@ -43,6 +43,7 @@
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
         ".cache/rofi-2.sshcache"
         ".cache/rofi-3.runcache"
+        ".cache/rofi-entry-history.txt"
         ".ssh"
         ".tldrc"
         "Code"
@@ -60,6 +61,7 @@
         ".git-credentials"
         ".config/gh/hosts.yml"
         ".claude.json"
+        ".claude/.credentials.json"
       ];
     };
   };

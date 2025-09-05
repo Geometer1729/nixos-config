@@ -209,7 +209,6 @@ launchBindings =
     )
   , ((modShift, xK_r), rebuild)
   , ((modShift, xK_s), spawn "sudo systemctl sleep")
-  -- TODO systemctl sleep or so?
   ]
 
 workSpaces :: Bindings
