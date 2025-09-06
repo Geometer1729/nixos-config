@@ -11,6 +11,7 @@ in
   imports = with self.homeModules; [
     inputs.nur.modules.homeManager.default
     inputs.nixvim.homeManagerModules.nixvim
+    inputs.stylix.homeModules.stylix
 
     # System configuration
     system
