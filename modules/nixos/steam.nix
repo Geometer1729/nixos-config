@@ -18,12 +18,12 @@
       enable32Bit = true;
     };
   } // (if config.amd then
-      {
-        amdgpu.amdvlk = {
-          enable = true;
-          support32Bit.enable = true;
-        };
-      } else { });
+    {
+      amdgpu.amdvlk = {
+        enable = true;
+        support32Bit.enable = true;
+      };
+    } else { });
 
   security.pam.loginLimits = [
     { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
