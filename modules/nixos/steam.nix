@@ -11,14 +11,13 @@
     ];
   };
 
-  hardware =
-    {
-      pulseaudio.support32Bit = true;
-      graphics = {
-        enable = true;
-        enable32Bit = true;
-      };
-    } // (if config.amd then
+  services.pulseaudio.support32Bit = true;
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+  } // (if config.amd then
       {
         amdgpu.amdvlk = {
           enable = true;

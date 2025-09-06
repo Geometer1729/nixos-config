@@ -12,6 +12,7 @@ in
   home.packages = [ pkgs.cloudflared ];
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     matchBlocks = {
       tub = me // {
         hostname = "jsh.gov";

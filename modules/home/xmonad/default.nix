@@ -8,7 +8,7 @@
   ];
 
   options.xrander = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     description = "xrander commands to run in ./xinitrc";
     default = "";
   };

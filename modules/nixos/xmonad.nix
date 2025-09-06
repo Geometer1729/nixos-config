@@ -11,14 +11,14 @@
         lightdm = {
           enable = true;
         };
-        autoLogin = {
-          enable = true;
-          user = config.mainUser;
-        };
         sessionCommands = ''
           feh --randomize --bg-fill ~/Pictures/Wallpapers/
         '';
       };
+    };
+    displayManager.autoLogin = {
+      enable = true;
+      user = config.mainUser;
     };
   };
   console.useXkbConfig = true;
