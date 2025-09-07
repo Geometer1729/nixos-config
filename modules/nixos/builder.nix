@@ -17,4 +17,10 @@
 
   # Open firewall for nix-serve
   networking.firewall.allowedTCPPorts = [ 5000 ];
+
+  # Persist nix-serve keys with impermanence
+  environment.persistence."/persist/system".files = [
+    "/var/cache-priv-key.pem"
+    "/var/cache-pub-key.pem"
+  ];
 }
