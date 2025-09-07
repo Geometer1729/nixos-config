@@ -108,12 +108,18 @@ vim.diagnostic.config({
     }
 })
 
--- TODO use autocmd syntax
-
 -- show diagnostics for current line
-vim.cmd([[autocmd CursorMoved * lua vim.diagnostic.open_float(nil, {focus=false})]])
+vim.api.nvim_create_autocmd('CursorMoved', {
+  callback = function()
+    vim.diagnostic.open_float(nil, {focus=false})
+  end,
+})
 
--- remove trailing white spece
-vim.cmd([[autocmd BufWritePre * %s/\s\+$//e]])
+-- remove trailing white space
+vim.api.nvim_create_autocmd('BufWritePre', {
+  callback = function()
+    vim.cmd('%s/\\s\\+$//e')
+  end,
+})
 
 
