@@ -17,6 +17,10 @@ in
       tub = me // {
         hostname = "jsh.gov";
       };
+      capitol = me // {
+        hostname = "192.168.1.227";
+        proxyJump = "tub";
+      };
       torag = me // cloudflare // {
         hostname = "torag.bbrian.xyz";
       };
