@@ -27,7 +27,6 @@ in
     [
       ./hardware.nix
       default
-      home
 
       builder
     ];

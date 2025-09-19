@@ -29,7 +29,7 @@
     claude-code
 
     # Haskell development
-    (haskell.packages.ghc982.ghcWithPackages
+    (haskellPackages.ghc.withPackages
       (pkgs: with pkgs; [
         flow
         mtl
