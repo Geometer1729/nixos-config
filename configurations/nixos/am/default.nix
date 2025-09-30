@@ -17,8 +17,8 @@ in
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   services.xserver.displayManager.sessionCommands = ''
-    xrandr --output HDMI-1 --mode 2560x1440 --rate 60 --primary
-    xrandr --output DP-2 --mode 1920x1080 --rate 60 --right-of HDMI-1
+    xrandr --output DP-1 --mode 1920x1080 --rate 60 --primary
+    xrandr --output HDMI-1 --mode 2560x1440 --rate 60 --right-of DP-1
     # reset Wallpapers after xrandr commands
     feh --randomize --bg-fill ~/Pictures/Wallpapers/
   '';
