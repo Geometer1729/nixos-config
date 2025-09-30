@@ -1,0 +1,59 @@
+name: "Build NixOS Configuration"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+
+    - name: Check flake
+      run: nix flake check --all-systems
+
+    - name: Build configurations
+      run: |
+        # Build all NixOS configurations
+        nix build .#nixosConfigurations.am.config.system.build.toplevel
+        nix build .#nixosConfigurations.torag.config.system.build.toplevel
+
+        # Build home-manager configurations
+        nix build .#homeConfigurations.bbrian.activationPackage
+        nix build .#homeConfigurations.root.activationPackage
+
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+
+    - name: Check formatting
+      run: |
+        nix develop --command nixpkgs-fmt --check .
+
+    - name: Check for issues
+      run: |
+        # Check for dead code if available
+        if nix develop --command which deadnix >/dev/null 2>&1; then
+          nix develop --command deadnix --fail
+        fi
+
+        # Check for antipatterns if available
+        if nix develop --command which statix >/dev/null 2>&1; then
+          nix develop --command statix check
+        fi
