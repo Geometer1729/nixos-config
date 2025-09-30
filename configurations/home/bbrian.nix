@@ -10,7 +10,7 @@ in
 
   imports = with self.homeModules; [
     inputs.nur.modules.homeManager.default
-    inputs.nixvim.homeManagerModules.nixvim
+    inputs.nixvim.homeModules.nixvim
 
     # GUI applications
     alacritty

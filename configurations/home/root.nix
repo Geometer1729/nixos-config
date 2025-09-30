@@ -9,7 +9,7 @@ in
   home.homeDirectory = "/root";
 
   imports = with self.homeModules; [
-    inputs.nixvim.homeManagerModules.nixvim
+    inputs.nixvim.homeModules.nixvim
     git
     nvim
     tmux
