@@ -29,6 +29,17 @@ g.vimwiki_folding=''
 g.foldenable=false
 g.foldmethod="syntax"
 
+-- Use treesitter highlighting instead of vimwiki syntax
+-- Force treesitter for vimwiki files
+vim.api.nvim_create_autocmd({'FileType'}, {
+  pattern = 'vimwiki',
+  callback = function()
+    -- Disable vimwiki syntax and use treesitter markdown
+    vim.cmd('syntax off')
+    vim.treesitter.start()
+  end
+})
+
 vim.api.nvim_create_autocmd({'BufNewFile'},
   { pattern = '*Documents/vw/diary/*',
     command = [[silent :0r !cat ~/Documents/vw/templates/diary.md | sed "s/DATE/$(date '+\%m\/\%d\/\%y\ \%A')/g"]]
