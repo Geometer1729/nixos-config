@@ -1,16 +1,14 @@
-local lsp = require('lspconfig')
-
 local signs = { Error = "E", Warn = "W", Hint = "H", Info = "I" }
 
 vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 
-lsp.hls.setup { cmd = { "haskell-language-server", "--lsp" } }
-lsp.leanls.setup{}
-lsp.purescriptls.setup {}
-lsp.rust_analyzer.setup {}
-lsp.ts_ls.setup {} -- typescript
-lsp.ocamllsp.setup{}
-lsp.nixd.setup({
+vim.lsp.config.hls = { cmd = { "haskell-language-server", "--lsp" } }
+vim.lsp.config.leanls = {}
+vim.lsp.config.purescriptls = {}
+vim.lsp.config.rust_analyzer = {}
+vim.lsp.config.ts_ls = {} -- typescript
+vim.lsp.config.ocamllsp = {}
+vim.lsp.config.nixd = {
   cmd = { "nixd" },
   settings = {
     nixd = {
@@ -30,9 +28,9 @@ lsp.nixd.setup({
       },
     },
   }
-})
+}
 
-lsp.lua_ls.setup {
+vim.lsp.config.lua_ls = {
   settings = {
     Lua = {
       runtime = {
