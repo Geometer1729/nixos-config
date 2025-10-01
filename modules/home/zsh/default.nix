@@ -22,6 +22,8 @@
       ];
       history = {
         append = true;
+        # TODO it would be cool if this was set by impermenance?
+        # Or maybe just a global option for that
         path = "/persist/system/home/bbrian/.zsh_history";
         # I can't figure out why, but something about the wya it's mounted
         # causes constant failure with
@@ -38,10 +40,11 @@
       defaultKeymap = "viins";
       profileExtra =
         ''
-          if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
-          then
-            startx
-          fi
+          # Currently just using a display manager
+          #if [ "$(tty)" = "/dev/tty1" ] && ! pgrep -x Xorg >/dev/null
+          #then
+          #  startx
+          #fi
           if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then
             exec tmux new-session -A -s ssh
           fi
@@ -50,7 +53,6 @@
         source ${./helpers.sh}
         source ${./viCursor.sh}
         source ${./notify.sh}
-        eval "$(direnv hook zsh)"
         bindkey  clear-screen
       ''; #If this gets any more substantial it may be time for a file
       localVariables =
