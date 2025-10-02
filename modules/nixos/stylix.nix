@@ -50,8 +50,8 @@
       };
     };
     cursor = {
-      package = pkgs.simp1e-cursors;
-      name = "simp1e-dark";
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Classic";
       size = 24;
     };
   };

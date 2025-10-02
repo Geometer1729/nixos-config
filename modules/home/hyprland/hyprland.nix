@@ -15,9 +15,6 @@
   ];
 
   home.pointerCursor = {
-    #name = "Adwaita";
-    size = lib.mkForce 200; # You can change this size to your preference (e.g., 16–32)
-    package = lib.mkForce pkgs.simp1e-cursors;
     hyprcursor.enable = true;
   };
 
