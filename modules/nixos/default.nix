@@ -40,7 +40,7 @@ in
       stylix
       wifi
       work
-      xmonad
+      hyprland
 
       #yubikey
     ];

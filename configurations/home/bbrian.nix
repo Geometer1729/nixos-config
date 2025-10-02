@@ -15,6 +15,7 @@ in
     # GUI applications
     alacritty
     firefox
+    hyprland
     sway
     xmobar
     xmonad
