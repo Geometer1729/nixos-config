@@ -32,9 +32,11 @@
       ];
 
       # Input configuration
-      input = {
-        kb_layout = osConfig.services.xserver.xkb.layout or "us";
-        kb_options = osConfig.services.xserver.xkb.options or "";
+      input = with osConfig.services.xserver; {
+        kb_layout = xkb.layout or "us";
+        kb_options = xkb.options or "";
+        repeat_rate = autoRepeatInterval;
+        repeat_delay = autoRepeatDelay;
 
         follow_mouse = 1;
         sensitivity = 0; # -1.0 - 1.0, 0 means no modification
