@@ -6,6 +6,6 @@
     ./hyprpaper.nix
     ./hypridle.nix
     ./hyprlock.nix
-    ./wofi.nix
+    ./rofi.nix
   ];
 }

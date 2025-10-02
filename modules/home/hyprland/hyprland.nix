@@ -1,4 +1,4 @@
-{ pkgs, lib, config, osConfig, ... }:
+{ pkgs, lib, config, osConfig, flake, ... }:
 {
   # Install Hyprland-related packages
   home.packages = with pkgs; [
@@ -10,13 +10,23 @@
     grim # screenshot utility
     slurp # area selection for screenshots
     waybar # status bar
-    walker # launcher (what Omarchy uses)
     xdg-desktop-portal-hyprland
+    swappy
   ];
+
+  home.pointerCursor = {
+    #name = "Adwaita";
+    size = lib.mkForce 200; # You can change this size to your preference (e.g., 16–32)
+    package = lib.mkForce pkgs.simp1e-cursors;
+    hyprcursor.enable = true;
+  };
 
   # Hyprland configuration
   wayland.windowManager.hyprland = {
     enable = true;
+    plugins = [
+      #REEE I can't get plugins to build
+    ];
     settings = {
       # Monitor configuration - matching your XMonad setup
       monitor = [
@@ -38,9 +48,6 @@
         gaps_in = 5;
         gaps_out = 10;
         border_size = 1;
-
-        # Colors managed by Stylix
-
         layout = "dwindle";
         allow_tearing = false;
       };
@@ -114,19 +121,14 @@
       bind = [
         # Application launchers
         "$mod, Return, exec, alacritty"
-        "$mod, d, exec, wofi --show drun"
-        "$mod, s, exec, wofi --show run"
+        "$mod, d, exec, rofi -show drun"
+        "$mod, s, exec, rofi -show ssh"
 
         # Window management
         "$mod, q, killactive"
         "$mod SHIFT, q, exit"
         "$mod, space, togglefloating"
-        "$mod, f, fullscreen"
-
-        # Layout cycling (approximating your layout bindings)
-        "$mod, w, exec, hyprctl keyword general:layout dwindle"
-        "$mod, g, exec, hyprctl keyword general:layout master"
-        "$mod SHIFT, w, cyclenext"
+        "$mod, f, fullscreen,1"
 
         # Focus movement (vim-style like your XMonad)
         "$mod, h, movefocus, l"
@@ -165,37 +167,39 @@
         "$mod, F12, workspace, 22"
 
         # Move windows to workspaces
-        "$mod SHIFT, 1, movetoworkspace, 1"
-        "$mod SHIFT, 2, movetoworkspace, 2"
-        "$mod SHIFT, 3, movetoworkspace, 3"
-        "$mod SHIFT, 4, movetoworkspace, 4"
-        "$mod SHIFT, 5, movetoworkspace, 5"
-        "$mod SHIFT, 6, movetoworkspace, 6"
-        "$mod SHIFT, 7, movetoworkspace, 7"
-        "$mod SHIFT, 8, movetoworkspace, 8"
-        "$mod SHIFT, 9, movetoworkspace, 9"
-        "$mod SHIFT, 0, movetoworkspace, 10"
-        "$mod SHIFT, F1, movetoworkspace, 11"
-        "$mod SHIFT, F2, movetoworkspace, 12"
-        "$mod SHIFT, F3, movetoworkspace, 13"
-        "$mod SHIFT, F4, movetoworkspace, 14"
-        "$mod SHIFT, F5, movetoworkspace, 15"
-        "$mod SHIFT, F6, movetoworkspace, 16"
-        "$mod SHIFT, F7, movetoworkspace, 17"
-        "$mod SHIFT, F8, movetoworkspace, 18"
-        "$mod SHIFT, F9, movetoworkspace, 19"
-        "$mod SHIFT, F10, movetoworkspace, 20"
-        "$mod SHIFT, F11, movetoworkspace, 21"
-        "$mod SHIFT, F12, movetoworkspace, 22"
+        "$mod SHIFT, 1  , movetoworkspacesilent, 1"
+        "$mod SHIFT, 2  , movetoworkspacesilent, 2"
+        "$mod SHIFT, 3  , movetoworkspacesilent, 3"
+        "$mod SHIFT, 4  , movetoworkspacesilent, 4"
+        "$mod SHIFT, 5  , movetoworkspacesilent, 5"
+        "$mod SHIFT, 6  , movetoworkspacesilent, 6"
+        "$mod SHIFT, 7  , movetoworkspacesilent, 7"
+        "$mod SHIFT, 8  , movetoworkspacesilent, 8"
+        "$mod SHIFT, 9  , movetoworkspacesilent, 9"
+        "$mod SHIFT, 0  , movetoworkspacesilent, 10"
+        "$mod SHIFT, F1 , movetoworkspacesilent, 11"
+        "$mod SHIFT, F2 , movetoworkspacesilent, 12"
+        "$mod SHIFT, F3 , movetoworkspacesilent, 13"
+        "$mod SHIFT, F4 , movetoworkspacesilent, 14"
+        "$mod SHIFT, F5 , movetoworkspacesilent, 15"
+        "$mod SHIFT, F6 , movetoworkspacesilent, 16"
+        "$mod SHIFT, F7 , movetoworkspacesilent, 17"
+        "$mod SHIFT, F8 , movetoworkspacesilent, 18"
+        "$mod SHIFT, F9 , movetoworkspacesilent, 19"
+        "$mod SHIFT, F10, movetoworkspacesilent, 20"
+        "$mod SHIFT, F11, movetoworkspacesilent, 21"
+        "$mod SHIFT, F12, movetoworkspacesilent, 22"
 
         # Workspace navigation (bracket keys like XMonad)
-        "$mod, bracketleft, workspace, -1"
-        "$mod, bracketright, workspace, +1"
-        "$mod SHIFT, bracketleft, movetoworkspace, -1"
-        "$mod SHIFT, bracketright, movetoworkspace, +1"
+        "$mod, bracketleft, focusmonitor, -1"
+        "$mod, bracketright, focusmonitor, +1"
+        #"$mod SHIFT, bracketleft, movewindow, mon:+1"
+        #"$mod SHIFT, bracketright, movewindow, mon:-1"
+        "$mod SHIFT, bracketleft, movecurrentworkspacetomonitor,+1"
+        "$mod SHIFT, bracketright, movecurrentworkspacetomonitor, -1"
 
         # Tab navigation
-        "$mod, Tab, workspace, previous"
+        "$mod, Tab, cyclenext"
         "$mod SHIFT, Tab, cyclenext, prev"
 
         # Scratchpads (using special workspaces to mimic your scratchpads)
@@ -217,7 +221,7 @@
         "$mod SHIFT, s, exec, sudo systemctl suspend"
 
         # Screenshots
-        ", Print, exec, grim -g \"$(slurp)\" - | wl-copy"
+        ", Print, exec, slurp | grim -g - - | swappy -f -"
         "$mod, Print, exec, grim ~/Pictures/screenshot-$(date +'%Y%m%d-%H%M%S').png"
 
         # Bluetooth

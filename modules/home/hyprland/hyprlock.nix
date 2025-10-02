@@ -2,6 +2,6 @@
 {
   programs.hyprlock = {
     enable = true;
-    # All styling managed by Stylix
+    # TODO it would be cool if this was a screenshot
   };
 }
