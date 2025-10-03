@@ -228,9 +228,11 @@
       ];
 
       # Media keys
-      bindl = [
+      bindle = [
         ", XF86AudioRaiseVolume, exec, pulsemixer --change-volume +1"
         ", XF86AudioLowerVolume, exec, pulsemixer --change-volume -1"
+      ];
+      bindl = [
         ", XF86AudioMute, exec, pulsemixer --toggle-mute"
         ", XF86AudioPlay, exec, playerctl play-pause"
         ", XF86AudioNext, exec, playerctl next"
