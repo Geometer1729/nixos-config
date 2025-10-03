@@ -107,11 +107,12 @@
 
       # Window rules
       windowrule = [
-        #"float, ^(blueman-manager)$"
+        "float, class:^(.blueman-manager-wrapped)$"
+        "size 50% 50%, class:^(.blueman-manager-wrapped)$"
         "float, title:^(float)$"
-        #"workspace 21, ^(discord)$"
-        #"workspace 21, ^(Discord)$"
-        #"workspace 10, ^(Steam)$"
+        "workspace 21, class:^(discord)$"
+        "workspace 10, title:^(Steam)$"
+        "workspace 1, class:^(firefox)$"
       ];
 
       # Keybindings - translating your XMonad bindings
@@ -202,18 +203,11 @@
         "$mod SHIFT, Tab, cyclenext, prev"
 
         # Scratchpads (using special workspaces to mimic your scratchpads)
-        "$mod, n, togglespecialworkspace, sp"
-        "$mod, m, togglespecialworkspace, ghci"
-        "$mod, v, togglespecialworkspace, vim"
-        "$mod, c, togglespecialworkspace, calcurse"
-        "$mod, b, togglespecialworkspace, vit"
-
-        # Move to scratchpads
-        "$mod SHIFT, n, movetoworkspace, special:sp"
-        "$mod SHIFT, m, movetoworkspace, special:ghci"
-        "$mod SHIFT, v, movetoworkspace, special:vim"
-        "$mod SHIFT, c, movetoworkspace, special:calcurse"
-        "$mod SHIFT, b, movetoworkspace, special:vit"
+        "$mod, n, exec, scratchPad sp"
+        "$mod, m, exec, scratchPad ghci"
+        "$mod, v, exec, scratchPad vim"
+        "$mod, c, exec, scratchPad calcurse"
+        "$mod, b, exec, scratchPad vit"
 
         # System controls
         "$mod SHIFT, r, exec, systemctl --user restart hyprland.service" # Rebuild equivalent
