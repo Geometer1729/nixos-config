@@ -115,6 +115,7 @@ in
     enable = true;
     addCss = true;
     enableLeftBackColors = true;
+    enableRightBackColors = true;
   };
   programs.waybar = {
     enable = true;
