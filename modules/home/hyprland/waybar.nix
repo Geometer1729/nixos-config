@@ -9,7 +9,7 @@ let
 
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ ];
-      modules-right = [ "pulseaudio#source" "pulseaudio" "network" "cpu" "memory" "clock" ];
+      modules-right = [ "pulseaudio#source" "pulseaudio" "network" "cpu" "temperature" "memory" "clock" ];
 
       # Workspaces module - similar to your XMonad workspace display
       "hyprland/workspaces" = {
@@ -79,10 +79,18 @@ let
         max-length = 50;
       };
 
+      temperature = {
+        hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input"; # k10temp CPU sensor
+        format = "{icon} {temperatureC}°C ";
+        critical-threshold = 85;
+        #format-icons = [ "" "" "" ];
+      };
+
       # CPU usage
       cpu = {
         format = "{usage}% ";
         tooltip = false;
+        on-click = "hyprctl dispatch exec ${pkgs.alacritty}/bin/alacritty -e ${pkgs.btop}/bin/btop";
       };
 
       # Memory usage
@@ -103,6 +111,11 @@ in
     pulseaudioFull
     pavucontrol
   ];
+  stylix.targets.waybar = {
+    enable = true;
+    addCss = true;
+    enableLeftBackColors = true;
+  };
   programs.waybar = {
     enable = true;
     settings = [ settings (settings // { output = [ "DP-1" ]; }) ];

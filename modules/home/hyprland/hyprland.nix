@@ -248,13 +248,8 @@
         "hypridle"
         "sleep 10 && firefox"
         "discord"
-        "echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"
-        # Create scratchpad terminals
-        "[workspace special:sp silent] alacritty -t sp -e tmux new-session -A -s sp"
-        "[workspace special:ghci silent] alacritty -t ghci -e tmux new-session -A -s ghci ghci"
-        "[workspace special:vim silent] alacritty -t vim -e tmux new-session -A -s vim vim"
-        "[workspace special:calcurse silent] alacritty -t calcurse -e tmux new-session -A -s calcurse calcurse"
-        "[workspace special:vit silent] alacritty -t vit -e tmux new-session -A -s vit vit"
+        # todo replace with a script that actually works for bluetoothctl
+        #"echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"
       ];
     };
   };
