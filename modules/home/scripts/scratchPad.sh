@@ -16,12 +16,9 @@ hyprctl dispatch togglespecialworkspace special:"$name"
 
 if ! [ "$client" ] ; then
   hyprctl dispatch exec "$cmd"
-  #hyprctl dispatch togglefloating
+  sleep 0.1
+  hyprctl dispatch togglefloating
 fi
 
-win="$(hyprctl -j monitors | jq -r \ '.[] | select(.focused)')"
-width="$(echo "$win" | jq -r '.width')"
-height="$(echo "$win" | jq -r '.height')"
-
-hyprctl dispatch resizewindowpixel exact "$(("$width" / 2))" "$(("$height" / 2))"
+hyprctl dispatch resizeactive exact 50% 50%
 hyprctl dispatch centerwindow
