@@ -33,7 +33,7 @@
 
     # Screenshots
     flameshot = {
-      enable = true;
+      enable = false; # gives an annoying notification and doesn't work on wayland
       settings = {
         General = {
           #this breaks something now?

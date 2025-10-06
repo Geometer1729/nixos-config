@@ -21,15 +21,6 @@
     tmux-navigator.enable = true;
     lazygit.enable = true;
     lualine.enable = true;
-    #avante = {
-    #  enable = true;
-    #  settings = {
-    #    provider = "claude";
-    #    claude = {
-    #      api_key_name = "cmd:cat /run/secrets/anthropic_key";
-    #    };
-    #  };
-    #};
     treesitter = {
       enable = true;
       nixvimInjections = true;

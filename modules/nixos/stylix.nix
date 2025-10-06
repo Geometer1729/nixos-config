@@ -10,6 +10,7 @@
 {
   stylix = {
     enable = true;
+    # TODO this doesn't work?
     image = ./grub/sand.jpg;
     opacity.terminal = 0.9;
     polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
@@ -17,11 +18,28 @@
     # I don't hate atelier forest
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/atelier-forest.yaml";
     # AYU is pretty good
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
+    #base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/deep-oceanic-next.yaml";
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/gotham.yaml";
+    #base16Scheme = {
+    #  base00 = "#000000";
+    #  base01 = "#571dc2";
+    #  base02 = "#14db49";
+    #  base03 = "#403d70";
+    #  base04 = "#385a70";
+    #  base05 = "#384894";
+    #  base06 = "#4f3a5e";
+    #  base07 = "#999999";
+    #  base08 = "#38372c";
+    #  base09 = "#7c54b0";
+    #  base0A = "#a2e655";
+    #  base0B = "#9c6f59";
+    #  base0C = "#323f5c";
+    #  base0D = "#5e6c99";
+    #  base0E = "#667d77";
+    #  base0F = "#ffffff";
+    #};
     #"${pkgs.base16-schemes}/share/themes/isotope.yaml";
     ##isotope //
     #override =
