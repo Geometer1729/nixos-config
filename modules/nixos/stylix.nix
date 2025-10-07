@@ -10,6 +10,7 @@
     polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
     base16Scheme =
       let
+        # Colors from vim-j
         black = "#000000";
         darkred = "#800000";
         darkgreen = "#008000";
@@ -36,12 +37,13 @@
         jorange = "#FF8B00";
         jyellow = "#ffff00";
 
-        # Softer alternatives to reduce eye strain
+        # Colors from claude
         soft_green = "#87af87"; # Much easier on eyes than #00ff00
         soft_yellow = "#d7d75f"; # Toned down yellow
         soft_blue = "#5f87d7"; # Softer than pure blue
         soft_cyan = "#5fafaf"; # Muted cyan
         soft_purple = "#af87d7"; # Gentler purple
+        dark_purple = "#6b5b95"; # Darker purple for contrast
         soft_red = "#d75f5f"; # Softer red
         darker_bg = "#1a1a1a"; # Slightly lighter background
       in
@@ -51,18 +53,18 @@
         base00 = black; # Background - softer than pure black
         base01 = jgray; # Lighter background
         base02 = darkgray; # Selection background
-        base03 = soft_purple; # Comments
+        base03 = dark_purple; # Comments/unfocused - darker for contrast
         base04 = darkgray; # Dark foreground
         base05 = white; # Default foreground
         base06 = gray; # Light foreground
         base07 = white; # Light background
-        base08 = jbrown; # Red - iconic joker red/orange
+        base08 = jbrown; # Red - organge but it works
         base09 = jorange; # Orange - keep the joker orange
         base0A = jyellow; # Yellow - bring back the bright yellow
         base0B = jgreen; # Green - iconic joker green
         base0C = soft_cyan; # Cyan - keep this one softer
         base0D = jpurple; # Purple - the nice joker purple
-        base0E = soft_red; # Secondary red - softer
+        base0E = soft_purple; # Secondary red - softer
         base0F = jdarkgreen; # Extra color
       };
     fonts = {
