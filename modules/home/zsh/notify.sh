@@ -6,7 +6,7 @@ function is_window_focused() {
     # On Wayland with Hyprland, use tmux to get terminal PID and check if it's focused
     if [[ -n "$TMUX" ]]; then
       local terminal_pid=$(tmux display-message -p '#{client_pid}')
-      local focused_pid=$(pgrep -P $(hyprctl activewindow -j | jq -r '.pid'))
+      local focused_pid=$(hyprctl activewindow -j | jq -r '.pid')
       pgrep -P $focused_pid | grep $terminal_pid > /dev/null
     else
       # Not in tmux don't notify
