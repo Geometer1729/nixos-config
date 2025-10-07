@@ -18,28 +18,58 @@
     # I don't hate atelier forest
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/atelier-forest.yaml";
     # AYU is pretty good
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
+    #base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/deep-oceanic-next.yaml";
-    #base16Scheme = {
-    #  base00 = "#000000";
-    #  base01 = "#571dc2";
-    #  base02 = "#14db49";
-    #  base03 = "#403d70";
-    #  base04 = "#385a70";
-    #  base05 = "#384894";
-    #  base06 = "#4f3a5e";
-    #  base07 = "#999999";
-    #  base08 = "#38372c";
-    #  base09 = "#7c54b0";
-    #  base0A = "#a2e655";
-    #  base0B = "#9c6f59";
-    #  base0C = "#323f5c";
-    #  base0D = "#5e6c99";
-    #  base0E = "#667d77";
-    #  base0F = "#ffffff";
-    #};
+    base16Scheme =
+      let
+          black       = "#000000";
+          darkred     = "#800000";
+          darkgreen   = "#008000";
+          darkyellow  = "#808000";
+          darkblue    = "#000080";
+          darkmagenta = "#800080";
+          darkcyan    = "#008080";
+          gray        = "#c0c0c0";
+          darkgray    = "#808080";
+          red         = "#a8361b";
+          green       = "#00ff00";
+          yellow      = "#ffff00";
+          blue        = "#0000ff";
+          magenta     = "#ff00ff";
+          cyan        = "#00ffff";
+          white       = "#d7d4cd";
+          jbrown      = "#FA3B17";
+          jred        = "#ff0000";
+          jgray       = "#4e4e4e";
+          jgreen      = "#58FF1E";
+          jdarkgreen  = "#5f875f";
+          jpurple     = "#bd93f9";
+          jblack      = "#121212";
+          jorange     = "#FF8B00";
+          jyellow     = "#ffff00";
+      in
+      {
+          name = "joker";
+
+          base00 = black;
+          base01 = darkred;
+          base02 = darkgreen;
+          base03 = jorange;
+          base04 = darkblue;
+          base05 = jpurple;
+          base06 = cyan;
+          base07 = gray;
+          base08 = darkgray;
+          base09 = red;
+          base0A = jgreen;
+          base0B = jyellow;
+          base0C = blue;
+          base0D = magenta; # TODO repeated
+          base0E = cyan;
+          base0F = white;
+      };
     #"${pkgs.base16-schemes}/share/themes/isotope.yaml";
     ##isotope //
     #override =
