@@ -1,10 +1,4 @@
 # Programs I want this to work for
-# ranger
-# btop
-# lazygit
-# vim
-# tmux
-# xmobar (mostly needs a fix for the part from xmonad)
 # vit (not really, needs a stylix module)
 { pkgs, ... }:
 {
@@ -14,14 +8,6 @@
     image = ./grub/sand.jpg;
     opacity.terminal = 0.9;
     polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
-    #https://tinted-theming.github.io/base16-gallery/
-    # I don't hate atelier forest
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/atelier-forest.yaml";
-    # AYU is pretty good
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/ayu-dark.yaml";
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/deep-oceanic-next.yaml";
     base16Scheme =
       let
         black = "#000000";
@@ -62,11 +48,11 @@
       {
         name = "joker";
 
-        base00 = jblack; # Background - softer than pure black
+        base00 = black; # Background - softer than pure black
         base01 = jgray; # Lighter background
         base02 = darkgray; # Selection background
-        base03 = darkred; # Comments
-        base04 = gray; # Dark foreground
+        base03 = soft_purple; # Comments
+        base04 = darkgray; # Dark foreground
         base05 = white; # Default foreground
         base06 = gray; # Light foreground
         base07 = white; # Light background
@@ -79,15 +65,6 @@
         base0E = soft_red; # Secondary red - softer
         base0F = jdarkgreen; # Extra color
       };
-    #"${pkgs.base16-schemes}/share/themes/isotope.yaml";
-    ##isotope //
-    #override =
-    #  {
-    #    base0A = "#ffff00"; #yellow
-    #    base0B = "#58FF1E"; # green
-    #    base0E = "#bd93f9"; # purple?
-    #    base0F = "#5f875f"; # brown (cringe) blue
-    #  };
     fonts = {
       serif = {
         package = pkgs.nerd-fonts.hack;
