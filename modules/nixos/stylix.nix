@@ -57,7 +57,7 @@
         base04 = darkgray; # Dark foreground
         base05 = white; # Default foreground
         base06 = gray; # Light foreground
-        base07 = white; # Light background
+        base07 = soft_purple; # Light background
         base08 = jbrown; # Red - organge but it works
         base09 = jorange; # Orange - keep the joker orange
         base0A = jyellow; # Yellow - bring back the bright yellow
