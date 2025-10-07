@@ -70,13 +70,13 @@
         base05 = white; # Default foreground
         base06 = gray; # Light foreground
         base07 = white; # Light background
-        base08 = soft_red; # Red - using softer version
-        base09 = jorange; # Orange
-        base0A = soft_yellow; # Yellow - much easier on eyes
-        base0B = soft_green; # Green - way less harsh
-        base0C = soft_cyan; # Cyan - softer
-        base0D = soft_blue; # Blue - gentler
-        base0E = jpurple; # Magenta/Purple - already nice
+        base08 = jbrown; # Red - iconic joker red/orange
+        base09 = jorange; # Orange - keep the joker orange
+        base0A = jyellow; # Yellow - bring back the bright yellow
+        base0B = jgreen; # Green - iconic joker green
+        base0C = soft_cyan; # Cyan - keep this one softer
+        base0D = jpurple; # Purple - the nice joker purple
+        base0E = soft_red; # Secondary red - softer
         base0F = jdarkgreen; # Extra color
       };
     #"${pkgs.base16-schemes}/share/themes/isotope.yaml";
