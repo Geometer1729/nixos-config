@@ -124,9 +124,9 @@
       # Workspaces - matching your XMonad 22 workspaces
       workspace =
         # Create workspaces 1-10 on primary monitor
-        (map (i: "${toString i}, monitor:HDMI-A-1") (lib.range 1 10)) ++
+        (map (i: "${toString i}, monitor:HDMI-A-1") ((lib.range 1 5) ++ (lib.range 11 15))) ++
         # Create workspaces 11-22 on secondary monitor
-        (map (i: "${toString i}, monitor:DP-1") (lib.range 11 22));
+        (map (i: "${toString i}, monitor:DP-1") ((lib.range 6 10) ++ (lib.range 16 22)));
 
       # Window rules
       windowrule = [
@@ -137,12 +137,8 @@
         "workspace 10, title:^(Steam)$"
       ];
 
-      # Firefox profile-based workspace assignments
       windowrulev2 = [
-        "workspace 1, class:^(firefox)$, title:.*youtube.*"
-        "workspace 2, class:^(firefox)$, title:.*default.*"
-        "workspace 18, class:^(firefox)$, title:.*work.*"
-        "workspace 20, class:^(firefox)$, title:.*ttrpg.*"
+        # Add other window rules here as needed
       ];
 
       # Keybindings - translating your XMonad bindings
@@ -277,11 +273,11 @@
         "hyprpaper"
         "hypridle"
         "mako"
-        # Launch all Firefox profiles immediately
-        "firefox -P youtube --new-instance"
-        "firefox -P default --new-instance"
-        "firefox -P work --new-instance"
-        "firefox -P ttrpg --new-instance"
+        # Launch all Firefox profiles directly to their workspaces
+        "[workspace 1 silent] firefox -P youtube --new-instance"
+        "[workspace 2 silent] firefox -P default --new-instance"
+        "[workspace 18 silent] firefox -P work --new-instance"
+        "[workspace 20 silent] firefox -P ttrpg --new-instance"
         "discord"
         # todo replace with a script that actually works for bluetoothctl
         #"echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"

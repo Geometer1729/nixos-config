@@ -40,6 +40,9 @@
         ".local/state/nvim"
         ".claude" # Claude Code state and configuration
         ".mozilla/firefox/default"
+        ".mozilla/firefox/youtube"
+        ".mozilla/firefox/work"
+        ".mozilla/firefox/ttrpg"
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
         ".cache/rofi-2.sshcache"
         ".cache/rofi-3.runcache"
