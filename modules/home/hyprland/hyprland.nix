@@ -127,17 +127,21 @@
         (map (i: "${toString i}, monitor:HDMI-A-1") ((lib.range 1 5) ++ (lib.range 11 15))) ++
         # Create workspaces 11-22 on secondary monitor
         (map (i: "${toString i}, monitor:DP-1") ((lib.range 6 10) ++ (lib.range 16 22)));
-
       # Window rules
       windowrule = [
         "float, class:^(.blueman-manager-wrapped)$"
         "size 50% 50%, class:^(.blueman-manager-wrapped)$"
         "float, title:^(float)$"
         "workspace 21, class:^(discord)$"
+        "workspace 21, class:^(signal)$"
         "workspace 10, title:^(Steam)$"
       ];
 
       windowrulev2 = [
+        # TODO it would be so nice to auto fullscreen 1 workspace 21
+        #"workspace 21, class:^(discord|signal)$"
+        #"group, class:^(discord|signal)$"
+        #"fullscreen:1, class:^(discord|signal)$"
         # Add other window rules here as needed
       ];
 
@@ -278,9 +282,10 @@
         "[workspace 2 silent] firefox -P default --new-instance"
         "[workspace 18 silent] firefox -P work --new-instance"
         "[workspace 20 silent] firefox -P ttrpg --new-instance"
-        "discord"
-        # todo replace with a script that actually works for bluetoothctl
-        #"echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"
+        "[workspace 21 silent] discord"
+        "[workspace 21 silent] signal-desktop"
+        # Auto-connect to Bluetooth headphones
+        "bluetooth-autoconnect"
       ];
 
     };
