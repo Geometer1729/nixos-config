@@ -119,7 +119,10 @@ in
   };
   programs.waybar = {
     enable = true;
-    settings = [ settings (settings // { output = [ "DP-1" ]; }) ];
+    settings = {
+      mainBar = settings;
+      secondaryBar = settings // { output = [ "DP-1" ]; };
+    };
 
     # Styling similar to your XMobar colors
   };
