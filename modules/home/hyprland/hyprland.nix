@@ -12,10 +12,33 @@
     waybar # status bar
     xdg-desktop-portal-hyprland
     swappy
+    mako # notification daemon for wayland
+    libnotify # notify-send command
   ];
 
   home.pointerCursor = {
     hyprcursor.enable = true;
+  };
+
+  # Mako notification service configuration
+  services.mako = {
+    enable = true;
+    settings = {
+      # Follow the cursor to display notifications on the active monitor
+      output = ""; # Empty means follow cursor/active monitor
+      anchor = "top-right";
+      width = 300;
+      height = 150;
+      margin = "10";
+      padding = "15";
+      border-size = 2;
+      border-radius = 5;
+      default-timeout = 5000;
+      ignore-timeout = false;
+      layer = "overlay";
+      max-visible = 5;
+      sort = "-time";
+    };
   };
 
   # Hyprland configuration
@@ -246,6 +269,7 @@
         "waybar"
         "hyprpaper"
         "hypridle"
+        "mako"
         "sleep 10 && firefox"
         "discord"
         # todo replace with a script that actually works for bluetoothctl
