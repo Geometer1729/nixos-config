@@ -82,6 +82,17 @@
           };
         })
 
+      (pkgs.vimUtils.buildVimPlugin
+        {
+          name = "Recover.vim";
+          src = pkgs.fetchFromGitHub {
+            owner = "chrisbra";
+            repo = "Recover.vim";
+            rev = "e61319bce3cd1004e5b695933296d8f267dd65a3";
+            sha256 = "sha256-BPvxcvC4Il9NkyY3qmAKAraORNYQNiyOvM+5DRTh3EI=";
+          };
+        })
+
       # LSP
       nvim-lspconfig
       # cmp

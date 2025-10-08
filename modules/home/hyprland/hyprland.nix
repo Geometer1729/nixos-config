@@ -135,7 +135,14 @@
         "float, title:^(float)$"
         "workspace 21, class:^(discord)$"
         "workspace 10, title:^(Steam)$"
-        "workspace 1, class:^(firefox)$"
+      ];
+
+      # Firefox profile-based workspace assignments
+      windowrulev2 = [
+        "workspace 1, class:^(firefox)$, title:.*youtube.*"
+        "workspace 2, class:^(firefox)$, title:.*default.*"
+        "workspace 18, class:^(firefox)$, title:.*work.*"
+        "workspace 20, class:^(firefox)$, title:.*ttrpg.*"
       ];
 
       # Keybindings - translating your XMonad bindings
@@ -270,11 +277,16 @@
         "hyprpaper"
         "hypridle"
         "mako"
-        "sleep 10 && firefox"
+        # Launch all Firefox profiles immediately
+        "firefox -P youtube --new-instance"
+        "firefox -P default --new-instance"
+        "firefox -P work --new-instance"
+        "firefox -P ttrpg --new-instance"
         "discord"
         # todo replace with a script that actually works for bluetoothctl
         #"echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"
       ];
+
     };
   };
 }
