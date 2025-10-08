@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   gen-task-link =
     pkgs.writeShellApplication
@@ -57,20 +57,34 @@ in
       redirect.regex = "^Redirect"
       redirect.command = "vim ~/Documents/vw/tasks/$UUID.md --command VimwikiFollowLink"
     '';
-  #home.file.".taskopenrc".text =
-  #  ''
-  #  TASK_ATTRIBUTES = priority,project,tags,description
-  #  NOTES_FOLDER=$HOME/Documents/vw/tasks/
-  #  NOTES_EXT=.md
-  #  NOTES_CMD = "${edit-note}/bin/edit-note $HOME/Documents/vw/tasks/$UUID.md $TASK_DESCRIPTION"
-  #  '';
   home.file.".vit/config.ini".text =
     ''
       [keybinding]
       o = :!wr taskopen {TASK_UUID}<Enter>
       [vit]
-      #theme = classic
+      theme = stylix
     '';
+
+  # Generate vit theme from Stylix colors following base16 guidelines
+  home.file.".vit/theme/stylix.py".text = ''
+    # Auto-generated vit theme from Stylix configuration
+    # Following base16 guidelines: base00=bg, base01=lighter_bg, base02=selection, base03=comments, base05=fg, base08=errors, base0D=functions/focus
+    theme = [
+        ('list-header', "", "", "", "", ""),
+        ('list-header-column', 'black', 'light gray', "", 'black', 'light gray'),  # base05 on base01
+        ('list-header-column-separator', 'black', 'light gray', "", 'black', 'light gray'),  # base03 on base01
+        ('striped-table-row', 'white', 'dark gray', "", 'white', 'dark gray'),  # base05 on base02
+        ('reveal focus', 'black', 'dark cyan', 'standout', 'black', 'dark cyan'),  # base00 on base0D (focus)
+        ('message status', 'white', 'dark blue', 'standout', 'white', 'dark blue'),  # base05 on base0D (status)
+        ('message error', 'white', 'dark red', 'standout', 'white', 'dark red'),  # base05 on base08 (error)
+        ('status', 'dark magenta', 'black', "", 'dark magenta', 'black'),  # base0E on base00
+        ('flash off', 'black', 'black', 'standout', 'black', 'black'),
+        ('flash on', 'white', 'black', 'standout', 'white', 'black'),  # base05 on base00
+        ('pop_up', 'white', 'black', "", 'white', 'black'),  # base05 on base00
+        ('button action', 'white', 'dark red', "", 'white', 'dark red'),  # base05 on base08 (action)
+        ('button cancel', 'black', 'light gray', "", 'black', 'light gray'),  # base03 on base01 (cancel)
+    ]
+  '';
   programs.zsh.shellAliases =
     {
       ta = "task add";
