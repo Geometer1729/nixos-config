@@ -4,7 +4,7 @@
     enable = true;
     settings = {
       general = {
-        after_sleep_cmd = "hyprctl dispatch dpms on";
+        after_sleep_cmd = "hyprctl dispatch dpms on; bluetooth-autoconnect.sh";
         before_sleep_cmd = "hyprlock";
         ignore_dbus_inhibit = false;
         lock_cmd = "hyprlock";
