@@ -6,6 +6,7 @@
     hypridle # idle daemon
     hyprlock # screen locker
     hyprpicker # color picker
+    wayfreeze
     wl-clipboard # clipboard utilities
     grim # screenshot utility
     slurp # area selection for screenshots
@@ -244,11 +245,11 @@
         "$mod SHIFT, s, exec, sudo systemctl suspend"
 
         # Screenshots
-        ", Print, exec, slurp | grim -g - - | swappy -f -"
+        ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
         "$mod, Print, exec, grim ~/Pictures/screenshot-$(date +'%Y%m%d-%H%M%S').png"
 
         # Bluetooth
-        "$mod SHIFT, b, exec, echo 'connect 60:AB:D2:42:5E:19' | bluetoothctl"
+        "$mod SHIFT, b, exec, bluetooth-autoconnect"
       ];
 
       # Mouse bindings
