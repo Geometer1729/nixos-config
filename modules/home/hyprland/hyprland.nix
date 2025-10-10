@@ -304,6 +304,8 @@
         "[workspace 21 silent] signal-desktop"
         # Auto-connect to Bluetooth headphones
         "bluetooth-autoconnect"
+        # Pester me about any swap files
+        "check-swaps"
       ];
 
     };
