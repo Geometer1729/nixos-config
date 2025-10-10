@@ -112,14 +112,34 @@ let
       "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "toolkit.telemetry.pioneer-new-studies-available" = false;
+      #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
     };
-    extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
-      vimium
-    ];
+    #userChrome = ''
+    #  /* Fix unfocused tab background color - force to black */
+    #  .tabbrowser-tab:not([selected]):not(:hover) .tab-background {
+    #    background-color: #000000 !important;
+    #  }
+
+    #  /* Also fix unfocused window unfocused tabs */
+    #  :root:not([active]) .tabbrowser-tab:not([selected]) .tab-background {
+    #    background-color: #000000 !important;
+    #  }
+    #'';
+    extensions = {
+      force = true;
+      packages = with inputs.firefox-addons.packages."x86_64-linux"; [
+        vimium
+        #TODO video speed controller
+        #adblock
+      ];
+    };
   };
 in
 {
-  stylix.targets.firefox.profileNames = [ "default" "youtube" "work" "ttrpg" ];
+  stylix.targets.firefox = {
+    profileNames = [ "default" "youtube" "work" "ttrpg" ];
+    colorTheme.enable = true;
+  };
 
   # Desktop files for Firefox profiles
   xdg.desktopEntries = {
