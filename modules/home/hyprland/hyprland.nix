@@ -12,10 +12,27 @@
     slurp # area selection for screenshots
     waybar # status bar
     xdg-desktop-portal-hyprland
-    swappy
     mako # notification daemon for wayland
     libnotify # notify-send command
   ];
+
+  # Swappy configuration - auto-exit on copy like omarchy
+  programs.swappy = {
+    enable = true;
+    settings = {
+      Default = {
+        save_dir = "$HOME/Pictures";
+        save_filename_format = "screenshot-%Y%m%d-%H%M%S.png";
+        show_panel = false;
+        line_size = 5;
+        text_size = 20;
+        text_font = "sans-serif";
+        paint_mode = "arrow";
+        early_exit = true;
+        fill_shape = false;
+      };
+    };
+  };
 
   home.pointerCursor = {
     hyprcursor.enable = true;
