@@ -16,8 +16,7 @@ cleanup() {
 trap cleanup EXIT
 
 find_swap_files() {
-    find "$SWAP_DIR" -name "*.swp" -o -name "*.swo" -o -name "*.swn" 2>/dev/null || true
-    find . -name ".*.swp" -o -name ".*.swo" -o -name ".*.swn" 2>/dev/null || true
+    find "$SWAP_DIR" -name "*.s*" 2>/dev/null || true
 }
 
 decode_swap_filename() {
@@ -28,13 +27,9 @@ decode_swap_filename() {
 
     basename_swap=$(basename "$swap_file")
 
-    # Remove trailing .swp/.swo/.swn
-    if [[ "$basename_swap" == *.swp ]]; then
-        encoded_path="${basename_swap%.swp}"
-    elif [[ "$basename_swap" == *.swo ]]; then
-        encoded_path="${basename_swap%.swo}"
-    elif [[ "$basename_swap" == *.swn ]]; then
-        encoded_path="${basename_swap%.swn}"
+    # Remove trailing .s* extension (any swap file extension starting with .s)
+    if [[ "$basename_swap" == *.s* ]]; then
+        encoded_path="${basename_swap%%.s*}"
     else
         encoded_path="$basename_swap"
     fi
@@ -69,7 +64,12 @@ main() {
         original_file=$(decode_swap_filename "$swap_file")
 
         echo "$original_file" "$swap_file"
-        vim "$original_file"
+        if [ -f "$original_file" ]; then
+          vim "$original_file"
+        else
+          vim -r "$swap_file"
+        fi
+        mv "$swap_file" "/tmp/$(basename "$swap_file")"
         echo "---"
     done <<< "$swap_files"
 }

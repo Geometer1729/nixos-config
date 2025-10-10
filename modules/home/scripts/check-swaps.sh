@@ -7,8 +7,7 @@ set -euo pipefail
 SWAP_DIR="${XDG_DATA_HOME:-$HOME/.local/state}/nvim/swap"
 
 find_swap_files() {
-    find "$SWAP_DIR" -name "*.swp" -o -name "*.swo" -o -name "*.swn" 2>/dev/null || true
-    find . -name ".*.swp" -o -name ".*.swo" -o -name ".*.swn" 2>/dev/null || true
+    find "$SWAP_DIR" -name "*.s*" 2>/dev/null || true
 }
 
 main() {
