@@ -45,27 +45,49 @@
         soft_purple = "#af87d7"; # Gentler purple
         dark_purple = "#6b5b95"; # Darker purple for contrast
         soft_red = "#d75f5f"; # Softer red
-        darker_bg = "#1a1a1a"; # Slightly lighter background
+        darker_gray = "#1a1a1a"; # Slightly lighter background
       in
       {
-        name = "joker";
+        name = "Joker";
 
-        base00 = black; # Background - softer than pure black
-        base01 = jgray; # Lighter background
-        base02 = darkgray; # Selection background
-        base03 = dark_purple; # Comments/unfocused - darker for contrast
-        base04 = darkgray; # Dark foreground
-        base05 = white; # Default foreground
-        base06 = gray; # Light foreground
-        base07 = soft_purple; # Light background
+        base00 = black; # Primary Background
+        base01 = darker_gray; # Lighter (than black) background
+
+        base02 = jgray;
+        # Selection background
+
+        base03 = jpurple;
+        # Comments
+        # Unfocused vim tabs
+        # Waybar Clock
+        # Waybar focused workspace
+        # Needs to be light enough to makeout black text
+        # Needs to be distinct from 0D for window focus
+        # Needs to be distinct from 07 for workspace focus in waybar
+
+        # Foregrounds
+        base04 = darker_gray; # Dark foreground
+        base05 = gray; # Default foreground
+        base06 = white; # Light foreground
+
+        base07 = dark_purple;
+        # Waybar Temperature
+        # Waybar unfocused workspace
+        # Needs to be distinct from 03
+
         base08 = jbrown; # Red - organge but it works
         base09 = jorange; # Orange - keep the joker orange
         base0A = jyellow; # Yellow - bring back the bright yellow
         base0B = jgreen; # Green - iconic joker green
         base0C = soft_cyan; # Cyan - keep this one softer
-        base0D = jpurple; # Purple - the nice joker purple
-        base0E = soft_purple; # Secondary red - softer
-        base0F = jdarkgreen; # Extra color
+
+        base0D = jgreen;
+        # Focused window border
+
+        base0E = soft_purple; #Normally purple
+
+        base0F = jdarkgreen;
+        # Honestly not sure I've seen this anywhere?
       };
     fonts = {
       serif = {

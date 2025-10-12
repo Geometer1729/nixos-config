@@ -8,8 +8,15 @@ let
       output = [ "HDMI-A-1" ]; # Primary monitor
 
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
-      modules-center = [ ];
-      modules-right = [ "pulseaudio#source" "pulseaudio" "network" "cpu" "temperature" "memory" "clock" ];
+      modules-center = [ "clock" ];
+      modules-right = [
+        "pulseaudio#source"
+        "pulseaudio"
+        "network"
+        "temperature"
+        "cpu"
+        "memory"
+      ];
 
       # Workspaces module - similar to your XMonad workspace display
       "hyprland/workspaces" = {
@@ -101,8 +108,12 @@ let
       # Clock
       clock = {
         timezone = "America/New_York";
-        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        format-alt = "{:%Y-%m-%d}";
+        tooltip-format = "{:%a %d}\n<tt><small>{calendar}</small></tt>";
+        calendar.format.today = "<b>{}</b>";
+        # TODO calandly on-click would be cool
+        format = "{:%m-%d-%Y : %a : %H:%M:%S}";
+        format-alt = "{:%a %H:%M:%S}";
+        interval = 1;
       };
     };
 in
@@ -115,6 +126,7 @@ in
     enable = true;
     addCss = true;
     enableLeftBackColors = true;
+    enableCenterBackColors = false;
     enableRightBackColors = true;
   };
   programs.waybar = {
@@ -123,7 +135,7 @@ in
       mainBar = settings;
       secondaryBar = settings // { output = [ "DP-1" ]; };
     };
-
-    # Styling similar to your XMobar colors
   };
+
+
 }

@@ -1,4 +1,4 @@
-{ flake, pkgs, ... }:
+{ flake, pkgs, config, ... }:
 let
   inherit (flake) inputs;
   common = {
@@ -112,19 +112,56 @@ let
       "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "toolkit.telemetry.pioneer-new-studies-available" = false;
-      #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+      "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
     };
-    #userChrome = ''
-    #  /* Fix unfocused tab background color - force to black */
-    #  .tabbrowser-tab:not([selected]):not(:hover) .tab-background {
-    #    background-color: #000000 !important;
-    #  }
+    # Maybe it's just my theme but I don't like the way stylix handles the
+    # tab bar so I just make it all base00
+    userChrome = ''
+      /* Fix unfocused tab background color - use stylix base00 */
+      .tabbrowser-tab:not([selected]):not(:hover) .tab-background {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
 
-    #  /* Also fix unfocused window unfocused tabs */
-    #  :root:not([active]) .tabbrowser-tab:not([selected]) .tab-background {
-    #    background-color: #000000 !important;
-    #  }
-    #'';
+      /* Also fix unfocused window unfocused tabs */
+      :root:not([active]) .tabbrowser-tab:not([selected]) .tab-background {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Fix tab area/toolbar background */
+      #TabsToolbar {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Fix tab strip background */
+      .tabbrowser-arrowscrollbox {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Fix any remaining tab area backgrounds */
+      #tabbrowser-tabs {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Set URL bar to base02 to reduce brightness */
+      #urlbar-background {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* URL bar input field */
+      #urlbar-input {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Alternative URL bar selectors */
+      .urlbar-input-box {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+
+      /* Search bar */
+      #searchbar {
+        background-color: ${config.lib.stylix.colors.withHashtag.base00} !important;
+      }
+    '';
     extensions = {
       force = true;
       packages = with inputs.firefox-addons.packages."x86_64-linux"; [
