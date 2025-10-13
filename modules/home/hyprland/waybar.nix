@@ -129,12 +129,26 @@ in
     enableCenterBackColors = false;
     enableRightBackColors = true;
   };
+
   programs.waybar = {
     enable = true;
     settings = {
       mainBar = settings;
       secondaryBar = settings // { output = [ "DP-1" ]; };
     };
+    # Override workspace colors to match hyprland window borders
+    # I don't like the stylix defaults here
+    style = ''
+      window#waybar #workspaces button {
+        background-color: @base07;
+        color: @base00;
+      }
+
+      window#waybar #workspaces button.active {
+        background-color: @base0D;
+        color: @base00;
+      }
+    '';
   };
 
 

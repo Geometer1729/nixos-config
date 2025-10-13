@@ -81,7 +81,7 @@
         base0B = jgreen; # Green - iconic joker green
         base0C = soft_cyan; # Cyan - keep this one softer
 
-        base0D = jgreen;
+        base0D = soft_purple;
         # Focused window border
 
         base0E = soft_purple; #Normally purple

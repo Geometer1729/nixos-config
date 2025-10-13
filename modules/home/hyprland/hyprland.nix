@@ -291,7 +291,7 @@
 
       # Startup applications (matching your XMonad startup)
       exec-once = [
-        "waybar"
+        # waybar is already started by systemd via programs.waybar.enable
         "hyprpaper"
         "hypridle"
         "mako"
