@@ -16,7 +16,14 @@ in
   nix.settings.extra-platforms = [ "i686-linux" "aarch64-linux" ];
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
-  # Monitor setup handled by Hyprland configuration
+  # Monitor setup for desktop
+  home-manager.users.bbrian = {
+    programs.hyprland-custom = {
+      dualMonitor = true;
+      primaryMonitor = "HDMI-A-1,2560x1440@60,0x0,1";
+      secondaryMonitor = "DP-1,1920x1080@60,2560x0,1";
+    };
+  };
 
   imports = with self.nixosModules;
     [
