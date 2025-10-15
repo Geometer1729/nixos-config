@@ -90,6 +90,7 @@ let
         hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input"; # k10temp CPU sensor
         format = "{icon} {temperatureC}°C ";
         critical-threshold = 85;
+        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
         #format-icons = [ "" "" "" ];
       };
 
@@ -97,12 +98,13 @@ let
       cpu = {
         format = "{usage}% ";
         tooltip = false;
-        on-click = "hyprctl dispatch exec ${pkgs.alacritty}/bin/alacritty -e ${pkgs.btop}/bin/btop";
+        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
       };
 
       # Memory usage
       memory = {
         format = "{}% ";
+        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
       };
 
       # Clock
@@ -132,6 +134,10 @@ in
 
   programs.waybar = {
     enable = true;
+    systemd = {
+      enable = true;
+      target = "hyprland-session.target";
+    };
     settings = {
       mainBar = settings;
       secondaryBar = settings // { output = [ "DP-1" ]; };

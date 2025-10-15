@@ -56,7 +56,7 @@
         base02 = jgray;
         # Selection background
 
-        base03 = jpurple;
+        base03 = dark_purple;
         # Comments
         # Unfocused vim tabs
         # Waybar Clock
@@ -72,7 +72,7 @@
 
         base07 = dark_purple;
         # Waybar Temperature
-        # Waybar unfocused workspace
+        # ~~Waybar unfocused workspace~~
         # Needs to be distinct from 03
 
         base08 = jbrown; # Red - organge but it works
