@@ -112,9 +112,8 @@ let
         timezone = "America/New_York";
         tooltip-format = "{:%a %d}\n<tt><small>{calendar}</small></tt>";
         calendar.format.today = "<b>{}</b>";
-        # TODO calandly on-click would be cool
+        on-click = "scratchPad calcurse";
         format = "{:%m-%d-%Y : %a : %H:%M:%S}";
-        format-alt = "{:%a %H:%M:%S}";
         interval = 1;
       };
     };
