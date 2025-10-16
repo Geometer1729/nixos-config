@@ -187,11 +187,7 @@ in
         ];
 
         windowrulev2 = [
-          # TODO it would be so nice to auto fullscreen 1 workspace 21
-          #"workspace 21, class:^(discord|signal)$"
-          #"group, class:^(discord|signal)$"
-          #"fullscreen:1, class:^(discord|signal)$"
-          # Add other window rules here as needed
+          "suppressevent fullscreen, class:^(firefox)$"
         ];
 
         # Keybindings - translating your XMonad bindings
@@ -207,7 +203,9 @@ in
           "$mod, q, killactive"
           "$mod SHIFT, q, exit"
           "$mod, space, togglefloating"
-          "$mod, f, fullscreen,1"
+          "$mod, w, fullscreen,1"
+          # TODO this works pretty badly tbh and I really wish it was automatic
+          "$mod, f, fullscreenstate, -1 2"
 
           # Focus movement (vim-style like your XMonad)
           "$mod, h, movefocus, l"

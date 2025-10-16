@@ -66,7 +66,7 @@
         # Needs to be distinct from 07 for workspace focus in waybar
 
         # Foregrounds
-        base04 = darker_gray; # Dark foreground
+        base04 = jpurple; # Dark foreground # Needs to be readable on 01
         base05 = gray; # Default foreground
         base06 = white; # Light foreground
 
@@ -74,6 +74,7 @@
         # Waybar Temperature
         # ~~Waybar unfocused workspace~~
         # Needs to be distinct from 03
+        # Tmux unfocused window names, needs to be readable on 04?
 
         base08 = jbrown; # Red - organge but it works
         base09 = jorange; # Orange - keep the joker orange

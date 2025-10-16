@@ -41,6 +41,7 @@ in
     #yubikey
     zsh
     claude
+    webapps
   ];
 
 }
