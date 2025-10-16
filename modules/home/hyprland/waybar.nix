@@ -1,11 +1,19 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
+  cfg = config.programs.hyprland-custom;
+
+  # Extract monitor name from monitor configuration string (format: "MONITOR-NAME,resolution@refresh,position,scale")
+  extractMonitorName = monitorConfig: builtins.head (lib.splitString "," monitorConfig);
+
+  primaryMonitorName = extractMonitorName cfg.primaryMonitor;
+  secondaryMonitorName = if cfg.dualMonitor then extractMonitorName cfg.secondaryMonitor else primaryMonitorName;
+
   settings =
     {
       layer = "top";
       position = "top";
       height = 24;
-      output = [ "HDMI-A-1" ]; # Primary monitor
+      output = [ primaryMonitorName ];
 
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ "clock" ];
@@ -137,10 +145,13 @@ in
       enable = true;
       target = "hyprland-session.target";
     };
-    settings = {
-      mainBar = settings;
-      secondaryBar = settings // { output = [ "DP-1" ]; };
-    };
+    settings =
+      if cfg.dualMonitor then {
+        mainBar = settings;
+        secondaryBar = settings // { output = [ secondaryMonitorName ]; };
+      } else {
+        mainBar = settings;
+      };
     # Override workspace colors to match hyprland window borders
     # I don't like the stylix defaults here
     style = ''
