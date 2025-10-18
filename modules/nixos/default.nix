@@ -28,7 +28,6 @@ in
       #self
       boot
       bt
-      cloudflare
       disko
       gh-noto
       impermanence
@@ -38,6 +37,7 @@ in
       ssh
       steam
       stylix
+      tailscale
       wifi
       work
       hyprland

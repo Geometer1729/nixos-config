@@ -4,12 +4,8 @@ let
     user = "bbrian";
     identityFile = "/home/bbrian/.ssh/id_ed25519";
   };
-  cloudflare = {
-    proxyCommand = "cloudflared access ssh --hostname %h";
-  };
 in
 {
-  home.packages = [ pkgs.cloudflared ];
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -21,12 +17,13 @@ in
         hostname = "192.168.1.227";
         proxyJump = "tub";
       };
-      torag = me // cloudflare // {
-        hostname = "torag.bbrian.xyz";
-      };
-      am = me // cloudflare // {
-        hostname = "am.bbrian.xyz";
-      };
+      # I guess with tailscale I don't really need this
+      #torag = me // {
+      #  hostname = "10.0.0.7";
+      #};
+      #am = me // {
+      #  hostname = "10.0.0.248";
+      #};
     };
   };
 }

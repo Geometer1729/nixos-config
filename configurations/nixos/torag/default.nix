@@ -7,7 +7,6 @@ in
 
   networking.hostName = "torag";
   drive = "/dev/nvme0n1";
-  cloudflare-id = "9f53e225-4287-4c83-8049-b25f792cd1e0";
 
   home-manager.users.${config.mainUser} = {
     wifi = {
@@ -29,7 +28,6 @@ in
     [
       ./hardware.nix
       default
-
       useBuilders
     ];
 }

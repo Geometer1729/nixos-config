@@ -6,6 +6,7 @@
     directories = [
       "/var/log"
       "/var/lib/bluetooth"
+      "/var/lib/tailscale"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/var/lib/hass"
@@ -19,7 +20,7 @@
       "/etc/ssh/ssh_host_rsa_key"
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/machine-id"
-      "/etc/cloudflared-cert.json"
+      "/root/.config/tailscale/ssh_known_hosts"
     ];
     users.bbrian = {
       directories = [
@@ -63,6 +64,7 @@
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ".git-credentials"
         ".config/gh/hosts.yml"
+        ".config/tailscale/ssh_known_hosts"
         ".claude.json"
         ".claude/.credentials.json"
       ];

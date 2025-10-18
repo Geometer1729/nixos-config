@@ -22,6 +22,7 @@ in
               "FASBOOKS WIFI_5GEXT"
               "binaup"
               "WhiteSky-Slate"
+              "moria"
             ]
         );
   };

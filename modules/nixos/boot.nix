@@ -20,6 +20,7 @@
   # Boot faster
 
   # keeps breaking cloudflare I give up
+  # TODO revisit after ditching cloudflare I guess
   #let
   #  wait = {
   #    after = [ "network-online.target" "dhcpcd.service" ];

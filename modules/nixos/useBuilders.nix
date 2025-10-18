@@ -1,16 +1,11 @@
 { config, pkgs, ... }:
 {
-  # Configure nix-daemon to have cloudflared in PATH
-  systemd.services.nix-daemon = {
-    path = [ pkgs.cloudflared ];
-  };
-
   nix = {
     settings = {
       builders-use-substitutes = true;
       # Add am as a substitute server
-      substituters = [ "http://am.nix-store.bbrian.xyz" ];
-      trusted-substituters = [ "http://am.nix-store.bbrian.xyz" ];
+      substituters = [ "ssh://bbrian@am" ];
+      trusted-substituters = [ "ssh://bbrian@am" ];
     };
     distributedBuilds = true;
     buildMachines = [

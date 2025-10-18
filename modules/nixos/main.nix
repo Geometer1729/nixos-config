@@ -72,7 +72,6 @@ in
       extraGroups = [ "networkmanager" "wheel" ];
       packages = with pkgs; [
         picom # afaict this is needed for picom to work
-        cloudflare-warp
       ];
     };
 
