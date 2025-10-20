@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   programs.alacritty = {
     enable = true;
@@ -9,7 +9,14 @@
           y = 3;
         };
       };
-      terminal.shell = "tmux";
+      # Small delay to fix Wayland initialization race condition
+      # Issue only occurs on wayland + tmux
+      # you just get a % from zsh before the prompt
+      # Only happens on 2nd+ tmux sesions probably because tmux is slower the first time
+      terminal.shell = "${pkgs.writeShellScript "tmux-delayed" ''
+        sleep 0.02
+        exec tmux
+      ''}";
     };
   };
 }
