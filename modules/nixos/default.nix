@@ -10,6 +10,8 @@ in
   system.stateVersion = "22.05";
 
   nixpkgs.overlays = lib.attrValues self.overlays;
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
   home-manager.users.${config.mainUser} = {
     imports = [ (self + /configurations/home/bbrian.nix) ];
   };
@@ -21,6 +23,7 @@ in
     with self.nixosModules;
     [
       #inputs
+      inputs.nur.modules.nixos.default
       inputs.disko.nixosModules.default
       inputs.impermanence.nixosModules.impermanence
       inputs.stylix.nixosModules.stylix

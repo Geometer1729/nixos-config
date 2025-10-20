@@ -9,7 +9,6 @@ in
   home.homeDirectory = "/home/bbrian";
 
   imports = with self.homeModules; [
-    inputs.nur.modules.homeManager.default
     inputs.nixvim.homeModules.nixvim
 
     # GUI applications
