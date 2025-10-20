@@ -5,6 +5,7 @@
     pass
     gnupg
     pinentry
+    rofi-pass
   ];
 
   # GPG agent configuration
