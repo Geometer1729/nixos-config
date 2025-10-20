@@ -5,6 +5,7 @@ in
 {
   networking.wireless = {
     enable = true;
+    interfaces = [ "wlp0s20f3" ];
     secretsFile = config.sops.secrets.wifi.path;
     extraConfig = ''
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
