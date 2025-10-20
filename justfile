@@ -34,3 +34,8 @@ health:
   systemctl --failed
   journalctl -p 3 -xb --no-pager -n 10 || echo "No recent critical errors"
   df -h /
+
+# edit the secrets file
+secrets:
+  ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
+  sops edit ./modules/nixos/secrets.yaml

@@ -28,7 +28,6 @@
         ".config/discord"
         ".config/spotify"
         ".config/Slack"
-        ".config/sops/age"
         ".config/clorio-wallet"
         ".config/ncspot"
         ".gnupg"
