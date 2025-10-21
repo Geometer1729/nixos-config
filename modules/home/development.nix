@@ -25,6 +25,7 @@
     ripgrep
     moreutils # more gnu utils like sponge
     wmctrl # window manager control tool
+    usbutils
 
     claude-code
 

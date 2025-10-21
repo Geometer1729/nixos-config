@@ -21,8 +21,8 @@
       };
     };
     signing = {
-      #signByDefault = true;
-      #key = "79C7B4461F8AA7D7CE6239E47889938835D9DD8E";
+      signByDefault = true;
+      key = "0xA1314A37485AD93E";
     };
   };
   programs.diff-so-fancy = {

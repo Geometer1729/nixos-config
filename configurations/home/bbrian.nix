@@ -37,7 +37,7 @@ in
     tasks
     tmux
     work
-    #yubikey
+    yubikey
     zsh
     claude
     webapps

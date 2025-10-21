@@ -48,7 +48,6 @@ in
       tailscale
       work
       hyprland
-
-      #yubikey
+      yubikey
     ];
 }
