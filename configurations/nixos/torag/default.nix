@@ -27,6 +27,7 @@ in
     with self.nixosModules;
     [
       ./hardware.nix
+      wifi
       default
       useBuilders
     ];

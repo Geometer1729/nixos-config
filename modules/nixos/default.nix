@@ -41,7 +41,6 @@ in
       steam
       stylix
       tailscale
-      wifi
       work
       hyprland
 
