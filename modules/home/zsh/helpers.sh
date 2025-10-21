@@ -25,7 +25,7 @@ tillFail(){
 }
 
 grab(){
-	git clone `xclip -selection clipboard -o`
+	git clone `wl-paste -o`
 }
 
 log(){

@@ -5,6 +5,7 @@
     home-manager
     openssh
     xclip
+    wl-clipboard
     du-dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
