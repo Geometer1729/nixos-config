@@ -7,16 +7,21 @@ in
 
   mainUser = "bbrian";
   nixos-unified.sshTarget = "${config.mainUser}@${config.networking.hostName}";
-  system.stateVersion = "22.05";
+  system.stateVersion = "25.05";
+
+  # Remove 90 second wait from rebuild ffs
+  virtualisation.virtualbox.guest.enable = false;
+  services.tcsd.enable = false;
 
   nixpkgs.overlays = lib.attrValues self.overlays;
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.users.${config.mainUser} = {
-    imports = [ (self + /configurations/home/bbrian.nix) ];
-  };
-  home-manager.users.root = {
-    imports = [ (self + /configurations/home/root.nix) ];
+  home-manager = {
+    backupFileExtension = "bkp";
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users = {
+      ${config.mainUser}.imports = [ (self + /configurations/home/bbrian.nix) ];
+      root.imports = [ (self + /configurations/home/root.nix) ];
+    };
   };
 
   imports =

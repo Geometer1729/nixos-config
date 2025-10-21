@@ -8,7 +8,7 @@ in
   networking.hostName = "am";
   amd = true;
   drive = "/dev/nvme0n1";
-  system.stateVersion = "22.05";
+  system.stateVersion = "25.05";
 
   # Machine-specific Nix configuration for cross-compilation
   # TODO verify this works

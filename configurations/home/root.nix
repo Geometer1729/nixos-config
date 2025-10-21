@@ -4,7 +4,7 @@ let
   inherit (inputs) self;
 in
 {
-  home.stateVersion = "22.05";
+  home.stateVersion = "25.05";
   home.username = "root";
   home.homeDirectory = "/root";
 
