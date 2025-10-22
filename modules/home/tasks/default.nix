@@ -66,23 +66,24 @@ in
     '';
 
   # Generate vit theme from Stylix colors following base16 guidelines
-  home.file.".vit/theme/stylix.py".text = ''
+  home.file.".vit/theme/stylix.py".text = with config.lib.stylix.colors.withHashtag; ''
     # Auto-generated vit theme from Stylix configuration
     # Following base16 guidelines: base00=bg, base01=lighter_bg, base02=selection, base03=comments, base05=fg, base08=errors, base0D=functions/focus
+    # urwid palette format: (name, fg_16color, bg_16color, mono, fg_256color, bg_256color)
     theme = [
         ('list-header', "", "", "", "", ""),
-        ('list-header-column', 'black', 'light gray', "", 'black', 'light gray'),  # base05 on base01
-        ('list-header-column-separator', 'black', 'light gray', "", 'black', 'light gray'),  # base03 on base01
-        ('striped-table-row', 'white', 'dark gray', "", 'white', 'dark gray'),  # base05 on base02
-        ('reveal focus', 'black', 'dark cyan', 'standout', 'black', 'dark cyan'),  # base00 on base0D (focus)
-        ('message status', 'white', 'dark blue', 'standout', 'white', 'dark blue'),  # base05 on base0D (status)
-        ('message error', 'white', 'dark red', 'standout', 'white', 'dark red'),  # base05 on base08 (error)
-        ('status', 'dark magenta', 'black', "", 'dark magenta', 'black'),  # base0E on base00
-        ('flash off', 'black', 'black', 'standout', 'black', 'black'),
-        ('flash on', 'white', 'black', 'standout', 'white', 'black'),  # base05 on base00
-        ('pop_up', 'white', 'black', "", 'white', 'black'),  # base05 on base00
-        ('button action', 'white', 'dark red', "", 'white', 'dark red'),  # base05 on base08 (action)
-        ('button cancel', 'black', 'light gray', "", 'black', 'light gray'),  # base03 on base01 (cancel)
+        ('list-header-column', 'white', 'black', "", '${base05}', '${base01}'),  # Default foreground on lighter background
+        ('list-header-column-separator', 'dark magenta', 'black', "", '${base03}', '${base01}'),  # Comments color on lighter background
+        ('striped-table-row', 'white', 'dark gray', "", '${base05}', '${base02}'),  # Default foreground on selection background
+        ('reveal focus', 'black', 'dark magenta', 'standout', '${base00}', '${base0D}'),  # Primary background on focus color (inverted for visibility)
+        ('message status', 'white', 'dark magenta', 'standout', '${base05}', '${base0D}'),  # Default foreground on focus/info color
+        ('message error', 'white', 'dark red', 'standout', '${base05}', '${base08}'),  # Default foreground on error color
+        ('status', 'dark magenta', 'black', "", '${base0E}', '${base00}'),  # Purple on primary background
+        ('flash off', 'black', 'black', 'standout', '${base00}', '${base00}'),  # Background on background (invisible)
+        ('flash on', 'white', 'black', 'standout', '${base05}', '${base00}'),  # Default foreground on primary background
+        ('pop_up', 'white', 'black', "", '${base05}', '${base00}'),  # Default foreground on primary background
+        ('button action', 'white', 'dark red', "", '${base05}', '${base08}'),  # Default foreground on error color (for action emphasis)
+        ('button cancel', 'dark magenta', 'black', "", '${base03}', '${base01}'),  # Comments color on lighter background
     ]
   '';
   programs.zsh.shellAliases =
