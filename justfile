@@ -39,3 +39,9 @@ health:
 secrets:
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets.yaml
+
+deploy:
+  nh os build -H am
+  nh os build -H torag
+  nixos-rebuild --flake ~/conf#am --target-host bbrian@am --sudo switch
+  nixos-rebuild --flake ~/conf#torag --target-host bbrian@torag --sudo switch
