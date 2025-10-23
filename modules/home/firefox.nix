@@ -113,6 +113,33 @@ let
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "toolkit.telemetry.pioneer-new-studies-available" = false;
       "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+      # Toolbar layout: back, forward, firefox-view, urlbar, downloads, signin, extensions, settings
+      "browser.uiCustomization.state" = builtins.toJSON {
+        placements = {
+          widget-overflow-fixed-list = [ ];
+          unified-extensions-area = [ ];
+          nav-bar = [
+            "back-button"
+            "forward-button"
+            "firefox-view-button"
+            "urlbar-container"
+            "downloads-button"
+            "fxa-toolbar-menu-button"
+            "unified-extensions-button"
+          ];
+          toolbar-menubar = [ "menubar-items" ];
+          TabsToolbar = [ "tabbrowser-tabs" "new-tab-button" "alltabs-button" ];
+          PersonalToolbar = [ "personal-bookmarks" ];
+        };
+        seen = [
+          "save-to-pocket-button"
+          "developer-button"
+          "screenshot-button"
+        ];
+        dirtyAreaCache = [ "nav-bar" "PersonalToolbar" "toolbar-menubar" "TabsToolbar" ];
+        currentVersion = 23;
+        newElementCount = 0;
+      };
     };
     userChrome =
       let
