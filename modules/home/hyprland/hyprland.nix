@@ -198,6 +198,7 @@ in
           "$mod, Return, exec, alacritty"
           "$mod, d, exec, rofi -show drun"
           "$mod, s, exec, rofi -show ssh"
+          "$mod, r, exec, rofi -show run"
 
           # Window management
           "$mod, q, killactive"
