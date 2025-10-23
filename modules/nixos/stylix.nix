@@ -4,8 +4,8 @@
 {
   stylix = {
     enable = true;
-    # TODO this doesn't work?
     image = ./grub/sand.jpg;
+    targets.grub.useWallpaper = true;
     opacity.terminal = 0.9;
     polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
     base16Scheme =

@@ -9,8 +9,10 @@
     loader = {
       efi.canTouchEfiVariables = true;
       timeout = 1;
-      systemd-boot = {
+      grub = {
         enable = true;
+        device = "nodev";
+        efiSupport = true;
         configurationLimit = 20;
       };
     };
