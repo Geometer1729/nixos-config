@@ -128,9 +128,8 @@ let
     extensions = {
       force = true;
       packages = with inputs.firefox-addons.packages."x86_64-linux"; [
-        vimium
-        #TODO video speed controller
-        #adblock
+        # vimium, videospeed, ublock-origin, adblocker-ultimate, and firefox-color
+        # are all managed via policies.ExtensionSettings for auto-enabling
       ];
     };
   };
@@ -179,6 +178,30 @@ in
   programs.firefox =
     {
       enable = true;
+      policies = {
+        ExtensionSettings = {
+          "{d7742d87-e61d-4b78-b8a1-b469842139fa}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
+            installation_mode = "force_installed";
+          };
+          "{7be2ba16-0f1e-4d93-9ebc-5164397477a9}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/videospeed/latest.xpi";
+            installation_mode = "force_installed";
+          };
+          "uBlock0@raymondhill.net" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+            installation_mode = "force_installed";
+          };
+          "adblockultimate@adblockultimate.net" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/adblocker-ultimate/latest.xpi";
+            installation_mode = "force_installed";
+          };
+          "FirefoxColor@mozilla.com" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/firefox-color/latest.xpi";
+            installation_mode = "force_installed";
+          };
+        };
+      };
       profiles = {
         default = common // {
           name = "default";

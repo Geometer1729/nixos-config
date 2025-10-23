@@ -41,6 +41,9 @@ secrets:
   sops edit ./modules/nixos/secrets.yaml
 
 deploy:
+  nh os build -H am
+  nh os build -H torag
   nix flake check
-  nh os switch --target-host=am
-  nh os switch --target-host=torag
+  nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
+  nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --sudo switch
+
