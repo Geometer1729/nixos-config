@@ -94,6 +94,7 @@ let
         format-ethernet = "{ifname} ";
         format-disconnected = "Disconnected ";
         max-length = 50;
+        on-click = "wpa_gui";
       };
 
       # Battery

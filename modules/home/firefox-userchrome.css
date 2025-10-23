@@ -1,0 +1,58 @@
+/* Tab backgrounds */
+.tabbrowser-tab:not([selected]):not(:hover) .tab-background,
+:root:not([active]) .tabbrowser-tab:not([selected]) .tab-background,
+#TabsToolbar,
+.tabbrowser-arrowscrollbox,
+#tabbrowser-tabs {
+  background-color: @base00@ !important;
+}
+
+/* Force all nav-bar elements to base00 (overrides stylix) */
+#nav-bar,
+#nav-bar *,
+#nav-bar-customization-target,
+#nav-bar-customization-target * {
+  background: @base00@ !important;
+  background-color: @base00@ !important;
+  background-image: none !important;
+}
+
+/* Remove all borders from URL bar and nav bar */
+#urlbar,
+#urlbar *,
+#urlbar-background,
+#urlbar-input-container,
+#urlbar[focused="true"],
+#urlbar-wrapper,
+#urlbar-search-splitter,
+#urlbar-container,
+#nav-bar,
+#nav-bar * {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* URL bar button icons */
+#urlbar .urlbar-page-action,
+.urlbar-page-action,
+#page-action-buttons toolbarbutton {
+  fill: @base05@ !important;
+}
+
+/* Hover states */
+#page-action-buttons > toolbarbutton:hover,
+#urlbar-container toolbarbutton:hover,
+.urlbar-page-action:hover,
+#back-button:hover,
+#forward-button:hover {
+  background: @base01@ !important;
+  background-color: @base01@ !important;
+}
+
+/* Hide spacers */
+#urlbar-container::before,
+#urlbar-container::after,
+toolbarspring {
+  display: none !important;
+}
