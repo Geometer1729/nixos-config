@@ -4,8 +4,8 @@
     settings = {
       builders-use-substitutes = true;
       # Add am as a substitute server
-      substituters = [ "ssh://bbrian@am" ];
-      trusted-substituters = [ "ssh://bbrian@am" ];
+      substituters = [ "ssh-ng://bbrian@am" ];
+      trusted-substituters = [ "ssh-ng://bbrian@am" ];
     };
     distributedBuilds = true;
     buildMachines = [

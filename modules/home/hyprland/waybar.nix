@@ -99,13 +99,16 @@ let
 
       # Battery
       battery = {
-        format = "{capacity}% {icon}";
-        format-charging = "{capacity}% ";
-        format-plugged = "{capacity}% ";
-        format-icons = [ "" "" "" "" "" ];
+        format = "{capacity}% {icon} {time}";
+        format-time = "{H}:{m}";
+        format-icons = [ "" "" "" "" "" ];
         states = {
           warning = 30;
           critical = 15;
+        };
+        events = {
+          on-discharging-warning = "notify-send -u normal 'Low Battery'";
+          on-discharging-critical = "notify-send -u normal 'Very Low Battery'";
         };
       };
 
