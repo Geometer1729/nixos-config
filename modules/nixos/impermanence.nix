@@ -44,9 +44,6 @@
         ".mozilla/firefox/work"
         ".mozilla/firefox/ttrpg"
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
-        ".cache/rofi-2.sshcache"
-        ".cache/rofi-3.runcache"
-        ".cache/rofi-entry-history.txt"
         ".ssh"
         ".tldrc"
         "Code"
@@ -60,6 +57,9 @@
         ".zsh_history" # This seems to not work, and causes some sort of permissions error
         ".config/lazygit/state.yml"
         ".cache/nix-index/files"
+        ".cache/rofi3.druncache"
+        ".cache/rofi-2.sshcache"
+        ".cache/rofi-entry-history.txt"
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ".git-credentials"
         ".config/gh/hosts.yml"
