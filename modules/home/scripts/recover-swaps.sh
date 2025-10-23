@@ -69,7 +69,7 @@ main() {
         else
           vim -r "$swap_file"
         fi
-        mv "$swap_file" "/tmp/$(basename "$swap_file")"
+        mv "$swap_file" "/tmp/$(basename "$swap_file")" || true
         echo "---"
     done <<< "$swap_files"
 }
