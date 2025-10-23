@@ -2,6 +2,6 @@
 {
   programs.hyprlock = {
     enable = true;
-    # TODO it would be cool if this was a screenshot
+    settings.general.ignore_empty_input = true;
   };
 }

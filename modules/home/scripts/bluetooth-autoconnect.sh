@@ -39,7 +39,7 @@ if [ -n "$MATCHING_DEVICES" ]; then
 
                 # Attempt to connect
                 if bluetoothctl connect "$MAC_ADDRESS"; then
-                    echo "Successfully connected to $DEVICE_NAME"
+                    notify-send "Successfully connected to $DEVICE_NAME"
                     CONNECTED=true
                     break
                 else
@@ -50,7 +50,8 @@ if [ -n "$MATCHING_DEVICES" ]; then
     done <<< "$MATCHING_DEVICES"
 
     if [ "$CONNECTED" = false ]; then
-        echo "Failed to connect to any matching devices"
+        notify-send "Failed to connect to any matching devices"
+        blueman-manager
     fi
 else
     echo "No paired devices found matching pattern: $DEVICE_PATTERN"

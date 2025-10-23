@@ -287,8 +287,8 @@ in
           "$mod, b, exec, scratchPad vit"
 
           # System controls
-          "$mod SHIFT, r, exec, systemctl --user restart hyprland.service" # Rebuild equivalent
           "$mod SHIFT, s, exec, sudo systemctl suspend"
+          "$mod SHIFT, r, exec, hyprlock"
 
           # Screenshots
           ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
