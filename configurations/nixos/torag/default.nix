@@ -8,11 +8,13 @@ in
   networking.hostName = "torag";
   drive = "/dev/nvme0n1";
 
+  # NixOS-level wifi configuration
+  wifi = {
+    enable = true;
+    interface = "wlp0s20f3";
+  };
+
   home-manager.users.${config.mainUser} = {
-    wifi = {
-      enable = true;
-      interface = "wlp0s20f3";
-    };
     battery = true;
     fast_lock = true;
     #programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
@@ -28,7 +30,6 @@ in
     with self.nixosModules;
     [
       ./hardware.nix
-      wifi
       default
       useBuilders
     ];

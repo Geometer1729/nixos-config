@@ -38,6 +38,7 @@ in
       bt
       disko
       gh-noto
+      hyprland
       impermanence
       main
       nix
@@ -47,7 +48,7 @@ in
       stylix
       tailscale
       work
-      hyprland
+      wifi
       yubikey
     ];
 }

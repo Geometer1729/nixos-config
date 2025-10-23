@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, osConfig, ... }:
 let
   cfg = config.programs.hyprland-custom;
 
@@ -20,7 +20,9 @@ let
       modules-right = [
         "pulseaudio#source"
         "pulseaudio"
-        "network"
+      ] ++ lib.optionals (osConfig.wifi.enable or false) [ "network" ]
+      ++ lib.optionals config.battery [ "battery" ]
+      ++ [
         "temperature"
         "cpu"
         "memory"
@@ -92,6 +94,18 @@ let
         format-ethernet = "{ifname} ";
         format-disconnected = "Disconnected ";
         max-length = 50;
+      };
+
+      # Battery
+      battery = {
+        format = "{capacity}% {icon}";
+        format-charging = "{capacity}% ";
+        format-plugged = "{capacity}% ";
+        format-icons = [ "" "" "" "" "" ];
+        states = {
+          warning = 30;
+          critical = 15;
+        };
       };
 
       temperature = {

@@ -1,22 +1,13 @@
-{ pkgs, config, ... }:
+{ pkgs, config, osConfig, ... }:
 let
   inherit (pkgs) lib;
   when = cond: val: if cond then val else "";
   font = config.stylix.fonts.monospace.name;
-  wifi = when config.wifi.enable (" %" + config.wifi.interface + "wi% |");
+  wifi = when (osConfig.wifi.enable or false) (" %" + (osConfig.wifi.interface or "") + "wi% |");
   battery = when config.battery "%battery% |";
 in
 with config.lib.stylix.colors.withHashtag;
 {
-  options.wifi.enable = lib.mkOption {
-    type = lib.types.bool;
-    description = "show wifi on the status bar";
-    default = false;
-  };
-  options.wifi.interface = lib.mkOption {
-    type = lib.types.str;
-    description = "name of wifi interface";
-  };
   options.battery = lib.mkOption {
     type = lib.types.bool;
     description = "show battery on the status bar";
@@ -83,7 +74,7 @@ with config.lib.stylix.colors.withHashtag;
                 ,"--offc","${red}"
                 ,"--onc","${green}"
                 ]
-              ${when config.wifi.enable (", Run Wireless \"" +  config.wifi.interface + "\" [] 10")}
+              ${when (osConfig.wifi.enable or false) (", Run Wireless \"" +  (osConfig.wifi.interface or "") + "\" [] 10")}
               ]
           }
         '';
