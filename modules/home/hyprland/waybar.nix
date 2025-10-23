@@ -94,7 +94,7 @@ let
         format-ethernet = "{ifname} ";
         format-disconnected = "Disconnected ";
         max-length = 50;
-        on-click = "wpa_gui";
+        on-click = if (osConfig.wifi.interface or null) != null then "wpa_gui -i ${osConfig.wifi.interface}" else "wpa_gui";
       };
 
       # Battery
