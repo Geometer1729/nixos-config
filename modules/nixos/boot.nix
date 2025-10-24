@@ -25,15 +25,9 @@
     dhcpcd.wait = "background"; # Don't block boot waiting for DHCP
     dhcpcd.extraConfig = ''
       # Fast boot optimizations
-      timeout 1         # Only wait 1 second for DHCP
-      noarp            # Skip ARP probes (saves ~2 seconds)
+      timeout 5         # Wait up to 5 seconds for DHCP (more reliable)
       nodelay          # Don't add random delay
       noipv4ll         # Skip IPv4 link-local address assignment
-
-      # Only request what we need
-      option domain_name_servers, domain_name, domain_search
-      option classless_static_routes
-      option interface_mtu
 
       # Background IPv6 to speed up IPv4
       ipv6rs
@@ -48,5 +42,12 @@
     NetworkManager-wait-online.enable = false;
     systemd-networkd-wait-online.enable = false;
   };
+
+  # Additional boot speed optimizations
+  services.journald.extraConfig = ''
+    # Reduce journal flush time
+    SyncIntervalSec=60
+    RateLimitBurst=10000
+  '';
 
 }
