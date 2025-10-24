@@ -4,7 +4,6 @@
     # System utilities
     home-manager
     openssh
-    xclip
     wl-clipboard
     du-dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies

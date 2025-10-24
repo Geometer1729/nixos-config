@@ -15,9 +15,6 @@ in
     alacritty
     firefox
     hyprland
-    sway
-    xmobar
-    xmonad
 
     # System configuration
     system

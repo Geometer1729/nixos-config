@@ -88,7 +88,6 @@
           rm = "rm_";
           cd = "cd_";
           nix-du = "\\nix-du  -s=500mb | dot -Tpng > /tmp/store.png && sxiv /tmp/store.png";
-          xclip = "xclip -selection clipboard";
         } //
         (# always sudo
           builtins.listToAttrs

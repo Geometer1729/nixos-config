@@ -38,5 +38,5 @@ nixos-deploy(){
 }
 
 jqcb(){
-  xclip -selection clipboard -o | jq | xclip -selection clipboard -i
+  wl-paste | jq | wl-copy
 }

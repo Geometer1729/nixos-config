@@ -33,8 +33,6 @@ in
         enable = true;
         settings = {
           PasswordAuthentication = false;
-          X11Forwarding = true;
-          X11USeLocalhost = true;
         };
       };
       pipewire = {
@@ -45,11 +43,6 @@ in
       };
       # config tool for mice
       ratbagd.enable = true;
-      xserver = {
-        # system just feels a bit more responsive
-        autoRepeatInterval = 20;
-        autoRepeatDelay = 400;
-      };
       cron = {
         enable = true;
         systemCronJobs = [
@@ -70,9 +63,6 @@ in
       shell = pkgs.zsh; # TODO: can home-manager do this? (currently here as workaround for completion issues)
       # https://github.com/nix-community/home-manager/issues/2562
       extraGroups = [ "networkmanager" "wheel" ];
-      packages = with pkgs; [
-        picom # afaict this is needed for picom to work
-      ];
     };
 
     programs.zsh.enable = true;

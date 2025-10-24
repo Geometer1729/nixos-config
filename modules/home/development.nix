@@ -24,7 +24,6 @@
     killall
     ripgrep
     moreutils # more gnu utils like sponge
-    wmctrl # window manager control tool
     usbutils
 
     claude-code
@@ -38,9 +37,6 @@
         text
         time
         generics-sop
-
-        xmonad
-        xmonad-contrib
       ])
     )
     haskellPackages.hoogle

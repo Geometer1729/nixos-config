@@ -50,14 +50,15 @@ Don't mark work as complete if the configuration doesn't build or if functionali
   - `home/` - Home-manager configurations (bbrian.nix, root.nix)
   - `nixos/` - NixOS system configurations by hostname (am/, torag/)
 - `modules/` - Reusable configuration modules
-  - `flake-parts/` - Flake-parts modules (devshell, neovim, toplevel, xmonad)
+  - `flake-parts/` - Flake-parts modules (devshell, neovim, toplevel)
   - `home/` - Home-manager modules (applications, development tools, scripts)
   - `nixos/` - NixOS system modules (boot, networking, security, etc.)
 
 ### Key Files
 - `flake.nix` - Main flake configuration with inputs and outputs
-- `modules/home/xmonad/Config.hs` the xmonad configuration
-- `modules/home/nvim/nixvim.nix` the main neovim configuration
+- `modules/home/hyprland/hyprland.nix` - Hyprland window manager configuration
+- `modules/home/hyprland/waybar.nix` - Waybar status bar configuration
+- `modules/home/nvim/nixvim.nix` - Main neovim configuration
 
 ### Configuration Pattern
 The repository uses nixos-unified for configuration management with:
@@ -85,13 +86,16 @@ When adding configurations, consider the functional purpose rather than just the
 - `torag` - Secondary machine configuration
 
 ### Development Environment
-- Haskell development setup with GHC 9.8.2 and XMonad
+- Haskell development setup with GHC
 - Neovim configuration with Nixvim
 - Custom scripts for system rebuilding and tmux integration
 
 ### Window Manager
-- XMonad window manager with custom configuration in `modules/home/xmonad/`
-- XMobar status bar configuration
-- Sway as alternative window manager
+- Hyprland - Wayland compositor with custom configuration in `modules/home/hyprland/`
+  - Waybar - Status bar (replaces Xmobar)
+  - Hyprlock - Screen locker
+  - Hypridle - Idle management
+  - Hyprpaper - Wallpaper manager
+  - Rofi - Application launcher (Wayland-compatible)
 
 The configuration emphasizes reproducibility, modularity, and integration between system and user environments through the Nix ecosystem.

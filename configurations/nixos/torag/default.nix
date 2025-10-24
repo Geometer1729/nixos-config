@@ -15,7 +15,6 @@ in
   };
 
   home-manager.users.${config.mainUser} = {
-    battery = true;
     fast_lock = true;
     #programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
 
@@ -23,6 +22,7 @@ in
     programs.hyprland-custom = {
       dualMonitor = false;
       primaryMonitor = "eDP-1,1920x1080@60,0x0,1";
+      battery = true;
     };
   };
 

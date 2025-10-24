@@ -1,15 +1,11 @@
-tmux kill-window -t rebuild || true
-# kill any previous failed rebuilds
-# this errors if there are no previous
-# failed rebuilds so continue on error
-CMD="
-  tmux new-window \
-    -e HIDE_SP_AFTER_REBUILD=${HIDE_SP_AFTER_REBUILD:-false} \
-    -k -t sp -n rebuild rebuild
-  "
+#!/usr/bin/env bash
 
-$CMD \
-  || (sleep 0.5s ; $CMD) \
-  || (sleep 1.0s; $CMD)
-# Failure is usually caused by waiting for the
-# tmux sesion to spawn so just wait and retry
+# Check if we're already in the sp scratchpad - if so, don't hide after rebuild
+hide_after=$(hyprctl activewindow -j 2>/dev/null | jq -r '.title' | grep -q "^sp$" && echo "false" || echo "true")
+
+scratchPad sp show
+tmux kill-window -t sp:rebuild 2>/dev/null || true
+
+tmux new-window -e HIDE_SP_AFTER_REBUILD="$hide_after" -t sp -n rebuild rebuild \
+  || (sleep 0.5 && tmux new-window -e HIDE_SP_AFTER_REBUILD="$hide_after" -t sp -n rebuild rebuild) \
+  || (sleep 1.0 && tmux new-window -e HIDE_SP_AFTER_REBUILD="$hide_after" -t sp -n rebuild rebuild)

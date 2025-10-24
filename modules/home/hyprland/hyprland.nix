@@ -18,6 +18,12 @@ in
       type = lib.types.str;
       description = "Secondary monitor configuration (only used if dualMonitor is true)";
     };
+
+    battery = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to show battery indicator in waybar";
+    };
   };
 
   config = {
@@ -97,11 +103,11 @@ in
           ];
 
         # Input configuration
-        input = with osConfig.services.xserver; {
-          kb_layout = xkb.layout or "us";
-          kb_options = xkb.options or "";
-          repeat_rate = autoRepeatInterval;
-          repeat_delay = autoRepeatDelay;
+        input = {
+          kb_layout = "us";
+          kb_options = "caps:swapescape";
+          repeat_rate = 20;
+          repeat_delay = 400;
 
           follow_mouse = 1;
           sensitivity = 0; # -1.0 - 1.0, 0 means no modification
@@ -289,7 +295,7 @@ in
 
           # System controls
           "$mod SHIFT, s, exec, sudo systemctl suspend"
-          "$mod SHIFT, r, exec, hyprlock"
+          "$mod SHIFT, r, exec, tmuxRebuild"
 
           # Screenshots
           ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"

@@ -220,21 +220,6 @@
         "type": "github"
       }
     },
-    "fourmolu-nix": {
-      "locked": {
-        "lastModified": 1707266073,
-        "narHash": "sha256-tCFzZQJicDdYjnuJiNK4hiiRAH7c2wQzMhOCdUMbVKE=",
-        "owner": "jedimahdi",
-        "repo": "fourmolu-nix",
-        "rev": "717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jedimahdi",
-        "repo": "fourmolu-nix",
-        "type": "github"
-      }
-    },
     "fromYaml": {
       "flake": false,
       "locked": {
@@ -281,21 +266,6 @@
         "owner": "GNOME",
         "ref": "48.2",
         "repo": "gnome-shell",
-        "type": "github"
-      }
-    },
-    "haskell-flake": {
-      "locked": {
-        "lastModified": 1760905572,
-        "narHash": "sha256-WhLrE4Rlr1+SAhcJIK2vxoWzPbBDKYcXQsiwPvGQhn0=",
-        "owner": "Srid",
-        "repo": "haskell-flake",
-        "rev": "2d828c4ddf2e74f7b628b6020e187ad13eca5c36",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Srid",
-        "repo": "haskell-flake",
         "type": "github"
       }
     },
@@ -633,9 +603,7 @@
         "disko": "disko",
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
-        "fourmolu-nix": "fourmolu-nix",
         "git-hooks": "git-hooks",
-        "haskell-flake": "haskell-flake",
         "home-manager": "home-manager",
         "homeassistant-smartrent": "homeassistant-smartrent",
         "impermanence": "impermanence",

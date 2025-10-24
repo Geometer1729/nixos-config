@@ -21,7 +21,7 @@ let
         "pulseaudio#source"
         "pulseaudio"
       ] ++ lib.optionals (osConfig.wifi.enable or false) [ "network" ]
-      ++ lib.optionals config.battery [ "battery" ]
+      ++ lib.optionals cfg.battery [ "battery" ]
       ++ [
         "temperature"
         "cpu"

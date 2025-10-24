@@ -2,7 +2,6 @@
 {
   imports = [
     (inputs.git-hooks + /flake-module.nix)
-    inputs.fourmolu-nix.flakeModule
   ];
 
   perSystem = { config, pkgs, ... }: {
@@ -10,7 +9,6 @@
       name = "nixos-unified-template-shell";
       meta.description = "Shell environment for modifying this Nix configuration";
       inputsFrom = [
-        config.haskellProjects.default.outputs.devShell # See ./nix/modules/haskell.nix
         config.pre-commit.devShell # See ./nix/modules/formatter.nix
       ];
       packages = with pkgs; [
@@ -23,12 +21,6 @@
 
     pre-commit.settings.hooks = {
       nixpkgs-fmt.enable = true;
-      cabal-fmt.enable = true;
-      fourmolu = {
-        enable = true;
-        package = config.fourmolu.wrapper;
-      };
-      hlint.enable = true;
     };
   };
 }
