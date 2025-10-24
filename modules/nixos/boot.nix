@@ -19,55 +19,34 @@
   };
 
 
-  # Boot faster
+  # Boot faster - optimized dhcpcd configuration
+  networking = {
+    dhcpcd.enable = true;
+    dhcpcd.wait = "background"; # Don't block boot waiting for DHCP
+    dhcpcd.extraConfig = ''
+      # Fast boot optimizations
+      timeout 1         # Only wait 1 second for DHCP
+      noarp            # Skip ARP probes (saves ~2 seconds)
+      nodelay          # Don't add random delay
+      noipv4ll         # Skip IPv4 link-local address assignment
 
-  # keeps breaking cloudflare I give up
-  # TODO revisit after ditching cloudflare I guess
-  #let
-  #  wait = {
-  #    after = [ "network-online.target" "dhcpcd.service" ];
-  #    wants = [ "network-online.target" "dhcpcd.service" ];
-  #  };
-  #  waitAndRestart = wait // {
-  #    serviceConfig = {
-  #      # Force cloudflared to wait until DHCP and DNS are fully operational
-  #      ExecStartPre = "/run/current-system/sw/bin/sleep 5"; # Optional buffer
-  #      Restart = "on-failure";
-  #      RestartSec = "5s";
-  #    };
-  #  };
-  #  dontWaitFor = {
-  #    wantedBy = lib.mkForce [ ];
-  #  };
-  #in
-  #networking = {
-  #  dhcpcd.enable = true;
-  #  dhcpcd.wait = "background";
-  #  dhcpcd.extraConfig = ''
-  #    timeout 1
-  #    noarp
-  #    nodelay
-  #  '';
-  #};
+      # Only request what we need
+      option domain_name_servers, domain_name, domain_search
+      option classless_static_routes
+      option interface_mtu
 
-  #systemd.network.networks = {
-  # internet0 = {
-  #   matchConfig = { Name = "enp4s0"; };
-  #   networkConfig = { DHCP = "ipv4"; };
-  #  };
-  #};
+      # Background IPv6 to speed up IPv4
+      ipv6rs
 
-  #systemd = {
-  #  targets = {
-  #    home-assistant = dontWaitFor;
-  #  };
-  #  services = {
-  #    ntpd = waitAndRestart;
-  #    sshd = wait;
-  #    home-assistant = waitAndRestart;
-  #    "cloudflared-tunnel-${config.cloudflare-id}" = waitAndRestart // dontWaitFor;
-  #    cloudflare-warp = dontWaitFor;
-  #  };
-  #};
+      # Reduce discover attempts
+      reboot 0
+    '';
+  };
+
+  # Prevent services from waiting for network
+  systemd.services = {
+    NetworkManager-wait-online.enable = false;
+    systemd-networkd-wait-online.enable = false;
+  };
 
 }

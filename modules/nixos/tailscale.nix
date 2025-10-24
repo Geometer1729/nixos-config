@@ -5,6 +5,16 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "client";
+    # Auth key file for automatic authentication on boot
+    # Generate a reusable key at: https://login.tailscale.com/admin/settings/keys
+    # Then save it to /persist/system/tailscale-auth-key
+    authKeyFile = "/persist/system/tailscale-auth-key";
+    # Flags to pass to tailscale up on boot (only used if authKeyFile is set)
+    extraUpFlags = [
+      "--ssh"
+      "--accept-routes"
+      "--operator=${config.mainUser}"
+    ];
   };
 
   # Enable the required kernel module for NAT traversal
