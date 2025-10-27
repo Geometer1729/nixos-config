@@ -33,7 +33,7 @@
     homeassistant-smartrent.url = "github:ZacheryThomas/homeassistant-smartrent";
     homeassistant-smartrent.flake = false;
     git-hooks.url = "github:cachix/git-hooks.nix";
-    git-hooks.flake = false;
+    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
 
   };
 
