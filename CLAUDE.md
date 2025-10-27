@@ -37,9 +37,8 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 **CRITICAL**: Always verify changes work before considering them complete. Never tell the user you're done without running the build check first.
 
 0. **Git tracking**: If you created ANY new files (especially `.nix` files), run `git add <file>` IMMEDIATELY - Nix flakes can only see git-tracked files. This is MANDATORY before any build attempt.
-1. **Build check**: Run `nh os build` to ensure configuration builds - THIS IS MANDATORY
-2. **Test changes**: Run `nh os test` to switch to the configuration (doesn't set as default boot)
-3. **Verify functionality**: Test that your changes work as expected or outline what should be tested manually
+1. **Test changes**: Run `nh os test` to switch to the configuration (doesn't set as default boot).
+2. **Verify functionality**: Test that your changes work as expected or outline what should be tested manually
 
 Don't mark work as complete if the configuration doesn't build or if functionality is broken.
 

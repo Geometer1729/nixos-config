@@ -43,7 +43,7 @@ launch(){
 
 case "$action" in
   hide)
-    [ "$is_visible" ] && toggle
+    [ "$client" ] && hyprctl dispatch closewindow address:"$client"
     ;;
   show)
     if [ -z "$is_visible" ]; then
