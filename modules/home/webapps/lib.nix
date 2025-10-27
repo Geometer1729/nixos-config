@@ -10,45 +10,6 @@ let
     sha256 = "01kcyw28iayd1lgw7jnjv7bv87nvwsx3fkbp9rz0fq16b5w696nz";
   };
 
-  # Create a Firefox profile with userChrome.css to hide the tab bar
-  webappProfile = pkgs.writeTextFile {
-    name = "webapp-profile";
-    destination = "/chrome/userChrome.css";
-    text = ''
-      /* Hide tab bar when there's only one tab */
-      #TabsToolbar {
-        visibility: collapse !important;
-      }
-
-      /* Hide the title bar buttons (minimize, maximize, close) */
-      .titlebar-buttonbox-container {
-        display: none !important;
-      }
-
-      /* Optional: hide the address bar for a more app-like experience */
-      #nav-bar {
-        visibility: collapse !important;
-      }
-    '';
-  };
-
-  # Script to set up the Firefox profile
-  setupProfile = pkgs.writeShellScript "setup-webapp-profile" ''
-    PROFILE_DIR="$HOME/.mozilla/firefox/webapp"
-
-    # Create profile directory if it doesn't exist
-    mkdir -p "$PROFILE_DIR/chrome"
-
-    # Copy userChrome.css
-    cp ${webappProfile}/chrome/userChrome.css "$PROFILE_DIR/chrome/"
-
-    # Create prefs.js to enable userChrome.css
-    cat > "$PROFILE_DIR/prefs.js" << 'EOF'
-    user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-    user_pref("browser.tabs.inTitlebar", 0);
-    EOF
-  '';
-
   mkWebapp = name: webapp:
     let
       iconPath =
@@ -64,7 +25,7 @@ let
         Version=1.0
         Name=${webapp.name}
         Comment=${webapp.description or webapp.name}
-        Exec=sh -c '${setupProfile} && ${pkgs.firefox}/bin/firefox --profile "$HOME/.mozilla/firefox/webapp" --new-window "${webapp.url}"'
+        Exec=${pkgs.ungoogled-chromium}/bin/chromium --app="${webapp.url}" --class="${name}-webapp"
         Terminal=false
         Type=Application
         Icon=${iconPath}
@@ -104,7 +65,7 @@ in
 
           icon = mkOption {
             type = types.str;
-            default = "firefox";
+            default = "chromium";
             description = "Icon name or path for the application";
           };
 

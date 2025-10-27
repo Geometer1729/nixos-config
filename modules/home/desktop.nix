@@ -12,6 +12,9 @@
     # Input device configuration
     piper
     libratbag
+
+    #browser
+    ungoogled-chromium
   ];
 
   # Rofi configuration

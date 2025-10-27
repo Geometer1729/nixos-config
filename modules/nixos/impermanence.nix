@@ -29,6 +29,7 @@
         ".config/Slack"
         ".config/clorio-wallet"
         ".config/ncspot"
+        ".config/chromium"
         ".gnupg"
         ".hoogle"
         ".local/share/PrismLauncher"
