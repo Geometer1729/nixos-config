@@ -121,6 +121,7 @@ let
           nav-bar = [
             "back-button"
             "forward-button"
+            "stop-reload-button"
             "firefox-view-button"
             "urlbar-container"
             "downloads-button"
