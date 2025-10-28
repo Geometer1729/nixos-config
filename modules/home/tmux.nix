@@ -12,6 +12,9 @@
     keyMode = "vi";
     extraConfig =
       ''
+        # Send prefix to nested tmux with double press
+        bind C-b send-prefix
+
         # better splits
         unbind %
         bind h split-window -v
