@@ -19,12 +19,12 @@ map('n','<Leader>o',
   end
   )
 
+-- Window navigation: tmux-navigator plugin handles Ctrl-hjkl mappings
 local dirKeys = "hjkl"
 for i = 1,#dirKeys do
   local c = dirKeys:sub(i,i)
   local key = '<C-'..c..'>'
   local action = '<C-w>'..c
-  map('n',key,action)
   map('t',key,'<C-\\><C-n>'..action)
 end
 map('t','<C-n>','<C-\\><C-n>')
