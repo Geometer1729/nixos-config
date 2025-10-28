@@ -33,3 +33,5 @@ todo
 .session.vim
 modules/nvim/lua/.luarc.json
 *.luarc.json
+
+.pre-commit-config.yaml
