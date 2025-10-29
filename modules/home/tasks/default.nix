@@ -22,20 +22,26 @@ let
         runtimeInputs = [ pkgs.taskwarrior3 ];
         text =
           ''
-            # Usage: create-task-from-heading "Heading Text" "file/path.md" "heading-anchor"
-            HEADING="$1"
+            # Usage: create-task-from-heading "Description" "file/path.md" "heading-anchor" ["checklist-item"]
+            DESCRIPTION="$1"
             FILE_PATH="$2"
             ANCHOR="$3"
+            CHECKLIST_ITEM="''${4:-}"
 
-            # Create task with heading as description
-            task add "$HEADING" >> /dev/null
+            # Create task with description
+            task add "$DESCRIPTION" >> /dev/null
             task +LATEST annotate Redirect >> /dev/null
             UUID="$(task +LATEST uuids)"
 
-            # Create markdown file with link to heading
-            echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
-
-            echo "Created task $UUID: $HEADING -> $FILE_PATH#$ANCHOR"
+            # Create markdown file with link - include checklist item if present
+            if [ -n "$CHECKLIST_ITEM" ]; then
+              echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+              echo "CHECKLIST:$CHECKLIST_ITEM" >> ~/Documents/vw/tasks/"$UUID".md
+              echo "Created task $UUID: $DESCRIPTION -> $FILE_PATH#$ANCHOR (checklist item)"
+            else
+              echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+              echo "Created task $UUID: $DESCRIPTION -> $FILE_PATH#$ANCHOR"
+            fi
           '';
       };
   update-task-link =
@@ -45,9 +51,10 @@ let
         runtimeInputs = [ pkgs.taskwarrior3 pkgs.fzf ];
         text =
           ''
-            # Usage: update-task-link "file/path.md" "heading-anchor"
+            # Usage: update-task-link "file/path.md" "heading-anchor" ["checklist-item"]
             FILE_PATH="$1"
             ANCHOR="$2"
+            CHECKLIST_ITEM="''${3:-}"
 
             # Select task using fzf
             SELECTED=$(task status:pending export | ${pkgs.jq}/bin/jq -r '.[] | "\(.uuid) \(.description)"' | fzf --prompt="Select task to update: ")
@@ -59,15 +66,44 @@ let
 
             UUID=$(echo "$SELECTED" | awk '{print $1}')
 
-            # Update the redirect link
-            echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+            # Update the redirect link - include checklist item if present
+            if [ -n "$CHECKLIST_ITEM" ]; then
+              echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+              echo "CHECKLIST:$CHECKLIST_ITEM" >> ~/Documents/vw/tasks/"$UUID".md
+              echo "Updated task $UUID to point to $FILE_PATH#$ANCHOR (checklist item)"
+            else
+              echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+              echo "Updated task $UUID to point to $FILE_PATH#$ANCHOR"
+            fi
 
             # Add Redirect annotation if not present
             if ! task "$UUID" | grep -q "Redirect"; then
               task "$UUID" annotate Redirect >> /dev/null
             fi
+          '';
+      };
+  taskopen-redirect =
+    pkgs.writeShellApplication
+      {
+        name = "taskopen-redirect";
+        runtimeInputs = [ pkgs.neovim ];
+        text =
+          ''
+            # Usage: taskopen-redirect ~/Documents/vw/tasks/$UUID.md
+            TASK_FILE="$1"
 
-            echo "Updated task $UUID to point to $FILE_PATH#$ANCHOR"
+            # Check if file has a checklist item
+            if grep -q "^CHECKLIST:" "$TASK_FILE"; then
+              CHECKLIST_TEXT=$(grep "^CHECKLIST:" "$TASK_FILE" | sed 's/^CHECKLIST://')
+              # Open file and follow link, then search for checklist item
+              vim "$TASK_FILE" \
+                -c "VimwikiFollowLink" \
+                -c "normal! gg" \
+                -c "call search('\\V$CHECKLIST_TEXT', 'c')"
+            else
+              # Just follow the link normally
+              vim "$TASK_FILE" -c "VimwikiFollowLink"
+            fi
           '';
       };
   edit-note = bin
@@ -101,6 +137,7 @@ in
       gen-task-link
       create-task-from-heading
       update-task-link
+      taskopen-redirect
     ];
   home.file.".taskopenrc".text =
     ''
@@ -112,7 +149,7 @@ in
       notes.command = "${edit-note} ~/Documents/vw/tasks/$UUID.md \"$TASK_DESCRIPTION\""
 
       redirect.regex = "^Redirect"
-      redirect.command = "vim ~/Documents/vw/tasks/$UUID.md -c VimwikiFollowLink"
+      redirect.command = "${bin taskopen-redirect} ~/Documents/vw/tasks/$UUID.md"
     '';
   home.file.".vit/config.ini".text =
     ''

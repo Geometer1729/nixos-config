@@ -265,6 +265,14 @@ end
 -- Function to get current heading and its info
 local function get_heading_info()
   local current_line_num = vim.api.nvim_win_get_cursor(0)[1]
+  local current_line = vim.api.nvim_buf_get_lines(0, current_line_num-1, current_line_num, false)[1]
+
+  -- Check if we're on a checklist item
+  local checklist_text = nil
+  if current_line:match('^%s*[-*+]%s+%[.%]%s+') then
+    -- Extract the checklist item text (without the checkbox syntax)
+    checklist_text = current_line:gsub('^%s*[-*+]%s+%[.%]%s+', ''):gsub('%s+$', '')
+  end
 
   -- Search backwards for the nearest heading
   local heading_text = nil
@@ -300,7 +308,8 @@ local function get_heading_info()
   return {
     heading = heading_text,
     file_path = relative_path,
-    anchor = anchor
+    anchor = anchor,
+    checklist_item = checklist_text
   }
 end
 
@@ -312,12 +321,17 @@ local function create_task_from_heading()
     return
   end
 
+  -- Use checklist text as description if available, otherwise use heading
+  local description = info.checklist_item or info.heading
+  local checklist_arg = info.checklist_item and vim.fn.shellescape(info.checklist_item) or '""'
+
   -- Call the shell script
   local cmd = string.format(
-    'create-task-from-heading %s %s %s',
-    vim.fn.shellescape(info.heading),
+    'create-task-from-heading %s %s %s %s',
+    vim.fn.shellescape(description),
     vim.fn.shellescape(info.file_path),
-    vim.fn.shellescape(info.anchor)
+    vim.fn.shellescape(info.anchor),
+    checklist_arg
   )
 
   local result = vim.fn.system(cmd)
@@ -332,11 +346,14 @@ local function update_task_to_heading()
     return
   end
 
+  local checklist_arg = info.checklist_item and vim.fn.shellescape(info.checklist_item) or '""'
+
   -- Use vim terminal to run fzf interactively
   local cmd = string.format(
-    'update-task-link %s %s',
+    'update-task-link %s %s %s',
     vim.fn.shellescape(info.file_path),
-    vim.fn.shellescape(info.anchor)
+    vim.fn.shellescape(info.anchor),
+    checklist_arg
   )
 
   -- Open in a split terminal
