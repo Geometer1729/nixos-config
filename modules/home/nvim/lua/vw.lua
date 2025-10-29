@@ -248,3 +248,107 @@ end
 -- Map the function to a keybinding (e.g., <Leader>sh)
 vim.keymap.set("n", "<Leader>sh", move_heading_to_new_file, { noremap = true, silent = true })
 vim.keymap.set("n", "<Leader>vl", vim.cmd.VimwikiVSplitLink)
+
+-- Task management integration
+
+-- Function to convert heading text to anchor slug
+local function heading_to_anchor(heading_text)
+  -- Remove markdown heading markers and trim
+  local clean = heading_text:gsub('^#+%s+', ''):gsub('%s+$', '')
+  -- Convert to lowercase and replace spaces with hyphens
+  local anchor = clean:lower():gsub('[%s_]+', '-')
+  -- Remove any characters that aren't alphanumeric or hyphens
+  anchor = anchor:gsub('[^%w%-]', '')
+  return anchor
+end
+
+-- Function to get current heading and its info
+local function get_heading_info()
+  local current_line_num = vim.api.nvim_win_get_cursor(0)[1]
+
+  -- Search backwards for the nearest heading
+  local heading_text = nil
+  for i = current_line_num, 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(0, i-1, i, false)[1]
+    if line:match('^#+%s+') then
+      heading_text = line:gsub('^#+%s+', ''):gsub('%s+$', '')
+      break
+    end
+  end
+
+  if not heading_text then
+    return nil
+  end
+
+  -- Get file path relative to wiki root
+  local current_file, wiki_path = get_current_vimwiki_path()
+  if not current_file or not wiki_path then
+    print("Not in a vimwiki directory")
+    return nil
+  end
+
+  -- Strip leading slash if present and calculate path relative to tasks/ directory
+  local relative_to_wiki = current_file:sub(#wiki_path + 1)
+  if relative_to_wiki:sub(1, 1) == '/' then
+    relative_to_wiki = relative_to_wiki:sub(2)
+  end
+
+  -- Since redirect files are in tasks/ subdirectory, we need to go up one level
+  local relative_path = '../' .. relative_to_wiki
+  local anchor = heading_to_anchor(heading_text)
+
+  return {
+    heading = heading_text,
+    file_path = relative_path,
+    anchor = anchor
+  }
+end
+
+-- Function to create a task from current heading
+local function create_task_from_heading()
+  local info = get_heading_info()
+  if not info then
+    print("No heading found above cursor")
+    return
+  end
+
+  -- Call the shell script
+  local cmd = string.format(
+    'create-task-from-heading %s %s %s',
+    vim.fn.shellescape(info.heading),
+    vim.fn.shellescape(info.file_path),
+    vim.fn.shellescape(info.anchor)
+  )
+
+  local result = vim.fn.system(cmd)
+  print(result)
+end
+
+-- Function to update an existing task to point to current heading
+local function update_task_to_heading()
+  local info = get_heading_info()
+  if not info then
+    print("No heading found above cursor")
+    return
+  end
+
+  -- Use vim terminal to run fzf interactively
+  local cmd = string.format(
+    'update-task-link %s %s',
+    vim.fn.shellescape(info.file_path),
+    vim.fn.shellescape(info.anchor)
+  )
+
+  -- Open in a split terminal
+  vim.cmd('split | terminal ' .. cmd)
+  -- Auto-close terminal when command finishes
+  vim.cmd('autocmd TermClose <buffer> quit')
+end
+
+-- Create commands
+vim.api.nvim_create_user_command('TaskFromHeading', create_task_from_heading, {})
+vim.api.nvim_create_user_command('TaskUpdateLink', update_task_to_heading, {})
+
+-- Create keybindings
+vim.keymap.set('n', '<Leader>tc', create_task_from_heading, { noremap = true, silent = true, desc = 'Create task from current heading' })
+vim.keymap.set('n', '<Leader>tu', update_task_to_heading, { noremap = true, silent = true, desc = 'Update task link to current heading' })

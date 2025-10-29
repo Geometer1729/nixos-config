@@ -15,6 +15,61 @@ let
             echo "[[**$UUID**|$1]]" > /tmp/task-link
           '';
       };
+  create-task-from-heading =
+    pkgs.writeShellApplication
+      {
+        name = "create-task-from-heading";
+        runtimeInputs = [ pkgs.taskwarrior3 ];
+        text =
+          ''
+            # Usage: create-task-from-heading "Heading Text" "file/path.md" "heading-anchor"
+            HEADING="$1"
+            FILE_PATH="$2"
+            ANCHOR="$3"
+
+            # Create task with heading as description
+            task add "$HEADING" >> /dev/null
+            task +LATEST annotate Redirect >> /dev/null
+            UUID="$(task +LATEST uuids)"
+
+            # Create markdown file with link to heading
+            echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+
+            echo "Created task $UUID: $HEADING -> $FILE_PATH#$ANCHOR"
+          '';
+      };
+  update-task-link =
+    pkgs.writeShellApplication
+      {
+        name = "update-task-link";
+        runtimeInputs = [ pkgs.taskwarrior3 pkgs.fzf ];
+        text =
+          ''
+            # Usage: update-task-link "file/path.md" "heading-anchor"
+            FILE_PATH="$1"
+            ANCHOR="$2"
+
+            # Select task using fzf
+            SELECTED=$(task status:pending export | ${pkgs.jq}/bin/jq -r '.[] | "\(.uuid) \(.description)"' | fzf --prompt="Select task to update: ")
+
+            if [ -z "$SELECTED" ]; then
+              echo "No task selected"
+              exit 1
+            fi
+
+            UUID=$(echo "$SELECTED" | awk '{print $1}')
+
+            # Update the redirect link
+            echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
+
+            # Add Redirect annotation if not present
+            if ! task "$UUID" | grep -q "Redirect"; then
+              task "$UUID" annotate Redirect >> /dev/null
+            fi
+
+            echo "Updated task $UUID to point to $FILE_PATH#$ANCHOR"
+          '';
+      };
   edit-note = bin
     (pkgs.writeShellApplication
       {
@@ -44,6 +99,8 @@ in
       vit
       taskopen
       gen-task-link
+      create-task-from-heading
+      update-task-link
     ];
   home.file.".taskopenrc".text =
     ''
@@ -55,7 +112,7 @@ in
       notes.command = "${edit-note} ~/Documents/vw/tasks/$UUID.md \"$TASK_DESCRIPTION\""
 
       redirect.regex = "^Redirect"
-      redirect.command = "vim ~/Documents/vw/tasks/$UUID.md --command VimwikiFollowLink"
+      redirect.command = "vim ~/Documents/vw/tasks/$UUID.md -c VimwikiFollowLink"
     '';
   home.file.".vit/config.ini".text =
     ''

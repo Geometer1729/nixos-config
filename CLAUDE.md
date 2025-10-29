@@ -18,25 +18,15 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 ## Common Commands
 
 ### System Operations
-- `just update` - Update the system configuration and commit changes
-- `nh os switch` - Switch to the current configuration
-- `nh os test` - Test the configuration without switching (used by rebuild scripts)
-- `nixpkgs-fmt` - Format Nix files using nixpkgs-fmt
-
-### Development
+- `just` - The justfile contains some handy commands
 - `nix develop` - Enter the development shell
-- `nixd` - Nix language server (available in development environment)
-- `nixpkgs-fmt` - Format Nix files
-
-### Testing and Debugging
-- Rebuild scripts are located in `modules/home/scripts/` and use `nh os test` with output redirection to `~/Downloads/nixerr`
-- Test configurations before applying with `nh os test`
+- `nh os test` - Test the configuration can produce a verbose output so redirect it to `/tmp/nixerr` and only read the file if it fails.
 
 ## Testing Changes
 
 **CRITICAL**: Always verify changes work before considering them complete. Never tell the user you're done without running the build check first.
 
-0. **Git tracking**: If you created ANY new files (especially `.nix` files), run `git add <file>` IMMEDIATELY - Nix flakes can only see git-tracked files. This is MANDATORY before any build attempt.
+0. **Git tracking**: If you created ANY new files (especially `.nix` files), run `git add <file>` IMMEDIATELY - Nix flakes can only see git-tracked files. This is MANDATORY before any build attempt. Do not git add files which are only modified.
 1. **Test changes**: Run `nh os test` to switch to the configuration (doesn't set as default boot).
 2. **Verify functionality**: Test that your changes work as expected or outline what should be tested manually
 
