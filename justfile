@@ -37,10 +37,12 @@ health:
 
 # edit the secrets file
 secrets:
+  mkdir -p ~/.config/sops/age
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets.yaml
 
 deploy:
+  nixpkgs-fmt .
   nh os build -H am
   nh os build -H torag
   nix flake check

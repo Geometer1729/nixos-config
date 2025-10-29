@@ -17,6 +17,7 @@ in
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
       anthropic_key = owned;
+      taskwarrior-sync-secret = owned;
     };
   };
   # secret hosts

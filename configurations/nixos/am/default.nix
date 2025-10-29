@@ -31,5 +31,6 @@ in
       default
 
       builder
+      taskchampion
     ];
 }

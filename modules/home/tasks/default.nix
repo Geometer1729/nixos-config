@@ -23,5 +23,6 @@ in
     ./scripts.nix
     ./vit.nix
     ./icloud.nix
+    ./taskchampion-client.nix
   ];
 }
