@@ -9,7 +9,6 @@ let
             # description target_file
             read -r description
             task add "$description" >> /dev/null
-            task +LATEST annotate Redirect >> /dev/null
             UUID="$(task +LATEST uuids)"
             echo "[Redirect]($1#$UUID)" > ~/Documents/vw/tasks/"$UUID".md
             echo "[[**$UUID**|$1]]" > /tmp/task-link
@@ -30,7 +29,6 @@ let
 
             # Create task with description
             task add "$DESCRIPTION" >> /dev/null
-            task +LATEST annotate Redirect >> /dev/null
             UUID="$(task +LATEST uuids)"
 
             # Create markdown file with link - include checklist item if present
@@ -75,34 +73,41 @@ let
               echo "[Redirect]($FILE_PATH#$ANCHOR)" > ~/Documents/vw/tasks/"$UUID".md
               echo "Updated task $UUID to point to $FILE_PATH#$ANCHOR"
             fi
-
-            # Add Redirect annotation if not present
-            if ! task "$UUID" | grep -q "Redirect"; then
-              task "$UUID" annotate Redirect >> /dev/null
-            fi
           '';
       };
-  taskopen-redirect =
+  taskopen-smart =
     pkgs.writeShellApplication
       {
-        name = "taskopen-redirect";
+        name = "taskopen-smart";
         runtimeInputs = [ pkgs.neovim ];
         text =
           ''
-            # Usage: taskopen-redirect ~/Documents/vw/tasks/$UUID.md
+            # Usage: taskopen-smart ~/Documents/vw/tasks/$UUID.md "Task Description"
             TASK_FILE="$1"
+            TASK_DESCRIPTION="$2"
 
-            # Check if file has a checklist item
-            if grep -q "^CHECKLIST:" "$TASK_FILE"; then
-              CHECKLIST_TEXT=$(grep "^CHECKLIST:" "$TASK_FILE" | sed 's/^CHECKLIST://')
-              # Open file and follow link, then search for checklist item
-              vim "$TASK_FILE" \
-                -c "VimwikiFollowLink" \
-                -c "normal! gg" \
-                -c "call search('\\V$CHECKLIST_TEXT', 'c')"
+            # Create file if it doesn't exist
+            if ! [ -e "$TASK_FILE" ]; then
+              echo "# $TASK_DESCRIPTION" > "$TASK_FILE"
+            fi
+
+            # Check if file has a redirect link
+            if grep -q "^\[Redirect\]" "$TASK_FILE"; then
+              # Check if file has a checklist item
+              if grep -q "^CHECKLIST:" "$TASK_FILE"; then
+                CHECKLIST_TEXT=$(grep "^CHECKLIST:" "$TASK_FILE" | sed 's/^CHECKLIST://')
+                # Open file and follow link, then search for checklist item
+                vim "$TASK_FILE" \
+                  -c "VimwikiFollowLink" \
+                  -c "normal! gg" \
+                  -c "call search('\\V$CHECKLIST_TEXT', 'c')"
+              else
+                # Just follow the link normally
+                vim "$TASK_FILE" -c "VimwikiFollowLink"
+              fi
             else
-              # Just follow the link normally
-              vim "$TASK_FILE" -c "VimwikiFollowLink"
+              # No redirect, just edit the notes file
+              vim "$TASK_FILE"
             fi
           '';
       };
@@ -137,19 +142,16 @@ in
       gen-task-link
       create-task-from-heading
       update-task-link
-      taskopen-redirect
+      taskopen-smart
     ];
   home.file.".taskopenrc".text =
     ''
       [General]
-      no_annotation_hook="${edit-note} ~/Documents/vw/tasks/$UUID.md \"$TASK_DESCRIPTION\""
+      no_annotation_hook="${bin taskopen-smart} ~/Documents/vw/tasks/$UUID.md \"$TASK_DESCRIPTION\""
 
       [Actions]
       notes.regex = "^Notes"
       notes.command = "${edit-note} ~/Documents/vw/tasks/$UUID.md \"$TASK_DESCRIPTION\""
-
-      redirect.regex = "^Redirect"
-      redirect.command = "${bin taskopen-redirect} ~/Documents/vw/tasks/$UUID.md"
     '';
   home.file.".vit/config.ini".text =
     ''
