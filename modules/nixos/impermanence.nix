@@ -30,6 +30,7 @@
         ".config/clorio-wallet"
         ".config/ncspot"
         ".config/chromium"
+        ".config/icloud-sync/credentials"
         ".gnupg"
         ".hoogle"
         ".local/share/PrismLauncher"

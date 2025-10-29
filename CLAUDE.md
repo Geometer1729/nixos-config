@@ -20,7 +20,7 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 ### System Operations
 - `just` - The justfile contains some handy commands
 - `nix develop` - Enter the development shell
-- `nh os test` - Test the configuration can produce a verbose output so redirect it to `/tmp/nixerr` and only read the file if it fails.
+- `nh os test` - Test the configuration
 
 ## Testing Changes
 

@@ -17,6 +17,7 @@ in
 
   # Monitor setup for desktop
   home-manager.users.bbrian = {
+    #icloud-tasks = true;
     programs.hyprland-custom = {
       dualMonitor = true;
       primaryMonitor = "HDMI-A-1,2560x1440@60,0x0,1";
