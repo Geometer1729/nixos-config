@@ -32,6 +32,7 @@ in
     nvim
     scripts
     ssh
+    syncthing
     tasks
     tmux
     work
