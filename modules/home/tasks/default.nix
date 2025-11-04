@@ -22,7 +22,7 @@ in
   imports = [
     ./scripts.nix
     ./vit.nix
-    ./icloud.nix
     ./taskchampion-client.nix
+    ./gtd.nix
   ];
 }

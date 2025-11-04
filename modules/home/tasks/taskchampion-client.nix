@@ -30,4 +30,33 @@ in
   programs.zsh.shellAliases = {
     ts = "task sync";
   };
+
+  # Automatic sync service
+  systemd.user.services.taskwarrior-sync = {
+    Unit = {
+      Description = "Taskwarrior sync service";
+      After = [ "network-online.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.taskwarrior3}/bin/task sync";
+      # Don't fail if sync has issues (e.g., server unavailable)
+      SuccessExitStatus = [ 0 1 ];
+    };
+  };
+
+  # Automatic sync timer - runs every 5 minutes
+  systemd.user.timers.taskwarrior-sync = {
+    Unit = {
+      Description = "Taskwarrior sync timer";
+    };
+    Timer = {
+      OnBootSec = "1min";
+      OnUnitActiveSec = "5min";
+      Persistent = true;
+    };
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
+  };
 }
