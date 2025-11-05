@@ -168,7 +168,7 @@ let
           return-type = "json";
           interval = 30;
           format = " 📥 {} ";
-          on-click = "hyprctl dispatch exec tmuxProcess";
+          on-click = "hyprctl dispatch exec 'onScratchPad vit process process'";
         };
     };
 in

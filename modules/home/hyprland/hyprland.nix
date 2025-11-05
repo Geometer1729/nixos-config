@@ -295,7 +295,7 @@ in
 
           # System controls
           "$mod SHIFT, s, exec, sudo systemctl suspend"
-          "$mod SHIFT, r, exec, tmuxRebuild"
+          "$mod SHIFT, r, exec, onScratchPad --hide-after sp rebuild rebuild"
 
           # Screenshots
           ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
