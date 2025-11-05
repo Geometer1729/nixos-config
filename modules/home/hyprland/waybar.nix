@@ -4,9 +4,11 @@ let
 
   # Extract monitor name from monitor configuration string (format: "MONITOR-NAME,resolution@refresh,position,scale")
   extractMonitorName = monitorConfig: builtins.head (lib.splitString "," monitorConfig);
-
   primaryMonitorName = extractMonitorName cfg.primaryMonitor;
-  secondaryMonitorName = if cfg.dualMonitor then extractMonitorName cfg.secondaryMonitor else primaryMonitorName;
+  secondaryMonitorName =
+    if cfg.dualMonitor
+    then extractMonitorName cfg.secondaryMonitor
+    else primaryMonitorName;
 
   settings =
     {
@@ -18,6 +20,7 @@ let
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ "clock" ];
       modules-right = [
+        "custom/inbox"
         "pulseaudio#source"
         "pulseaudio"
       ] ++ lib.optionals (osConfig.wifi.enable or false) [ "network" ]
@@ -142,6 +145,31 @@ let
         format = "{:%m-%d-%Y : %a : %H:%M:%S}";
         interval = 1;
       };
+
+      # Custom inbox counter
+      "custom/inbox" =
+        let
+          inboxCounter = pkgs.writeShellScript "inbox-counter" ''
+            COUNT=$(${pkgs.taskwarrior3}/bin/task status:pending -next -waiting -someday count 2>/dev/null || echo "0")
+
+            if [ "$COUNT" -eq 0 ]; then
+              CLASS="empty"
+            elif [ "$COUNT" -gt 5 ]; then
+              CLASS="urgent"
+            else
+              CLASS="normal"
+            fi
+
+            echo "{\"text\":\"$COUNT\",\"class\":\"$CLASS\",\"tooltip\":\"$COUNT tasks in inbox\"}"
+          '';
+        in
+        {
+          exec = "${inboxCounter}";
+          return-type = "json";
+          interval = 30;
+          format = " 📥 {} ";
+          on-click = "tmuxProcess";
+        };
     };
 in
 {
@@ -181,6 +209,24 @@ in
       window#waybar #workspaces button.active {
         background-color: @base0D;
         color: @base00;
+      }
+
+      /* inbox theme */
+      #custom-inbox.empty {
+        background-color: @base0B;
+        color: @base00;
+        font-weight: bold;
+      }
+
+      #custom-inbox.normal {
+        background-color: @base0D;
+        color: @base00;
+      }
+
+      #custom-inbox.urgent {
+        background-color: @base08;
+        color: @base00;
+        font-weight: bold;
       }
     '';
   };
