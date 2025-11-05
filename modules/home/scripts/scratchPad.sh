@@ -13,7 +13,7 @@ client=$(hyprctl -j clients | jq -r --arg title "$name" '.[] | select(.title == 
 is_visible=$(hyprctl -j activewindow | jq -r '.workspace.name' 2>/dev/null | grep -q "^special:$name" && echo "yes" || echo "")
 
 toggle(){
-  hyprctl dispatch togglespecialworkspace special:"$name"
+  hyprctl dispatch togglespecialworkspace "$name"
 }
 
 launch(){
