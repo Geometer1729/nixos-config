@@ -292,6 +292,7 @@ in
           "$mod, v, exec, scratchPad vim"
           "$mod, c, exec, scratchPad calcurse"
           "$mod, b, exec, scratchPad vit"
+          "$mod, t, exec, onScratchPad --hide-after vit quickadd quick-add-task"
 
           # System controls
           "$mod SHIFT, s, exec, sudo systemctl suspend"
