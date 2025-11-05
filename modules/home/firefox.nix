@@ -113,6 +113,10 @@ let
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "toolkit.telemetry.pioneer-new-studies-available" = false;
       "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+      # Suppress extension update/donation pages
+      "browser.startup.homepage_override.mstone" = "ignore";
+      "extensions.getAddons.showPane" = false;
+      "extensions.htmlaboutaddons.recommendations.enabled" = false;
       # Toolbar layout: back, forward, firefox-view, urlbar, downloads, signin, extensions, settings
       "browser.uiCustomization.state" = builtins.toJSON {
         placements = {
