@@ -5,17 +5,24 @@ let
     name = "process";
     runtimeInputs = [ pkgs.taskwarrior3 pkgs.fzf ];
     text = ''
-      set -x
-
       # Process inbox - GTD triage workflow
       echo "=== GTD INBOX PROCESSING ==="
       echo ""
       task inbox
 
       while true; do
+        # Get list of tasks to process
+        TASK_LIST=$(task status:pending -next -waiting -someday export | ${pkgs.jq}/bin/jq -r '.[] | "\(.id) \(.description)"')
+
+        # Check if there are any tasks left
+        if [ -z "$TASK_LIST" ]; then
+          echo "Processing complete! Inbox is empty."
+          exit 0
+        fi
+
         echo ""
         echo "Select task to process (Ctrl-C to exit):"
-        SELECTED=$(task status:pending -next -waiting -someday export | ${pkgs.jq}/bin/jq -r '.[] | "\(.id) \(.description)"' | fzf --prompt="Process: " --preview 'task {} info' --preview-window=right:60%)
+        SELECTED=$(echo "$TASK_LIST" | fzf --select-1 --prompt="Process: " --preview 'task {} info' --preview-window=right:60%)
 
         if [ -z "$SELECTED" ]; then
           echo "Processing complete!"
@@ -24,6 +31,8 @@ let
 
         TASK_ID=$(echo "$SELECTED" | awk '{print $1}')
 
+        echo ""
+        echo "Processing task: $SELECTED"
         echo ""
         echo "What is it? (1-5)"
         echo "  1) Actionable - Next action (+next)"
