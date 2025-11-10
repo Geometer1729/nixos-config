@@ -3,8 +3,8 @@
   home.packages = with pkgs; [
     # Fonts
     font-awesome
-    fira-mono
-    noto-fonts-emoji
+    fira-mono # TODO do I need this?
+    noto-fonts-color-emoji
 
     # Desktop environment tools
     libnotify # notify-send

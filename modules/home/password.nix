@@ -4,7 +4,6 @@
     # Password management
     pass
     gnupg
-    pinentry
     rofi-pass
   ];
 

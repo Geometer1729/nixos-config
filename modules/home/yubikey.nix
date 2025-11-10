@@ -12,7 +12,7 @@
     # GPG tools for YubiKey
     gnupg # Already in password.nix but listing for clarity
     paperkey # Backup GPG keys to paper
-    pcsctools # Tools for smartcard communication (useful for debugging)
+    pcsc-tools # Tools for smartcard communication (useful for debugging)
   ];
 
   # Ensure XDG directories exist for YubiKey config

@@ -7,7 +7,8 @@
       steam
       steam-run
       libgdiplus
-      glxinfo
+      #glxinfo
+      mesa-demos # TODO do I need this?
     ];
   };
 

@@ -14,7 +14,7 @@
       packages = with pkgs; [
         just
         nixd
-        sumneko-lua-language-server # for nvim config stuff
+        lua-language-server # for nvim config stuff
         ssh-to-age
       ];
 
