@@ -7,7 +7,23 @@
     #may cause gc issues
     stdlib =
       ''
-        tmux rename-session "#{b:pane_current_path}"
+        if [ -n "$TMUX" ]; then
+          session_name=$(basename "$PWD")
+          current_session=$(tmux display-message -p '#S')
+
+          if [ "$current_session" != "$session_name" ]; then
+            if tmux has-session -t "$session_name" 2>/dev/null; then
+              printf "Tmux session '%s' already exists. Attach to it? [y/n] " "$session_name"
+              read -r answer
+              if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+                tmux switch-client -t "$session_name" \
+                  && tmux kill-session -t $(tmux display-message -p '#{session_name}')
+              fi
+            else
+              tmux rename-session "$session_name"
+            fi
+          fi
+        fi
       '';
   };
   home.sessionVariables.DIRENV_LOG_FORMAT = "";
