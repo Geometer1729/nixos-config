@@ -12,6 +12,10 @@
         (name: name != "default.nix")
         (builtins.attrNames (builtins.readDir ./.))
       )
-    );
+    )
+    # packages needed by scripts
+    ++ [
+      fzf
+    ];
 }
 
