@@ -17,15 +17,7 @@
     radeontop
     neofetch
 
-    # Custom utilities
-    (pkgs.writeShellApplication {
-      name = "flushSwap";
-      text = ''
-        sudo swapoff -a
-        sudo swapon -a
-        notify-send "swap flushed"
-      '';
-    })
+    # Custom utilities moved to modules/home/scripts/
   ];
 
   # System monitoring configuration

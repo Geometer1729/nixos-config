@@ -28,7 +28,6 @@ in
 
     # Core functionality
     git
-    mime
     nvim
     scripts
     ssh

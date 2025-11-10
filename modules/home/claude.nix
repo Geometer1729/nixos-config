@@ -132,44 +132,7 @@ in
   home.packages = with pkgs; [
     # Ensure libnotify is available for notify-send
     libnotify
-
-
-    # Create specific notification for user input requests
-    (pkgs.writeShellApplication {
-      name = "claude-user-input";
-      text = ''
-        # Notify user that Claude Code needs input
-        PWD_INFO=$(pwd | sed "s|^$HOME|~|")
-
-        notify-send \
-          --urgency=normal \
-          --icon=dialog-question \
-          --app-name="Claude" \
-          --expire-time=0 \
-          "Input needed" \
-          "in $PWD_INFO"
-      '';
-    })
-
-    # Create notification for Claude Code completion
-    (pkgs.writeShellApplication {
-      name = "claude-completed";
-      text = ''
-        # Notify user that Claude Code has completed a task
-        PWD_INFO=$(pwd | sed "s|^$HOME|~|")
-
-        # Get the last command from history for context
-        LAST_CMD=$(history | tail -1 | sed 's/^[[:space:]]*[0-9]*[[:space:]]*//' | cut -c1-50)
-
-        notify-send \
-          --urgency=low \
-          --icon=dialog-information \
-          --app-name="Claude" \
-          --expire-time=3000 \
-          "Completed in $PWD_INFO" \
-          "$LAST_CMD"
-      '';
-    })
+    # Claude notification scripts are now in modules/home/scripts/
   ];
 
   # Create Claude Code settings configuration
