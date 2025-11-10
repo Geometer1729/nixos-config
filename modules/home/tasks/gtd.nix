@@ -48,9 +48,9 @@ let
         case $choice in
           1)
             task "$TASK_ID" modify +next
-            read -r -p "Context (@computer/@home/@errands/@anywhere): " context
+            read -r -p "Context (@computer/@home): " context
             if [ -n "$context" ]; then
-              task "$TASK_ID" modify context:"$context"
+              task "$TASK_ID" modify +"$context"
             fi
             read -r -p "Energy level (H/M/L): " energy
             if [ -n "$energy" ]; then
@@ -152,11 +152,6 @@ in
 
   programs.taskwarrior.config = {
     # GTD User Defined Attributes
-    "uda.context.type" = "string";
-    "uda.context.label" = "Context";
-    "uda.context.values" = "@computer,@home,@errands,@anywhere";
-    "uda.context.default" = "@anywhere";
-
     "uda.energy.type" = "string";
     "uda.energy.label" = "Energy";
     "uda.energy.values" = "H,M,L";
@@ -177,8 +172,8 @@ in
     "report.inbox.sort" = "entry+";
 
     "report.next.description" = "GTD Next Actions";
-    "report.next.columns" = "id,start.age,priority,project,context,energy,estimate,tags,description.count,urgency";
-    "report.next.labels" = "ID,Active,P,Project,Context,Energy,Est,Tags,Description,Urg";
+    "report.next.columns" = "id,start.age,priority,project,energy,estimate,tags,description.count,urgency";
+    "report.next.labels" = "ID,Active,P,Project,Energy,Est,Tags,Description,Urg";
     "report.next.filter" = "+next status:pending";
     "report.next.sort" = "urgency-";
 
@@ -202,19 +197,19 @@ in
 
     # Context-based reports
     "report.computer.description" = "Tasks at computer";
-    "report.computer.filter" = "+next context:@computer status:pending";
+    "report.computer.filter" = "+next +@computer status:pending";
     "report.computer.columns" = "id,priority,energy,estimate,project,description.count,urgency";
     "report.computer.labels" = "ID,P,Energy,Est,Project,Description,Urg";
     "report.computer.sort" = "urgency-";
 
     "report.home.description" = "Tasks at home";
-    "report.home.filter" = "+next context:@home status:pending";
+    "report.home.filter" = "+next +@home status:pending";
     "report.home.columns" = "id,priority,energy,estimate,project,description.count,urgency";
     "report.home.labels" = "ID,P,Energy,Est,Project,Description,Urg";
     "report.home.sort" = "urgency-";
 
     "report.errands.description" = "Errands to run";
-    "report.errands.filter" = "+next context:@errands status:pending";
+    "report.errands.filter" = "+next +@errands status:pending";
     "report.errands.columns" = "id,priority,energy,estimate,project,description.count,urgency";
     "report.errands.labels" = "ID,P,Energy,Est,Project,Description,Urg";
     "report.errands.sort" = "urgency-";
@@ -222,14 +217,14 @@ in
     # Energy-based reports
     "report.high.description" = "High energy tasks";
     "report.high.filter" = "+next energy:H status:pending";
-    "report.high.columns" = "id,context,estimate,project,description.count,urgency";
-    "report.high.labels" = "ID,Context,Est,Project,Description,Urg";
+    "report.high.columns" = "id,tags,estimate,project,description.count,urgency";
+    "report.high.labels" = "ID,Tags,Est,Project,Description,Urg";
     "report.high.sort" = "urgency-";
 
     "report.low.description" = "Low energy tasks";
     "report.low.filter" = "+next energy:L status:pending";
-    "report.low.columns" = "id,context,estimate,project,description.count,urgency";
-    "report.low.labels" = "ID,Context,Est,Project,Description,Urg";
+    "report.low.columns" = "id,tags,estimate,project,description.count,urgency";
+    "report.low.labels" = "ID,Tags,Est,Project,Description,Urg";
     "report.low.sort" = "urgency-";
   };
 

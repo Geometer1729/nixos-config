@@ -10,9 +10,9 @@
       ''
         [keybinding]
         o = :!wr taskopen {TASK_UUID}<Enter>
-        I = :inbox<Enter>
-        S = :someday<Enter>
-        N = :next<Enter>
+        ri = :inbox<Enter>
+        rs = :someday<Enter>
+        rn = :next<Enter>
         [vit]
         theme = stylix
       '';
