@@ -6,6 +6,9 @@ let
   };
 in
 {
+  # Enable ssh-agent for regular SSH key management
+  services.ssh-agent.enable = true;
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;

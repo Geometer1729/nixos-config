@@ -4,12 +4,10 @@
   services = {
     pcscd.enable = true;
     udev.packages = [ pkgs.yubikey-personalization ];
-    yubikey-agent.enable = true;
   };
 
   # Enable U2F for PAM authentication
   security.pam = {
-    sshAgentAuth.enable = true;
     u2f = {
       enable = true;
       settings = {
@@ -22,7 +20,6 @@
   # GPG support for YubiKey
   programs.gnupg.agent = {
     enable = true;
-    enableSSHSupport = true;
   };
 
   # Add udev rules for YubiKey
