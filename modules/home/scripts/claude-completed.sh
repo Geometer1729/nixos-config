@@ -1,13 +1,22 @@
 # Notify user that Claude Code has completed a task
-PWD_INFO=$(pwd | sed "s|^$HOME|~|")
 
-# Get the last command from history for context
-LAST_CMD=$(history | tail -1 | sed 's/^[[:space:]]*[0-9]*[[:space:]]*//' | cut -c1-50)
+# Source helper functions
+source "$SCRIPTS_LIB/claude-notify-helper.sh"
 
+# Check if we should send notification
+if ! should_notify "completed"; then
+  exit 0
+fi
+
+# Get contextual information
+PROJECT_INFO=$(get_project_info)
+TIMESTAMP=$(date '+%H:%M:%S')
+
+# Send notification
 notify-send \
   --urgency=low \
-  --icon=dialog-information \
-  --app-name="Claude" \
-  --expire-time=3000 \
-  "Completed in $PWD_INFO" \
-  "$LAST_CMD"
+  --icon="$CLAUDE_ICON" \
+  --app-name="Claude Code" \
+  --expire-time=4000 \
+  "Claude completed at $TIMESTAMP" \
+  "$PROJECT_INFO"

@@ -1,5 +1,11 @@
 { pkgs, config, ... }:
 let
+  # Fetch Claude icon as a derivation
+  claudeIcon = pkgs.fetchurl {
+    url = "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
+    sha256 = "sha256-86hX9EtbVC7nniAN1kpLjt485fm5lpOjm9ECTLK392o=";
+  };
+
   claudeSettings = {
     permissions = {
       Bash = {
@@ -134,6 +140,9 @@ in
     libnotify
     # Claude notification scripts are now in modules/home/scripts/
   ];
+
+  # Install Claude icon for notifications
+  home.file.".local/share/icons/claude-icon.svg".source = claudeIcon;
 
   # Create Claude Code settings configuration
   home.file.".claude/settings.json".source = settingsJson;
