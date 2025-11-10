@@ -8,6 +8,7 @@ in
     package = pkgs.taskwarrior3;
     config = {
       urgency."inherit" = "on";
+      "news.version" = "3.4.1"; # I don't love this but it beats everything else I've tried
     };
   };
 

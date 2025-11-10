@@ -167,6 +167,8 @@ in
         # Misc settings - most managed by Stylix
         misc = {
           force_default_wallpaper = -1;
+          enable_swallow = true;
+          swallow_regex = ".*prismlauncher.*";
         };
 
         # Workspaces - 22 workspaces total
@@ -193,7 +195,10 @@ in
         ];
 
         windowrulev2 = [
-          "suppressevent fullscreen, class:^(firefox)$"
+          # firefox handles this poorly it's not really worth it
+          #"suppressevent fullscreen, class:^(firefox)$"
+          # Force prismlauncher to tile to prevent floating positioning issues with swallow
+          "tile, class:^(prismlauncher)$"
         ];
 
         # Keybindings - translating your XMonad bindings
@@ -345,7 +350,6 @@ in
           # Pester me about any swap files
           "check-swaps"
         ];
-
       };
     };
   };

@@ -65,7 +65,7 @@
         ".git-credentials"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
-        ".config/task/taskrc" # persisted just for news.version :(
+        #".config/task/taskrc" # persisted just for news.version :(
         ".claude.json"
         ".claude/.credentials.json"
       ];
