@@ -95,7 +95,6 @@
               (name: { inherit name; value = "sudo ${name}"; })
               [
                 "dd"
-                "systemctl"
                 "mount"
                 "umount"
                 "shutdown"
