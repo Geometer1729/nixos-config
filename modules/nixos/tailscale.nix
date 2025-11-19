@@ -5,13 +5,33 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
-    # Flags to pass to tailscale up on boot (only used if authKeyFile is set)
+    # These are only applied by the tailscale-reset thing.
     extraUpFlags = [
       "--ssh"
       "--accept-routes"
+      "--accept-dns"
       "--operator=${config.mainUser}"
       "--advertise-exit-node"
     ];
+  };
+
+  # Reset Tailscale preferences on boot to match NixOS config
+  # This ensures manual `tailscale set` commands don't persist unexpectedly
+  # Uses `tailscale up --reset` to enforce complete desired state
+  systemd.services.tailscale-reset-prefs = {
+    description = "Reset Tailscale preferences to NixOS defaults";
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      # Wait for tailscaled to be ready
+      sleep 2
+      ${pkgs.tailscale}/bin/tailscale up --reset ${lib.concatStringsSep " " config.services.tailscale.extraUpFlags}
+    '';
   };
 
   # Enable the required kernel module for NAT traversal
