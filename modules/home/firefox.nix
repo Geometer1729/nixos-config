@@ -172,6 +172,24 @@ in
     colorTheme.enable = true;
   };
 
+  # Set firefox-xdg as the default browser for xdg-open
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "firefox-xdg.desktop";
+      "x-scheme-handler/http" = "firefox-xdg.desktop";
+      "x-scheme-handler/https" = "firefox-xdg.desktop";
+      "x-scheme-handler/ftp" = "firefox-xdg.desktop";
+      "x-scheme-handler/chrome" = "firefox-xdg.desktop";
+      "application/x-extension-htm" = "firefox-xdg.desktop";
+      "application/x-extension-html" = "firefox-xdg.desktop";
+      "application/x-extension-shtml" = "firefox-xdg.desktop";
+      "application/xhtml+xml" = "firefox-xdg.desktop";
+      "application/x-extension-xhtml" = "firefox-xdg.desktop";
+      "application/x-extension-xht" = "firefox-xdg.desktop";
+    };
+  };
+
   # Desktop files for Firefox profiles
   xdg.desktopEntries = {
     firefox-youtube = {
@@ -204,6 +222,26 @@ in
       exec = "firefox -P default --new-instance";
       icon = "firefox";
       categories = [ "Network" "WebBrowser" ];
+    };
+
+    # Desktop entry for xdg-open (without --new-instance to accept remote commands)
+    firefox-xdg = {
+      name = "Firefox (XDG)";
+      comment = "Browse the Web";
+      exec = "firefox-xdg-open %u";
+      icon = "firefox";
+      categories = [ "Network" "WebBrowser" ];
+      mimeType = [
+        "text/html"
+        "text/xml"
+        "application/xhtml+xml"
+        "application/xml"
+        "application/rss+xml"
+        "application/rdf+xml"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+        "x-scheme-handler/ftp"
+      ];
     };
   };
 
