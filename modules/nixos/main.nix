@@ -23,9 +23,19 @@ in
 
     nixpkgs.config.allowUnfree = true;
 
-
-    security.rtkit.enable = true;
-    security.sudo.wheelNeedsPassword = false;
+    security = {
+      rtkit.enable = true;
+      sudo.wheelNeedsPassword = false;
+      # No password for systemctl
+      polkit.extraConfig = ''
+        polkit.addRule(function(action, subject) {
+          if (action.id == "org.freedesktop.systemd1.manage-units" &&
+              subject.isInGroup("wheel")) {
+            return polkit.Result.YES;
+          }
+        });
+      '';
+    };
 
     # services
     services = {
