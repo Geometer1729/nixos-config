@@ -42,6 +42,7 @@ in
       impermanence
       main
       nix
+      polkit
       secrets
       ssh
       steam
