@@ -113,10 +113,16 @@ let
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "toolkit.telemetry.pioneer-new-studies-available" = false;
       "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-      # Suppress extension update/donation pages
+      # Suppress extension update/donation pages and notifications
       "browser.startup.homepage_override.mstone" = "ignore";
       "extensions.getAddons.showPane" = false;
       "extensions.htmlaboutaddons.recommendations.enabled" = false;
+      "extensions.update.enabled" = false;
+      "extensions.update.autoUpdateDefault" = false;
+      "extensions.update.notifyUser" = false;
+      "extensions.ui.lastCategory" = "addons://list/extension";
+      "extensions.ui.dictionary.hidden" = true;
+      "extensions.ui.locale.hidden" = true;
       # Toolbar layout: back, forward, firefox-view, urlbar, downloads, signin, extensions, settings
       "browser.uiCustomization.state" = builtins.toJSON {
         placements = {
