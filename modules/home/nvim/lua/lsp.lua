@@ -5,9 +5,23 @@ vim.api.nvim_set_hl(0,"NormalFloat",{ctermbg = "black"})
 vim.lsp.config.hls = { cmd = { "haskell-language-server", "--lsp" } }
 vim.lsp.config.leanls = {}
 vim.lsp.config.purescriptls = {}
-vim.lsp.config.rust_analyzer = {}
+vim.lsp.config.rust_analyzer = {
+  cmd = { "rust-analyzer" },
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = {
+        allFeatures = true,
+      },
+      checkOnSave = {
+        command = "clippy",
+      },
+      procMacro = {
+        enable = true,
+      },
+    },
+  },
+}
 vim.lsp.config.ts_ls = {} -- typescript
-vim.lsp.config.ocamllsp = {}
 vim.lsp.config.nixd = {
   cmd = { "nixd" },
   settings = {
@@ -53,8 +67,17 @@ vim.lsp.config.lua_ls = {
   },
 }
 
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+-- Enable LSP servers for their respective filetypes
+vim.lsp.enable('hls')
+vim.lsp.enable('leanls')
+vim.lsp.enable('purescriptls')
+vim.lsp.enable('rust_analyzer')
+vim.lsp.enable('ts_ls')
+vim.lsp.enable('nixd')
+vim.lsp.enable('lua_ls')
+
+vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end)
+vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end)
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),

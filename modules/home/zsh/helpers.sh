@@ -25,7 +25,7 @@ tillFail(){
 }
 
 grab(){
-	git clone `wl-paste -o`
+	git clone `wl-paste`
 }
 
 log(){
