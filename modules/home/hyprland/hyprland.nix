@@ -325,10 +325,10 @@ in
         ];
         bindl = [
           ", XF86AudioMute, exec, pulsemixer --toggle-mute"
-          ", XF86AudioPlay, exec, playerctl play-pause"
+          ", XF86AudioPlay, exec, playPause"
           ", XF86AudioNext, exec, playerctl next"
           ", XF86AudioPrev, exec, playerctl previous"
-          "$mod SHIFT, p, exec, playerctl play-pause"
+          "$mod SHIFT, p, exec, playPause"
           "$mod, o, exec, playerctl next -a"
         ];
 
