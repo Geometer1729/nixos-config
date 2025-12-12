@@ -6,6 +6,7 @@
       enableZshIntegration = true;
       settings = {
         add_newline = false;
+        right_format = "";
         format =
           "$status$username$hostname$directory$git_branch$git_status$memory_usage$time$nix_shell\n$character";
         character.format = "[❯](bold green)";
@@ -25,6 +26,8 @@
             format = "[$symbol$branch(:$remote_branch)]($style) ";
             style = "bold yellow";
             symbol = "🏷 ";
+            truncation_length = 20;
+            truncation_symbol = "…";
           };
         git_status =
           {

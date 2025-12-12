@@ -5,7 +5,11 @@ local g = vim.g
 -- W shortens write messages
 -- c alegedly reduce press enter to continue insanity
 -- o I don't even know
-o.shortmess = "IWco"
+-- A ignores swap file messages
+-- T truncates long messages
+-- s don't show "search hit BOTTOM"
+-- F don't give file info when editing a file
+o.shortmess = "IWcoATsF"
 vim.api.nvim_set_hl(0,"Normal", { bg = "none" })
 vim.api.nvim_set_hl(0,"NormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0,"NormalFloat", { bg = "none" })

@@ -8,7 +8,11 @@ vim.api.nvim_create_autocmd({'BufNewFile','BufRead'},
 require('lualine').setup {
   sections = {
     lualine_a = {'mode'},
-    lualine_b = {'branch', 'diff', 'diagnostics'},
+    lualine_b = {
+      { 'branch', fmt = function(str) return string.sub(str, 1, 20) end },
+      'diff',
+      'diagnostics'
+    },
     lualine_c =  { { "filename", path = 1 , } },
     lualine_x = {'filetype'},
     lualine_y = {'progress'},

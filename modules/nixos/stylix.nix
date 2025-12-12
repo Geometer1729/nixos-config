@@ -47,6 +47,7 @@
         soft_red = "#d75f5f"; # Softer red
         darker_gray = "#1a1a1a"; # Slightly lighter background
       in
+      # Note terminal.sexy is kinda okay for testing themes
       {
         name = "Joker";
 

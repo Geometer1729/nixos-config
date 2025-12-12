@@ -129,10 +129,10 @@ vim.diagnostic.config({
     }
 })
 
--- show diagnostics for current line
-vim.api.nvim_create_autocmd('CursorMoved', {
+-- show diagnostics for current line after cursor is idle
+vim.api.nvim_create_autocmd('CursorHold', {
   callback = function()
-    vim.diagnostic.open_float(nil, {focus=false})
+    vim.diagnostic.open_float(nil, {focus=false, scope='line'})
   end,
 })
 

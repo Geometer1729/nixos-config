@@ -334,9 +334,8 @@ in
 
         # Startup applications (matching your XMonad startup)
         exec-once = [
-          # waybar is already started by systemd via programs.waybar.enable
+          # waybar and hypridle are started by systemd via their respective service enables
           "hyprpaper"
-          "hypridle"
           "mako"
           # Launch all Firefox profiles directly to their workspaces
           "[workspace 1 silent] firefox -P youtube --new-instance"
