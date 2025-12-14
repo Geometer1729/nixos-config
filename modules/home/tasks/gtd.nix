@@ -24,8 +24,8 @@
     "report.inbox.sort" = "entry+";
 
     "report.next.description" = "GTD Next Actions";
-    "report.next.columns" = "id,start.age,priority,project,energy,estimate,tags,description.count,urgency";
-    "report.next.labels" = "ID,Active,P,Project,Energy,Est,Tags,Description,Urg";
+    "report.next.columns" = "id,start.age,priority,project,energy,estimate,description.count,tags,urgency";
+    "report.next.labels" = "ID,Active,P,Project,Energy,Est,Description,Tags,Urg";
     "report.next.filter" = "+next status:pending";
     "report.next.sort" = "urgency-";
 
