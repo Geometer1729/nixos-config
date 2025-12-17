@@ -10,6 +10,7 @@
       ''
         [keybinding]
         o = :!wr taskopen {TASK_UUID}<Enter>
+        i = :!wr task {TASK_UUID} info<Enter>
         ri = :inbox<Enter>
         rs = :someday<Enter>
         rn = :next<Enter>

@@ -67,6 +67,10 @@ vim.lsp.config.lua_ls = {
   },
 }
 
+vim.lsp.config.sqls = {
+  cmd = { "sqls" },
+}
+
 -- Enable LSP servers for their respective filetypes
 vim.lsp.enable('hls')
 vim.lsp.enable('leanls')
@@ -75,6 +79,7 @@ vim.lsp.enable('rust_analyzer')
 vim.lsp.enable('ts_ls')
 vim.lsp.enable('nixd')
 vim.lsp.enable('lua_ls')
+vim.lsp.enable('sqls')
 
 vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end)
 vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end)

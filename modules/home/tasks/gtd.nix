@@ -1,4 +1,101 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
+let
+  # Global mapping of column names to their display labels
+  columnLabels = {
+    id = "ID";
+    "entry.age" = "Age";
+    "start.age" = "Active";
+    priority = "P";
+    project = "Project";
+    energy = "Energy";
+    estimate = "Est";
+    description = "Description";
+    "description.count" = "Description";
+    tags = "Tags";
+    urgency = "Urg";
+    annotations = "Waiting For";
+  };
+
+  # Helper function to generate taskwarrior report configuration
+  mkReport = { name, columns, filter, sort ? null, description ? "" }:
+    {
+      "report.${name}.description" = description;
+      "report.${name}.columns" = lib.concatStringsSep "," columns;
+      "report.${name}.labels" = lib.concatStringsSep "," (map (c: columnLabels.${c}) columns);
+      "report.${name}.filter" = filter;
+    } // lib.optionalAttrs (sort != null) {
+      "report.${name}.sort" = sort;
+    };
+
+  # Convert reports attrset to taskwarrior config
+  mkReports = reports:
+    lib.foldl' lib.mergeAttrs { }
+      (lib.mapAttrsToList (name: cfg: mkReport (cfg // { inherit name; })) reports);
+
+  # Define all reports
+  reports = {
+    inbox = {
+      description = "GTD Inbox - items to process";
+      columns = [ "id" "entry.age" "description" ];
+      filter = "status:pending -next -waiting -someday";
+      sort = "entry+";
+    };
+    next = {
+      description = "GTD Next Actions";
+      columns = [ "id" "start.age" "priority" "project" "energy" "estimate" "description.count" "tags" "urgency" ];
+      filter = "+next status:pending";
+      sort = "urgency-";
+    };
+    waiting = {
+      description = "GTD Waiting For";
+      columns = [ "id" "entry.age" "description.count" "annotations" ];
+      filter = "+waiting status:pending";
+      sort = "entry+";
+    };
+    someday = {
+      description = "GTD Someday/Maybe";
+      columns = [ "id" "entry.age" "project" "description.count" ];
+      filter = "+someday status:pending";
+      sort = "entry+";
+    };
+    review = {
+      description = "GTD Weekly Review";
+      columns = [ "id" "project" "tags" "description.count" "urgency" ];
+      filter = "status:pending";
+      sort = "project+,urgency-";
+    };
+    computer = {
+      description = "Tasks at computer";
+      columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
+      filter = "+next +@computer status:pending";
+      sort = "urgency-";
+    };
+    home = {
+      description = "Tasks at home";
+      columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
+      filter = "+next +@home status:pending";
+      sort = "urgency-";
+    };
+    errands = {
+      description = "Errands to run";
+      columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
+      filter = "+next +@errands status:pending";
+      sort = "urgency-";
+    };
+    high = {
+      description = "High energy tasks";
+      columns = [ "id" "estimate" "project" "description.count" "urgency" "tags" ];
+      filter = "+next energy:H status:pending";
+      sort = "urgency-";
+    };
+    low = {
+      description = "Low energy tasks";
+      columns = [ "id" "estimate" "project" "description.count" "urgency" "tags" ];
+      filter = "+next energy:L status:pending";
+      sort = "urgency-";
+    };
+  };
+in
 {
   # GTD helper scripts moved to modules/home/scripts/
 
@@ -17,68 +114,7 @@
     "urgency.user.tag.someday.coefficient" = "-5.0"; # Someday items not urgent
 
     # GTD Reports
-    "report.inbox.description" = "GTD Inbox - items to process";
-    "report.inbox.columns" = "id,entry.age,description";
-    "report.inbox.labels" = "ID,Age,Description";
-    "report.inbox.filter" = "status:pending -next -waiting -someday";
-    "report.inbox.sort" = "entry+";
-
-    "report.next.description" = "GTD Next Actions";
-    "report.next.columns" = "id,start.age,priority,project,energy,estimate,description.count,tags,urgency";
-    "report.next.labels" = "ID,Active,P,Project,Energy,Est,Description,Tags,Urg";
-    "report.next.filter" = "+next status:pending";
-    "report.next.sort" = "urgency-";
-
-    "report.waiting.description" = "GTD Waiting For";
-    "report.waiting.columns" = "id,entry.age,description.count,annotations";
-    "report.waiting.labels" = "ID,Age,Description,Waiting For";
-    "report.waiting.filter" = "+waiting status:pending";
-    "report.waiting.sort" = "entry+";
-
-    "report.someday.description" = "GTD Someday/Maybe";
-    "report.someday.columns" = "id,entry.age,project,description.count";
-    "report.someday.labels" = "ID,Age,Project,Description";
-    "report.someday.filter" = "+someday status:pending";
-    "report.someday.sort" = "entry+";
-
-    "report.review.description" = "GTD Weekly Review";
-    "report.review.columns" = "id,project,tags,description.count,urgency";
-    "report.review.labels" = "ID,Project,Tags,Description,Urg";
-    "report.review.filter" = "status:pending";
-    "report.review.sort" = "project+,urgency-";
-
-    # Context-based reports
-    "report.computer.description" = "Tasks at computer";
-    "report.computer.filter" = "+next +@computer status:pending";
-    "report.computer.columns" = "id,priority,energy,estimate,project,description.count,urgency";
-    "report.computer.labels" = "ID,P,Energy,Est,Project,Description,Urg";
-    "report.computer.sort" = "urgency-";
-
-    "report.home.description" = "Tasks at home";
-    "report.home.filter" = "+next +@home status:pending";
-    "report.home.columns" = "id,priority,energy,estimate,project,description.count,urgency";
-    "report.home.labels" = "ID,P,Energy,Est,Project,Description,Urg";
-    "report.home.sort" = "urgency-";
-
-    "report.errands.description" = "Errands to run";
-    "report.errands.filter" = "+next +@errands status:pending";
-    "report.errands.columns" = "id,priority,energy,estimate,project,description.count,urgency";
-    "report.errands.labels" = "ID,P,Energy,Est,Project,Description,Urg";
-    "report.errands.sort" = "urgency-";
-
-    # Energy-based reports
-    "report.high.description" = "High energy tasks";
-    "report.high.filter" = "+next energy:H status:pending";
-    "report.high.columns" = "id,tags,estimate,project,description.count,urgency";
-    "report.high.labels" = "ID,Tags,Est,Project,Description,Urg";
-    "report.high.sort" = "urgency-";
-
-    "report.low.description" = "Low energy tasks";
-    "report.low.filter" = "+next energy:L status:pending";
-    "report.low.columns" = "id,tags,estimate,project,description.count,urgency";
-    "report.low.labels" = "ID,Tags,Est,Project,Description,Urg";
-    "report.low.sort" = "urgency-";
-  };
+  } // mkReports reports;
 
   # TODO these all feel kinda silly
   programs.zsh.shellAliases = {

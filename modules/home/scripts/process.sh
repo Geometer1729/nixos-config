@@ -43,7 +43,9 @@ while true; do
       task "$TASK_ID" modify +next
       read -r -p "Context (@computer/@home): " context
       if [ -n "$context" ]; then
-        task "$TASK_ID" modify +"$context"
+        for ctx in $context; do
+          task "$TASK_ID" modify +"$ctx"
+        done
       fi
       read -r -p "Energy level (H/M/L): " energy
       if [ -n "$energy" ]; then
