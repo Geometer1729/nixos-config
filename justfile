@@ -41,6 +41,10 @@ secrets:
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets.yaml
 
+# Update Claude Code to latest version
+update-claude:
+  ./scripts/update-claude.sh
+
 deploy:
   nixpkgs-fmt .
   nh os build -H am
