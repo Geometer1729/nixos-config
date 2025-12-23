@@ -23,7 +23,7 @@ sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$LATEST_VERSION\"/" overlay
 # Prefetch the source to get the hash
 echo "Prefetching source..."
 SRC_HASH=$(nix-prefetch-url --unpack "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-$LATEST_VERSION.tgz" 2>&1 | tail -1)
-SRI_HASH=$(nix hash to-sri --type sha256 "$SRC_HASH")
+SRI_HASH=$(nix hash convert to-sri --type sha256 "$SRC_HASH")
 
 # Update the source hash in overlay
 sed -i "0,/hash = \"sha256-.*\"/s//hash = \"$SRI_HASH\"/" overlays/claude-code.nix

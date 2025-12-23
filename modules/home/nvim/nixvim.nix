@@ -24,7 +24,7 @@
     treesitter = {
       enable = true;
       nixvimInjections = true;
-      folding = false;
+      folding.enable = false;
       settings = {
         indent.enable = true;
         ensureInstalled = [
