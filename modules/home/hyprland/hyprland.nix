@@ -343,7 +343,7 @@ in
           "mako"
           # Launch all Firefox profiles directly to their workspaces
           "[workspace 1 silent] firefox -P youtube --new-instance"
-          "[workspace 2 silent] firefox -P default --new-instance"
+          "[workspace 2 silent] firefox -P default"
           "[workspace 18 silent] firefox -P work --new-instance"
           "[workspace 20 silent] firefox -P ttrpg --new-instance"
           "[workspace 21 silent] discord"
