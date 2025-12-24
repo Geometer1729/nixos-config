@@ -199,6 +199,9 @@ in
           #"suppressevent fullscreen, class:^(firefox)$"
           # Force prismlauncher to tile to prevent floating positioning issues with swallow
           "tile, class:^(prismlauncher)$"
+          # Auto-group Discord and Signal on workspace 21
+          "group set, class:^(discord)$"
+          "group set, class:^(signal)$"
         ];
 
         # Keybindings - translating your XMonad bindings
@@ -218,6 +221,11 @@ in
           "$mod, w, fullscreen,1"
           # TODO this works pretty badly tbh and I really wish it was automatic
           "$mod, f, fullscreenstate, -1 2"
+
+          # Group management (tabbed windows)
+          "$mod, g, togglegroup"
+          "$mod, Tab, changegroupactive, f"
+          "$mod SHIFT, Tab, changegroupactive, b"
 
           # Focus movement (vim-style like your XMonad)
           "$mod, h, movefocus, l"
@@ -286,10 +294,6 @@ in
           #"$mod SHIFT, bracketright, movewindow, mon:-1"
           "$mod SHIFT, bracketleft, movecurrentworkspacetomonitor,+1"
           "$mod SHIFT, bracketright, movecurrentworkspacetomonitor, -1"
-
-          # Tab navigation
-          "$mod, Tab, cyclenext"
-          "$mod SHIFT, Tab, cyclenext, prev"
 
           # Scratchpads (using special workspaces to mimic your scratchpads)
           "$mod, n, exec, scratchPad sp"
