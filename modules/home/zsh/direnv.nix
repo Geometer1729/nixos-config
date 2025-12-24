@@ -7,7 +7,7 @@
     #may cause gc issues
     stdlib =
       ''
-        if [ -n "$TMUX" ]; then
+        if [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
           session_name=$(basename "$PWD")
           current_session=$(tmux display-message -p '#S')
 
@@ -21,6 +21,7 @@
               fi
             else
               tmux rename-session "$session_name"
+              export DIRENV_NO_TMUX_RENAME=1
             fi
           fi
         fi
