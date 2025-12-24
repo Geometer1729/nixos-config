@@ -171,6 +171,11 @@ in
           swallow_regex = ".*prismlauncher.*";
         };
 
+        group = {
+          auto_group = true;
+          group_on_movetoworkspace = true;
+        };
+
         # Workspaces - 22 workspaces total
         workspace =
           let
@@ -200,8 +205,7 @@ in
           # Force prismlauncher to tile to prevent floating positioning issues with swallow
           "tile, class:^(prismlauncher)$"
           # Auto-group Discord and Signal on workspace 21
-          "group set, class:^(discord)$"
-          "group set, class:^(signal)$"
+          "group set, class:^(discord|signal|slack)$"
         ];
 
         # Keybindings - translating your XMonad bindings
@@ -342,12 +346,12 @@ in
           "hyprpaper"
           "mako"
           # Launch all Firefox profiles directly to their workspaces
-          "[workspace 1 silent] firefox -P youtube --new-instance"
-          "[workspace 2 silent] firefox -P default"
+          "[workspace 1 silent]  firefox -P youtube --new-instance"
+          "[workspace 2 silent]  firefox -P default"
           "[workspace 18 silent] firefox -P work --new-instance"
           "[workspace 20 silent] firefox -P ttrpg --new-instance"
-          "[workspace 21 silent] discord"
-          "[workspace 21 silent] signal-desktop"
+          "[workspace 21 silent] (hypr-await; discord)"
+          "[workspace 21 silent] (hypr-await; signal-desktop)"
           # Auto-connect to Bluetooth headphones
           "bluetooth-autoconnect"
           # Pester me about any swap files
