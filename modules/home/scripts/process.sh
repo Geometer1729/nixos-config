@@ -41,10 +41,22 @@ while true; do
   case $choice in
     1)
       task "$TASK_ID" modify +next
-      read -r -p "Context (@computer/@home): " context
-      if [ -n "$context" ]; then
-        for ctx in $context; do
-          task "$TASK_ID" modify +"$ctx"
+      read -r -p "@computer (y/n): " computer
+      if [ "$computer" = "y" ]; then
+        task "$TASK_ID" modify +@computer
+      fi
+      read -r -p "@home (y/n): " home
+      if [ "$home" = "y" ]; then
+        task "$TASK_ID" modify +@home
+      fi
+      read -r -p "@work (y/n): " work
+      if [ "$work" = "y" ]; then
+        task "$TASK_ID" modify +@work
+      fi
+      read -r -p "Additional tags (space-separated): " extra_tags
+      if [ -n "$extra_tags" ]; then
+        for tag in $extra_tags; do
+          task "$TASK_ID" modify +"$tag"
         done
       fi
       read -r -p "Energy level (H/M/L): " energy

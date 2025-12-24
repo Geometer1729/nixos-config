@@ -43,7 +43,7 @@ let
     next = {
       description = "GTD Next Actions";
       columns = [ "id" "start.age" "priority" "project" "energy" "estimate" "description.count" "tags" "urgency" ];
-      filter = "+next status:pending";
+      filter = "+next status:pending -@work";
       sort = "urgency-";
     };
     waiting = {
@@ -55,7 +55,7 @@ let
     someday = {
       description = "GTD Someday/Maybe";
       columns = [ "id" "entry.age" "project" "description.count" ];
-      filter = "+someday status:pending";
+      filter = "+someday status:pending -@work";
       sort = "entry+";
     };
     review = {
@@ -80,6 +80,12 @@ let
       description = "Errands to run";
       columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
       filter = "+next +@errands status:pending";
+      sort = "urgency-";
+    };
+    work = {
+      description = "Tasks at work";
+      columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
+      filter = "+next +@work status:pending";
       sort = "urgency-";
     };
     high = {
@@ -136,6 +142,7 @@ in
     tcomputer = "task computer"; # Tasks at computer
     thome = "task home"; # Tasks at home
     terrands = "task errands"; # Errands to run
+    twork = "task work"; # Tasks at work
 
     # Energy-based views
     thigh = "task high"; # High energy tasks
