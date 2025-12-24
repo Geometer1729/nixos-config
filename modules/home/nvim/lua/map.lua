@@ -41,6 +41,13 @@ vim.api.nvim_create_user_command('W'
 
 map('n','<Leader>pv',vim.cmd.Ex)
 
+-- Copy filepath to clipboard
+map('n','<Leader>fp', function()
+  local filepath = vim.fn.expand('%:p')
+  vim.fn.setreg('+', filepath)
+  print('Copied: ' .. filepath)
+end)
+
 map('n','<Return>', function()
   vim.cmd('noh')
   -- Close floating windows
