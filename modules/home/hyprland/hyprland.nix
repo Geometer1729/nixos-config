@@ -228,7 +228,7 @@ in
 
           # Group management (tabbed windows)
           "$mod, g, togglegroup"
-          "$mod, Tab, changegroupactive, f"
+          "$mod, Tab, exec, hypr-smart-tab"
           "$mod SHIFT, Tab, changegroupactive, b"
 
           # Focus movement (vim-style like your XMonad)

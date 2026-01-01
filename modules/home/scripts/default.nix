@@ -24,6 +24,7 @@
     # packages needed by scripts
     ++ [
       fzf
+      jq
     ];
 }
 
