@@ -309,7 +309,7 @@ in
           "$mod, p, exec, onScratchPad --hide-after vit process process"
 
           # System controls
-          "$mod SHIFT, s, exec, sudo systemctl suspend"
+          "$mod SHIFT, s, exec, suspend-with-dpms-fix"
           "$mod SHIFT, r, exec, onScratchPad --hide-after sp rebuild rebuild"
 
           # Screenshots
