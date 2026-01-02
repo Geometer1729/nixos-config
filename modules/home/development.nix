@@ -5,6 +5,7 @@
     tmux
     nix-output-monitor
     nixpkgs-fmt
+    nix-inspect
     neovim-remote
     postman # rest-api tool
     nixd # nix lsp

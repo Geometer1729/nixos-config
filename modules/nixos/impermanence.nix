@@ -62,6 +62,7 @@
         ".cache/rofi-2.sshcache"
         ".cache/rofi-entry-history.txt"
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
+        ".local/share/nix/repl-history" # nix repl command history
         ".git-credentials"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
