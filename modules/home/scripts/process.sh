@@ -25,7 +25,7 @@ while true; do
   TASK_ID=$(echo "$SELECTED" | awk '{print $1}')
 
   echo ""
-  echo "Processing task: \033[1m$SELECTED\033[0m"
+  printf "Processing task: \033[1m%s\033[0m\n" "$SELECTED"
   echo ""
   echo "What is it? (1-5)"
   echo "  1) Actionable - Next action (+next)"
@@ -41,15 +41,15 @@ while true; do
   case $choice in
     1)
       task "$TASK_ID" modify +next
-      read -r -p "@computer (y/\033[1mN\033[0m): " computer
+      read -r -p "$(printf "@computer (y/\033[1mN\033[0m): ")" computer
       if [ "$computer" = "y" ]; then
         task "$TASK_ID" modify +@computer
       fi
-      read -r -p "@home (y/\033[1mN\033[0m): " home
+      read -r -p "$(printf "@home (y/\033[1mN\033[0m): ")" home
       if [ "$home" = "y" ]; then
         task "$TASK_ID" modify +@home
       fi
-      read -r -p "@work (y/\033[1mN\033[0m): " work
+      read -r -p "$(printf "@work (y/\033[1mN\033[0m): ")" work
       if [ "$work" = "y" ]; then
         task "$TASK_ID" modify +@work
       fi
