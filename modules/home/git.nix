@@ -10,7 +10,7 @@
       branch.autoSetupMerge = true;
       credential."https://github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
       credential."https://gitst.github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
-      credential.helper = "store";
+      credential.helper = "store --file ~/.local/share/git/credentials";
       alias = {
         co = "checkout";
         s = "status";

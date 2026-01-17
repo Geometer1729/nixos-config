@@ -38,6 +38,7 @@
         ".local/share/direnv"
         ".local/share/task"
         ".local/share/wasistlos"
+        ".local/share/git"
         ".local/state/nvim"
         ".claude" # Claude Code state and configuration
         ".mozilla/firefox/default"
@@ -63,7 +64,6 @@
         ".cache/rofi-entry-history.txt"
         ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
         ".local/share/nix/repl-history" # nix repl command history
-        ".git-credentials"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
         #".config/task/taskrc" # persisted just for news.version :(

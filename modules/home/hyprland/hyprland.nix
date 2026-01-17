@@ -189,23 +189,23 @@ in
           else
           # Single monitor: all workspaces on primary
             (map (i: "${toString i}, monitor:${primaryMonitorName}") (lib.range 1 22));
-        # Window rules
+        # Window rules - using new 0.53 syntax with match:
         windowrule = [
-          "float, class:^(.blueman-manager-wrapped)$"
-          "size 50% 50%, class:^(.blueman-manager-wrapped)$"
-          "float, title:^(float)$"
-          "workspace 21, class:^(discord)$"
-          "workspace 21, class:^(signal)$"
-          "workspace 10, title:^(Steam)$"
-        ];
-
-        windowrulev2 = [
           # firefox handles this poorly it's not really worth it
-          #"suppressevent fullscreen, class:^(firefox)$"
+          #"suppressevent fullscreen, match:class firefox"
           # Force prismlauncher to tile to prevent floating positioning issues with swallow
-          "tile, class:^(prismlauncher)$"
-          # Auto-group Discord and Signal on workspace 21
-          "group set, class:^(discord|signal|slack)$"
+          "tile on, match:class prismlauncher"
+          ## Auto-group Discord and Signal on workspace 21
+          "group set invade, match:class (discord|signal|slack)"
+
+          "float on, match:class .blueman-manager-wrapped"
+          "size monitor_w*0.5 monitor_h*0.5, match:class .blueman-manager-wrapped"
+          "center on, match:class .blueman-manager-wrapped"
+          "float on, match:title float"
+          "workspace 21 silent, match:class discord"
+          "workspace 21 silent, match:class signal"
+          "workspace 21 silent, match:class Slack"
+          "workspace 10 silent, match:title Steam"
         ];
 
         # Keybindings - translating your XMonad bindings
@@ -342,8 +342,7 @@ in
 
         # Startup applications (matching your XMonad startup)
         exec-once = [
-          # waybar and hypridle are started by systemd via their respective service enables
-          "hyprpaper"
+          # waybar, hypridle, and hyprpaper are started by systemd via their respective service enables
           "mako"
           # Launch all Firefox profiles directly to their workspaces
           "[workspace 1 silent]  firefox -P youtube --new-instance"

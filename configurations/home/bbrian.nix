@@ -41,4 +41,12 @@ in
     webapps
   ];
 
+  # Keeps failing and I don't need it
+  systemd.user.services.speech-dispatcher = {
+    Unit.ConditionPathExists = "/dev/null";
+  };
+  systemd.user.sockets.speech-dispatcher = {
+    Unit.ConditionPathExists = "/dev/null";
+  };
+
 }
