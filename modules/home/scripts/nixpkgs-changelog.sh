@@ -10,7 +10,8 @@
 source "$SCRIPTS_LIB/flake-update-lib.sh"
 
 # Number of commit pages to fetch (100 per page)
-MAX_PAGES=10
+# 14k commits = 140 pages, but let's cap at 200 to be safe
+MAX_PAGES=200
 
 # Parse arguments
 OLD_REV=""
@@ -84,7 +85,7 @@ echo "[]" > "$COMMITS_FILE"
 for page in $(seq 1 $MAX_PAGES); do
   log_info "  Fetching page $page..."
 
-  if ! curl -sf "https://api.github.com/repos/NixOS/nixpkgs/commits?sha=$NEW_REV&per_page=100&page=$page" > "$PAGE_FILE" 2>/dev/null; then
+  if ! gh api "repos/NixOS/nixpkgs/commits?sha=$NEW_REV&per_page=100&page=$page" > "$PAGE_FILE" 2>/dev/null; then
     log_warn "Failed to fetch page $page"
     break
   fi
@@ -99,7 +100,7 @@ for page in $(seq 1 $MAX_PAGES); do
     # Filter commits up to old revision and merge
     jq "[.[] | select(.sha != \"$OLD_REV\")]" "$PAGE_FILE" > "$PAGE_FILE.filtered"
     jq -s '.[0] + .[1]' "$COMMITS_FILE" "$PAGE_FILE.filtered" > "$COMMITS_FILE.tmp"
-    mv "$COMMITS_FILE.tmp" "$COMMITS_FILE"
+    mv -f "$COMMITS_FILE.tmp" "$COMMITS_FILE"
     rm -f "$PAGE_FILE.filtered"
     break
   fi
@@ -125,12 +126,16 @@ MATCHES_FILE="$FLAKE_UPDATE_DIR/nixpkgs-matches.json"
 jq -r '.[] | "\(.sha)\t\(.commit.message | split("\n")[0])"' "$COMMITS_FILE" | \
 while IFS=$'\t' read -r sha message; do
   # Extract package name (first token before colon)
-  pkg_name=$(echo "$message" | cut -d':' -f1 | tr '[:upper:]' '[:lower:]' | sed 's/^ *//' | sed 's/ *$//')
+  raw_pkg=$(echo "$message" | cut -d':' -f1 | tr '[:upper:]' '[:lower:]' | sed 's/^ *//' | sed 's/ *$//')
+
+  # Strip common prefixes to get the actual package name
+  # nixos/hyprland -> hyprland, python3Packages.foo -> foo, haskellPackages.bar -> bar
+  pkg_name=$(echo "$raw_pkg" | sed -E 's|^nixos/||; s|^[a-z0-9]+packages\.||i; s|plugins\..*||')
 
   # Check if package is in our config
   if grep -iqw "$pkg_name" "$PACKAGES_FILE" 2>/dev/null; then
-    # Extract PR number if present
-    pr_num=$(echo "$message" | grep -oE '#[0-9]+' | tail -1 | tr -d '#')
+    # Extract PR number if present (grep returns 1 if no match, so use || true)
+    pr_num=$(echo "$message" | grep -oE '#[0-9]+' | tail -1 | tr -d '#' || true)
     echo "$sha|$pkg_name|$message|$pr_num"
   fi
 done > "$FLAKE_UPDATE_DIR/matches.txt"
@@ -140,9 +145,9 @@ log_info "Checking for potential breaking changes..."
 jq -r '.[] | "\(.sha)\t\(.commit.message | split("\n")[0])"' "$COMMITS_FILE" | \
   grep -iE 'breaking|deprecat|BREAKING' | \
   while IFS=$'\t' read -r sha message; do
-    pr_num=$(echo "$message" | grep -oE '#[0-9]+' | tail -1 | tr -d '#')
+    pr_num=$(echo "$message" | grep -oE '#[0-9]+' | tail -1 | tr -d '#' || true)
     echo "$sha|BREAKING|$message|$pr_num"
-  done >> "$FLAKE_UPDATE_DIR/matches.txt"
+  done >> "$FLAKE_UPDATE_DIR/matches.txt" || true  # grep returns 1 if no matches
 
 # Step 4: Fetch PR details for matches
 log_info "Fetching PR details for matches..."
@@ -156,7 +161,7 @@ while IFS='|' read -r sha pkg message pr_num; do
 
   if [[ -n "$pr_num" ]]; then
     # Fetch PR details to temp file to avoid shell escaping issues
-    if curl -sf "https://api.github.com/repos/NixOS/nixpkgs/pulls/$pr_num" > "$PR_TEMP" 2>/dev/null; then
+    if gh api "repos/NixOS/nixpkgs/pulls/$pr_num" > "$PR_TEMP" 2>/dev/null; then
       # Extract fields using jq with proper escaping, writing to a temp JSON
       jq -n \
         --arg sha "$sha" \
@@ -176,7 +181,7 @@ while IFS='|' read -r sha pkg message pr_num; do
 
       # Merge into matches file
       jq -s '.[0] + [.[1]]' "$MATCHES_FILE" "$PR_TEMP.entry" > "$MATCHES_FILE.tmp"
-      mv "$MATCHES_FILE.tmp" "$MATCHES_FILE"
+      mv -f "$MATCHES_FILE.tmp" "$MATCHES_FILE"
       rm -f "$PR_TEMP.entry"
     fi
     sleep 0.3  # Rate limit protection
@@ -188,7 +193,7 @@ while IFS='|' read -r sha pkg message pr_num; do
       --arg message "$message" \
       '{sha: $sha, package: $package, message: $message, pr_number: null, pr_body: null, pr_labels: [], pr_merged: null}' > "$PR_TEMP.entry"
     jq -s '.[0] + [.[1]]' "$MATCHES_FILE" "$PR_TEMP.entry" > "$MATCHES_FILE.tmp"
-    mv "$MATCHES_FILE.tmp" "$MATCHES_FILE"
+    mv -f "$MATCHES_FILE.tmp" "$MATCHES_FILE"
     rm -f "$PR_TEMP.entry"
   fi
 

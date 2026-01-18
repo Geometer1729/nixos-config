@@ -1,10 +1,21 @@
 { pkgs, ... }:
+let
+  # Packages available to all scripts at runtime
+  scriptDeps = with pkgs; [
+    curl
+    fzf
+    gh
+    jq
+    python3
+  ];
+in
 {
   home.packages = with pkgs;
-    (builtins.map
+    (map
       (name: writeShellApplication
         {
           name = builtins.replaceStrings [ ".sh" ] [ "" ] name;
+          runtimeInputs = scriptDeps;
           runtimeEnv = {
             SCRIPTS_LIB = "${./lib}";
           };
@@ -21,11 +32,7 @@
         (builtins.attrNames (builtins.readDir ./.))
       )
     )
-    # packages needed by scripts
-    ++ [
-      fzf
-      gh
-      jq
-    ];
+    # Also install these packages globally for interactive use
+    ++ scriptDeps;
 }
 

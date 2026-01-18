@@ -64,6 +64,10 @@ Summarize findings into categories:
 2. **Worth reviewing** - New features or improvements you might want
 3. **Action required** - Breaking changes that need config updates
 
+Explore the existing config and use web search to add context.
+If an option is deprecated check my config to see if I'm using it.
+If a package has a significant upgrade check what changes were made.
+
 ### Step 4: Make fixes if needed
 
 If breaking changes require config updates:
@@ -79,7 +83,7 @@ The `nixpkgs-changelog` script:
    - `environment.systemPackages`
    - `home-manager.users.*.home.packages`
 
-2. **Fetches commits** from the GitHub API (up to 1000)
+2. **Fetches commits** from the GitHub API
 
 3. **Filters** commits to only those matching your packages:
    - Parses commit messages like `hyprland: fix substituteInPlace pattern (#480983)`

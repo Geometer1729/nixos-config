@@ -1,21 +1,22 @@
 {
   "permissions": {
     "allow": [
+      "Bash(flake-update:*)",
+      "Bash(gh api:*)",
       "Bash(grep:*)",
+      "Bash(hyprctl clients:*)",
+      "Bash(hyprctl keyword:*)",
+      "Bash(journalctl:*)",
       "Bash(mkdir:*)",
       "Bash(nh os build)",
+      "Bash(nh os test:*)",
       "Bash(nix eval:*)",
       "Bash(nix search:*)",
       "WebFetch(domain:discourse.nixos.org)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:nix-community.github.io)",
-      "WebFetch(domain:nixos-unified.org)",
-      "Bash(hyprctl clients:*)",
-      "Bash(hyprctl keyword:*)",
-      "Bash(nh os test:*)",
-      "Bash(journalctl:*)",
-      "Bash(gh api:*)"
+      "WebFetch(domain:nixos-unified.org)"
     ],
     "deny": []
   }
