@@ -1,5 +1,10 @@
 # Flake Update Skill
 
+### This skill is still in development!
+
+If you encounter errors or limitations with any of the tools you use raise them and feel free to suggest changes to the skill.
+If you get negative feedback about the report or any other part of using this skill feel free to suggest changes to the skill.
+
 Update the NixOS flake inputs and analyze changes for relevance to this configuration.
 
 ## Quick Start
@@ -68,12 +73,24 @@ Explore the existing config and use web search to add context.
 If an option is deprecated check my config to see if I'm using it.
 If a package has a significant upgrade check what changes were made.
 
-### Step 4: Make fixes if needed
+### Step 4: Build and check for build errors
+
+Run `nh os build` if it fails add the error to the report.
+Provid related commits to add context.
+Feel free to use web search and read the config to understand which commits are related.
+
+### Step 5: Make fixes if needed
 
 If breaking changes require config updates:
 1. Show the specific changes needed
 2. Make the edits
 3. Run `nh os test` to verify the build works
+
+### Step 6: Suggest tests and concerns
+
+Run a general websearch for breaking changes as well as websearches for any signficant updates.
+Based on the report suggest things that may be broken and sugest ways to verify they work.
+
 
 ## nixpkgs Analysis Details
 
@@ -137,3 +154,5 @@ If you think commits were missed:
 1. Check the package list: `cat /tmp/flake-update/config-packages.txt`
 2. Verify the package name matches nixpkgs conventions
 3. Some packages have different names in nixpkgs vs derivation output
+
+

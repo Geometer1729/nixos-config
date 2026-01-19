@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   # Fetch Claude icon as a derivation
   claudeIcon = pkgs.fetchurl {
@@ -175,4 +175,18 @@ in
 
   # Install Claude icon for notifications
   home.file.".local/share/icons/claude-icon.svg".source = claudeIcon;
+
+  # Claude account isolation: separate config directories for work/personal
+  # Direnv sets CLAUDE_CONFIG_DIR based on current directory (see zsh/direnv.nix)
+  # These symlink the managed settings/memory into both config directories
+  home.file = {
+    ".claude-work/settings.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
+    ".claude-work/CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
+    ".claude-personal/settings.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
+    ".claude-personal/CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
+  };
 }

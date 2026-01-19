@@ -32,6 +32,17 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 
 Don't mark work as complete if the configuration doesn't build or if functionality is broken.
 
+## Impermanence
+
+This system uses impermanence - the root filesystem is wiped on reboot and only explicitly persisted paths survive via bind mounts from `/persist/system/`.
+
+When changing what's persisted in `modules/nixos/impermanence.nix`:
+- Activating the new config creates bind mounts that **hide** (not erase) existing data
+- If data appears "lost" after activation, unmount the bind mount to access the hidden data: `sudo umount ~/.some-path`
+- Copy the hidden data to the persist location, then remount
+
+Data on the ephemeral root is only truly lost on reboot.
+
 ## Architecture
 
 ### Directory Structure

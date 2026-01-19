@@ -40,7 +40,10 @@
         ".local/share/wasistlos"
         ".local/share/git"
         ".local/state/nvim"
-        ".claude" # Claude Code state and configuration
+        # Claude Code: separate work/personal configs with isolated logins
+        # Settings and CLAUDE.md are managed by home-manager via symlinks
+        ".claude-work/projects"
+        ".claude-personal/projects"
         ".mozilla/firefox/default"
         ".mozilla/firefox/youtube"
         ".mozilla/firefox/work"
@@ -67,8 +70,12 @@
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
         #".config/task/taskrc" # persisted just for news.version :(
-        ".claude.json"
-        ".claude/.credentials.json"
+        ".claude-work/.credentials.json"
+        ".claude-work/.claude.json" # stores dark mode, allowed folders, vim mode, etc.
+        ".claude-work/history.jsonl"
+        ".claude-personal/.credentials.json"
+        ".claude-personal/.claude.json"
+        ".claude-personal/history.jsonl"
       ];
     };
   };

@@ -7,6 +7,7 @@
     #may cause gc issues
     stdlib =
       ''
+        # Tmux session management
         if [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
           session_name=$(basename "$PWD")
           current_session=$(tmux display-message -p '#S')
@@ -24,6 +25,14 @@
               export DIRENV_NO_TMUX_RENAME=1
             fi
           fi
+        fi
+
+        # Claude Code account isolation
+        # ~/Code/work/* uses work config, everything else uses personal
+        if [[ "$PWD" == "$HOME/Code/work"* ]]; then
+          export CLAUDE_CONFIG_DIR="$HOME/.claude-work"
+        else
+          export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
         fi
       '';
   };

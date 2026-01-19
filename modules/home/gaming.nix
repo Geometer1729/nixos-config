@@ -4,5 +4,4 @@
     # Games
     prismlauncher
   ];
-
 }
