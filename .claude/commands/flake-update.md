@@ -91,6 +91,10 @@ If breaking changes require config updates:
 Run a general websearch for breaking changes as well as websearches for any signficant updates.
 Based on the report suggest things that may be broken and sugest ways to verify they work.
 
+There are also some tests you can always run:
+`nix flake check`, `just health` and `just vim-health`
+if these report errors mention them and ideally suggest fixes.
+
 
 ## nixpkgs Analysis Details
 

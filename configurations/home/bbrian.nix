@@ -1,4 +1,4 @@
-{ flake, ... }:
+{ flake, lib, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -41,12 +41,8 @@ in
     webapps
   ];
 
-  # Keeps failing and I don't need it
-  systemd.user.services.speech-dispatcher = {
-    Unit.ConditionPathExists = "/dev/null";
-  };
-  systemd.user.sockets.speech-dispatcher = {
-    Unit.ConditionPathExists = "/dev/null";
-  };
+  # Disable speech-dispatcher - comes as a dependency but not needed
+  systemd.user.services.speech-dispatcher = lib.mkForce { };
+  systemd.user.sockets.speech-dispatcher = lib.mkForce { };
 
 }

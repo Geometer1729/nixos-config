@@ -2,6 +2,12 @@
 {
   viAlias = true;
   vimAlias = true;
+  extraPackages = with pkgs; [
+    tree-sitter # Required by nvim-treesitter for grammar compilation
+    fd # Required by telescope for faster file finding
+    curl # Required by nvim-treesitter for downloading parsers
+    ripgrep # Required by telescope for live-grep
+  ];
   extraConfigLua =
     lib.strings.concatStrings
       (builtins.map

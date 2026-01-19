@@ -35,6 +35,12 @@ health:
   journalctl -p 3 -xb --no-pager -n 10 || echo "No recent critical errors"
   df -h /
 
+# Check neovim health (shows errors only)
+vim-health:
+  @nvim --headless -c "checkhealth" -c "w! /tmp/nvim-health.txt" -c "qa" 2>/dev/null || true
+  @echo "=== Neovim Checkhealth Summary ==="
+  @grep -E '^- (❌|⚠)' /tmp/nvim-health.txt | grep -v 'is not executable. Configuration will not be used' || echo "No errors or warnings found"
+
 # edit the secrets file
 secrets:
   mkdir -p ~/.config/sops/age

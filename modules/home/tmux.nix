@@ -37,6 +37,9 @@
 
         set -g default-terminal tmux-256color
 
+        # Pass focus events through to applications (e.g. neovim autoread)
+        set -g focus-events on
+
         # Fixes escape being slow in vim (when in tmux)
         set -sg escape-time 0
 
