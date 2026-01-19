@@ -350,7 +350,7 @@ in
           "[workspace 18 silent] firefox -P work --new-instance"
           "[workspace 20 silent] firefox -P ttrpg --new-instance"
           "[workspace 21 silent] (hypr-await; discord)"
-          "[workspace 21 silent] (hypr-await; signal-desktop)"
+          "[workspace 21 silent] (hypr-await --group 21; signal-desktop)"
           # Auto-connect to Bluetooth headphones
           "bluetooth-autoconnect"
           # Pester me about any swap files
