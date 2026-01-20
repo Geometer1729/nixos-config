@@ -6,9 +6,12 @@
     package = pkgs.nixVersions.latest;
     #package = flake.inputs.nix.packages."x86_64-linux".nix;
     settings = {
-      substituters = [ "https://cache.nixos.org" ];
-      trusted-substituters = [ "https://cache.nixos.org" ];
-      trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
+      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="
+      ];
       warn-dirty = false;
       #accept-flake-config = true;
       log-lines = 25;

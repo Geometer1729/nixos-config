@@ -13,7 +13,10 @@ in
   virtualisation.virtualbox.guest.enable = false;
   services.tcsd.enable = false;
 
-  nixpkgs.overlays = lib.attrValues self.overlays;
+  nixpkgs.overlays = [
+    # PrismLauncher nightly overlay (new auth system)
+    inputs.prismlauncher.overlays.default
+  ] ++ lib.attrValues self.overlays;
   home-manager = {
     backupFileExtension = "bkp";
     useGlobalPkgs = true;

@@ -35,6 +35,10 @@
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
 
+    # PrismLauncher nightly for new auth system
+    prismlauncher.url = "github:PrismLauncher/PrismLauncher/develop";
+    prismlauncher.inputs.nixpkgs.follows = "nixpkgs";
+
   };
 
   # Wired using https://nixos-unified.org/autowiring.html
