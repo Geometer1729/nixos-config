@@ -86,14 +86,20 @@ If breaking changes require config updates:
 2. Make the edits
 3. Run `nh os test` to verify the build works
 
-### Step 6: Suggest tests and concerns
+### Step 6: Run checks and tests
 
-Run a general websearch for breaking changes as well as websearches for any signficant updates.
-Based on the report suggest things that may be broken and sugest ways to verify they work.
+Run `nix flake check` to verify the flake evaluates correctly.
 
-There are also some tests you can always run:
-`nix flake check`, `just health` and `just vim-health`
-if these report errors mention them and ideally suggest fixes.
+After `nh os test` activates the new configuration, run these health checks:
+- `just health` - System health checks
+- `just vim-health` - Neovim health checks
+
+If any checks report errors, mention them in the report and suggest fixes.
+
+### Step 7: Suggest tests and concerns
+
+Run a general websearch for breaking changes as well as websearches for any significant updates.
+Based on the report suggest things that may be broken and suggest ways to verify they work.
 
 
 ## nixpkgs Analysis Details
