@@ -40,3 +40,20 @@ nixos-deploy(){
 jqcb(){
   wl-paste | jq | wl-copy
 }
+
+git_(){
+  if [[ "$1" == "push" ]]; then
+    local args=("push")
+    shift
+    for arg in "$@"; do
+      if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
+        args+=("--force-with-lease")
+      else
+        args+=("$arg")
+      fi
+    done
+    command git "${args[@]}"
+  else
+    command git "$@"
+  fi
+}

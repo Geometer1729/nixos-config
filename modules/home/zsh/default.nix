@@ -78,7 +78,8 @@
           ":q" = "exit";
           du = "dust";
           v = "vim";
-          g = "git";
+          g = "git_";
+          git = "git_";
           lg = "lazygit";
           fgv = ''
             vim -S .session.vim -c 'silent exec "!rm .session.vim"'

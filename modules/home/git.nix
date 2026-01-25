@@ -17,7 +17,7 @@
         sw = "switch";
         d = "diff";
         a = "add";
-        clean = "clean -fdX"; # this doesn't work :(
+        cl = "clean -fdX";
       };
     };
     signing = {
@@ -36,6 +36,7 @@
     enable = true;
     settings = {
       promptToReturnFromSubprocess = false;
+      git.push.forceWithLease = true;
     };
   };
 }
