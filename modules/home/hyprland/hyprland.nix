@@ -167,8 +167,8 @@ in
         # Misc settings - most managed by Stylix
         misc = {
           force_default_wallpaper = -1;
-          enable_swallow = true;
-          swallow_regex = ".*prismlauncher.*";
+          #enable_swallow = true;
+          #swallow_regex = ".*prismlauncher.*";
         };
 
         group = {
