@@ -22,7 +22,7 @@ in
       interfaces = [ cfg.interface ];
       secretsFile = config.sops.secrets.wifi.path;
       extraConfig = ''
-        ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
+        ctrl_interface=DIR=/run/wpa_supplicant GROUP=wpa_supplicant
         update_config=1
       '';
       networks =

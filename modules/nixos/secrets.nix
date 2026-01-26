@@ -13,7 +13,7 @@ in
     };
 
     secrets = {
-      wifi = owned;
+      wifi = { owner = "wpa_supplicant"; };
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
       anthropic_key = owned;
