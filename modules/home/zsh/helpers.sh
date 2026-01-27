@@ -1,14 +1,17 @@
 zathura_(){
 	\zathura $@ &
 }
+compdef zathura_=zathura
 
 rm_(){
 	\rm -v $@ || \rm -riv $@
 }
+compdef rm_=rm
 
 cd_(){
 	\cd $@  && ls -hN --color=auto --group-directories-first
 }
+compdef cd_=cd
 
 loop(){
 	while true
@@ -57,3 +60,5 @@ git_(){
     command git "$@"
   fi
 }
+compdef git_=git
+compdef g=git
