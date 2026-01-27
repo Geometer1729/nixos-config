@@ -6,6 +6,7 @@
       user.email = "16kuhnb@gmail.com";
       user.name = "Geometer1729";
       push.autoSetupRemote = true;
+      advice.forceDeleteBranch = false;
       merge.conflictstyle = "diff3";
       branch.autoSetupMerge = true;
       credential."https://github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
