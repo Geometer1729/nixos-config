@@ -1,5 +1,23 @@
 { lib, ... }:
 {
+  # Hack: clean up claude.json before impermanence tries to mount it
+  # This handles the case where files exist but aren't bind-mounted
+  # TODO revive persist retro handle this better
+  system.activationScripts.cleanupClaudeBeforeImpermanence = {
+    text = ''
+      for f in /home/bbrian/.claude-work/.claude.json \
+               /home/bbrian/.claude-personal/.claude.json; do
+        if [ -e "$f" ] && ! mountpoint -q "$f" 2>/dev/null; then
+          backup="/tmp/claude-backup-$(basename "$f")-$(date +%s)"
+          cp "$f" "$backup" 2>/dev/null || true
+          echo "Backed up $f to $backup"
+          rm -f "$f" || true
+        fi
+      done
+    '';
+    deps = [ ];
+  };
+
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;
