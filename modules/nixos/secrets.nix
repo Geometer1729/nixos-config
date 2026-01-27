@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   owned = { owner = config.mainUser; };
 in
@@ -13,7 +13,7 @@ in
     };
 
     secrets = {
-      wifi = { owner = "wpa_supplicant"; };
+      wifi = lib.mkIf config.wifi.enable { owner = "wpa_supplicant"; };
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
       anthropic_key = owned;
