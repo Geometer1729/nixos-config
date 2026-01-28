@@ -3,6 +3,7 @@
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
+    enableBashIntegration = true; # Mostly for claude
     nix-direnv.enable = true;
     #may cause gc issues
     stdlib =

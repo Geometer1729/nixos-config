@@ -163,7 +163,8 @@ in
       ## Nixos
       - This machine uses nixos and nix heavily
       - Expect projects to use nix
-      - Expect commands to require `nix develop`
+      - Projects use direnv to automatically load nix environments - prefer `direnv allow` over manual `nix develop`
+      - If a project has a `.envrc` file, use direnv rather than running `nix develop` manually
     '';
   };
 
