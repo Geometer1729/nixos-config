@@ -20,14 +20,14 @@ This is a NixOS configuration repository managed using flakes and nixos-unified.
 ### System Operations
 - `just` - The justfile contains some handy commands
 - `nix develop` - Enter the development shell
-- `nh os test` - Test the configuration
+- `nixos-rebuild test` - Test the configuration
 
 ## Testing Changes
 
 **CRITICAL**: Always verify changes work before considering them complete. Never tell the user you're done without running the build check first.
 
 0. **Git tracking**: If you created ANY new files (especially `.nix` files), run `git add <file>` IMMEDIATELY - Nix flakes can only see git-tracked files. This is MANDATORY before any build attempt. Do not git add files which are only modified.
-1. **Test changes**: Run `nh os test` to switch to the configuration (doesn't set as default boot).
+1. **Test changes**: Run `nixos-rebuild test` to switch to the configuration (doesn't set as default boot).
 2. **Verify functionality**: Test that your changes work as expected or outline what should be tested manually
 
 Don't mark work as complete if the configuration doesn't build or if functionality is broken.
