@@ -12,6 +12,8 @@
       "Bash(mkdir:*)",
       "Bash(nh os build)",
       "Bash(nh os test:*)",
+      "Bash(nixos-rebuild build)",
+      "Bash(nixos-rebuild test:*)",
       "Bash(nix eval:*)",
       "Bash(nix flake check:*)",
       "Bash(nix search:*)",
