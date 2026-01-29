@@ -29,12 +29,15 @@ in
     };
   };
 
-  imports = with self.nixosModules;
-    [
-      ./hardware.nix
-      default
+  imports = (with self.nixosModules; [
+    ./hardware.nix
+    default
 
-      builder
-      taskchampion
-    ];
+    builder
+    taskchampion
+  ]) ++ [
+    # XLibre - X11 fork replacing Xorg
+    inputs.xlibre-overlay.nixosModules.overlay-xlibre-xserver
+    inputs.xlibre-overlay.nixosModules.overlay-all-xlibre-drivers
+  ];
 }
