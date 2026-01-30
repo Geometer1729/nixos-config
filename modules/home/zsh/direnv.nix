@@ -35,6 +35,8 @@
         else
           export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
         fi
+
+        export CLAUDE_ENV_FILE=${../scripts/claude-env.sh}
       '';
   };
   home.sessionVariables.DIRENV_LOG_FORMAT = "";
