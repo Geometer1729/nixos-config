@@ -22,7 +22,7 @@
     undotree.enable = true;
     fugitive.enable = true;
     startify.enable = true;
-    #vimtex.enable = true;  # Temporarily disabled - clisp/xindy build issues
+    vimtex.enable = true;
     trouble.enable = true;
     tmux-navigator.enable = true;
     lazygit.enable = true;
