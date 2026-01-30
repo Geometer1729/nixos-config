@@ -1,23 +1,5 @@
 { lib, ... }:
 {
-  # Hack: clean up claude.json before impermanence tries to mount it
-  # This handles the case where files exist but aren't bind-mounted
-  # TODO revive persist retro handle this better
-  system.activationScripts.cleanupClaudeBeforeImpermanence = {
-    text = ''
-      for f in /home/bbrian/.claude-work/.claude.json \
-               /home/bbrian/.claude-personal/.claude.json; do
-        if [ -e "$f" ] && ! mountpoint -q "$f" 2>/dev/null; then
-          backup="/tmp/claude-backup-$(basename "$f")-$(date +%s)"
-          cp "$f" "$backup" 2>/dev/null || true
-          echo "Backed up $f to $backup"
-          rm -f "$f" || true
-        fi
-      done
-    '';
-    deps = [ ];
-  };
-
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;
@@ -58,10 +40,9 @@
         ".local/share/wasistlos"
         ".local/share/git"
         ".local/state/nvim"
-        # Claude Code: separate work/personal configs with isolated logins
-        # Settings and CLAUDE.md are managed by home-manager via symlinks
-        ".claude-work/projects"
-        ".claude-personal/projects"
+        # Claude Code: persist entire directories to avoid file-level bind mount issues
+        ".claude-work"
+        ".claude-personal"
         ".mozilla/firefox/default"
         ".mozilla/firefox/youtube"
         ".mozilla/firefox/work"
@@ -88,12 +69,6 @@
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
         #".config/task/taskrc" # persisted just for news.version :(
-        ".claude-work/.credentials.json"
-        ".claude-work/.claude.json" # stores dark mode, allowed folders, vim mode, etc.
-        ".claude-work/history.jsonl"
-        ".claude-personal/.credentials.json"
-        ".claude-personal/.claude.json"
-        ".claude-personal/history.jsonl"
       ];
     };
   };
