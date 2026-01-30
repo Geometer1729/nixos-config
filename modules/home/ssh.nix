@@ -25,13 +25,6 @@ in
         hostname = "192.168.1.227";
         proxyJump = "tub";
       };
-      # I guess with tailscale I don't really need this
-      #torag = me // {
-      #  hostname = "10.0.0.7";
-      #};
-      #am = me // {
-      #  hostname = "10.0.0.248";
-      #};
     };
   };
 }
