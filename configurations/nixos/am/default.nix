@@ -10,8 +10,7 @@ in
   drive = "/dev/nvme0n1";
   system.stateVersion = "25.05";
 
-  # Machine-specific Nix configuration for cross-compilation
-  # TODO verify this works
+  # Cross-compilation support via QEMU binfmt emulation
   nix.settings.extra-platforms = [ "i686-linux" "aarch64-linux" ];
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
