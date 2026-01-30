@@ -39,6 +39,9 @@
     prismlauncher.url = "github:PrismLauncher/PrismLauncher/develop";
     prismlauncher.inputs.nixpkgs.follows = "nixpkgs";
 
+    # XLibre - X11 fork replacing Xorg
+    xlibre-overlay.url = "git+https://codeberg.org/takagemacoed/xlibre-overlay?ref=dev-for-26.05";
+
   };
 
   # Wired using https://nixos-unified.org/autowiring.html
