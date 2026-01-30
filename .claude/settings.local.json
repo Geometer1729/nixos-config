@@ -22,7 +22,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:nix-community.github.io)",
       "WebFetch(domain:nixos-unified.org)",
-      "Bash(nh os boot:*)"
+      "Bash(nh os boot:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

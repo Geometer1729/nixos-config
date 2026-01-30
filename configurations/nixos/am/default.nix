@@ -17,8 +17,6 @@ in
 
   # Monitor setup for desktop
   home-manager.users.bbrian = {
-    #icloud-tasks = true;
-
     # Disable hypridle completely on this machine to test if it's causing display flickering
     services.hypridle.enable = flake.inputs.nixpkgs.lib.mkForce false;
 
