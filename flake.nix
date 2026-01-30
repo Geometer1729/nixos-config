@@ -12,8 +12,6 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     # Software inputs
-    nix.url = "github:NixOS/nix/2.21.5";
-
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.url = "github:nix-community/nixvim";
@@ -22,14 +20,19 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     impermanence.url = "github:nix-community/impermanence";
+    impermanence.inputs.nixpkgs.follows = "nixpkgs";
+    impermanence.inputs.home-manager.follows = "home-manager";
     stylix.url = "github:danth/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
+    stylix.inputs.flake-parts.follows = "flake-parts";
+    stylix.inputs.nur.follows = "nur";
     firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
     firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nur.url = "github:nix-community/NUR";
     nur.inputs.nixpkgs.follows = "nixpkgs";
+    nur.inputs.flake-parts.follows = "flake-parts";
     homeassistant-smartrent.url = "github:ZacheryThomas/homeassistant-smartrent";
     homeassistant-smartrent.flake = false;
     git-hooks.url = "github:cachix/git-hooks.nix";
@@ -41,6 +44,8 @@
 
     # XLibre - X11 fork replacing Xorg
     xlibre-overlay.url = "git+https://codeberg.org/takagemacoed/xlibre-overlay?ref=dev-for-26.05";
+    xlibre-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    xlibre-overlay.inputs.flake-parts.follows = "flake-parts";
 
   };
 

@@ -4,7 +4,6 @@
     nixPath = [ "nixpkgs=${flake.inputs.nixpkgs}" ];
 
     package = pkgs.nixVersions.latest;
-    #package = flake.inputs.nix.packages."x86_64-linux".nix;
     settings = {
       substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
       trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
@@ -13,7 +12,7 @@
         "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="
       ];
       warn-dirty = false;
-      #accept-flake-config = true;
+      accept-flake-config = true;
       log-lines = 25;
       auto-optimise-store = true;
       experimental-features = [ "nix-command" "flakes" "ca-derivations" "recursive-nix" ];
