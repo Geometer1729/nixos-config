@@ -7,7 +7,7 @@
     image = ./grub/sand.jpg;
     targets.grub.useWallpaper = true;
     opacity.terminal = 0.9;
-    polarity = "dark"; # TODO this doesn't seem to work for some programs like pinentry
+    polarity = "dark";
     base16Scheme =
       let
         # Colors from vim-j

@@ -24,7 +24,6 @@
     { domain = "*"; item = "nofile"; type = "-"; value = 16777216; }
   ];
   programs.nix-ld.enable = true;
-  # TODO figure out how much of this is actually needed
   programs.nix-ld.libraries = with pkgs; [
     # Add any missing dynamic libraries for unpackaged programs
 
