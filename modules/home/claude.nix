@@ -147,7 +147,7 @@ in
 
       ## Testing and Verification Requirements
 
-      **CRITICAL: Never claim a fix works without testing it first.**
+      **CRITICAL: ALWAYS test a fix before claiming it works or suggest a test **
 
       - ALWAYS run the failing command/test after making changes to verify the fix actually works
       - If you can't test immediately, say "This change should help" or "Let me test this" instead of "Fixed!"
@@ -163,9 +163,10 @@ in
 
       ## Nixos
       - This machine uses nixos and nix heavily
-      - Expect projects to use nix
-      - Projects use direnv to automatically load nix environments - prefer `direnv allow` over manual `nix develop`
-      - If a project has a `.envrc` file, use direnv rather than running `nix develop` manually
+      - Most projects use direnv to automatically load nix environments
+      - Expect your Bash tool already use the local devshell
+      - Expect each call to use the current version changes will be reflected immediately
+      - If you want to use a tool that's not in path feel free to use nix-shell -p or add it to the devshell if it feels apropriate
     '';
   };
 
