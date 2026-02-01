@@ -24,7 +24,14 @@
       "WebFetch(domain:nixos-unified.org)",
       "Bash(nh os boot:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(claude --version:*)",
+      "Bash(readlink:*)",
+      "Bash(rust-analyzer search:*)",
+      "Bash(claude plugins --help:*)",
+      "Bash(claude plugin install:*)",
+      "Bash(claude plugin list:*)",
+      "Bash(nix flake show:*)"
     ],
     "deny": []
   }

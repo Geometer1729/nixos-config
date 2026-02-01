@@ -28,8 +28,6 @@
     moreutils # more gnu utils like sponge
     usbutils
 
-    claude-code
-
     # Haskell development
     (haskellPackages.ghc.withPackages
       (pkgs: with pkgs; [

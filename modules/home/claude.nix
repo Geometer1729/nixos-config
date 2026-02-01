@@ -1,5 +1,6 @@
-{ pkgs, config, ... }:
+{ flake, pkgs, config, ... }:
 let
+  inherit (flake) inputs;
   # Fetch Claude icon as a derivation
   claudeIcon = pkgs.fetchurl {
     url = "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
@@ -10,7 +11,7 @@ in
   # Use home-manager's official Claude Code module
   programs.claude-code = {
     enable = true;
-    package = pkgs.claude-code;
+    package = inputs.claude-code.packages.${pkgs.system}.default; # native binary
 
     # Settings for ~/.claude/settings.json
     settings = {
