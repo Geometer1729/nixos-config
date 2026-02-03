@@ -4,4 +4,5 @@
 
 if command -v direnv &> /dev/null; then
     eval "$(direnv export bash 2>/dev/null)"
+    direnv reload
 fi
