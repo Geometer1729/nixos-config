@@ -19,6 +19,7 @@
     jq # json tool
     wget
     gh
+    act # Run GitHub Actions locally
     just
     expect # provides unbuffer
     unzip
@@ -44,4 +45,9 @@
 
   # GHC configuration
   home.file.".ghc/ghci.conf".source = ./ghci.repl;
+
+  # act (GitHub Actions runner) configuration
+  xdg.configFile."act/actrc".text = ''
+    -P ubuntu-latest=catthehacker/ubuntu:act-latest
+  '';
 }

@@ -40,6 +40,7 @@ in
       boot
       bt
       disko
+      docker
       gh-noto
       hyprland
       impermanence
