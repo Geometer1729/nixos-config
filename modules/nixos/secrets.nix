@@ -18,6 +18,7 @@ in
       hosts = owned;
       anthropic_key = owned;
       taskwarrior-sync-secret = owned;
+      foundryvtt-env = { };
     };
   };
   # secret hosts

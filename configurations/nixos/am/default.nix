@@ -32,6 +32,7 @@ in
 
     builder
     taskchampion
+    foundryvtt
   ]) ++ [
     # XLibre - X11 fork replacing Xorg
     inputs.xlibre-overlay.nixosModules.overlay-xlibre-xserver
