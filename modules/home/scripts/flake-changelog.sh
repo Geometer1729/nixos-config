@@ -59,13 +59,14 @@ fetch_github_releases() {
   fi
 
   # Fetch releases and filter by date
+  # --paginate returns one JSON array per page, so merge them with jq -s 'add // []'
   gh api "repos/$repo/releases" --paginate --jq "[.[] | select(.published_at > \"$old_date\" and .published_at <= \"$new_date\") | {
     tag: .tag_name,
     name: .name,
     url: .html_url,
     published: .published_at,
     prerelease: .prerelease
-  }]" 2>/dev/null || echo '[]'
+  }]" 2>/dev/null | jq -s 'add // []' || echo '[]'
 }
 
 # Fetch commits from GitLab between two revisions

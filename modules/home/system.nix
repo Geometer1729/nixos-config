@@ -8,7 +8,6 @@
     dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
-    deploy-rs
     nh # nix helper
     sops # needed to edit sops-nix secrets
 

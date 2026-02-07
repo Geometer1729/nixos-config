@@ -31,7 +31,9 @@
       "Bash(claude plugins --help:*)",
       "Bash(claude plugin install:*)",
       "Bash(claude plugin list:*)",
-      "Bash(nix flake show:*)"
+      "Bash(nix flake show:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr view:*)"
     ],
     "deny": []
   }
