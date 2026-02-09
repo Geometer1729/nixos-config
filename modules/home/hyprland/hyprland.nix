@@ -355,6 +355,8 @@ in
           "bluetooth-autoconnect"
           # Pester me about any swap files
           "check-swaps"
+          # Set Blue Snowball as default mic (state is wiped on reboot)
+          "sleep 2 && pactl set-default-source alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_SUGA_2020_11_28_42691-00.mono-fallback"
         ];
       };
     };
