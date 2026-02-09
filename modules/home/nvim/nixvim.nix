@@ -32,6 +32,7 @@
       nixvimInjections = true;
       folding.enable = false;
       settings = {
+        highlight.enable = true;
         indent.enable = true;
         ensureInstalled = [
           "lean"
