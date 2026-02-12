@@ -84,10 +84,34 @@ vim.lsp.enable('sqls')
 vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end)
 vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end)
 
+local lsp_progress = {}
+
+vim.api.nvim_create_autocmd('LspProgress', {
+  callback = function(ev)
+    local client_id = ev.data.client_id
+    local value = ev.data.params.value
+    local token = ev.data.params.token
+
+    if not lsp_progress[client_id] then
+      lsp_progress[client_id] = {}
+    end
+
+    if value.kind == 'begin' then
+      lsp_progress[client_id][token] = value.title or true
+    elseif value.kind == 'end' then
+      lsp_progress[client_id][token] = nil
+      if next(lsp_progress[client_id]) == nil then
+        local client = vim.lsp.get_client_by_id(client_id)
+        local name = client and client.name or "LSP"
+        print(name .. " Ready")
+      end
+    end
+  end,
+})
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(ev)
-    print("LSP Ready")
     -- Enable completion triggered by <c-x><c-o>
     vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
