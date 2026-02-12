@@ -133,7 +133,7 @@ process_input() {
   old_ts=$(get_last_modified "$old_locked")
   new_ts=$(get_last_modified "$new_locked")
 
-  local repo commits_data releases_data
+  local repo="" commits_data releases_data
 
   case "$source_type" in
     github)
