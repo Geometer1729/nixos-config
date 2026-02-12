@@ -17,14 +17,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.${config.mainUser}.extraGroups = [ "wpa_supplicant" ];
     networking.wireless = {
       enable = true;
       interfaces = [ cfg.interface ];
       secretsFile = config.sops.secrets.wifi.path;
-      extraConfig = ''
-        ctrl_interface=DIR=/run/wpa_supplicant GROUP=wpa_supplicant
-        update_config=1
-      '';
+      userControlled = true;
       networks =
         lib.attrsets.foldAttrs (l: r: l) { }
           (
