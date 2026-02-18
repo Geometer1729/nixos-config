@@ -2,7 +2,6 @@
 {
   home.packages = with pkgs; [
     # YubiKey management tools
-    yubioath-flutter # TOTP/HOTP authenticator (also serves as GUI for YubiKey)
     yubikey-manager # CLI tool for YubiKey management
     yubikey-personalization # Tool for personalizing YubiKey
 

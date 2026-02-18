@@ -54,7 +54,7 @@
   };
   extraPlugins = with pkgs.vimPlugins;
     [
-      hoogle
+      vim-hoogle
       vimwiki
       nerdtree
       purescript-vim

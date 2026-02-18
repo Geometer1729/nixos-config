@@ -46,7 +46,8 @@
 
     # XLibre - X11 fork replacing Xorg
     xlibre-overlay.url = "git+https://codeberg.org/takagemacoed/xlibre-overlay?ref=dev-for-26.05";
-    xlibre-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    #the follow breaks everything
+    #xlibre-overlay.inputs.nixpkgs.follows = "nixpkgs";
     xlibre-overlay.inputs.flake-parts.follows = "flake-parts";
 
   };

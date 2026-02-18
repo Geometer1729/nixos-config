@@ -53,6 +53,7 @@ in
       tailscale
       work
       wifi
+      xlibre
       yubikey
     ];
 }

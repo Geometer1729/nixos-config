@@ -1,4 +1,4 @@
-{ flake, ... }:
+{ flake, lib, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -17,7 +17,7 @@ in
   # Monitor setup for desktop
   home-manager.users.bbrian = {
     # Disable hypridle completely on this machine to test if it's causing display flickering
-    services.hypridle.enable = flake.inputs.nixpkgs.lib.mkForce false;
+    services.hypridle.enable = lib.mkForce false;
 
     programs.hyprland-custom = {
       dualMonitor = true;
@@ -26,16 +26,12 @@ in
     };
   };
 
-  imports = (with self.nixosModules; [
+  imports = [
     ./hardware.nix
+  ] ++ (with self.nixosModules; [
     default
-
     builder
     taskchampion
     foundryvtt
-  ]) ++ [
-    # XLibre - X11 fork replacing Xorg
-    inputs.xlibre-overlay.nixosModules.overlay-xlibre-xserver
-    inputs.xlibre-overlay.nixosModules.overlay-all-xlibre-drivers
-  ];
+  ]);
 }
