@@ -16,7 +16,7 @@ in
       wifi = lib.mkIf config.wifi.enable { owner = "wpa_supplicant"; };
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
-      anthropic_key = owned;
+      linear_api_key = owned;
       taskwarrior-sync-secret = owned;
       foundryvtt-env = { };
     };

@@ -13,6 +13,31 @@ in
     enable = true;
     package = inputs.claude-code.packages.${pkgs.system}.default; # native binary
 
+    mcpServers = {
+      linear = {
+        type = "http";
+        url = "https://mcp.linear.app/mcp";
+        headers = {
+          Authorization = "Bearer \${LINEAR_API_KEY}";
+        };
+      };
+      github = {
+        type = "http";
+        url = "https://api.githubcopilot.com/mcp/";
+        headers = {
+          Authorization = "Bearer \${GITHUB_PERSONAL_ACCESS_TOKEN}";
+        };
+      };
+      slack = {
+        type = "http";
+        url = "https://mcp.slack.com/mcp";
+        oauth = {
+          clientId = "1601185624273.8899143856786";
+          callbackPort = 3118;
+        };
+      };
+    };
+
     # Settings for ~/.claude/settings.json
     settings = {
       permissions = {
@@ -169,6 +194,19 @@ in
       - If you want to use a tool that's not in path feel free to use nix-shell -p or add it to the devshell if it feels apropriate
     '';
   };
+
+  # LINEAR_API_KEY must be in the shell session (not CLAUDE_ENV_FILE)
+  # because MCP server headers are expanded at Claude Code startup
+  programs.zsh.initContent = ''
+    if [ -f /run/secrets/linear_api_key ]; then
+      LINEAR_API_KEY="$(< /run/secrets/linear_api_key)"
+      export LINEAR_API_KEY
+    fi
+    if command -v gh &> /dev/null; then
+      GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
+      export GITHUB_PERSONAL_ACCESS_TOKEN
+    fi
+  '';
 
   home.packages = with pkgs; [
     # Ensure libnotify is available for notify-send

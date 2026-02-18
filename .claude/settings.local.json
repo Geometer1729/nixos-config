@@ -34,7 +34,8 @@
       "Bash(claude plugin list:*)",
       "Bash(nix flake show:*)",
       "Bash(gh pr diff:*)",
-      "Bash(gh pr view:*)"
+      "Bash(gh pr view:*)",
+      "WebFetch(domain:docs.slack.dev)"
     ],
     "deny": []
   }
