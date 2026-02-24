@@ -15,6 +15,7 @@
     htop
     radeontop
     neofetch
+    lsof # list open files
 
     # Custom utilities moved to modules/home/scripts/
   ];

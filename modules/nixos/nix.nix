@@ -15,7 +15,7 @@
       accept-flake-config = true;
       log-lines = 25;
       auto-optimise-store = true;
-      experimental-features = [ "nix-command" "flakes" "ca-derivations" "recursive-nix" ];
+      experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
       trusted-users = [ "root" config.mainUser ];
       keep-outputs = true;
     };
