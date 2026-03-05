@@ -53,7 +53,7 @@ in
       tailscale
       work
       wifi
-      xlibre
+      #xlibre #honestly I think nixpkgs is breaking this on purpose :(
       yubikey
     ];
 }
