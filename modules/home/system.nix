@@ -14,7 +14,7 @@
     # Monitoring and status tools
     htop
     radeontop
-    neofetch
+    fastfetch
     lsof # list open files
 
     # Custom utilities moved to modules/home/scripts/
