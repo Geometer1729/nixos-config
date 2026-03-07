@@ -35,7 +35,10 @@
       "Bash(nix flake show:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr view:*)",
-      "WebFetch(domain:docs.slack.dev)"
+      "WebFetch(domain:docs.slack.dev)",
+      "Bash(nix-store:*)",
+      "Bash(nix-instantiate:*)",
+      "WebSearch"
     ],
     "deny": []
   }

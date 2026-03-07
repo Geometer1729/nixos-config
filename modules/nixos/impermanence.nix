@@ -34,6 +34,7 @@
         ".hoogle"
         ".local/share/PrismLauncher"
         ".local/share/Steam"
+        ".local/share/Anki2"
         ".local/share/direnv"
         ".local/share/task"
         ".local/share/wasistlos"

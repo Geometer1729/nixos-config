@@ -10,6 +10,7 @@
     ncspot
     pulsemixer
     playerctl # play/pause controls
+    mpv # used by anki for audio playback
 
     # Image
     feh # sets background

@@ -10,7 +10,8 @@
       ''
         # Tmux session management
         if [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
-          session_name=$(basename "$PWD")
+          git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+          session_name=$(basename "''${git_root:-$PWD}")
           current_session=$(tmux display-message -p '#S')
 
           if [ "$current_session" != "$session_name" ]; then
