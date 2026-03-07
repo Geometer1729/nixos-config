@@ -13,7 +13,6 @@
     okteta # hex editor
 
     # Command line utilities
-    ranger # tui file browser
     arp-scan # network scanner
     cloc # count lines of code
     jq # json tool

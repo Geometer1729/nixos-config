@@ -7,7 +7,7 @@
     extraConfig = {
       modi = "drun,ssh,run";
       show-icons = true;
-      terminal = "alacritty";
+      terminal = "ghostty";
       drun-display-format = "{icon} {name}";
       location = 0;
       disable-history = false;

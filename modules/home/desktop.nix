@@ -20,7 +20,7 @@
   programs.rofi = {
     enable = true;
     pass.enable = true;
-    terminal = "alacritty"; # not working
+    terminal = "ghostty"; # not working
   };
 
   # Desktop services

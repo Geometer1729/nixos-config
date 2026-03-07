@@ -37,6 +37,9 @@
 
         set -g default-terminal tmux-256color
 
+        # Allow passthrough of escape sequences (needed for kitty image protocol in ranger)
+        set -g allow-passthrough on
+
         # Pass focus events through to applications (e.g. neovim autoread)
         set -g focus-events on
 

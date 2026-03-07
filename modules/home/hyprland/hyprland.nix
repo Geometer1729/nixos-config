@@ -213,7 +213,7 @@ in
 
         bind = [
           # Application launchers
-          "$mod, Return, exec, alacritty"
+          "$mod, Return, exec, ghostty"
           "$mod, d, exec, rofi -show drun"
           "$mod, s, exec, rofi -show ssh"
           "$mod, r, exec, rofi -show run"

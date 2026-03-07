@@ -4,9 +4,9 @@ name=$1
 action=${2:-toggle}
 
 if [ "$name" = sp ]; then
-  cmd="/etc/profiles/per-user/bbrian/bin/alacritty -t $name -e /etc/profiles/per-user/bbrian/bin/tmux new-session -A -s $name"
+  cmd="/etc/profiles/per-user/bbrian/bin/ghostty --title=$name -e /etc/profiles/per-user/bbrian/bin/tmux new-session -A -s $name"
 else
-  cmd="/etc/profiles/per-user/bbrian/bin/alacritty -t $name -e /etc/profiles/per-user/bbrian/bin/tmux new-session -A -s $name $name"
+  cmd="/etc/profiles/per-user/bbrian/bin/ghostty --title=$name -e /etc/profiles/per-user/bbrian/bin/tmux new-session -A -s $name $name"
 fi
 
 client=$(hyprctl -j clients | jq -r --arg title "$name" '.[] | select(.title == $title) | .address')

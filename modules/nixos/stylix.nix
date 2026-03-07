@@ -6,7 +6,7 @@
     enable = true;
     image = ./grub/sand.jpg;
     targets.grub.useWallpaper = true;
-    opacity.terminal = 0.9;
+    opacity.terminal = 0.5;
     polarity = "dark";
     base16Scheme =
       let

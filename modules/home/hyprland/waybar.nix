@@ -119,7 +119,7 @@ let
         hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input"; # k10temp CPU sensor
         format = "{icon} {temperatureC}°C ";
         critical-threshold = 85;
-        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
+        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
         #format-icons = [ "" "" "" ];
       };
 
@@ -127,13 +127,13 @@ let
       cpu = {
         format = "{usage}% ";
         tooltip = false;
-        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
+        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
 
       # Memory usage
       memory = {
         format = "{}% ";
-        on-click = "hyprctl dispatch exec 'alacritty -e btop'";
+        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
 
       # Clock

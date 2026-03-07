@@ -4,7 +4,7 @@ set -euo pipefail
 
 # If running from dmenu, launch in terminal
 if [[ "${TERM:-}" == "dumb" ]] || [[ -z "${TERM:-}" ]]; then
-    exec alacritty -e "$0" "$@"
+    exec ghostty -e "$0" "$@"
 fi
 
 SWAP_DIR="${XDG_DATA_HOME:-$HOME/.local/state}/nvim/swap"

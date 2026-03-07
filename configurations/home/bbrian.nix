@@ -12,7 +12,8 @@ in
     inputs.nixvim.homeModules.nixvim
 
     # GUI applications
-    alacritty
+    ghostty
+    ranger
     firefox
     hyprland
 
