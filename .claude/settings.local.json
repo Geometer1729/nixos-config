@@ -46,7 +46,12 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(nix path-info:*)",
       "Bash(systemctl:*)",
-      "Bash(got-gnomed:*)"
+      "Bash(got-gnomed:*)",
+      "Bash(nvim --headless -c \"checkhealth\" -c \"w! /tmp/nvim-checkhealth.txt\" -c \"qa!\")",
+      "Read(//tmp/**)",
+      "Bash(just deploy:*)",
+      "Bash(just test-remote-builds:*)",
+      "Bash(nvim:*)"
     ],
     "deny": []
   }
