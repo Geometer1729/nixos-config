@@ -26,7 +26,7 @@ in
       networks =
         lib.attrsets.foldAttrs (l: r: l) { }
           (
-            builtins.map (name: { ${name}.pskRaw = "ext:${name}"; })
+            map (name: { ${name}.pskRaw = "ext:${name}"; })
               [
                 "My love"
                 "the_dojo"
@@ -36,6 +36,7 @@ in
                 "binaup"
                 "WhiteSky-Slate"
                 "moria"
+                "Rina Wirelss 5g"
               ]
           );
     };
