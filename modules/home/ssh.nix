@@ -13,6 +13,10 @@ in
     enable = true;
     enableDefaultConfig = false;
     matchBlocks = {
+      # Set TERM for hosts that don't have ghostty terminfo
+      "*" = {
+        setEnv = { TERM = "xterm-256color"; };
+      };
       # Use Tailscale SSH for all .tail-scale.ts.net hosts
       "*.tail-scale.ts.net" = {
         proxyCommand = "${pkgs.tailscale}/bin/tailscale nc %h %p";

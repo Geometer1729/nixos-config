@@ -41,7 +41,8 @@
       "WebSearch",
       "Bash(ghostty +list-themes:*)",
       "Bash(ghostty +show-config:*)",
-      "Read(//nix/store/jn3syhaq5f7wf964f52hak5cpzs5ka50-user-environment/lib/**)"
+      "Read(//nix/store/jn3syhaq5f7wf964f52hak5cpzs5ka50-user-environment/lib/**)",
+      "Bash(rofi:*)"
     ],
     "deny": []
   }
