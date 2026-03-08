@@ -44,7 +44,7 @@
           key = "C";
           context = "files";
           command = "git recommit";
-          subprocess = true;
+          output = "terminal";
           description = "Commit with previous message (recommit)";
         }
       ];

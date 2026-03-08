@@ -10,6 +10,7 @@
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="
+        "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s="
       ];
       warn-dirty = false;
       accept-flake-config = true;

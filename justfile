@@ -51,11 +51,15 @@ secrets:
 update-claude:
   ./scripts/update-claude.sh
 
+# Test remote build infrastructure (am <-> torag)
+test-remote-builds:
+  test-remote-builds
+
 deploy:
   nixpkgs-fmt .
   nh os build -H am
   nh os build -H torag
   nix flake check
   nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
-  nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --sudo switch
+  nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --use-substitutes --sudo switch
 

@@ -37,7 +37,7 @@ log(){
 
 nixos-deploy(){
   nh os build -H $1
-  \nixos-rebuild --flake ~/conf\#$1 --target-host bbrian@$1 --sudo $2
+  \nixos-rebuild --flake ~/conf\#$1 --target-host bbrian@$1 --use-substitutes --sudo $2
 }
 
 jqcb(){

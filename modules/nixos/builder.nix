@@ -4,6 +4,8 @@
     settings = {
       # Explicitly set system features for remote building
       system-features = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
+      # Sign store paths so they're trusted by machines using am as a substituter
+      secret-key-files = [ "/var/cache-priv-key.pem" ];
     };
     sshServe.enable = true;
   };
