@@ -19,6 +19,7 @@
         d = "diff";
         a = "add";
         cl = "clean -fdX";
+        recommit = "commit -eF .git/COMMIT_EDITMSG";
       };
     };
     signing = {
