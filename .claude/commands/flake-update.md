@@ -93,6 +93,9 @@ Run `nix flake check` to verify the flake evaluates correctly.
 After `nh os test` activates the new configuration, run these health checks:
 - `just health` - System health checks
 - `just vim-health` - Neovim health checks
+- `just deploy` - Apply to am and torag, if torag is not up ask me to go do that.
+- `just test-remote-builds` - Verify remote build infrastructure (am <-> torag) still works
+- run all the above checks on torag too
 
 If any checks report errors, mention them in the report and suggest fixes.
 

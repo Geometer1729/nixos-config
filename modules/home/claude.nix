@@ -11,7 +11,7 @@ in
   # Use home-manager's official Claude Code module
   programs.claude-code = {
     enable = true;
-    package = inputs.claude-code.packages.${pkgs.system}.default; # native binary
+    package = inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default; # native binary
 
     mcpServers = {
       linear = {
