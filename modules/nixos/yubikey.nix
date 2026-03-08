@@ -20,6 +20,7 @@
   # GPG support for YubiKey
   programs.gnupg.agent = {
     enable = true;
+    pinentryPackage = pkgs.pinentry-curses;
   };
 
   # Add udev rules for YubiKey

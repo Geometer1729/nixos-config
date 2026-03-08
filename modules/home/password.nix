@@ -10,9 +10,7 @@
   # GPG agent configuration for YubiKey support
   services.gpg-agent = {
     enable = true;
-    pinentry.package = pkgs.pinentry-qt;
-    # TODO it'd be cool to make a wrapper
-    # that tries curses then uses qt
+    pinentry.package = pkgs.pinentry-curses;
 
     # Cache settings for YubiKey
     defaultCacheTtl = 600;
