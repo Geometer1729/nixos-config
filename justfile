@@ -62,6 +62,8 @@ deploy:
   nix flake check
   nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
   nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --use-substitutes --sudo switch
+  ssh am nh clean all
+  ssh torag nh clean all
 
 gnome-check:
   got-gnomed
