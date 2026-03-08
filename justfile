@@ -63,3 +63,5 @@ deploy:
   nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
   nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --use-substitutes --sudo switch
 
+gnome-check:
+  got-gnomed

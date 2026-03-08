@@ -42,7 +42,11 @@
       "Bash(ghostty +list-themes:*)",
       "Bash(ghostty +show-config:*)",
       "Read(//nix/store/jn3syhaq5f7wf964f52hak5cpzs5ka50-user-environment/lib/**)",
-      "Bash(rofi:*)"
+      "Bash(rofi:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(nix path-info:*)",
+      "Bash(systemctl:*)",
+      "Bash(got-gnomed:*)"
     ],
     "deny": []
   }

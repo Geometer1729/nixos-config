@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   services.getty.autologinUser = config.mainUser;
 
@@ -11,7 +11,9 @@
   # XDG portal for Hyprland
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+    # mkForce to override wayland-session.nix which adds xdg-desktop-portal-gtk (pulls in all of GNOME)
+    extraPortals = lib.mkForce [ pkgs.xdg-desktop-portal-hyprland ];
+    config.common.default = [ "hyprland" ];
   };
 
   services = {
