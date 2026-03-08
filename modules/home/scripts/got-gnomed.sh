@@ -12,7 +12,7 @@ echo ""
 sorted_paths=$(nix path-info -rS "$target" 2>/dev/null \
     | grep -i gnome \
     | grep -v "got-gnomed" \
-    | sort -t'	' -k2 -n -r)
+    | sort -t'	' -k2 -n -r || true)
 
 if [[ -z "$sorted_paths" ]]; then
     echo "No GNOME packages found. You're clean!"

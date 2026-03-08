@@ -2,10 +2,16 @@
 # vit (not really, needs a stylix module)
 { pkgs, ... }:
 {
+  # Disable GNOME stylix target for all HM users — not using GNOME
+  home-manager.sharedModules = [{
+    stylix.targets.gnome.enable = false;
+  }];
+
   stylix = {
     enable = true;
     image = ./grub/sand.jpg;
     targets.grub.useWallpaper = true;
+    targets.gnome.enable = false;
     opacity.terminal = 0.5;
     polarity = "dark";
     base16Scheme =
