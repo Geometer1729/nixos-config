@@ -60,6 +60,7 @@ deploy:
   nh os build -H am
   nh os build -H torag
   nix flake check
+  ssh torag git -C ~/conf pull
   nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
   nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --use-substitutes --sudo switch
   ssh am nh clean all
