@@ -107,6 +107,7 @@ let
       "browser.sessionstore.resume_from_crash" = true;
       "browser.startup.page" = 3;
       "accessibility.typeaheadfind.enablesound" = false;
+      "browser.shell.checkDefaultBrowser" = false;
       "browser.compactmode.show" = true;
       "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
       "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
