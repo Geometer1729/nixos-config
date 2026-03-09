@@ -32,14 +32,13 @@
         git_status =
           {
             conflicted = "⚔️";
-            ahead = "🏎️ 💨 \${count}";
-            behind = "🐢×\${count} ";
-            diverged = "🔱 🏎️💨\${ahead_count} 🐢\${behind_count} ";
-            untracked = "🛤️\${count} ";
+            ahead = "🏎️💨\${count}";
+            behind = "🐢×\${count}";
+            diverged = "🔱🏎️💨\${ahead_count}🐢\${behind_count}";
+            untracked = "🛤️\${count}";
             stashed = "📦";
             modified = "📝×\${count}";
             staged = "🗃️×\${count}";
-            #renamed = "📛 ×\${count}";
             renamed = "[➡](bold green)×\${count}";
             deleted = "🗑️×\${count}";
             style = "bright-white";
