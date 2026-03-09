@@ -6,6 +6,7 @@ in
 {
 
   networking.hostName = "am";
+  networking.interfaces.enp4s0.wakeOnLan.enable = true;
   amd = true;
   drive = "/dev/nvme0n1";
   system.stateVersion = "25.05";

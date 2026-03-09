@@ -14,6 +14,8 @@
 
     # Command line utilities
     arp-scan # network scanner
+    ethtool
+    wakeonlan
     cloc # count lines of code
     jq # json tool
     wget
