@@ -25,6 +25,11 @@
       {
         name = "bbrian";
         ensureDBOwnership = true;
+        ensureClauses = {
+          superuser = true;
+          createrole = true;
+          createdb = true;
+        };
       }
     ];
   };
