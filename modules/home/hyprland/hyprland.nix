@@ -195,8 +195,8 @@ in
           #"suppressevent fullscreen, match:class firefox"
           # Force prismlauncher to tile to prevent floating positioning issues with swallow
           "tile on, match:class prismlauncher"
-          ## Auto-group Discord and Signal on workspace 21
-          "group set invade, match:class (discord|signal|slack)"
+          # Maximize messaging apps on workspace 21 (xmonad Full layout style)
+          "fullscreen_state 1 0, match:class (discord|signal|slack)"
 
           "float on, match:class .blueman-manager-wrapped"
           "size monitor_w*0.5 monitor_h*0.5, match:class .blueman-manager-wrapped"
@@ -226,10 +226,8 @@ in
           # TODO this works pretty badly tbh and I really wish it was automatic
           "$mod, f, fullscreenstate, -1 2"
 
-          # Group management (tabbed windows)
-          "$mod, g, togglegroup"
-          "$mod, Tab, exec, hypr-smart-tab"
-          "$mod SHIFT, Tab, changegroupactive, b"
+          # Cycle to next window and maximize (xmonad Full layout style)
+          "$mod, Tab, exec, hyprctl --batch 'dispatch cyclenext; dispatch fullscreen 1'"
 
           # Focus movement (vim-style like your XMonad)
           "$mod, h, movefocus, l"
@@ -349,8 +347,8 @@ in
           "[workspace 2 silent]  firefox -P default"
           "[workspace 18 silent] firefox -P work --new-instance"
           "[workspace 20 silent] firefox -P ttrpg --new-instance"
-          "[workspace 21 silent] (hypr-await; discord)"
-          "[workspace 21 silent] (hypr-await --group 21; signal-desktop)"
+          "[workspace 21 silent] discord"
+          "[workspace 21 silent] signal-desktop"
           # Auto-connect to Bluetooth headphones
           "bluetooth-autoconnect"
           # Pester me about any swap files

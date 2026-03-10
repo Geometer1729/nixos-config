@@ -51,7 +51,8 @@
       "Read(//tmp/**)",
       "Bash(just deploy:*)",
       "Bash(just test-remote-builds:*)",
-      "Bash(nvim:*)"
+      "Bash(nvim:*)",
+      "Bash(hyprctl:*)"
     ],
     "deny": []
   }
