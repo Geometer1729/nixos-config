@@ -40,6 +40,7 @@ in
 
     # Settings for ~/.claude/settings.json
     settings = {
+      voiceEnabled = true;
       permissions = {
         Bash = {
           allowed = [
@@ -211,6 +212,7 @@ in
   home.packages = with pkgs; [
     # Ensure libnotify is available for notify-send
     libnotify
+    sox # Required for Claude Code /voice command (audio recording)
     # Claude notification scripts are now in modules/home/scripts/
   ];
 
