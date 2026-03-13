@@ -183,6 +183,10 @@ in
       - When the test fails try something else don't give up
 
       ## Communication Style
+      - I make mistakes tell me when I'm wrong/confused
+      - Tell me when a request is:
+          - much harder or less realistic than I seem to think
+          - just doesn't make snese
       - Be honest about uncertainty
       - Distinguish between theory and verified results
       - Test before claiming success
@@ -190,8 +194,8 @@ in
       ## Nixos
       - This machine uses nixos and nix heavily
       - Most projects use direnv to automatically load nix environments
-      - Expect your Bash tool already use the local devshell
-      - Expect each call to use the current version changes will be reflected immediately
+      - Expect your Bash tool already use the local devshell via direnv
+      - Unfortunately sometimes direnv reload is needed
       - If you want to use a tool that's not in path feel free to use nix-shell -p or add it to the devshell if it feels apropriate
     '';
   };
