@@ -52,7 +52,12 @@
       "Bash(just deploy:*)",
       "Bash(just test-remote-builds:*)",
       "Bash(nvim:*)",
-      "Bash(hyprctl:*)"
+      "Bash(hyprctl:*)",
+      "Bash(cd ~/conf && nixpkgs-changelog aca4d95fce4914b3892661bcb80b8087293536c6 62dc67aa6a52b4364dd75994ec00b51fbf474e50 --json 2>&1)",
+      "Bash(cd ~/conf && just gnome-check 2>&1)",
+      "Bash(ssh -o ConnectTimeout=5 torag echo \"reachable\" 2>&1)",
+      "WebFetch(domain:ghostty.org)",
+      "Bash(ssh torag:*)"
     ],
     "deny": []
   }

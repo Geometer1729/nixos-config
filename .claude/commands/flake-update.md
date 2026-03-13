@@ -61,7 +61,32 @@ For each input in the changelog with commits, spawn a Task agent to analyze rele
 - Review PR descriptions for migration notes
 - Check for breaking changes flagged as `"package": "BREAKING"`
 
+### Step 2b: Scan unmatched nixpkgs commits
+
+The `nixpkgs-changelog` script only matches commits by package name prefix. It misses NixOS module changes (e.g. `nixos/networking:`, `nixos/systemd:`), lib changes, and infrastructure changes that could affect the config.
+
+To catch these, fetch the full commit list and scan the ones NOT already matched:
+
+1. Get all nixpkgs commit messages between old and new rev:
+   ```bash
+   # Use the GitHub compare API or git log to get all commit messages
+   gh api "repos/nixos/nixpkgs/compare/<old_rev>...<new_rev>" --paginate -q '.commits[].commit.message' > /tmp/flake-update/all-nixpkgs-commits.txt
+   ```
+   If this is too many for the API, use `git log --oneline <old_rev>..<new_rev>` from a local nixpkgs checkout if available, or paginate the API.
+
+2. Remove commits already covered by `nixpkgs-changelog.json` (the package-matched ones).
+
+3. Spawn parallel subagents to scan the remaining commits in batches of ~100. Each agent should:
+   - Read its batch of commit messages
+   - Look for anything potentially relevant: NixOS module changes (`nixos/`), changes to services/options used in the config, security fixes, infrastructure changes
+   - Cross-reference against the actual NixOS modules and options used in `~/conf` (check `modules/nixos/`, `configurations/nixos/`, etc.)
+   - Report back any commits worth flagging
+
+4. Collect results from all agents and include relevant findings in the report.
+
 ### Step 3: Generate report
+
+Include **all** relevant nixpkgs changes in the report — both the package-matched ones from `nixpkgs-changelog` and any NixOS module/infrastructure changes found by the subagent scan. Present all package updates affecting this config in a comprehensive table.
 
 Summarize findings into categories:
 
@@ -98,9 +123,21 @@ After `nh os test` activates the new configuration, run these health checks:
 - `just test-remote-builds` - Verify remote build infrastructure (am <-> torag) still works
 - run all the above checks on torag too
 
-If any checks report errors, mention them in the report and suggest fixes.
+Compare health check results against `~/conf/failures.md` which documents the known pre-existing failures baseline. Only flag **new** errors/warnings that aren't already in the baseline. Update `failures.md` if failures are resolved or new ones appear.
 
-### Step 7: Suggest tests and concerns
+### Step 7: Write the report to `update-reports/`
+
+Save the full report as `~/conf/update-reports/YYYY-MM-DD.md` (using today's date). Include:
+- Build status (all commands run and their results)
+- Table of all updated inputs with commit counts
+- Table of **all** nixpkgs package changes affecting the config (not just highlights)
+- Any BREAKING flags and whether they affect this config
+- New/removed packages in the closure
+- Notes on anything to monitor or follow up on
+
+See existing reports in `update-reports/` for the format.
+
+### Step 8: Suggest tests and concerns
 
 Run a general websearch for breaking changes as well as websearches for any significant updates.
 Based on the report suggest things that may be broken and suggest ways to verify they work.
