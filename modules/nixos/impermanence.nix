@@ -58,7 +58,8 @@
         "password-store"
       ];
       files = [
-        ".zsh_history" # This seems to not work, and causes some sort of permissions error
+        # zsh_history: NOT bind-mounted here — zsh writes directly to /persist via history.path
+        # Bind-mounting a single file breaks zsh's write-new-then-rename strategy
         ".config/lazygit/state.yml"
         ".cache/nix-index/files"
         ".cache/rofi3.druncache"

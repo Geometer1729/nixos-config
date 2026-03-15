@@ -55,5 +55,6 @@ in
       wifi
       #xlibre #honestly I think nixpkgs is breaking this on purpose :(
       yubikey
+      hm-fallback
     ];
 }
