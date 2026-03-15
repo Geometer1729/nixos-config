@@ -226,14 +226,24 @@ in
   # Claude account isolation: separate config directories for work/personal
   # Direnv sets CLAUDE_CONFIG_DIR based on current directory (see zsh/direnv.nix)
   # These symlink the managed settings/memory into both config directories
+  # force=true: these live in persisted directories, so stale files survive reboot
+  # and would block HM activation (which is all-or-nothing)
   home.file = {
-    ".claude-work/settings.json".source =
-      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
-    ".claude-work/CLAUDE.md".source =
-      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
-    ".claude-personal/settings.json".source =
-      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
-    ".claude-personal/CLAUDE.md".source =
-      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
+    ".claude-work/settings.json" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
+      force = true;
+    };
+    ".claude-work/CLAUDE.md" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
+      force = true;
+    };
+    ".claude-personal/settings.json" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
+      force = true;
+    };
+    ".claude-personal/CLAUDE.md" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
+      force = true;
+    };
   };
 }
