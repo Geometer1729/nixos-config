@@ -6,6 +6,7 @@
       user.email = "16kuhnb@gmail.com";
       user.name = "Geometer1729";
       push.autoSetupRemote = true;
+      push.default = "current";
       advice.forceDeleteBranch = false;
       merge.conflictstyle = "diff3";
       branch.autoSetupMerge = true;
