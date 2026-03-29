@@ -8,6 +8,10 @@
     curl # Required by nvim-treesitter for downloading parsers
     ripgrep # Required by telescope for live-grep
   ];
+  # neovim (nixpkgs>=2026-03-24) now uses luajit-env for require() resolution
+  # instead of runtimepath. Plugins that use require() across plugins need to
+  # be declared here so their Lua modules are findable.
+  extraLuaPackages = ps: with ps; [ plenary-nvim ];
   extraConfigLua =
     lib.strings.concatStrings
       (builtins.map

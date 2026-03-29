@@ -57,7 +57,10 @@
       "Bash(cd ~/conf && just gnome-check 2>&1)",
       "Bash(ssh -o ConnectTimeout=5 torag echo \"reachable\" 2>&1)",
       "WebFetch(domain:ghostty.org)",
-      "Bash(ssh torag:*)"
+      "Bash(ssh torag:*)",
+      "Bash(/nix/store/mx7ldb1pcsdf510p3avy4gnbhza3276r-nixvim/bin/nvim --headless -c \"lua require\\('telescope'\\)\" -c \"quit\" 2>&1)",
+      "Bash(nh os:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
