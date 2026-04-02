@@ -1,14 +1,19 @@
-# Known Health Check Failures (baseline 2026-03-15, nixpkgs c06b4ae3)
+# Known Health Check Failures (baseline 2026-03-29, nixpkgs 46db2e09)
 
 ## am (primary desktop)
 
 ### `just health`
-- **ACPI Error**: `\_SB.PCI0.GPP2.PTXH.RHUB.POT7._PLD` AE_AML_UNINITIALIZED_ELEMENT — hardware/firmware bug on USB controller, harmless
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
+- **kvm_amd**: `SVM not supported by CPU 23` — hardware doesn't support nested virtualization
+- **Bluetooth RTL**: `hci1: RTL: RTL: Read reg16 failed (-110)` — hardware/firmware issue, harmless
+- **Taskwarrior sync**: intermittent failure on activation (also seen on am now, not just torag)
 
 ### `just vim-health`
 - **ERROR**: `tree-sitter-cli v0.26.1 is required` — nixpkgs has tree-sitter 0.25.10, neovim 0.11.6 wants 0.26.1. Upstream version lag.
-- **ERROR**: `is not in runtimepath.` — appeared after neovim provider rework (was previously only on torag)
+- **ERROR**: `is not in runtimepath.` — appeared after neovim provider rework
+- **WARNING**: `node/npm not in PATH` — no Node.js provider configured
+- **WARNING**: `perl not installed` — no Perl provider configured
+- **WARNING**: `No Python executable found` — nvim-host-python3 removed from nixpkgs neovim wrapper (nixpkgs>=2026-03-24)
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
 ### `just gnome-check`
