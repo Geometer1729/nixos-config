@@ -1,4 +1,4 @@
-# Known Health Check Failures (baseline 2026-03-29, nixpkgs 46db2e09)
+# Known Health Check Failures (baseline 2026-04-08, nixpkgs 68d8aa3d)
 
 ## am (primary desktop)
 
@@ -9,8 +9,8 @@
 - **Taskwarrior sync**: intermittent failure on activation (also seen on am now, not just torag)
 
 ### `just vim-health`
-- **ERROR**: `tree-sitter-cli v0.26.1 is required` — nixpkgs has tree-sitter 0.25.10, neovim 0.11.6 wants 0.26.1. Upstream version lag.
-- **ERROR**: `is not in runtimepath.` — appeared after neovim provider rework
+- **ERROR**: `tree-sitter-cli v0.26.1 is required` — nixpkgs has tree-sitter 0.25.10, neovim 0.12.0 wants 0.26.1. Upstream version lag.
+- **WARNING**: `Nvim 0.12.1 is available (current: 0.12.0)` — informational, upstream has newer version
 - **WARNING**: `node/npm not in PATH` — no Node.js provider configured
 - **WARNING**: `perl not installed` — no Perl provider configured
 - **WARNING**: `No Python executable found` — nvim-host-python3 removed from nixpkgs neovim wrapper (nixpkgs>=2026-03-24)

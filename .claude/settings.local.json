@@ -60,7 +60,11 @@
       "Bash(ssh torag:*)",
       "Bash(/nix/store/mx7ldb1pcsdf510p3avy4gnbhza3276r-nixvim/bin/nvim --headless -c \"lua require\\('telescope'\\)\" -c \"quit\" 2>&1)",
       "Bash(nh os:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(for page:*)",
+      "Bash(do gh:*)",
+      "Bash(done)",
+      "Bash(gh search:*)"
     ],
     "deny": []
   }
