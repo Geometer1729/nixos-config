@@ -35,6 +35,7 @@ health:
   systemctl --failed
   journalctl -p 3 -xb --no-pager -n 10 || echo "No recent critical errors"
   df -h /
+  check-syncthing
 
 # Check neovim health (shows errors only)
 vim-health:
