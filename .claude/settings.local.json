@@ -64,7 +64,19 @@
       "Bash(for page:*)",
       "Bash(do gh:*)",
       "Bash(done)",
-      "Bash(gh search:*)"
+      "Bash(gh search:*)",
+      "Bash(slack:*)",
+      "Bash(nix-shell:*)",
+      "Bash(apt-cache search:*)",
+      "Bash(echo \"Search completed with exit code: $?\")",
+      "Bash(nix --version)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(xargs cat:*)",
+      "Bash(curl -s https://api.github.com/repos/czottmann/linearis/releases/latest)",
+      "Bash(curl -s https://registry.npmjs.org/linearis/latest)",
+      "Bash(nix log:*)",
+      "Bash(curl -s \"https://api.github.com/repositories/1049014049/contents/src/gql\")",
+      "Bash(nix hash:*)"
     ],
     "deny": []
   }

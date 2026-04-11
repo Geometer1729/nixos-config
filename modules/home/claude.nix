@@ -1,4 +1,4 @@
-{ flake, pkgs, config, ... }:
+{ flake, pkgs, lib, config, ... }:
 let
   inherit (flake) inputs;
   # Fetch Claude icon as a derivation
@@ -6,37 +6,46 @@ let
     url = "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
     sha256 = "sha256-86hX9EtbVC7nniAN1kpLjt485fm5lpOjm9ECTLK392o=";
   };
+
+  linearis-lockfile = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/czottmann/linearis/v2026.4.2/package-lock.json";
+    hash = "sha256-wOuf8nl9+ZecRVWkMcJ/T+sKFquTVJSb2hccs1nBc/s=";
+  };
+
+  linearis = pkgs.buildNpmPackage rec {
+    pname = "linearis";
+    version = "2026.4.2";
+    src = pkgs.fetchurl {
+      url = "https://registry.npmjs.org/linearis/-/linearis-${version}.tgz";
+      hash = "sha256-HZdcuxMgtS9sJLM1hy4dw+NaGjuMxlE4kmIXJ5E97Jw=";
+    };
+    sourceRoot = "package";
+    postPatch = ''
+      cp ${linearis-lockfile} package-lock.json
+      # Strip prepare/postinstall scripts (need network/git, dist/ is already pre-built)
+      ${pkgs.jq}/bin/jq 'del(.scripts.prepare, .scripts.postinstall, .scripts.preinstall)' \
+        package.json > package.json.new
+      mv package.json.new package.json
+    '';
+    npmDepsHash = "sha256-GDqnA14iQ9EM895nDomRX1n++p6nJqsWTM+XKdDwx5Q=";
+    dontNpmBuild = true; # npm tarball ships pre-built dist/
+    npmFlags = [ "--ignore-scripts" ];
+    npmInstallFlags = [ "--ignore-scripts" ];
+    nodejs = pkgs.nodejs_22;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    # Auto-load LINEAR_API_TOKEN from sops secret if not already set,
+    # so the binary works regardless of shell environment.
+    postFixup = ''
+      wrapProgram $out/bin/linearis \
+        --run 'if [ -z "''${LINEAR_API_TOKEN:-}" ] && [ -r /run/secrets/linear_api_key ]; then export LINEAR_API_TOKEN="$(< /run/secrets/linear_api_key)"; fi'
+    '';
+  };
 in
 {
   # Use home-manager's official Claude Code module
   programs.claude-code = {
     enable = true;
     package = inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default; # native binary
-
-    mcpServers = {
-      linear = {
-        type = "http";
-        url = "https://mcp.linear.app/mcp";
-        headers = {
-          Authorization = "Bearer \${LINEAR_API_KEY}";
-        };
-      };
-      github = {
-        type = "http";
-        url = "https://api.githubcopilot.com/mcp/";
-        headers = {
-          Authorization = "Bearer \${GITHUB_PERSONAL_ACCESS_TOKEN}";
-        };
-      };
-      slack = {
-        type = "http";
-        url = "https://mcp.slack.com/mcp";
-        oauth = {
-          clientId = "1601185624273.8899143856786";
-          callbackPort = 3118;
-        };
-      };
-    };
 
     # Settings for ~/.claude/settings.json
     settings = {
@@ -197,24 +206,28 @@ in
       - Expect your Bash tool already use the local devshell via direnv
       - Unfortunately sometimes direnv reload is needed
       - If you want to use a tool that's not in path feel free to use nix-shell -p or add it to the devshell if it feels apropriate
+
+      ## Available CLIs
+      - `gh`
+      -`linearis`
+      - `slack-search`
     '';
   };
 
-  # LINEAR_API_KEY must be in the shell session (not CLAUDE_ENV_FILE)
-  # because MCP server headers are expanded at Claude Code startup
+  # API keys for CLI tools (linearis, slack-search)
   programs.zsh.initContent = ''
     if [ -f /run/secrets/linear_api_key ]; then
-      LINEAR_API_KEY="$(< /run/secrets/linear_api_key)"
-      export LINEAR_API_KEY
+      LINEAR_API_TOKEN="$(< /run/secrets/linear_api_key)"
+      export LINEAR_API_TOKEN
     fi
-    if command -v gh &> /dev/null; then
-      GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
-      export GITHUB_PERSONAL_ACCESS_TOKEN
+    if [ -f /run/secrets/slack_token ]; then
+      SLACK_TOKEN="$(< /run/secrets/slack_token)"
+      export SLACK_TOKEN
     fi
   '';
 
   home.packages = with pkgs; [
-    # Ensure libnotify is available for notify-send
+    linearis
     libnotify
     sox # Required for Claude Code /voice command (audio recording)
     # Claude notification scripts are now in modules/home/scripts/

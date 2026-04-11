@@ -17,6 +17,7 @@ in
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
       linear_api_key = owned;
+      slack_token = owned;
       taskwarrior-sync-secret = owned;
       foundryvtt-env = { };
     };
