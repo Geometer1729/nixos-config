@@ -1,23 +1,20 @@
-{ lib, config, ... }:
+{ lib, config, osConfig, ... }:
 let
   # Device configuration - add your device IDs here
   # Get device ID by running: syncthing device-id
   devices = {
     am = {
-      id = "F5YLCSQ-AKXGXGH-3RVAGUA-BDMCMUT-DZ3NPWW-HGUV4Z7-ZNT7AV4-XLQCEAP";
+      id = "YFC525D-GUV3HTC-EPRRNPY-CRYYQCG-ANDWVZY-TXQAP36-GXQSB2J-YPJYEAF";
       addresses = [ "tcp://am:22000" ];
     };
     torag = {
-      id = "AZD3HDE-KTIG5P3-RBNVCPE-4IZH2E5-CHJXWBV-UTOUD63-ZYH4YEC-55ZXEAK";
+      id = "3MB5CXC-4FO3G2D-YH4PF6X-DY2IGTN-R4YB5RI-GZPTKAK-K6IKHOQ-QBBWNQG";
       addresses = [ "tcp://torag:22000" ];
     };
   };
 
-  # Get the current hostname to filter out self
-  hostname = config.networking.hostName or (builtins.getEnv "HOSTNAME");
-
   # Remove current machine from device list
-  otherDevices = lib.filterAttrs (name: _: name != hostname) devices;
+  otherDevices = lib.filterAttrs (name: _: name != osConfig.networking.hostName) devices;
 in
 {
   services.syncthing = {

@@ -69,6 +69,9 @@
         ".local/share/nix/repl-history" # nix repl command history
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
+        # Syncthing device identity only — config.xml is regenerated declaratively
+        ".local/state/syncthing/cert.pem"
+        ".local/state/syncthing/key.pem"
         #".config/task/taskrc" # persisted just for news.version :(
       ];
     };
