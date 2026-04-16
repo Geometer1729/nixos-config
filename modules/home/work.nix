@@ -4,6 +4,7 @@
     with pkgs;
     [
       slack
+      google-chrome
     ];
 
   programs.ssh.matchBlocks =

@@ -14,6 +14,9 @@
 
     #browser
     ungoogled-chromium
+
+    # presentations
+    presenterm
   ];
 
   # Rofi configuration
