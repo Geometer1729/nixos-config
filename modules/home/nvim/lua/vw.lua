@@ -369,3 +369,18 @@ vim.api.nvim_create_user_command('TaskUpdateLink', update_task_to_heading, {})
 -- Create keybindings
 vim.keymap.set('n', '<Leader>tc', create_task_from_heading, { noremap = true, silent = true, desc = 'Create task from current heading' })
 vim.keymap.set('n', '<Leader>tu', update_task_to_heading, { noremap = true, silent = true, desc = 'Update task link to current heading' })
+
+-- Sync WeddingTODOS.md with tub server
+vim.api.nvim_create_autocmd('BufReadPre', {
+  pattern = '*Documents/vw/WeddingTODOS.md',
+  callback = function()
+    vim.fn.system('rsync -az bbrian@tub:~/Documents/vw/WeddingTODOS.md ~/Documents/vw/WeddingTODOS.md')
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufWritePost', {
+  pattern = '*Documents/vw/WeddingTODOS.md',
+  callback = function()
+    vim.fn.system('rsync -az ~/Documents/vw/WeddingTODOS.md bbrian@tub:~/Documents/vw/WeddingTODOS.md')
+  end,
+})
