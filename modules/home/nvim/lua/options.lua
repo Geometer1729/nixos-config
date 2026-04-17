@@ -42,6 +42,9 @@ o.smarttab=true
 
 o.undofile=true
 
+-- load project-local .nvim.lua/.exrc/.nvimrc from cwd; nvim 0.9+ prompts to trust per-file
+o.exrc=true
+
 -- swap file UX improvements
 o.autoread=true -- automatically reload files changed outside vim
 o.updatetime=1000 -- write swap files more frequently (default 4000ms)
