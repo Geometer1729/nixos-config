@@ -53,6 +53,9 @@ in
       showThinkingSummaries = true;
       voiceEnabled = true;
       autoMemoryEnabled = false;
+      # Disable claude.ai MCP integrations (Gmail, Calendar, Drive, Slack, Linear)
+      mcpServers = { };
+      disabledMcpServers = [ "claude_ai_Gmail" "claude_ai_Google_Calendar" "claude_ai_Google_Drive" "claude_ai_Slack" "claude_ai_Linear" ];
       permissions = {
         Bash = {
           allowed = [
