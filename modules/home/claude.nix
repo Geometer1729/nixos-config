@@ -49,7 +49,10 @@ in
 
     # Settings for ~/.claude/settings.json
     settings = {
+      model = "claude-opus-4-5";
+      showThinkingSummaries = true;
       voiceEnabled = true;
+      autoMemoryEnabled = false;
       permissions = {
         Bash = {
           allowed = [
@@ -177,40 +180,9 @@ in
 
     # Memory file (~/CLAUDE.md)
     memory.text = ''
-      # Global Claude Instructions
-
-
-      ## Testing and Verification Requirements
-
-      **CRITICAL: ALWAYS test a fix before claiming it works or suggest a test **
-
-      - ALWAYS run the failing command/test after making changes to verify the fix actually works
-      - If you can't test immediately, say "This change should help" or "Let me test this" instead of "Fixed!"
-      - Only claim something is "Fixed" after verifying the original problem no longer occurs
-       - When debugging, test each hypothesis before moving to the next one
-       - Show the test results that prove the fix works
-      - When the test fails try something else don't give up
-
-      ## Communication Style
-      - I make mistakes tell me when I'm wrong/confused
-      - Tell me when a request is:
-          - much harder or less realistic than I seem to think
-          - just doesn't make snese
-      - Be honest about uncertainty
-      - Distinguish between theory and verified results
-      - Test before claiming success
-
-      ## Nixos
-      - This machine uses nixos and nix heavily
-      - Most projects use direnv to automatically load nix environments
-      - Expect your Bash tool already use the local devshell via direnv
-      - Unfortunately sometimes direnv reload is needed
-      - If you want to use a tool that's not in path feel free to use nix-shell -p or add it to the devshell if it feels apropriate
-
-      ## Available CLIs
-      - `gh`
-      -`linearis`
-      - `slack-search`
+      NixOS. Direnv loads devshells. nix-shell -p if needed.
+      CLIs: gh, linearis, slack-search
+      Test fixes. Be skeptical. Tell me when I'm wrong.
     '';
   };
 
@@ -246,16 +218,8 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
       force = true;
     };
-    ".claude-work/CLAUDE.md" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
-      force = true;
-    };
     ".claude-personal/settings.json" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
-      force = true;
-    };
-    ".claude-personal/CLAUDE.md" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/CLAUDE.md";
       force = true;
     };
   };
