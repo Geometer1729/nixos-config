@@ -40,15 +40,6 @@
     settings = {
       promptToReturnFromSubprocess = false;
       git.push.forceWithLease = true;
-      customCommands = [
-        {
-          key = "C";
-          context = "files";
-          command = "git recommit";
-          output = "terminal";
-          description = "Commit with previous message (recommit)";
-        }
-      ];
     };
   };
 }
