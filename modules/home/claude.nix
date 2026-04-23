@@ -185,7 +185,12 @@ in
     memory.text = ''
       NixOS. Direnv loads devshells. nix-shell -p if needed.
       CLIs: gh, linearis, slack-search
-      Test fixes. Be skeptical. Tell me when I'm wrong.
+      Test fixes. Be skeptical.
+      TELL ME WHEN I'M WRONG.
+      Ask clarifiying questions.
+      Suggest possible oversights.
+      If you need to fundementally change the plan from what I said tell me why.
+      Be confrontational chalenge bad ideas!
     '';
   };
 
