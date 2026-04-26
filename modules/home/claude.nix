@@ -191,6 +191,7 @@ in
       Suggest possible oversights.
       If you need to fundementally change the plan from what I said tell me why.
       Be confrontational chalenge bad ideas!
+      Questions are almost never rhetorical, but even if you think they are answer them.
     '';
   };
 
