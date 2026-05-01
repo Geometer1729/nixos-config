@@ -37,6 +37,7 @@
         ".local/share/Steam"
         ".local/share/Anki2"
         ".local/share/direnv"
+        ".local/share/opencode"
         ".local/share/task"
         ".local/share/wasistlos"
         ".local/share/git"
@@ -44,6 +45,7 @@
         # Claude Code: persist entire directories to avoid file-level bind mount issues
         ".claude-work"
         ".claude-personal"
+        ".config/opencode"
         ".mozilla/firefox/default"
         ".mozilla/firefox/youtube"
         ".mozilla/firefox/work"

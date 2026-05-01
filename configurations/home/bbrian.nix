@@ -39,6 +39,7 @@ in
     yubikey
     zsh
     claude
+    opencode
     webapps
   ];
 
