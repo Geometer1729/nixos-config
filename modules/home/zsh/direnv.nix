@@ -5,6 +5,7 @@
     enableZshIntegration = true;
     enableBashIntegration = true; # Mostly for claude
     nix-direnv.enable = true;
+    config.global.hide_env_diff = true;
     #may cause gc issues
     stdlib =
       ''
