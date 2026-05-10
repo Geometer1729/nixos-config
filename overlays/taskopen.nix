@@ -1,8 +1,8 @@
 { ... }:
 final: prev: {
-  # Taskopen was rewritten in nim
-  # so it's easier to start from scratch than overrideAttrs
-  # I should really update it in nixpkgs
+  # Keep taskopen on the 2.x Nim rewrite because nixpkgs still packages the
+  # older 1.1.5 Perl implementation. Remove this overlay once nixpkgs updates
+  # taskopen to a 2.x release that still works with this task workflow.
   taskopen = final.stdenv.mkDerivation {
     pname = "taskopen-nim";
     version = "2.0.1";

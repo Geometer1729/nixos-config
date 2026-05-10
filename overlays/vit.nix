@@ -1,10 +1,11 @@
 { ... }:
 final: prev:
 {
-  # Replace taskwarrior2 globally with taskwarrior3
+  # Keep taskwarrior2 consumers on taskwarrior3 for this task setup. Remove
+  # this overlay once vit/tasklib/nixpkgs support taskwarrior3 natively.
   taskwarrior2 = final.taskwarrior3;
 
-  # Override python3Packages.tasklib to use taskwarrior3
+  # tasklib still expects taskwarrior2 in nixpkgs.
   python3Packages = prev.python3Packages.override {
     overrides = pythonSelf: pythonSuper: {
       tasklib = pythonSuper.tasklib.override {
@@ -13,7 +14,9 @@ final: prev:
     };
   };
 
-  # Override vit to use taskwarrior3 and add case-insensitive search
+  # vit also still assumes taskwarrior2, and upstream search remains
+  # case-sensitive. Remove the patch once upstream or nixpkgs grows an
+  # equivalent case-insensitive search behavior.
   vit = (prev.vit.override {
     taskwarrior2 = final.taskwarrior3;
   }).overrideAttrs (oldAttrs: {

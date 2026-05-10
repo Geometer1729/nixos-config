@@ -85,7 +85,25 @@ To catch these, fetch the full commit list and scan the ones NOT already matched
 
 4. Collect results from all agents and include relevant findings in the report.
 
-### Step 3: Generate report
+### Step 3: Review local overlays
+
+Review every file in `overlays/` as part of the update, not just the inputs in `flake.lock`.
+
+For each overlay:
+- Identify why it exists from comments and the overridden attributes
+- Check whether the same override is now present in current `nixpkgs` or upstream package definitions
+- Decide whether the overlay is still appropriate, needs to be refreshed, or should be removed entirely
+- Pay special attention to version pins, temporary package overrides, and compatibility patches that may have been made obsolete by the flake update
+
+If an overlay remains necessary:
+- Confirm its comments still explain the reason for the override
+- Confirm the comments explain the condition for removal when that is knowable
+
+If an overlay is no longer necessary:
+- Remove it
+- Update the report to explain why it became obsolete
+
+### Step 4: Generate report
 
 Include **all** relevant nixpkgs changes in the report — both the package-matched ones from `nixpkgs-changelog` and any NixOS module/infrastructure changes found by the subagent scan. Present all package updates affecting this config in a comprehensive table.
 
@@ -99,20 +117,20 @@ Explore the existing config and use web search to add context.
 If an option is deprecated check my config to see if I'm using it.
 If a package has a significant upgrade check what changes were made.
 
-### Step 4: Build and check for build errors
+### Step 5: Build and check for build errors
 
 Run `nh os build` if it fails add the error to the report.
 Provid related commits to add context.
 Feel free to use web search and read the config to understand which commits are related.
 
-### Step 5: Make fixes if needed
+### Step 6: Make fixes if needed
 
 If breaking changes require config updates:
 1. Show the specific changes needed
 2. Make the edits
 3. Run `nh os test` to verify the build works
 
-### Step 6: Run checks and tests
+### Step 7: Run checks and tests
 
 Run `nix flake check` to verify the flake evaluates correctly.
 
@@ -126,19 +144,20 @@ After `nh os test` activates the new configuration, run these health checks:
 
 Compare health check results against `~/conf/failures.md` which documents the known pre-existing failures baseline. Only flag **new** errors/warnings that aren't already in the baseline. Update `failures.md` if failures are resolved or new ones appear.
 
-### Step 7: Write the report to `update-reports/`
+### Step 8: Write the report to `update-reports/`
 
 Save the full report as `~/conf/update-reports/YYYY-MM-DD.md` (using today's date). Include:
 - Build status (all commands run and their results)
 - Table of all updated inputs with commit counts
 - Table of **all** nixpkgs package changes affecting the config (not just highlights)
+- Overlay review results for every file in `overlays/`, including whether each overlay was kept, updated, or removed
 - Any BREAKING flags and whether they affect this config
 - New/removed packages in the closure
 - Notes on anything to monitor or follow up on
 
 See existing reports in `update-reports/` for the format.
 
-### Step 8: Suggest tests and concerns
+### Step 9: Suggest tests and concerns
 
 Run a general websearch for breaking changes as well as websearches for any significant updates.
 Based on the report suggest things that may be broken and suggest ways to verify they work.

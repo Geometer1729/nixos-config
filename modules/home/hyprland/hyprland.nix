@@ -61,10 +61,6 @@ in
       };
     };
 
-    home.pointerCursor = {
-      hyprcursor.enable = true;
-    };
-
     # Mako notification service configuration
     services.mako = {
       enable = true;
@@ -342,6 +338,7 @@ in
         exec-once = [
           # waybar, hypridle, and hyprpaper are started by systemd via their respective service enables
           "mako"
+          "blueman-applet"
           # Launch all Firefox profiles directly to their workspaces
           "[workspace 1 silent]  firefox -P youtube --new-instance"
           "[workspace 2 silent]  firefox -P default"
