@@ -2,6 +2,7 @@
 {
   specialisation.rescue.configuration = {
     system.nixos.tags = [ "rescue" ];
+    boot.initrd.systemd.emergencyAccess = true;
 
     # Disable home-manager entirely
     systemd.services."home-manager-${config.mainUser}".enable = lib.mkForce false;

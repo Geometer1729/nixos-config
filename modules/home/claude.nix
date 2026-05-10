@@ -181,8 +181,8 @@ in
       };
     };
 
-    # Memory file (~/CLAUDE.md)
-    memory.text = ''
+    # Global context file (~/CLAUDE.md)
+    context = ''
       NixOS. Direnv loads devshells. nix-shell -p if needed.
       CLIs: gh, linearis, slack-search
       Test fixes. Be skeptical.

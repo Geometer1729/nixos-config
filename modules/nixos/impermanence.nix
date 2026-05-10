@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ ... }:
 {
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
@@ -39,7 +39,6 @@
         ".local/share/direnv"
         ".local/share/opencode"
         ".local/share/task"
-        ".local/share/wasistlos"
         ".local/share/git"
         ".local/state/nvim"
         # Claude Code: persist entire directories to avoid file-level bind mount issues
@@ -81,28 +80,49 @@
   };
 
   fileSystems."/persist".neededForBoot = true;
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    mkdir /btrfs_tmp
-    mount /dev/root_vg/root /btrfs_tmp
-    if [[ -e /btrfs_tmp/root ]]; then
-        mkdir -p /btrfs_tmp/old_roots
-        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-    fi
+  boot.initrd.systemd.services.rollback-root = {
+    description = "Rotate btrfs root subvolume";
+    wantedBy = [ "initrd.target" ];
+    requires = [ "initrd-root-device.target" ];
+    after = [
+      "initrd-root-device.target"
+      "local-fs-pre.target"
+    ];
+    before = [ "sysroot.mount" ];
+    unitConfig.DefaultDependencies = "no";
+    serviceConfig = {
+      Type = "oneshot";
+      StandardOutput = "journal+console";
+      StandardError = "journal+console";
+    };
+    script = ''
+      set -euo pipefail
 
-    delete_subvolume_recursively() {
-        IFS=$'\n'
-        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-            delete_subvolume_recursively "/btrfs_tmp/$i"
-        done
-        btrfs subvolume delete "$1"
-    }
+      mkdir -p /btrfs_tmp
+      mount -t btrfs -o subvol=/ /dev/root_vg/root /btrfs_tmp
 
-    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
-        delete_subvolume_recursively "$i"
-    done
+      delete_subvolume_recursively() {
+          IFS=$'\n'
+          for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+              delete_subvolume_recursively "/btrfs_tmp/$i"
+          done
+          btrfs subvolume delete "$1"
+      }
 
-    btrfs subvolume create /btrfs_tmp/root
-    umount /btrfs_tmp
-  '';
+      if [[ -d /btrfs_tmp/old_roots ]]; then
+          for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+              delete_subvolume_recursively "$i"
+          done
+      fi
+
+      if [[ -e /btrfs_tmp/root ]]; then
+          mkdir -p /btrfs_tmp/old_roots
+          timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%d_%H:%M:%S")
+          mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+      fi
+
+      btrfs subvolume create /btrfs_tmp/root
+      umount /btrfs_tmp
+    '';
+  };
 }
