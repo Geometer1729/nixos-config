@@ -89,4 +89,22 @@ in
       };
     };
   };
+
+  xdg.configFile."opencode/tui.json".text = builtins.toJSON {
+    "$schema" = "https://opencode.ai/tui.json";
+    plugin = [
+      [
+        "opencode-vim@0.0.13"
+        {
+          autoUpdate = false;
+          vim = {
+            defaultMode = "insert";
+          };
+        }
+      ]
+    ];
+    keybinds = {
+      editor_open = "ctrl+o";
+    };
+  };
 }
