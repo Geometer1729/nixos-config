@@ -19,6 +19,8 @@ in
       to = "taskopen";
       t = "task";
       note = "task +LATEST annotate Notes;taskopen $(task +LATEST ids)";
+      qn = "quick-note";
+      quicknote = "quick-note";
     };
 
   imports = [

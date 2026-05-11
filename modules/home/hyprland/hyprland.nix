@@ -300,6 +300,7 @@ in
           "$mod, c, exec, scratchPad calcurse"
           "$mod, b, exec, scratchPad vit"
           "$mod, t, exec, onScratchPad --hide-after vit quickadd quick-add-task"
+          "$mod SHIFT, t, exec, onScratchPad --hide-after vim quicknote quick-note"
           "$mod, p, exec, onScratchPad --hide-after vit process process"
 
           # System controls
