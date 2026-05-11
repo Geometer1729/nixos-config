@@ -305,6 +305,7 @@ in
           # System controls
           "$mod SHIFT, s, exec, suspend-with-dpms-fix"
           "$mod SHIFT, r, exec, onScratchPad --hide-after sp rebuild rebuild"
+          "$mod SHIFT, w, exec, systemctl --user start rotate-wallpaper.service"
 
           # Screenshots
           ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
