@@ -9,7 +9,8 @@ rm_(){
 compdef rm_=rm
 
 cd_(){
-	\cd $@  && ls -hN --color=auto --group-directories-first
+	builtin cd -- "$@" || return
+	[[ -t 1 ]] && command ls -hN --color=auto --group-directories-first
 }
 compdef cd_=cd
 

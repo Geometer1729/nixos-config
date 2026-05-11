@@ -5,8 +5,9 @@ local g = vim.g
 local o = vim.o
 local fn = vim.fn
 
-local function map(m, k, v)
-    vim.keymap.set(m, k, v, { silent = true })
+local function map(m, k, v, opts)
+    local options = vim.tbl_extend('force', { silent = true }, opts or {})
+    vim.keymap.set(m, k, v, options)
 end
 
 g.mapleader=' '
@@ -17,7 +18,7 @@ map('n','<Leader>o',
     o.spelllang="en_us"
     vim.cmd.highlight({"SpellBad","cterm=undercurl"})
   end
-  )
+  , { desc = 'Enable spell check' })
 
 -- Window navigation: tmux-navigator plugin handles Ctrl-hjkl mappings
 local dirKeys = "hjkl"
@@ -25,9 +26,9 @@ for i = 1,#dirKeys do
   local c = dirKeys:sub(i,i)
   local key = '<C-'..c..'>'
   local action = '<C-w>'..c
-  map('t',key,'<C-\\><C-n>'..action)
+  map('t',key,'<C-\\><C-n>'..action, { desc = 'Move to ' .. c .. ' window' })
 end
-map('t','<C-n>','<C-\\><C-n>')
+map('t','<C-n>','<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 --map('n','S','<CMD>%s//g<Left><Left>')
 --cmd without cr is not allowed
@@ -39,14 +40,14 @@ vim.api.nvim_create_user_command('W'
   ]],{})
 
 
-map('n','<Leader>pv',vim.cmd.Ex)
+map('n','<Leader>pv',vim.cmd.Ex, { desc = 'Open netrw' })
 
 -- Copy filepath to clipboard
 map('n','<Leader>fp', function()
   local filepath = vim.fn.expand('%:p')
   vim.fn.setreg('+', filepath)
   print('Copied: ' .. filepath)
-end)
+end, { desc = 'Copy full file path' })
 
 map('n','<Return>', function()
   vim.cmd('noh')
@@ -57,33 +58,34 @@ map('n','<Return>', function()
       vim.api.nvim_win_close(win, false)
     end
   end
-end)
+end, { desc = 'Clear search and close floats' })
 
-map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>')
+map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>', { desc = 'Save session and quit all' })
 
 -- Telescope
-map('n','<Leader>ff',telescope.live_grep)
-map('n','<Leader>fw',t.extensions.vw.live_grep)
-map('n','<Leader>fg',telescope.git_files)
-map('n','<Leader>fa',telescope.find_files)
-map('n','<Leader>fh',telescope.help_tags)
+map('n','<Leader>ff',telescope.live_grep, { desc = 'Search project text' })
+map('n','<Leader>fw',t.extensions.vw.live_grep, { desc = 'Search Vimwiki text' })
+map('n','<Leader>fg',telescope.git_files, { desc = 'Search git files' })
+map('n','<Leader>fa',telescope.find_files, { desc = 'Search all files' })
+map('n','<Leader>fh',telescope.help_tags, { desc = 'Search help tags' })
+map('n','<Leader>fk',telescope.keymaps, { desc = 'Search keymaps' })
 
 -- UndoTree
-map('n','<Leader>u',vim.cmd.UndotreeToggle)
+map('n','<Leader>u',vim.cmd.UndotreeToggle, { desc = 'Toggle undo tree' })
 
 --Fugitiv
-map('n','<Leader>gs',vim.cmd.Git)
+map('n','<Leader>gs',vim.cmd.Git, { desc = 'Open Fugitive status' })
 
 --primagen tweaks
-map('n','J','mzJ`z') -- hold cursor on J
-map('n','n','nzzzv')
-map('n','N','Nzzzv')
-map('n','<leader>d','\"_d')
+map('n','J','mzJ`z', { desc = 'Join line without moving cursor' }) -- hold cursor on J
+map('n','n','nzzzv', { desc = 'Next search result centered' })
+map('n','N','Nzzzv', { desc = 'Previous search result centered' })
+map('n','<leader>d','\"_d', { desc = 'Delete without yanking' })
 
-map('n','<Leader>jq','<cmd>.!jq<cr>')
+map('n','<Leader>jq','<cmd>.!jq<cr>', { desc = 'Format current line with jq' })
 
 --vimtex
-map('n','<Leader>ll',vim.cmd.VimtexCompile)
+map('n','<Leader>ll',vim.cmd.VimtexCompile, { desc = 'Compile LaTeX document' })
 
 -- task link
 map('v','<Leader>t',
@@ -91,6 +93,7 @@ map('v','<Leader>t',
   vim.cmd([[:'<,'>w !gen-task-link]]);
   vim.cmd([[:r /tmp/task-link]]);
   end
+  , { desc = 'Insert task link for selection' }
   )
 
 local function toggle_nerdtree_with_buffers()
@@ -106,7 +109,7 @@ local function toggle_nerdtree_with_buffers()
 end
 
 
-map('n','<Leader>tt',toggle_nerdtree_with_buffers)
+map('n','<Leader>tt',toggle_nerdtree_with_buffers, { desc = 'Toggle NERDTree for open buffers' })
 
 vim.api.nvim_create_autocmd("BufEnter", {
   callback = function()

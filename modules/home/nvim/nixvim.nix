@@ -20,6 +20,7 @@
       );
   plugins = {
     telescope.enable = true;
+    which-key.enable = true;
     web-devicons.enable = true;
     vim-surround.enable = true;
     direnv.enable = true;

@@ -142,10 +142,10 @@ local function link_current_heading()
 end
 
 -- Create a command to call the function
-vim.api.nvim_create_user_command('LinkCurrentHeading', link_current_heading, {})
+vim.api.nvim_create_user_command('LinkCurrentHeading', link_current_heading, { desc = 'Copy markdown link to current heading' })
 
 -- Create a key mapping (optional)
-vim.keymap.set('n', '<Leader>lh', link_current_heading, { noremap = true, silent = true })
+vim.keymap.set('n', '<Leader>lh', link_current_heading, { noremap = true, silent = true, desc = 'Copy link to current heading' })
 
 -- Function to convert snake_case to camelCase
 local function to_camel_case(snake_str)
@@ -246,8 +246,8 @@ local function move_heading_to_new_file()
 end
 
 -- Map the function to a keybinding (e.g., <Leader>sh)
-vim.keymap.set("n", "<Leader>sh", move_heading_to_new_file, { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>vl", vim.cmd.VimwikiVSplitLink)
+vim.keymap.set("n", "<Leader>sh", move_heading_to_new_file, { noremap = true, silent = true, desc = 'Move heading subtree to new file' })
+vim.keymap.set("n", "<Leader>vl", vim.cmd.VimwikiVSplitLink, { desc = 'Open Vimwiki link in vertical split' })
 
 -- Task management integration
 
@@ -363,24 +363,9 @@ local function update_task_to_heading()
 end
 
 -- Create commands
-vim.api.nvim_create_user_command('TaskFromHeading', create_task_from_heading, {})
-vim.api.nvim_create_user_command('TaskUpdateLink', update_task_to_heading, {})
+vim.api.nvim_create_user_command('TaskFromHeading', create_task_from_heading, { desc = 'Create task from current heading' })
+vim.api.nvim_create_user_command('TaskUpdateLink', update_task_to_heading, { desc = 'Update task link to current heading' })
 
 -- Create keybindings
 vim.keymap.set('n', '<Leader>tc', create_task_from_heading, { noremap = true, silent = true, desc = 'Create task from current heading' })
 vim.keymap.set('n', '<Leader>tu', update_task_to_heading, { noremap = true, silent = true, desc = 'Update task link to current heading' })
-
--- Sync WeddingTODOS.md with tub server
-vim.api.nvim_create_autocmd('BufReadPre', {
-  pattern = '*Documents/vw/WeddingTODOS.md',
-  callback = function()
-    vim.fn.system('rsync -az bbrian@tub:~/Documents/vw/WeddingTODOS.md ~/Documents/vw/WeddingTODOS.md')
-  end,
-})
-
-vim.api.nvim_create_autocmd('BufWritePost', {
-  pattern = '*Documents/vw/WeddingTODOS.md',
-  callback = function()
-    vim.fn.system('rsync -az ~/Documents/vw/WeddingTODOS.md bbrian@tub:~/Documents/vw/WeddingTODOS.md')
-  end,
-})

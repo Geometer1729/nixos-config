@@ -49,10 +49,6 @@ secrets:
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets.yaml
 
-# Update Claude Code to latest version
-update-claude:
-  ./scripts/update-claude.sh
-
 # Test remote build infrastructure (am <-> torag)
 test-remote-builds:
   test-remote-builds

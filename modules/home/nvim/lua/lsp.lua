@@ -84,8 +84,8 @@ vim.lsp.enable('nixd')
 vim.lsp.enable('lua_ls')
 vim.lsp.enable('sqls')
 
-vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end)
-vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end)
+vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, { desc = 'Previous diagnostic' })
+vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, { desc = 'Next diagnostic' })
 
 local lsp_progress = {}
 
@@ -127,19 +127,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.lsp.stop_client(vim.lsp.get_clients())
         vim.cmd('e')
       end
-      , opts)
-    vim.keymap.set('n', '<leader>gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', '<leader>h', function() vim.lsp.buf.hover({border="single"}) end, opts)
-    vim.keymap.set('n', '<leader>gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+      , vim.tbl_extend('force', opts, { desc = 'Restart LSP clients' }))
+    vim.keymap.set('n', '<leader>gD', vim.lsp.buf.declaration, vim.tbl_extend('force', opts, { desc = 'Go to declaration' }))
+    vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition, vim.tbl_extend('force', opts, { desc = 'Go to definition' }))
+    vim.keymap.set('n', '<leader>h', function() vim.lsp.buf.hover({border="single"}) end, vim.tbl_extend('force', opts, { desc = 'Show hover docs' }))
+    vim.keymap.set('n', '<leader>gi', vim.lsp.buf.implementation, vim.tbl_extend('force', opts, { desc = 'Go to implementation' }))
+    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, vim.tbl_extend('force', opts, { desc = 'Go to type definition' }))
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, vim.tbl_extend('force', opts, { desc = 'Rename symbol' }))
+    vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, vim.tbl_extend('force', opts, { desc = 'Code actions' }))
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, vim.tbl_extend('force', opts, { desc = 'List references' }))
     vim.keymap.set('n', '<leader>f', function()
       vim.diagnostic.goto_next()
       vim.lsp.buf.code_action()
-    end, opts)
+    end, vim.tbl_extend('force', opts, { desc = 'Next diagnostic and code action' }))
   end,
 })
 
@@ -174,5 +174,4 @@ vim.api.nvim_create_autocmd('BufWritePre', {
     vim.cmd('%s/\\s\\+$//e')
   end,
 })
-
 

@@ -184,26 +184,21 @@ in
     # Global context file (~/CLAUDE.md)
     context = ''
       NixOS. Direnv loads devshells. nix-shell -p if needed.
-      CLIs: gh, linearis, slack-search
+      CLIs: gh, linearis
       Test fixes. Be skeptical.
-      TELL ME WHEN I'M WRONG.
-      Ask clarifiying questions.
+      Do not be afraid to raise limitations or possible mistakes I missed.
+      Ask clarifying questions.
       Suggest possible oversights.
-      If you need to fundementally change the plan from what I said tell me why.
-      Be confrontational chalenge bad ideas!
+      If you need to fundamentally change the plan from what I said tell me why.
       Questions are almost never rhetorical, but even if you think they are answer them.
     '';
   };
 
-  # API keys for CLI tools (linearis, slack-search)
+  # API keys for CLI tools
   programs.zsh.initContent = ''
     if [ -f /run/secrets/linear_api_key ]; then
       LINEAR_API_TOKEN="$(< /run/secrets/linear_api_key)"
       export LINEAR_API_TOKEN
-    fi
-    if [ -f /run/secrets/slack_token ]; then
-      SLACK_TOKEN="$(< /run/secrets/slack_token)"
-      export SLACK_TOKEN
     fi
   '';
 

@@ -35,7 +35,7 @@ local function gvsplit_develop()
 end
 
 -- Bind the command to <leader>d
-vim.keymap.set('n', '<leader>de', gvsplit_develop, { desc = 'Git Diff Split with develop branch' })
+vim.keymap.set('n', '<leader>de', gvsplit_develop, { desc = 'Git diff split with develop branch' })
 
 -- Define the function
 local function source_file_if_exists(filepath)
