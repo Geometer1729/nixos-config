@@ -70,6 +70,14 @@ vim.lsp.config.lua_ls = {
   },
 }
 
+vim.lsp.config.bashls = {
+  cmd = { "bash-language-server", "start" },
+}
+
+vim.lsp.config.yamlls = {
+  cmd = { "yaml-language-server", "--stdio" },
+}
+
 vim.lsp.config.sqls = {
   cmd = { "sqls" },
 }
@@ -82,6 +90,8 @@ vim.lsp.enable('rust_analyzer')
 vim.lsp.enable('ts_ls')
 vim.lsp.enable('nixd')
 vim.lsp.enable('lua_ls')
+vim.lsp.enable('bashls')
+vim.lsp.enable('yamlls')
 vim.lsp.enable('sqls')
 
 vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, { desc = 'Previous diagnostic' })
@@ -174,4 +184,3 @@ vim.api.nvim_create_autocmd('BufWritePre', {
     vim.cmd('%s/\\s\\+$//e')
   end,
 })
-

@@ -15,6 +15,8 @@
         just
         nixd
         lua-language-server # for nvim config stuff
+        bash-language-server
+        yaml-language-server
         ssh-to-age
       ];
 

@@ -9,7 +9,7 @@
     neovim-remote
     postman # rest-api tool
     nixd # nix lsp
-    sqls # sql lsp
+    bash-language-server # shell lsp
     okteta # hex editor
 
     # Command line utilities

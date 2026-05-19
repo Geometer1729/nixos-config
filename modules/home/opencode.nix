@@ -54,18 +54,49 @@ let
     "nix store ping*"
     "nix store verify*"
   ];
+
+  lspServers = {
+    nixd = {
+      command = [ "nixd" ];
+      extensions = [ ".nix" ];
+    };
+    "lua-ls" = {
+      command = [ "lua-language-server" ];
+      extensions = [ ".lua" ];
+    };
+    bash = {
+      command = [ "bash-language-server" "start" ];
+      extensions = [ ".sh" ".bash" ".zsh" ".ksh" ];
+    };
+    rust = {
+      command = [ "rust-analyzer" ];
+      extensions = [ ".rs" ];
+    };
+    hls = {
+      command = [ "haskell-language-server" "--lsp" ];
+      extensions = [ ".hs" ".lhs" ];
+    };
+    "yaml-ls" = {
+      command = [ "yaml-language-server" "--stdio" ];
+      extensions = [ ".yaml" ".yml" ];
+    };
+  };
 in
 {
   home.packages = [ pkgs.opencode ];
+  home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
+  home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
 
   xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
     "$schema" = "https://opencode.ai/config.json";
     autoupdate = false;
+    lsp = lspServers;
     model = "openai/gpt-5.5";
     permission = {
       external_directory = {
         "/nix/store/**" = "allow";
       };
+      lsp = "allow";
       read = {
         "/nix/store/**" = "allow";
       };
