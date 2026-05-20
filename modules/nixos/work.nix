@@ -2,7 +2,7 @@
 {
   services.postgresql = {
     enable = true;
-    package = pkgs.postgresql_16;
+    package = pkgs.postgresql_18;
 
     # Enable TCP/IP connections
     enableTCPIP = true;
@@ -36,6 +36,6 @@
 
   # Add PostgreSQL client tools to system packages
   environment.systemPackages = with pkgs; [
-    postgresql_16
+    postgresql_18
   ];
 }
