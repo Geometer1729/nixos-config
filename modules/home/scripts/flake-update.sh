@@ -169,14 +169,19 @@ fi
 echo "Full changelog: $CHANGELOG"
 echo ""
 
-# Check if nixpkgs was updated and run specialized analysis
-NIXPKGS_OLD_REV=$(jq -r '.nodes.nixpkgs_3.locked.rev // .nodes.nixpkgs_2.locked.rev // .nodes.nixpkgs.locked.rev // empty' "$OLD_LOCK" 2>/dev/null)
-NIXPKGS_NEW_REV=$(jq -r '.nodes.nixpkgs_3.locked.rev // .nodes.nixpkgs_2.locked.rev // .nodes.nixpkgs.locked.rev // empty' "$NEW_LOCK" 2>/dev/null)
+# Check if the root nixpkgs input was updated and run specialized analysis.
+# Some locks contain additional followed nixpkgs nodes; those may be unchanged
+# even when the root nixpkgs input changed.
+NIXPKGS_OLD_LOCKED=$(get_input_info "$OLD_LOCK" nixpkgs)
+NIXPKGS_NEW_LOCKED=$(get_input_info "$NEW_LOCK" nixpkgs)
+NIXPKGS_OLD_REV=$(get_rev "$NIXPKGS_OLD_LOCKED")
+NIXPKGS_NEW_REV=$(get_rev "$NIXPKGS_NEW_LOCKED")
 
 if [[ -n "$NIXPKGS_OLD_REV" && -n "$NIXPKGS_NEW_REV" && "$NIXPKGS_OLD_REV" != "$NIXPKGS_NEW_REV" ]]; then
   if ! $NO_FETCH; then
     log_info "nixpkgs was updated, running specialized analysis..."
-    if nixpkgs-changelog "$NIXPKGS_OLD_REV" "$NIXPKGS_NEW_REV" --json > "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json" 2>/dev/null; then
+    NIXPKGS_ANALYSIS_ERROR="$FLAKE_UPDATE_DIR/nixpkgs-changelog.err"
+    if FLAKE_PATH="$FLAKE_PATH" nixpkgs-changelog "$NIXPKGS_OLD_REV" "$NIXPKGS_NEW_REV" --json > "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json" 2>"$NIXPKGS_ANALYSIS_ERROR"; then
       NIXPKGS_MATCHES=$(jq '.relevant_changes | length' "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json")
       echo ""
       echo "=== nixpkgs Changes (filtered by your config) ==="
@@ -186,6 +191,20 @@ if [[ -n "$NIXPKGS_OLD_REV" && -n "$NIXPKGS_NEW_REV" && "$NIXPKGS_OLD_REV" != "$
       fi
       echo ""
       echo "Full nixpkgs analysis: $FLAKE_UPDATE_DIR/nixpkgs-changelog.json"
+      rm -f "$NIXPKGS_ANALYSIS_ERROR"
+    else
+      log_warn "nixpkgs analysis failed; see $NIXPKGS_ANALYSIS_ERROR"
+      jq -n \
+        --arg old_rev "$NIXPKGS_OLD_REV" \
+        --arg new_rev "$NIXPKGS_NEW_REV" \
+        --arg error_file "$NIXPKGS_ANALYSIS_ERROR" \
+        '{
+          old_rev: $old_rev,
+          new_rev: $new_rev,
+          error: "nixpkgs-changelog failed",
+          error_file: $error_file,
+          relevant_changes: []
+        }' > "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json"
     fi
   fi
 fi
@@ -198,4 +217,7 @@ echo "New lock: $NEW_LOCK"
 echo "Changelog: $CHANGELOG"
 if [[ -f "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json" ]]; then
   echo "nixpkgs analysis: $FLAKE_UPDATE_DIR/nixpkgs-changelog.json"
+fi
+if [[ -f "$FLAKE_UPDATE_DIR/config-packages.txt" ]]; then
+  echo "Config packages: $FLAKE_UPDATE_DIR/config-packages.txt"
 fi
