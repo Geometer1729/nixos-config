@@ -37,7 +37,9 @@ let
     "git show*"
     "git branch*"
     "git remote*"
+    "gh api*"
     "nix eval*"
+    "nix build*"
     "nix log*"
     "nix show-derivation*"
     "nix path-info*"
@@ -48,11 +50,31 @@ let
     "nix flake show*"
     "nix flake metadata*"
     "nix flake check*"
+    "nix flake update*"
     "nix store ls*"
     "nix store cat*"
     "nix store diff-closures*"
     "nix store ping*"
     "nix store verify*"
+    "flake-update*"
+    "flake-changelog*"
+    "nixpkgs-changelog*"
+    "nh os build*"
+    "just build*"
+    "just health*"
+    "just vim-health*"
+    "just gnome-check*"
+    "just test-remote-builds*"
+    "nvd diff*"
+    "got-gnomed*"
+    "systemctl --failed*"
+    "journalctl -p*"
+    "check-syncthing*"
+    "ssh -o ConnectTimeout=5 torag echo*"
+    "ssh torag just health*"
+    "ssh torag just vim-health*"
+    "ssh torag just gnome-check*"
+    "ssh torag just test-remote-builds*"
   ];
 
   lspServers = {
@@ -95,10 +117,14 @@ in
     permission = {
       external_directory = {
         "/nix/store/**" = "allow";
+        "/tmp/flake-update/**" = "allow";
+        "/tmp/nvim-health.txt" = "allow";
       };
       lsp = "allow";
       read = {
         "/nix/store/**" = "allow";
+        "/tmp/flake-update/**" = "allow";
+        "/tmp/nvim-health.txt" = "allow";
       };
       bash = builtins.listToAttrs (
         [
