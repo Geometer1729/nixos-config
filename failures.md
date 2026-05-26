@@ -6,9 +6,12 @@
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
 - **kvm_amd**: `SVM not supported by CPU 23` — hardware doesn't support nested virtualization
 - **Bluetooth RTL**: `hci1: RTL: RTL: Read reg16 failed (-110)` — hardware/firmware issue, harmless
+- **Syncthing**: peer `3MB5CXC` disconnected — likely torag/offline peer state
 - **Taskwarrior sync**: intermittent failure on activation (also seen on am now, not just torag)
 
 ### `just vim-health`
+- **WARNING**: LSP log size is large — stale local Neovim state, not config evaluation
+- **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
 ### `just gnome-check`

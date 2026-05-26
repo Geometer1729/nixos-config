@@ -85,6 +85,7 @@ in
     # Hyprland configuration
     wayland.windowManager.hyprland = {
       enable = true;
+      configType = "hyprlang";
       plugins = [
         #REEE I can't get plugins to build
       ];
