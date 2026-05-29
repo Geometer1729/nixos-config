@@ -153,7 +153,6 @@ in
 
         # Layout configuration
         dwindle = {
-          pseudotile = true;
           preserve_split = true;
         };
 
