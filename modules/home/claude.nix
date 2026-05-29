@@ -49,7 +49,7 @@ in
 
     # Settings for ~/.claude/settings.json
     settings = {
-      model = "claude-opus-4-5";
+      model = "claude-opus-4-8";
       showThinkingSummaries = true;
       voiceEnabled = true;
       autoMemoryEnabled = false;
