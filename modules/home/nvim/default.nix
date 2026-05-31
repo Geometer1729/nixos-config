@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ flake, pkgs, lib, ... }:
 {
   stylix.targets.nixvim = {
     enable = true;
@@ -9,7 +9,10 @@
     };
   };
   programs.nixvim =
-    (import ./nixvim.nix { inherit pkgs lib; })
+    (import ./nixvim.nix {
+      inherit pkgs lib;
+      nixpkgsSource = flake.inputs.nixpkgs;
+    })
     // { enable = true; };
 
 }

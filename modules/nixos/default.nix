@@ -14,11 +14,6 @@ in
   services.tcsd.enable = false;
 
   nixpkgs.overlays = [
-    # PrismLauncher's upstream overlay still asks callPackage for the removed
-    # top-level alias. Remove this shim once upstream uses kdePackages directly.
-    (_final: prev: {
-      extra-cmake-modules = prev.kdePackages.extra-cmake-modules;
-    })
     # PrismLauncher nightly overlay (new auth system)
     inputs.prismlauncher.overlays.default
   ] ++ lib.attrValues self.overlays;

@@ -1,5 +1,9 @@
-{ pkgs, lib }:
+{ pkgs, lib, nixpkgsSource ? null }:
 {
+  version.enableNixpkgsReleaseCheck = false;
+  nixpkgs = lib.optionalAttrs (nixpkgsSource != null) {
+    source = nixpkgsSource;
+  };
   viAlias = true;
   vimAlias = true;
   extraPackages = with pkgs; [

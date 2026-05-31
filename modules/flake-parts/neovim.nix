@@ -13,6 +13,7 @@
         module = import ../home/nvim/nixvim.nix {
           pkgs = pkgsForNixvim;
           inherit lib;
+          nixpkgsSource = inputs.nixpkgs;
         };
       };
       neovimWithConfig = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule nixvimModule;
