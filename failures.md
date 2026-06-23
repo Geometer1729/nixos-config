@@ -10,10 +10,14 @@
 - **Waybar**: `.waybar-wrapped` coredump seen after activation — likely activation/session restart related unless it repeats during normal use
 - **Syncthing**: peer `3MB5CXC` disconnected — likely torag/offline peer state
 - **Taskwarrior sync**: intermittent failure on activation (also seen on am now, not just torag)
+- **dbus-broker duplicate service names**: duplicate names for Blueman, dconf, and xdg-desktop-portal service files after boot — noisy but services are still running
+- **FoundryVTT auth DNS**: `getaddrinfo EAI_AGAIN foundryvtt.com` during boot/authentication — transient DNS/network timing unless it persists
+- **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
 
 ### `just vim-health`
 - **ERROR**: nvim-treesitter install directory `/home/bbrian/.local/share/nvim/site` is writable but not in runtimepath — packaged parsers are still available from the Nix store
 - **WARNING**: LSP log size is large — stale local Neovim state, not config evaluation
+- **WARNING**: Nvim 0.12.3 is available while packaged Nvim is 0.12.2 — upstream availability notice
 - **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 

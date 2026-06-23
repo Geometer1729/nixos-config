@@ -2,12 +2,11 @@
 # vit (not really, needs a stylix module)
 { pkgs, ... }:
 {
-  # Disable GNOME stylix target for all HM users — not using GNOME
+  # Disable GNOME stylix target for all HM users - not using GNOME
   home-manager.sharedModules = [
-    ({ config, ... }: {
-      gtk.gtk4.theme = config.gtk.theme;
+    {
       stylix.targets.gnome.enable = false;
-    })
+    }
   ];
 
   stylix = {

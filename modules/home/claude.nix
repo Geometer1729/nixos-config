@@ -191,6 +191,12 @@ in
       Suggest possible oversights.
       If you need to fundamentally change the plan from what I said tell me why.
       Questions are almost never rhetorical, but even if you think they are answer them.
+      If I ask a question, answer it directly before taking action.
+      Treat questions as genuine requests for information,
+      not implicit permission to edit, run commands, or proceed.
+      If you think action is needed, first answer the question, then ask whether I want you to act.
+      I ask a question that's a request to plan (even in build mode).
+      If I ask you to diagnose a problem that's a request to plan.
     '';
   };
 
