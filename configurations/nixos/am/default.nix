@@ -25,6 +25,8 @@ in
       primaryMonitor = "HDMI-A-1,2560x1440@60,0x0,1";
       secondaryMonitor = "DP-1,1920x1080@60,2560x0,1";
     };
+
+    services.mighty-rearranger.enable = true;
   };
 
   imports = [

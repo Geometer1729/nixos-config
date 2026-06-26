@@ -40,6 +40,7 @@
         ".local/share/opencode"
         ".local/share/task"
         ".local/share/git"
+        ".local/state/mighty-rearranger"
         ".local/state/nvim"
         # Claude Code: persist entire directories to avoid file-level bind mount issues
         ".claude-work"

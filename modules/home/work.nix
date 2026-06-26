@@ -1,5 +1,7 @@
-{ pkgs, ... }:
+{ flake, pkgs, ... }:
 {
+  imports = [ flake.inputs.mighty-rearranger.homeManagerModules.default ];
+
   home.packages =
     with pkgs;
     [
