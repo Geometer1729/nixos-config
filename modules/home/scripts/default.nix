@@ -1,12 +1,17 @@
-{ pkgs, ... }:
+{ flake, pkgs, ... }:
 let
+  system = pkgs.stdenv.hostPlatform.system;
+
   # Packages available to all scripts at runtime
   scriptDeps = with pkgs; [
     curl
     fzf
     gh
+    git
     jq
     python3
+    flake.inputs.mighty-rearranger.packages.${system}.default
+    flake.inputs.mighty-rearranger.inputs.rageveil.packages.${system}.default
   ];
 in
 {
@@ -35,4 +40,3 @@ in
     # Also install these packages globally for interactive use
     ++ scriptDeps;
 }
-

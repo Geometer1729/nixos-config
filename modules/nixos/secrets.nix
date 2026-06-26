@@ -16,6 +16,8 @@ in
       wifi = lib.mkIf config.wifi.enable { owner = "wpa_supplicant"; };
       hashedPassword = owned // { neededForUsers = true; };
       hosts = owned;
+      gcloud_client_id = owned;
+      gcloud_secret = owned;
       linear_api_key = owned;
       slack_token = owned;
       taskwarrior-sync-secret = owned;
