@@ -14,6 +14,14 @@
           pkgs = pkgsForNixvim;
           inherit lib;
           nixpkgsSource = inputs.nixpkgs;
+          pluginSources = {
+            inherit (inputs)
+              telescope-vimwiki-nvim
+              nvim-luaref
+              ocaml-nvim
+              recover-vim
+              ;
+          };
         };
       };
       neovimWithConfig = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule nixvimModule;

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ flake, ... }:
 {
   imports = [ ./starship.nix ./direnv.nix ];
   programs.zsh =
@@ -12,12 +12,7 @@
           # gets nix-shell to use zsh
           name = "zsh-nix-shell";
           file = "nix-shell.plugin.zsh";
-          src = pkgs.fetchFromGitHub {
-            owner = "chisui";
-            repo = "zsh-nix-shell";
-            rev = "v0.5.0";
-            sha256 = "0za4aiwwrlawnia4f29msk822rj9bgcygw6a8a6iikiwzjjz0g91";
-          };
+          src = flake.inputs.zsh-nix-shell;
         }
       ];
       history = {

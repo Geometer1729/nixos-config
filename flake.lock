@@ -588,6 +588,38 @@
         "type": "github"
       }
     },
+    "nvim-luaref": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1645064202,
+        "narHash": "sha256-nmsKg1Ah67fhGzevTFMlncwLX9gN0JkR7Woi0T5On34=",
+        "owner": "milisims",
+        "repo": "nvim-luaref",
+        "rev": "9cd3ed50d5752ffd56d88dd9e395ddd3dc2c7127",
+        "type": "github"
+      },
+      "original": {
+        "owner": "milisims",
+        "repo": "nvim-luaref",
+        "type": "github"
+      }
+    },
+    "ocaml-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771140102,
+        "narHash": "sha256-aJ7k1af1PF4zqO3sazdAE0wuBGJAqRpQPLXTSRgNf7M=",
+        "owner": "andreypopp",
+        "repo": "ocaml.nvim",
+        "rev": "16198d5d4bf2574f996307bba3ad027879fc45a5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "andreypopp",
+        "repo": "ocaml.nvim",
+        "type": "github"
+      }
+    },
     "prismlauncher": {
       "inputs": {
         "libnbtplusplus": "libnbtplusplus",
@@ -632,6 +664,22 @@
         "type": "github"
       }
     },
+    "recover-vim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1439537091,
+        "narHash": "sha256-umh7gZ3UdKHO8UQCSME1GNaJq5PEAktwctDyJVCNX58=",
+        "owner": "chrisbra",
+        "repo": "Recover.vim",
+        "rev": "efa491f6121f65e025f42d79a93081abb8db69d4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chrisbra",
+        "repo": "Recover.vim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "claude-code": "claude-code",
@@ -649,10 +697,15 @@
         "nixpkgs": "nixpkgs_2",
         "nixvim": "nixvim",
         "nur": "nur",
+        "nvim-luaref": "nvim-luaref",
+        "ocaml-nvim": "ocaml-nvim",
         "prismlauncher": "prismlauncher",
+        "recover-vim": "recover-vim",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
-        "xlibre-overlay": "xlibre-overlay"
+        "telescope-vimwiki-nvim": "telescope-vimwiki-nvim",
+        "xlibre-overlay": "xlibre-overlay",
+        "zsh-nix-shell": "zsh-nix-shell"
       }
     },
     "rust-overlay": {
@@ -820,6 +873,22 @@
         "xlibre-overlay"
       ]
     },
+    "telescope-vimwiki-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1650393779,
+        "narHash": "sha256-46N1vMSu1UuzPFFe6Yt39s3xlKPOTErhPJbfaBQgq7g=",
+        "owner": "ElPiloto",
+        "repo": "telescope-vimwiki.nvim",
+        "rev": "13a83b6107da17af9eb8a1d8e0fe49e1004dfeb4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ElPiloto",
+        "repo": "telescope-vimwiki.nvim",
+        "type": "github"
+      }
+    },
     "tinted-kitty": {
       "flake": false,
       "locked": {
@@ -937,6 +1006,22 @@
       "parent": [
         "xlibre-overlay"
       ]
+    },
+    "zsh-nix-shell": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704028593,
+        "narHash": "sha256-Rtg8kWVLhXRuD2/Ctbtgz9MQCtKZOLpAIdommZhXKdE=",
+        "owner": "chisui",
+        "repo": "zsh-nix-shell",
+        "rev": "82ca15e638cc208e6d8368e34a1625ed75e08f90",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chisui",
+        "repo": "zsh-nix-shell",
+        "type": "github"
+      }
     }
   },
   "root": "root",

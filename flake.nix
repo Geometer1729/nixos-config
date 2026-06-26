@@ -11,7 +11,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixos-unified.url = "github:srid/nixos-unified";
 
-    # Software inputs
+    # Nix modules and package sets
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.url = "github:nix-community/nixvim";
@@ -39,6 +39,21 @@
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Custom source pins used by local modules.
+    # These are flake inputs so `nix flake update` can move them intentionally.
+    telescope-vimwiki-nvim.url = "github:ElPiloto/telescope-vimwiki.nvim";
+    telescope-vimwiki-nvim.flake = false;
+    nvim-luaref.url = "github:milisims/nvim-luaref";
+    nvim-luaref.flake = false;
+    ocaml-nvim.url = "github:andreypopp/ocaml.nvim";
+    ocaml-nvim.flake = false;
+    recover-vim.url = "github:chrisbra/Recover.vim";
+    recover-vim.flake = false;
+    zsh-nix-shell.url = "github:chisui/zsh-nix-shell";
+    zsh-nix-shell.flake = false;
+
+    # Work
     mighty-rearranger.url = "git+ssh://git@github.com/geosurge-ai/mighty-rearranger.git";
     mighty-rearranger.inputs.nixpkgs.follows = "nixpkgs";
 
