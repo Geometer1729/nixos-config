@@ -1,6 +1,5 @@
 { ... }:
 {
-  programs.fuse.enable = true;
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;
