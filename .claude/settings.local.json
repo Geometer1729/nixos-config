@@ -81,7 +81,8 @@
       "Read(//nix/store/c5m6lyknmx49ih0fkfqa0h2a18242qny-user-environment/**)",
       "Read(//home/bbrian/.config/environment.d/**)",
       "Read(//nix/store/**)",
-      "Bash(xargs -I{} sh -c 'test -f \"{}/homeManagerModules/default.nix\" && echo {}')"
+      "Bash(xargs -I{} sh -c 'test -f \"{}/homeManagerModules/default.nix\" && echo {}')",
+      "Bash(nixos-version)"
     ],
     "deny": []
   }
