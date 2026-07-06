@@ -82,7 +82,8 @@
       "Read(//home/bbrian/.config/environment.d/**)",
       "Read(//nix/store/**)",
       "Bash(xargs -I{} sh -c 'test -f \"{}/homeManagerModules/default.nix\" && echo {}')",
-      "Bash(nixos-version)"
+      "Bash(nixos-version)",
+      "Bash(git -C /tmp/flake-update/nixpkgs log --oneline -1)"
     ],
     "deny": []
   }
