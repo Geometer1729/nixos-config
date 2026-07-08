@@ -31,6 +31,7 @@
         ".config/ncspot"
         ".config/chromium"
         ".config/google-chrome"
+        ".config/meridian"
         ".gnupg"
         ".hoogle"
         ".local/share/PrismLauncher"
@@ -51,6 +52,7 @@
         ".mozilla/firefox/work"
         ".mozilla/firefox/ttrpg"
         ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
+        ".cache/meridian"
         ".ssh"
         ".tldrc"
         "Code"

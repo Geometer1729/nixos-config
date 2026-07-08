@@ -1,4 +1,4 @@
-{ flake, pkgs, ... }:
+{ flake, pkgs, config, ... }:
 let
   inherit (flake) inputs;
   unstable = import inputs.nixpkgs-unstable {
@@ -110,15 +110,39 @@ let
   };
 in
 {
+  imports = [ inputs.meridian.homeManagerModules.default ];
+
   home.packages = [ unstable.opencode ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
+
+  services.meridian = {
+    enable = true;
+    environment = {
+      CLAUDE_CONFIG_DIR = "${config.home.homeDirectory}/.claude-work";
+    };
+  };
+
+  xdg.configFile."meridian/sdk-features.json" = {
+    force = true;
+    text = builtins.toJSON {
+      opencode = {
+        clientSystemPrompt = false;
+        codeSystemPrompt = true;
+      };
+    };
+  };
 
   xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
     "$schema" = "https://opencode.ai/config.json";
     autoupdate = false;
     lsp = lspServers;
     model = "openai/gpt-5.5";
+    plugin = [ config.services.meridian.opencode.pluginPath ];
+    provider.anthropic.options = {
+      apiKey = "x";
+      baseURL = "http://127.0.0.1:3456";
+    };
     permission = {
       external_directory = {
         "/nix/store/**" = "allow";

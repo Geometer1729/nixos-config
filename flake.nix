@@ -40,6 +40,7 @@
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
+    meridian.url = "github:rynfar/meridian";
 
     # Custom source pins used by local modules.
     # These are flake inputs so `nix flake update` can move them intentionally.
