@@ -113,7 +113,7 @@
   home.sessionVariables = {
     EDITOR = "vim";
     NIX_AUTO_RUN = 1;
-    CLAUDE_CODE_EFFORT_LEVEL = "max";
+    #CLAUDE_CODE_EFFORT_LEVEL = "high";
   };
   programs.nix-index = {
     enable = true;

@@ -1,5 +1,10 @@
-{ pkgs, ... }:
+{ flake, pkgs, ... }:
 let
+  inherit (flake) inputs;
+  unstable = import inputs.nixpkgs-unstable {
+    system = pkgs.stdenv.hostPlatform.system;
+  };
+
   allowedBashCommands = [
     "ls*"
     "rg*"
@@ -105,7 +110,7 @@ let
   };
 in
 {
-  home.packages = [ pkgs.opencode ];
+  home.packages = [ unstable.opencode ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
 
