@@ -17,7 +17,7 @@
       log-lines = 25;
       auto-optimise-store = true;
       experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
-      trusted-users = [ "root" config.mainUser ];
+      trusted-users = [ "root" config.mainUser "yixin" ];
       keep-outputs = true;
     };
     gc = {

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   programs.tmux = {
     enable = true;
@@ -25,7 +25,7 @@
         bind a rename-session "#{b:pane_current_path}"
         set-hook -g session-renamed 'attach-session -c "#{pane_current_path}"'
 
-        set-option -g @tmux-autoreload-configs '/home/bbrian/.config/tmux/tmux.conf'
+        set-option -g @tmux-autoreload-configs '${config.home.homeDirectory}/.config/tmux/tmux.conf'
 
         # Only enable status when there is more than one window
         # from https://schauderbasis.de/posts/hide_tmux_status_bar_if_its_not_needed/

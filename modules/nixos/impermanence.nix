@@ -80,6 +80,11 @@
         #".config/task/taskrc" # persisted just for news.version :(
       ];
     };
+    users.yixin = {
+      directories = [
+        "."
+      ];
+    };
   };
 
   fileSystems."/persist".neededForBoot = true;

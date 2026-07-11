@@ -20,6 +20,11 @@ in
   config = {
     time.timeZone = "America/New_York";
     i18n.defaultLocale = "en_US.UTF-8";
+    i18n.supportedLocales = [
+      "C.UTF-8/UTF-8"
+      "en_US.UTF-8/UTF-8"
+      "zh_CN.UTF-8/UTF-8"
+    ];
 
     nixpkgs.config.allowUnfree = true;
     hardware.enableRedistributableFirmware = true;
@@ -73,6 +78,13 @@ in
       description = config.mainUser;
       shell = pkgs.zsh; # TODO: can home-manager do this? (currently here as workaround for completion issues)
       # https://github.com/nix-community/home-manager/issues/2562
+      extraGroups = [ "networkmanager" "wheel" ];
+    };
+    users.users.yixin = {
+      hashedPasswordFile = config.sops.secrets.hashedPassword.path;
+      isNormalUser = true;
+      description = "Yixin";
+      shell = pkgs.zsh;
       extraGroups = [ "networkmanager" "wheel" ];
     };
 

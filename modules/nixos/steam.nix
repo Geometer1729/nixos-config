@@ -11,6 +11,14 @@
       mesa-demos # TODO do I need this?
     ];
   };
+  users.users.yixin = {
+    packages = with pkgs; [
+      steam
+      steam-run
+      libgdiplus
+      mesa-demos
+    ];
+  };
 
   services.pulseaudio.support32Bit = true;
   hardware = {

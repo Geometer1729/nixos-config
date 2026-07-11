@@ -18,6 +18,7 @@ in
 
   config = lib.mkIf cfg.enable {
     users.users.${config.mainUser}.extraGroups = [ "wpa_supplicant" ];
+    users.users.yixin.extraGroups = [ "wpa_supplicant" ];
     networking.wireless = {
       enable = true;
       interfaces = [ cfg.interface ];

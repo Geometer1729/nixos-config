@@ -23,6 +23,7 @@ in
     useUserPackages = true;
     users = {
       ${config.mainUser}.imports = [ (self + /configurations/home/bbrian.nix) ];
+      yixin.imports = [ (self + /configurations/home/yixin.nix) ];
       root.imports = [ (self + /configurations/home/root.nix) ];
     };
   };
@@ -44,6 +45,7 @@ in
       gh-noto
       hyprland
       impermanence
+      kde
       main
       nix
       secrets
