@@ -71,11 +71,12 @@ should_notify() {
 
 # Get contextual information about current project
 get_project_info() {
-  local pwd_info=$(pwd | sed "s|^$HOME|~|")
+  local project_dir="${1:-$PWD}"
+  local pwd_info=$(printf '%s' "$project_dir" | sed "s|^$HOME|~|")
 
   # Try to get git repo name
-  if git rev-parse --git-dir >/dev/null 2>&1; then
-    local repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+  if git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+    local repo_name=$(basename "$(git -C "$project_dir" rev-parse --show-toplevel 2>/dev/null)")
     if [[ -n "$repo_name" ]]; then
       echo "$repo_name ($pwd_info)"
       return

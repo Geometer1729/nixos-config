@@ -5,6 +5,39 @@ let
     system = pkgs.stdenv.hostPlatform.system;
   };
 
+  developmentBashCommands = [
+    "cargo fmt*"
+    "cargo clippy*"
+    "cargo check*"
+    "cargo test*"
+    "cargo nextest run*"
+    "rustfmt*"
+    "cabal check*"
+    "cabal test*"
+    "cabal v2-test*"
+    "stack test*"
+    "hlint*"
+    "ormolu*"
+    "fourmolu*"
+    "stylish-haskell*"
+    "cabal-fmt*"
+    "nix fmt*"
+    "nixpkgs-fmt*"
+    "alejandra*"
+    "treefmt*"
+    "statix check*"
+    "deadnix*"
+    "shellcheck*"
+    "shfmt*"
+  ];
+
+  wrappedDevelopmentBashCommands = builtins.concatMap
+    (command: [
+      "nix develop --command ${command}"
+      "direnv exec . ${command}"
+    ])
+    developmentBashCommands;
+
   allowedBashCommands = [
     "ls*"
     "rg*"
@@ -36,12 +69,19 @@ let
     "printf*"
     "test*"
     "expr*"
+    "jq*"
     "git status*"
     "git log*"
     "git diff*"
     "git show*"
     "git branch*"
     "git remote*"
+    "git rev-parse*"
+    "git ls-files*"
+    "git blame*"
+    "git describe*"
+    "git tag"
+    "git tag --list*"
     "gh api*"
     "nix eval*"
     "nix build*"
@@ -65,7 +105,10 @@ let
     "flake-changelog*"
     "nixpkgs-changelog*"
     "nh os build*"
+    "nh os test*"
     "just build*"
+    "just fmt*"
+    "just test*"
     "just health*"
     "just vim-health*"
     "just gnome-check*"
@@ -80,7 +123,7 @@ let
     "ssh torag just vim-health*"
     "ssh torag just gnome-check*"
     "ssh torag just test-remote-builds*"
-  ];
+  ] ++ developmentBashCommands ++ wrappedDevelopmentBashCommands;
 
   lspServers = {
     nixd = {
@@ -112,7 +155,10 @@ in
 {
   imports = [ inputs.meridian.homeManagerModules.default ];
 
-  home.packages = [ unstable.opencode ];
+  home.packages = with pkgs; [
+    libnotify
+    unstable.opencode
+  ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
 
@@ -137,7 +183,7 @@ in
     "$schema" = "https://opencode.ai/config.json";
     autoupdate = false;
     lsp = lspServers;
-    model = "openai/gpt-5.5";
+    model = "openai/gpt-5.6-sol";
     plugin = [ config.services.meridian.opencode.pluginPath ];
     provider.anthropic.options = {
       apiKey = "x";
@@ -146,14 +192,12 @@ in
     permission = {
       external_directory = {
         "/nix/store/**" = "allow";
-        "/tmp/flake-update/**" = "allow";
-        "/tmp/nvim-health.txt" = "allow";
+        "/tmp/**" = "allow";
       };
       lsp = "allow";
       read = {
         "/nix/store/**" = "allow";
-        "/tmp/flake-update/**" = "allow";
-        "/tmp/nvim-health.txt" = "allow";
+        "/tmp/**" = "allow";
       };
       bash = builtins.listToAttrs (
         [
@@ -172,15 +216,40 @@ in
       edit = {
         "*" = "ask";
         "/nix/store/**" = "deny";
+        "/tmp/**" = "allow";
       };
     };
   };
 
+  xdg.configFile."opencode/plugins/notifications.js".text = ''
+    export const NotificationPlugin = async ({ directory }) => {
+      const notify = (eventType) => {
+        Bun.spawn({
+          cmd: ["opencode-notify", eventType, directory],
+          stdout: "ignore",
+          stderr: "ignore",
+        })
+      }
+
+      return {
+        event: async ({ event }) => {
+          if (event.type === "session.idle") notify("ready")
+          if (event.type === "permission.asked") notify("permission")
+        },
+      }
+    }
+  '';
+
   xdg.configFile."opencode/tui.json".text = builtins.toJSON {
     "$schema" = "https://opencode.ai/tui.json";
+    attention = {
+      enabled = true;
+      notifications = true;
+      sound = false;
+    };
     plugin = [
       [
-        "opencode-vim@0.0.13"
+        "opencode-vim@0.0.20"
         {
           autoUpdate = false;
           vim = {

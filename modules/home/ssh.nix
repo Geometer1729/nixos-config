@@ -29,6 +29,10 @@ in
         hostname = "192.168.1.227";
         proxyJump = "tub";
       };
+      firefly = me // {
+        hostname = "35.197.253.212";
+        user = "root";
+      };
     };
   };
 }

@@ -9,6 +9,7 @@ let
     gh
     git
     jq
+    libnotify
     python3
     flake.inputs.mighty-rearranger.packages.${system}.default
     flake.inputs.mighty-rearranger.inputs.rageveil.packages.${system}.default
