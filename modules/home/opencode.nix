@@ -29,6 +29,8 @@ let
     "deadnix*"
     "shellcheck*"
     "shfmt*"
+    "nixfmt*"
+    "command -v *"
   ];
 
   wrappedDevelopmentBashCommands = builtins.concatMap
