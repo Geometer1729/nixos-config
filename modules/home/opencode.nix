@@ -153,9 +153,10 @@ let
   };
 in
 {
-  imports = [ inputs.meridian.homeManagerModules.default ];
+  imports = [ inputs.meridian.homeModules.default ];
 
   home.packages = with pkgs; [
+    config.services.meridian.package
     libnotify
     unstable.opencode
   ];
