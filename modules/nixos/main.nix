@@ -81,7 +81,7 @@ in
       extraGroups = [ "networkmanager" "wheel" ];
     };
     users.users.yixin = {
-      hashedPasswordFile = config.sops.secrets.hashedPassword.path;
+      hashedPasswordFile = config.sops.secrets.yixinHashedPassword.path;
       isNormalUser = true;
       description = "Yixin";
       shell = pkgs.zsh;

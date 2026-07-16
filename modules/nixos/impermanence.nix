@@ -5,6 +5,12 @@
     hideMounts = true;
     directories = [
       "/var/log"
+      {
+        directory = "/var/cache/tuigreet";
+        user = "greeter";
+        group = "greeter";
+        mode = "0755";
+      }
       "/var/lib/bluetooth"
       "/var/lib/tailscale"
       "/var/lib/nixos"
