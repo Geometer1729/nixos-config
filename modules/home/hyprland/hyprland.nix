@@ -213,6 +213,7 @@ in
           "$mod, d, exec, rofi -show drun"
           "$mod, s, exec, rofi -show ssh"
           "$mod, r, exec, rofi -show run"
+          "$mod SHIFT, n, exec, start-ticket --desktop"
 
           # Window management
           "$mod, q, killactive"

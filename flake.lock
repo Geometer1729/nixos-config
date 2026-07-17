@@ -468,6 +468,34 @@
         "type": "github"
       }
     },
+    "linearis": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783328450,
+        "narHash": "sha256-ox7lS4+yB5B4XFY+DWTqrWKv1MISjk3O7eDUQN0fAVs=",
+        "owner": "linearis-oss",
+        "repo": "linearis",
+        "rev": "cc2a817e5ff1b30b852157799e1c718e907e0c7a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "linearis-oss",
+        "repo": "linearis",
+        "type": "github"
+      }
+    },
+    "linearis-npm": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-7wBReXNnveaAYGnKXeNPhC0BzwmcbO8kqw/wzIrLm8g=",
+        "type": "file",
+        "url": "https://registry.npmjs.org/linearis/next"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.npmjs.org/linearis/next"
+      }
+    },
     "meridian": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -864,6 +892,8 @@
         "home-manager": "home-manager",
         "homeassistant-smartrent": "homeassistant-smartrent",
         "impermanence": "impermanence",
+        "linearis": "linearis",
+        "linearis-npm": "linearis-npm",
         "meridian": "meridian",
         "mighty-rearranger": "mighty-rearranger",
         "nix-darwin": "nix-darwin",

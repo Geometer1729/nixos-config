@@ -56,6 +56,10 @@
     zsh-nix-shell.flake = false;
 
     # Work
+    linearis.url = "github:linearis-oss/linearis";
+    linearis.flake = false;
+    linearis-npm.url = "file+https://registry.npmjs.org/linearis/next";
+    linearis-npm.flake = false;
     mighty-rearranger.url = "git+ssh://git@github.com/geosurge-ai/mighty-rearranger.git";
     mighty-rearranger.inputs.nixpkgs.follows = "nixpkgs";
 
