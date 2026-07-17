@@ -473,20 +473,71 @@
         "bun2nix": "bun2nix",
         "flake-parts": "flake-parts_2",
         "home-manager": "home-manager_2",
+        "meridian-plugin-hermes-scrub": "meridian-plugin-hermes-scrub",
+        "meridian-plugin-opencode-scrub": "meridian-plugin-opencode-scrub",
+        "meridian-plugin-pi-scrub": "meridian-plugin-pi-scrub",
         "nixpkgs": "nixpkgs",
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1784047082,
-        "narHash": "sha256-7z8yy9buNN/Sf10iMijW4v8BDvwrg9q2qZQxBNLYgzw=",
+        "lastModified": 1784314998,
+        "narHash": "sha256-2zwk40gqJkH1ZvtulzbizJ1zXgyRSGc0cPj3XBqbtYo=",
         "owner": "rynfar",
         "repo": "meridian",
-        "rev": "0496e6de9785911aa8131732de058b9cbc4b2a44",
+        "rev": "01baa0f4d83738fa5c302149d0e05780f2d47f2b",
         "type": "github"
       },
       "original": {
         "owner": "rynfar",
         "repo": "meridian",
+        "type": "github"
+      }
+    },
+    "meridian-plugin-hermes-scrub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783706868,
+        "narHash": "sha256-NZ5jpEEShJPHWhpY/lqU81dkui2CgWf3GhOPKyqNKAM=",
+        "owner": "rynfar",
+        "repo": "meridian-plugin-hermes-scrub",
+        "rev": "d3a28e5465fee9eb8ffdde340f4f973fa9d450b3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rynfar",
+        "repo": "meridian-plugin-hermes-scrub",
+        "type": "github"
+      }
+    },
+    "meridian-plugin-opencode-scrub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783706886,
+        "narHash": "sha256-OhIYu4aZP+6RvlnDxraXfbh3Fez0QZ9pkaekmHkfBzY=",
+        "owner": "rynfar",
+        "repo": "meridian-plugin-opencode-scrub",
+        "rev": "59a1bfce767d1994a4bb6a700373e4c11aef3633",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rynfar",
+        "repo": "meridian-plugin-opencode-scrub",
+        "type": "github"
+      }
+    },
+    "meridian-plugin-pi-scrub": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783706871,
+        "narHash": "sha256-S3QdJQvSR3claesMgSPZvVFosuuDeYDgpMwBRR+3zM0=",
+        "owner": "rynfar",
+        "repo": "meridian-plugin-pi-scrub",
+        "rev": "65fe302e570044f6f115805d82b619277a8e538f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rynfar",
+        "repo": "meridian-plugin-pi-scrub",
         "type": "github"
       }
     },
