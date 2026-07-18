@@ -822,6 +822,22 @@
         "type": "github"
       }
     },
+    "opencode-vim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783909675,
+        "narHash": "sha256-YMpqwD5HBonzLAbvqkmvYRZov+cgoTumEZFQguhlN30=",
+        "owner": "Tarquinen",
+        "repo": "opencode-vim",
+        "rev": "d7489db5129b756246910c5e591f8d76be526fc8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Tarquinen",
+        "repo": "opencode-vim",
+        "type": "github"
+      }
+    },
     "prismlauncher": {
       "inputs": {
         "libnbtplusplus": "libnbtplusplus",
@@ -905,6 +921,7 @@
         "nur": "nur",
         "nvim-luaref": "nvim-luaref",
         "ocaml-nvim": "ocaml-nvim",
+        "opencode-vim": "opencode-vim",
         "prismlauncher": "prismlauncher",
         "recover-vim": "recover-vim",
         "sops-nix": "sops-nix",

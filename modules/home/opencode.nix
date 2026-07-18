@@ -4,6 +4,8 @@ let
   unstable = import inputs.nixpkgs-unstable {
     system = pkgs.stdenv.hostPlatform.system;
   };
+  opencodeVimVersion =
+    (builtins.fromJSON (builtins.readFile "${inputs.opencode-vim}/package.json")).version;
 
   developmentBashCommands = [
     "cargo fmt*"
@@ -252,7 +254,7 @@ in
     };
     plugin = [
       [
-        "opencode-vim@0.0.20"
+        "opencode-vim@${opencodeVimVersion}"
         {
           autoUpdate = false;
           vim = {

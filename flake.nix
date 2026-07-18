@@ -54,6 +54,8 @@
     recover-vim.flake = false;
     zsh-nix-shell.url = "github:chisui/zsh-nix-shell";
     zsh-nix-shell.flake = false;
+    opencode-vim.url = "github:Tarquinen/opencode-vim";
+    opencode-vim.flake = false;
 
     # Work
     linearis.url = "github:linearis-oss/linearis";
