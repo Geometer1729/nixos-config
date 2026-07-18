@@ -35,6 +35,9 @@ if [[ ! -d $worktree ]]; then
   else
     git -C "$repo" worktree add -b "$branch" "$worktree" origin/HEAD
   fi
+  if [[ -f $repo/.env ]]; then
+    cp "$repo/.env" "$worktree/.env"
+  fi
 fi
 
 if [[ -f $worktree/.envrc ]]; then
