@@ -37,6 +37,8 @@ vim.api.nvim_create_autocmd({'FileType'}, {
     -- Disable vimwiki syntax and use treesitter markdown
     vim.cmd('syntax off')
     vim.treesitter.start()
+    -- Ensure wiki-page omni completion for cmp-omni / <C-x><C-o>
+    vim.bo.omnifunc = 'vimwiki#Complete_wikifiles'
   end
 })
 

@@ -99,5 +99,6 @@
       cmp-buffer
       cmp-path
       cmp-cmdline
+      cmp-omni
     ];
 }

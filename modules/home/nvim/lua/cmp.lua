@@ -52,6 +52,21 @@ cmp.setup.filetype('gitcommit', {
   })
 })
 
+-- Vimwiki page links via omnifunc (vimwiki#Complete_wikifiles)
+cmp.setup.filetype('vimwiki', {
+  sources = cmp.config.sources({
+    {
+      name = 'omni',
+      option = {
+        disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' },
+      },
+    },
+  }, {
+    { name = 'buffer' },
+    { name = 'path' },
+  }),
+})
+
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
   mapping = cmp.mapping.preset.cmdline(),
