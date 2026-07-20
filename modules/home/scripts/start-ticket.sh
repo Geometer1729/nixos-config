@@ -42,12 +42,10 @@ fi
 
 if [[ -f $worktree/.envrc ]]; then
   direnv allow "$worktree"
-  direnv exec "$worktree" true
 fi
 
 if [[ -f $worktree/apps/panharmonicon/.envrc ]]; then
   direnv allow "$worktree/apps/panharmonicon"
-  direnv exec "$worktree/apps/panharmonicon" true
 fi
 
 if ! tmux has-session -t "=$session" 2>/dev/null; then
