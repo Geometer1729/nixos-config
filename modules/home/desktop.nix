@@ -26,6 +26,14 @@
     terminal = "ghostty"; # not working
   };
 
+  xdg.configFile."kwalletrc" = {
+    force = true;
+    text = ''
+      [Wallet]
+      Enabled=false
+    '';
+  };
+
   # Desktop services
   services = {
     systembus-notify.enable = true;
