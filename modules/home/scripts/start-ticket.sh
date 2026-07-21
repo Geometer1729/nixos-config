@@ -7,6 +7,22 @@ trap 'notify-send -u critical start-ticket "failed: $BASH_COMMAND"' ERR
 
 work=$HOME/Code/work
 
+cleanup_merged_worktrees() {
+  local candidate branch state common_dir
+
+  for candidate in "$work/grim-wts"/*; do
+    [[ -d $candidate && $candidate != "$worktree" ]] || continue
+    branch=$(git -C "$candidate" symbolic-ref --quiet --short HEAD 2>/dev/null) || continue
+    state=$(cd "$candidate" && gh pr view "$branch" --json state --jq .state 2>/dev/null) || continue
+    [[ $state == MERGED ]] || continue
+    common_dir=$(git -C "$candidate" rev-parse --path-format=absolute --git-common-dir) || continue
+
+    if git --git-dir="$common_dir" worktree remove "$candidate"; then
+      notify-send start-ticket "Removed merged worktree ${candidate##*/}"
+    fi
+  done
+}
+
 issues=$(
   linearis issues list --assignee brian@geosurge.ai | jq -r '
     .nodes[]
@@ -56,4 +72,5 @@ if ! tmux has-session -t "=$session" 2>/dev/null; then
   tmux select-layout -t "$session:0" even-horizontal
 fi
 
+(trap - ERR; cleanup_merged_worktrees) >/dev/null 2>&1 &
 exec ghostty --title="$session" -e tmux attach-session -t "$session"
