@@ -2,6 +2,7 @@
 {
   programs.tmux = {
     enable = true;
+    secureSocket = false;
     plugins = with pkgs.tmuxPlugins;
       [
         vim-tmux-navigator
