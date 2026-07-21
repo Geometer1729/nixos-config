@@ -8,12 +8,14 @@ let
     (builtins.fromJSON (builtins.readFile "${inputs.opencode-vim}/package.json")).version;
 
   developmentBashCommands = [
+    "cargo build*"
     "cargo fmt*"
     "cargo clippy*"
     "cargo check*"
     "cargo test*"
     "cargo nextest run*"
     "rustfmt*"
+    "cabal build*"
     "cabal check*"
     "cabal test*"
     "cabal v2-test*"
@@ -38,6 +40,9 @@ let
   wrappedDevelopmentBashCommands = builtins.concatMap
     (command: [
       "nix develop --command ${command}"
+      "nix develop .#* --command ${command}"
+      "nix develop -c ${command}"
+      "nix develop .#* -c ${command}"
       "direnv exec . ${command}"
     ])
     developmentBashCommands;
@@ -131,7 +136,36 @@ let
     "gcloud asset search-all-iam-policies*"
     "gcloud asset search-all-resources*"
     "gcloud storage du*"
+    "gcloud storage cat*"
     "gcloud storage ls*"
+  ];
+
+  ghReadOnlyBashCommands = [
+    "gh --help*"
+    "gh --version*"
+    "gh auth status*"
+    "gh status*"
+    "gh pr checks*"
+    "gh pr diff*"
+    "gh pr list*"
+    "gh pr status*"
+    "gh pr view*"
+    "gh issue list*"
+    "gh issue status*"
+    "gh issue view*"
+    "gh repo list*"
+    "gh repo view*"
+    "gh run list*"
+    "gh run view*"
+    "gh workflow list*"
+    "gh workflow view*"
+    "gh release list*"
+    "gh release view*"
+    "gh search code*"
+    "gh search commits*"
+    "gh search issues*"
+    "gh search prs*"
+    "gh search repos*"
   ];
 
   allowedBashCommands = [
@@ -148,6 +182,7 @@ let
     "cut*"
     "tree*"
     "file*"
+    "cmp*"
     "stat*"
     "du*"
     "df*"
@@ -161,6 +196,7 @@ let
     "realpath*"
     "readlink*"
     "date*"
+    "sleep *"
     "echo*"
     "printf*"
     "test*"
@@ -175,10 +211,15 @@ let
     "git rev-parse*"
     "git ls-files*"
     "git blame*"
+    "git merge-base*"
     "git describe*"
     "git tag"
     "git tag --list*"
     "gh api*"
+    "bash -n *"
+    "direnv reload"
+    "opencode --help*"
+    "opencode --version*"
     "nix eval*"
     "nix build*"
     "nix log*"
@@ -212,7 +253,10 @@ let
     "nvd diff*"
     "got-gnomed*"
     "systemctl --failed*"
+    "systemctl --user status*"
     "journalctl -p*"
+    "journalctl --user -u meridian --no-pager*"
+    "curl -sS http://127.0.0.1:3456/health"
     "check-syncthing*"
     "ssh -o ConnectTimeout=5 torag echo*"
     "ssh torag just health*"
@@ -223,6 +267,7 @@ let
   ++ developmentBashCommands
   ++ wrappedDevelopmentBashCommands
   ++ linearisReadOnlyBashCommands
+  ++ ghReadOnlyBashCommands
   ++ gcloudReadOnlyBashCommands;
 
   lspServers = {
