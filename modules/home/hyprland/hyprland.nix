@@ -211,6 +211,7 @@ in
           # Application launchers
           "$mod, Return, exec, ghostty"
           "$mod, d, exec, rofi -show drun"
+          "$mod SHIFT, d, exec, passmenu"
           "$mod, s, exec, rofi -show ssh"
           "$mod, r, exec, rofi -show run"
           "$mod SHIFT, n, exec, start-ticket"

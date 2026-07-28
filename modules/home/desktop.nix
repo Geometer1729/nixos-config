@@ -22,7 +22,6 @@
   # Rofi configuration
   programs.rofi = {
     enable = true;
-    pass.enable = true;
     terminal = "ghostty"; # not working
   };
 

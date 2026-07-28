@@ -4,6 +4,13 @@ let
   unstable = import inputs.nixpkgs-unstable {
     system = pkgs.stdenv.hostPlatform.system;
   };
+  opencode = pkgs.writeShellApplication {
+    name = "opencode";
+    runtimeEnv.PINENTRY_USER_DATA = "gui";
+    text = ''
+      exec ${unstable.opencode}/bin/opencode "$@"
+    '';
+  };
   opencodeVimVersion =
     (builtins.fromJSON (builtins.readFile "${inputs.opencode-vim}/package.json")).version;
 
@@ -303,7 +310,7 @@ in
   home.packages = with pkgs; [
     config.services.meridian.package
     libnotify
-    unstable.opencode
+    opencode
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
