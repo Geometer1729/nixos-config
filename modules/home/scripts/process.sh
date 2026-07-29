@@ -27,12 +27,13 @@ while true; do
   echo ""
   printf "Processing task: \033[1m%s\033[0m\n" "$SELECTED"
   echo ""
-  echo "What is it? (1-5)"
+  echo "What is it? (1-6)"
   echo "  1) Actionable - Next action (+next)"
   echo "  2) Waiting for someone/something (+waiting)"
   echo "  3) Someday/Maybe (+someday)"
   echo "  4) Multi-step project (assign project name)"
-  echo "  5) Delete/Not actionable"
+  echo "  5) Done/Already completed"
+  echo "  6) Delete/Not actionable"
   echo ""
   read -r -p "Choice: " choice
 
@@ -86,6 +87,9 @@ while true; do
       echo "Remember to add next actions for this project!"
       ;;
     5)
+      task "$TASK_ID" "done"
+      ;;
+    6)
       task "$TASK_ID" delete
       ;;
     *)
