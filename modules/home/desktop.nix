@@ -17,7 +17,16 @@
 
     # presentations
     presenterm
+
+    # Documents
+    libreoffice-fresh
   ];
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications."application/vnd.openxmlformats-officedocument.wordprocessingml.document" =
+      "libreoffice-writer.desktop";
+  };
 
   # Rofi configuration
   programs.rofi = {
