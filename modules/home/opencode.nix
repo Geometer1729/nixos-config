@@ -45,6 +45,7 @@ let
     "shellcheck*"
     "shfmt*"
     "nixfmt*"
+    "ruff format --check*"
     "command -v *"
   ];
 
@@ -57,6 +58,25 @@ let
       "direnv exec . ${command}"
     ])
     developmentBashCommands;
+
+  trustedNixRunApps = [
+    "codex-unresolved-comments"
+    "codex-unresolved-threads"
+    "panharmonicon-cabal2nix-check"
+    "panharmonicon-cabal2nix-generate"
+    "pr-ci-failed-logs"
+    "pr-ready-wait"
+    "precommit-check"
+    "prod-monolith-log"
+    "src-fix"
+  ];
+
+  trustedNixRunBashCommands = builtins.concatMap
+    (app: [
+      "nix run .#${app}"
+      "nix run .#${app} *"
+    ])
+    trustedNixRunApps;
 
   linearisReadOnlyBashCommands = [
     "linearis -V"
@@ -146,6 +166,8 @@ let
     "gcloud * get-iam-policy *"
     "gcloud asset search-all-iam-policies*"
     "gcloud asset search-all-resources*"
+    "gcloud auth list*"
+    "gcloud config get-value*"
     "gcloud storage du*"
     "gcloud storage cat*"
     "gcloud storage ls*"
@@ -168,6 +190,7 @@ let
     "gh repo view*"
     "gh run list*"
     "gh run view*"
+    "gh run watch*"
     "gh workflow list*"
     "gh workflow view*"
     "gh release list*"
@@ -206,6 +229,18 @@ let
     "dirname*"
     "realpath*"
     "readlink*"
+    "pwd"
+    "pwd -*"
+    "id"
+    "id *"
+    "uname"
+    "uname *"
+    "hostname"
+    "hostname -f"
+    "hostname -s"
+    "getent *"
+    "sha256sum *"
+    "comm *"
     "date*"
     "sleep *"
     "echo*"
@@ -221,6 +256,20 @@ let
     "git remote*"
     "git rev-parse*"
     "git ls-files*"
+    "git ls-remote*"
+    "git ls-tree*"
+    "git grep*"
+    "git check-ignore*"
+    "git rev-list*"
+    "git for-each-ref*"
+    "git reflog"
+    "git reflog show*"
+    "git cat-file*"
+    "git range-diff*"
+    "git patch-id*"
+    "git worktree list*"
+    "git config --get*"
+    "git config --list*"
     "git blame*"
     "git merge-base*"
     "git describe*"
@@ -229,6 +278,7 @@ let
     "gh api*"
     "bash -n *"
     "direnv reload"
+    "direnv status*"
     "opencode --help*"
     "opencode --version*"
     "nix eval*"
@@ -264,7 +314,22 @@ let
     "nvd diff*"
     "got-gnomed*"
     "systemctl --failed*"
+    "systemctl status*"
+    "systemctl show*"
+    "systemctl cat*"
+    "systemctl list-units*"
+    "systemctl list-unit-files*"
+    "systemctl list-timers*"
+    "systemctl is-active*"
+    "systemctl is-enabled*"
     "systemctl --user status*"
+    "systemctl --user show*"
+    "systemctl --user cat*"
+    "systemctl --user list-units*"
+    "systemctl --user list-unit-files*"
+    "systemctl --user list-timers*"
+    "systemctl --user is-active*"
+    "systemctl --user is-enabled*"
     "journalctl -p*"
     "journalctl --user -u meridian --no-pager*"
     "curl -sS http://127.0.0.1:3456/health"
@@ -277,6 +342,7 @@ let
   ]
   ++ developmentBashCommands
   ++ wrappedDevelopmentBashCommands
+  ++ trustedNixRunBashCommands
   ++ linearisReadOnlyBashCommands
   ++ ghReadOnlyBashCommands
   ++ gcloudReadOnlyBashCommands;
