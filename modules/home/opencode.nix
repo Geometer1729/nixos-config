@@ -6,7 +6,11 @@ let
   };
   opencode = pkgs.writeShellApplication {
     name = "opencode";
-    runtimeEnv.PINENTRY_USER_DATA = "gui";
+    runtimeEnv = {
+      # opencode-vim's broad peer ranges otherwise resolve to a conflicting OpenTUI tree.
+      NPM_CONFIG_FORCE = "true";
+      PINENTRY_USER_DATA = "gui";
+    };
     text = ''
       exec ${unstable.opencode}/bin/opencode "$@"
     '';
