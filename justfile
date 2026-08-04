@@ -37,6 +37,11 @@ health:
   df -h /
   check-syncthing
 
+# Clear failed systemd states to stop repeated notifications
+clear-notos:
+  systemctl --user reset-failed
+  systemctl reset-failed
+
 # Check neovim health (shows errors only)
 vim-health:
   @nvim --headless -c "checkhealth" -c "w! /tmp/nvim-health.txt" -c "qa" 2>/dev/null || true
