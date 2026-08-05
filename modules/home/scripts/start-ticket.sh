@@ -10,7 +10,7 @@ work=$HOME/Code/work
 cleanup_merged_worktrees() {
   local candidate branch state common_dir
 
-  for candidate in "$work/grim-wts"/*; do
+  for candidate in "$work/wts"/*; do
     [[ -d $candidate && $candidate != "$worktree" ]] || continue
     branch=$(git -C "$candidate" symbolic-ref --quiet --short HEAD 2>/dev/null) || continue
     state=$(cd "$candidate" && gh pr view "$branch" --json state --jq .state 2>/dev/null) || continue
@@ -35,12 +35,23 @@ choice=$(rofi -dmenu -i -no-custom -p 'Linear issue' \
   -display-columns 1,2,3 -display-column-separator $'\t' <<<"$issues") || exit 0
 IFS=$'\t' read -r identifier title _ branch <<<"$choice"
 
-repo=$(find "$work" -mindepth 1 -maxdepth 1 -type d ! -name grim-wts -printf '%f\n' |
+repo=$(find "$work" -mindepth 1 -maxdepth 1 -type d ! -name wts -printf '%f\n' |
   sort | rofi -dmenu -i -no-custom -p 'Repository') || exit 0
 repo=$work/$repo
 
-session=${identifier,,}
-worktree=$work/grim-wts/$session
+worktree=
+while IFS= read -r line; do
+  case $line in
+  worktree\ *) current_worktree=${line#worktree } ;;
+  branch\ refs/heads/"$branch") worktree=$current_worktree; break ;;
+  esac
+done < <(git -C "$repo" worktree list --porcelain)
+
+if [[ -z $worktree ]]; then
+  worktree_name=${branch:0:30}
+  worktree=$work/wts/${worktree_name//\//-}
+fi
+session=${worktree##*/}
 
 if [[ ! -d $worktree ]]; then
   git -C "$repo" fetch --quiet origin
