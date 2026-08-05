@@ -22,6 +22,7 @@
 
     # Root TTY auto-login, no display manager
     services.greetd.enable = lib.mkForce false;
+    services.xserver.displayManager.lightdm.enable = lib.mkForce false;
     services.getty.autologinUser = lib.mkForce "root";
   };
 }

@@ -26,7 +26,7 @@ in
       secondaryMonitor = "DP-1,1920x1080@60,2560x0,1";
     };
 
-    services.mighty-rearranger.enable = true;
+    services.mighty-rearranger.enable = false;
   };
 
   imports = [
