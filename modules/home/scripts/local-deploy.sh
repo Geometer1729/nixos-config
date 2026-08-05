@@ -99,9 +99,13 @@ nh os build -H "$host"
 # Validate the IP against the host's existing SSH key rather than trusting an
 # unrelated key recorded for a previously used address.
 export NIX_SSHOPTS="-o HostKeyAlias=$host${NIX_SSHOPTS:+ $NIX_SSHOPTS}"
+target_host="bbrian@$target_ip"
+if [[ "$target_ip" == *:* ]]; then
+  target_host="bbrian@[$target_ip]"
+fi
 nixos-rebuild "$action" \
   --flake "$HOME/conf#$host" \
-  --target-host "bbrian@$target_ip" \
+  --target-host "$target_host" \
   --use-substitutes \
   --sudo \
   "$@"
