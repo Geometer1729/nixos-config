@@ -1,13 +1,14 @@
 # Main flake update orchestrator
-# Usage: flake-update [--dry-run] [--no-fetch] [flake-path]
+# Usage: flake-update [--dry-run] [--no-fetch] [--output-dir dir] [flake-path]
 #
 # Options:
 #   --dry-run   Don't actually run nix flake update, just analyze current lock
 #   --no-fetch  Skip fetching commits from GitHub/GitLab (faster, less detail)
+#   --output-dir  Write artifacts to a run-specific directory
 #
 # Output:
-#   - Backs up old flake.lock to /tmp/flake-update/old-flake.lock
-#   - Generates changelog to /tmp/flake-update/changelog.json
+#   - Backs up old flake.lock to the output directory
+#   - Generates changelog in the output directory
 #   - Prints summary to stdout
 
 source "$SCRIPTS_LIB/flake-update-lib.sh"
@@ -27,12 +28,25 @@ while [[ $# -gt 0 ]]; do
       NO_FETCH=true
       shift
       ;;
+    --output-dir)
+      if [[ $# -lt 2 ]]; then
+        log_error "--output-dir requires a directory"
+        exit 2
+      fi
+      if [[ -z $2 ]]; then
+        log_error "--output-dir requires a directory"
+        exit 2
+      fi
+      FLAKE_UPDATE_DIR=$2
+      shift 2
+      ;;
     -h|--help)
-      echo "Usage: flake-update [--dry-run] [--no-fetch] [flake-path]"
+      echo "Usage: flake-update [--dry-run] [--no-fetch] [--output-dir dir] [flake-path]"
       echo ""
       echo "Options:"
       echo "  --dry-run   Don't run nix flake update, analyze current lock vs git HEAD~1"
       echo "  --no-fetch  Skip fetching commits from GitHub/GitLab"
+      echo "  --output-dir DIR  Write artifacts to DIR"
       echo ""
       echo "Output files written to: $FLAKE_UPDATE_DIR/"
       exit 0
@@ -43,6 +57,8 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+export FLAKE_UPDATE_DIR
 
 # Default to current directory
 if [[ -z "$FLAKE_PATH" ]]; then

@@ -1,25 +1,27 @@
+flake := justfile_directory()
+
 # Show available commands
 default:
   @just --list
 
 # Update system configuration and commit changes
 update:
-  nh os switch -u && nix develop --command "git add . && git commit -m update"
+  nh os switch -u "{{flake}}" && nix develop --command "git add . && git commit -m update"
   just health
 
 # Test configuration without switching
 test:
-  nh os test
-  nix flake check
+  nh os test "{{flake}}"
+  nix flake check "{{flake}}"
   just health
 
 # Build configuration
 build:
-  nh os build
+  nh os build "{{flake}}"
 
 # Format Nix files
 fmt:
-  nixpkgs-fmt .
+  nixpkgs-fmt "{{flake}}"
 
 # Clean old generations (keep 3)
 clean:
@@ -59,13 +61,12 @@ test-remote-builds:
   test-remote-builds
 
 deploy:
-  nixpkgs-fmt .
-  nh os build -H am
-  nh os build -H torag
-  nix flake check
-  ssh torag git -C ~/conf pull
-  nixos-rebuild --flake ~/conf\#am --target-host bbrian@am --sudo switch
-  nixos-rebuild --flake ~/conf\#torag --target-host bbrian@torag --use-substitutes --sudo switch
+  nixpkgs-fmt "{{flake}}"
+  nh os build "{{flake}}" -H am
+  nh os build "{{flake}}" -H torag
+  nix flake check "{{flake}}"
+  nixos-rebuild --flake "{{flake}}#am" --target-host bbrian@am --sudo switch
+  nixos-rebuild --flake "{{flake}}#torag" --target-host bbrian@torag --use-substitutes --sudo switch
 
 
 gnome-check:

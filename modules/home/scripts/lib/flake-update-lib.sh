@@ -2,7 +2,7 @@
 # Shared functions for flake update scripts
 
 # Output directory for update artifacts
-FLAKE_UPDATE_DIR="/tmp/flake-update"
+FLAKE_UPDATE_DIR="${FLAKE_UPDATE_DIR:-/tmp/flake-update}"
 
 # Ensure output directory exists
 ensure_output_dir() {

@@ -13,37 +13,56 @@ If you get negative feedback about the report or any other part of using this sk
 
 Update the NixOS flake inputs and analyze changes for relevance to this configuration.
 
-## Quick Start
+## Worktree Contract
 
-Run the flake update from the repository root:
+Never run an update in the primary `~/conf` worktree.
 
-```bash
-flake-update ~/conf
-```
+1. Read the current date with `date +%m-%d-%y` and use branch `update-MM-DD-YY`.
+2. Inspect `git worktree list --porcelain` and `git branch --list update-MM-DD-YY`.
+3. Reuse the branch's registered worktree when it exists, using the actual path reported by Git.
+4. If the branch exists but has no worktree, run:
+   ```bash
+   git worktree add /home/bbrian/Code/conf-update-MM-DD-YY update-MM-DD-YY
+   ```
+5. Otherwise create it from the primary worktree's committed `HEAD`:
+   ```bash
+   git worktree add --no-track -b update-MM-DD-YY /home/bbrian/Code/conf-update-MM-DD-YY HEAD
+   ```
+
+For a new worktree, the path is `/home/bbrian/Code/conf-update-MM-DD-YY`. The artifact directory is `/tmp/flake-update/update-MM-DD-YY`.
+Substitute the actual date and any reused worktree path in every command below.
+
+After creating or finding the worktree:
+
+- Use the worktree as `workdir` for every repository command.
+- Pass the worktree path explicitly to every `nh`, `nix`, and `nixos-rebuild` command. The user's `NH_FLAKE` points at `~/conf` and must not be relied upon.
+- Give every subagent the exact worktree and artifact paths. Never tell a subagent to use `~/conf`.
+- Write all fixes and the report in the worktree. Do not modify the primary worktree.
+- If a fix creates a new flake-relevant file, stage that file before evaluating or building so Nix can see it.
 
 ## What This Does
 
-1. **Backs up** the current `flake.lock` to `/tmp/flake-update/old-flake.lock`
+1. **Backs up** the current `flake.lock` to the run-specific artifact directory
 2. **Runs** `nix flake update` to update all inputs
 3. **Fetches** commit details from GitHub/GitLab for each changed input
 4. **Analyzes nixpkgs** specially - filters ~14k commits to only those affecting packages in your config
-5. **Generates** changelog files in `/tmp/flake-update/`
+5. **Generates** changelog files in the run-specific artifact directory
 
 ## Output Files
 
-After running, these files are available:
+For branch `update-MM-DD-YY`, these files are available under `/tmp/flake-update/update-MM-DD-YY/`:
 
-- `/tmp/flake-update/changelog.json` - Full changelog for all inputs
-- `/tmp/flake-update/nixpkgs-changelog.json` - nixpkgs changes filtered by your config
-- `/tmp/flake-update/config-packages.txt` - List of packages extracted from your config
-- `/tmp/flake-update/old-flake.lock` - Backup of previous lock file
+- `changelog.json` - Full changelog for all inputs
+- `nixpkgs-changelog.json` - nixpkgs changes filtered by your config
+- `config-packages.txt` - List of packages extracted from your config
+- `old-flake.lock` - Backup of the previous lock file
 
 ## Analysis Workflow
 
 ### Step 1: Run the update and read results
 
 ```bash
-flake-update ~/conf
+flake-update --output-dir /tmp/flake-update/update-MM-DD-YY /home/bbrian/Code/conf-update-MM-DD-YY
 ```
 
 Then read the output files.
@@ -71,7 +90,7 @@ To catch these, fetch the full commit list and scan the ones NOT already matched
 1. Get all nixpkgs commit messages between old and new rev:
    ```bash
    # Use the GitHub compare API or git log to get all commit messages
-   gh api "repos/nixos/nixpkgs/compare/<old_rev>...<new_rev>" --paginate -q '.commits[].commit.message' > /tmp/flake-update/all-nixpkgs-commits.txt
+   gh api "repos/nixos/nixpkgs/compare/<old_rev>...<new_rev>" --paginate -q '.commits[].commit.message' > /tmp/flake-update/update-MM-DD-YY/all-nixpkgs-commits.txt
    ```
    If this is too many for the API, use `git log --oneline <old_rev>..<new_rev>` from a local nixpkgs checkout if available, or paginate the API.
 
@@ -80,10 +99,19 @@ To catch these, fetch the full commit list and scan the ones NOT already matched
 3. Spawn parallel subagents to scan the remaining commits in batches of ~100. Each agent should:
    - Read its batch of commit messages
    - Look for anything potentially relevant: NixOS module changes (`nixos/`), changes to services/options used in the config, security fixes, infrastructure changes
-   - Cross-reference against the actual NixOS modules and options used in `~/conf` (check `modules/nixos/`, `configurations/nixos/`, etc.)
+   - Cross-reference against the actual NixOS modules and options used in the update worktree (check `modules/nixos/`, `configurations/nixos/`, etc.)
    - Report back any commits worth flagging
 
 4. Collect results from all agents and include relevant findings in the report.
+
+Preserve this exhaustive scan. Do not reduce the number of batches or replace it with a sampled review.
+
+If local upstream repositories are needed for the analysis:
+
+- Clone them under the run's artifact directory, such as `/tmp/flake-update/update-MM-DD-YY/repos/nixpkgs`.
+- Use filtered, no-checkout clones when possible.
+- Use `git -C <repository>` for fetches and detached checkouts so the constrained OpenCode permissions apply.
+- Do not clone upstream repositories into the update worktree.
 
 ### Step 3: Review local overlays
 
@@ -119,8 +147,13 @@ If a package has a significant upgrade check what changes were made.
 
 ### Step 5: Build and check for build errors
 
-Run `nh os build` if it fails add the error to the report.
-Provid related commits to add context.
+Run:
+
+```bash
+nh os build /home/bbrian/Code/conf-update-MM-DD-YY --out-link /tmp/flake-update/update-MM-DD-YY/result
+```
+
+If it fails, add the error to the report. Provide related commits to add context.
 Feel free to use web search and read the config to understand which commits are related.
 
 ### Step 6: Make fixes if needed
@@ -128,25 +161,27 @@ Feel free to use web search and read the config to understand which commits are 
 If breaking changes require config updates:
 1. Show the specific changes needed
 2. Make the edits
-3. Run `nh os test` to verify the build works
+3. Run `nh os test /home/bbrian/Code/conf-update-MM-DD-YY` to verify the build works
 
 ### Step 7: Run checks and tests
 
-Run `nix flake check` to verify the flake evaluates correctly.
+Run `nh os test /home/bbrian/Code/conf-update-MM-DD-YY` even when no config fixes were needed. This must activate the exact update worktree, not `NH_FLAKE`.
+
+Run `nix flake check /home/bbrian/Code/conf-update-MM-DD-YY` to verify the flake evaluates correctly.
 
 After `nh os test` activates the new configuration, run these health checks:
 - `just health` - System health checks
 - `just vim-health` - Neovim health checks
 - `just gnome-check` - make sure we haven't aquired a gnome dependency
-- `just deploy` - Apply to am and torag, if torag is not up ask me to go do that.
+- `just deploy` - From the update worktree, apply that worktree directly to am and torag. If torag is not up, ask me to go do that.
 - `just test-remote-builds` - Verify remote build infrastructure (am <-> torag) still works
 - run all the above checks on torag too
 
-Compare health check results against `~/conf/failures.md` which documents the known pre-existing failures baseline. Only flag **new** errors/warnings that aren't already in the baseline. Update `failures.md` if failures are resolved or new ones appear.
+Compare health check results against the update worktree's `failures.md`, which documents the known pre-existing failures baseline. Only flag **new** errors/warnings that aren't already in the baseline. Update it if failures are resolved or new ones appear.
 
 ### Step 8: Write the report to `update-reports/`
 
-Save the full report as `~/conf/update-reports/YYYY-MM-DD.md` (using today's date). Include:
+Save the full report as `/home/bbrian/Code/conf-update-MM-DD-YY/update-reports/YYYY-MM-DD.md` (using today's date). Include:
 - Build status (all commands run and their results)
 - Table of all updated inputs with commit counts
 - Table of **all** nixpkgs package changes affecting the config (not just highlights)
@@ -161,6 +196,19 @@ See existing reports in `update-reports/` for the format.
 
 Run a general websearch for breaking changes as well as websearches for any significant updates.
 Based on the report suggest things that may be broken and suggest ways to verify they work.
+
+### Step 10: Commit after deployment
+
+After deployment and all reachable health checks finish:
+
+1. Finalize the report with the actual deployment and health-check results.
+2. Inspect `git status`, `git diff`, and recent `git log` in the update worktree.
+3. Stage only the update's intended lock file, fixes, failure-baseline changes, and report.
+4. Commit them on the update branch with an update-appropriate message.
+
+If torag is unavailable, ask the user whether to wait or explicitly skip its deployment and checks. A user-approved skip counts as completion, but must be documented in the report before committing.
+
+Do not merge, push, or remove the worktree automatically.
 
 
 ## nixpkgs Analysis Details
@@ -185,11 +233,12 @@ The `nixpkgs-changelog` script:
 ## Options
 
 ```bash
-flake-update [--dry-run] [--no-fetch] [flake-path]
+flake-update [--dry-run] [--no-fetch] [--output-dir dir] [flake-path]
 ```
 
 - `--dry-run` - Don't run `nix flake update`, just analyze current vs previous git commit
 - `--no-fetch` - Skip fetching commits from GitHub/GitLab (faster, less detail)
+- `--output-dir` - Write artifacts to the branch-specific run directory
 
 ## Standalone nixpkgs Analysis
 
@@ -218,10 +267,10 @@ Wait a few minutes and retry, or use `--no-fetch` for a quick overview.
 If `nix eval` fails to extract packages (e.g., functions in config):
 - The script falls back to grep-based extraction
 - Some packages may be missed
-- Check `/tmp/flake-update/config-packages.txt` to see what was extracted
+- Check the run's `config-packages.txt` to see what was extracted
 
 ### Missing matches
 If you think commits were missed:
-1. Check the package list: `cat /tmp/flake-update/config-packages.txt`
+1. Check the package list in the run-specific artifact directory
 2. Verify the package name matches nixpkgs conventions
 3. Some packages have different names in nixpkgs vs derivation output

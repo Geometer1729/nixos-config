@@ -275,6 +275,8 @@ let
     "git range-diff*"
     "git patch-id*"
     "git worktree list*"
+    "git worktree add --no-track -b update-* ${config.home.homeDirectory}/Code/conf-update-* HEAD"
+    "git worktree add ${config.home.homeDirectory}/Code/conf-update-* update-*"
     "git config --get*"
     "git config --list*"
     "git blame*"
@@ -434,6 +436,7 @@ in
       external_directory = {
         "/nix/store/**" = "allow";
         "/tmp/**" = "allow";
+        "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
       };
       lsp = "allow";
       read = {
