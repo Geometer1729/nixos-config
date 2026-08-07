@@ -21,6 +21,8 @@ in
       gcloud_secret = owned;
       linear_api_key = owned;
       slack_token = owned;
+      slack_mcp_client_id = owned;
+      slack_mcp_client_secret = owned;
       taskwarrior-sync-secret = owned;
       foundryvtt-env = { };
     };

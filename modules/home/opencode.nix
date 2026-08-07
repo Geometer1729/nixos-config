@@ -426,6 +426,36 @@ in
     "$schema" = "https://opencode.ai/config.json";
     autoupdate = false;
     lsp = lspServers;
+    mcp.slack = {
+      type = "remote";
+      url = "https://mcp.slack.com/mcp";
+      # Slack requires MCP clients to be backed by a registered Slack app
+      # (no dynamic client registration). Read-only user scopes only.
+      oauth = {
+        clientId = "{file:/run/secrets/slack_mcp_client_id}";
+        clientSecret = "{file:/run/secrets/slack_mcp_client_secret}";
+        scope = builtins.concatStringsSep " " [
+          "search:read.public"
+          "search:read.private"
+          "search:read.mpim"
+          "search:read.im"
+          "search:read.files"
+          "search:read.users"
+          "files:read"
+          "emoji:read"
+          "channels:history"
+          "groups:history"
+          "mpim:history"
+          "im:history"
+          "channels:read"
+          "groups:read"
+          "mpim:read"
+          "users:read"
+          "users:read.email"
+          "canvases:read"
+        ];
+      };
+    };
     model = "openai/gpt-5.6-sol";
     plugin = [ config.services.meridian.opencode.pluginPath ];
     provider.anthropic.options = {
@@ -439,6 +469,14 @@ in
         "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
       };
       lsp = "allow";
+      # Slack MCP: reads are allowed by default; anything that publishes asks first.
+      # Drafts stay allowed — they are the review-first posting workflow.
+      "slack_slack_send_message" = "ask";
+      "slack_slack_schedule_message" = "ask";
+      "slack_slack_add_reaction" = "ask";
+      "slack_slack_create_conversation" = "ask";
+      "slack_slack_create_canvas" = "ask";
+      "slack_slack_update_canvas" = "ask";
       read = {
         "/nix/store/**" = "allow";
         "/tmp/**" = "allow";
