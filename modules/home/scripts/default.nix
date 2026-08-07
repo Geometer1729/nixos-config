@@ -1,7 +1,5 @@
-{ flake, pkgs, ... }:
+{ pkgs, ... }:
 let
-  system = pkgs.stdenv.hostPlatform.system;
-
   # Packages available to all scripts at runtime
   scriptDeps = with pkgs; [
     curl
@@ -11,8 +9,6 @@ let
     jq
     libnotify
     python3
-    flake.inputs.mighty-rearranger.packages.${system}.default
-    flake.inputs.mighty-rearranger.inputs.rageveil.packages.${system}.default
   ];
 in
 {
