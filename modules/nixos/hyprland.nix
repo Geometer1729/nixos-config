@@ -37,23 +37,13 @@ let
     echo "starting ${pkgs.hyprland}/bin/start-hyprland"
     exec ${pkgs.hyprland}/bin/start-hyprland
   '';
-  plasmaX11Session = "${pkgs.xinit}/bin/startx ${pkgs.kdePackages.plasma-workspace}/bin/startplasma-x11";
   xsessionWrapper = "${pkgs.xinit}/bin/startx ${pkgs.coreutils}/bin/env";
-  greetdSessions = pkgs.runCommand "greetd-sessions" { } ''
-    mkdir -p $out/share/wayland-sessions $out/share/xsessions
-
-    cat > $out/share/wayland-sessions/hyprland.desktop <<EOF
-    [Desktop Entry]
-    Name=Hyprland
-    Comment=Direct Hyprland session for greetd
-    Exec=${hyprlandSession}
-    Type=Application
-    DesktopNames=Hyprland
-    EOF
-
-    ln -s ${sessionData}/share/wayland-sessions/plasma.desktop $out/share/wayland-sessions/plasma.desktop
-    ln -s ${sessionData}/share/xsessions/plasmax11.desktop $out/share/xsessions/plasmax11.desktop
-  '';
+  # tuigreet remembers a session as the absolute path of its .desktop file
+  # (/var/cache/tuigreet/lastsession-path-$user). That path must stay stable
+  # across rebuilds, so these live in /etc rather than in a derivation whose
+  # store path changes whenever hyprland/plasma/coreutils do.
+  sessionsDir = "/etc/greetd/wayland-sessions";
+  xsessionsDir = "/etc/greetd/xsessions";
 in
 {
   # Enable Hyprland
@@ -94,10 +84,13 @@ in
           "--user-menu"
           "--remember"
           "--remember-user-session"
-          "--sessions ${lib.escapeShellArg "${greetdSessions}/share/wayland-sessions"}"
-          "--xsessions ${lib.escapeShellArg "${greetdSessions}/share/xsessions"}"
+          "--sessions ${lib.escapeShellArg sessionsDir}"
+          "--xsessions ${lib.escapeShellArg xsessionsDir}"
           "--xsession-wrapper ${lib.escapeShellArg xsessionWrapper}"
-          "--cmd ${lib.escapeShellArg plasmaX11Session}"
+          # Fallback when no session is remembered. Must be something that
+          # actually starts; a broken fallback is indistinguishable from a
+          # crashing login.
+          "--cmd ${lib.escapeShellArg hyprlandSession}"
         ];
       };
     };
@@ -109,6 +102,23 @@ in
       xkb.options = "caps:swapescape";
       xkb.layout = "us";
     };
+  };
+
+  # Only when greetd is actually running: the rescue specialisation disables it
+  # and has no displayManager.sessionData to point at.
+  environment.etc = lib.mkIf config.services.greetd.enable {
+    "greetd/wayland-sessions/hyprland.desktop".text = ''
+      [Desktop Entry]
+      Name=Hyprland
+      Comment=Direct Hyprland session for greetd
+      Exec=${hyprlandSession}
+      Type=Application
+      DesktopNames=Hyprland
+    '';
+    "greetd/wayland-sessions/plasma.desktop".source =
+      "${sessionData}/share/wayland-sessions/plasma.desktop";
+    "greetd/xsessions/plasmax11.desktop".source =
+      "${sessionData}/share/xsessions/plasmax11.desktop";
   };
 
   console.useXkbConfig = true;
