@@ -48,6 +48,7 @@
         ".local/share/task"
         ".local/share/git"
         ".local/state/nvim"
+        ".local/state/opencode"
         # Claude Code: persist entire directories to avoid file-level bind mount issues
         ".claude-work"
         ".claude-personal"

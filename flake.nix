@@ -56,6 +56,8 @@
     zsh-nix-shell.flake = false;
     opencode-vim.url = "github:Tarquinen/opencode-vim";
     opencode-vim.flake = false;
+    opencode2-npm.url = "file+https://registry.npmjs.org/@opencode-ai/cli-linux-x64/next";
+    opencode2-npm.flake = false;
 
     # Work
     linearis.url = "github:linearis-oss/linearis";

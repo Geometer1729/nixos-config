@@ -1,4 +1,4 @@
-{ flake, pkgs, lib, config, ... }:
+{ flake, pkgs, config, ... }:
 let
   inherit (flake) inputs;
   # Fetch Claude icon as a derivation

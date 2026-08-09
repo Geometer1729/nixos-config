@@ -15,6 +15,40 @@ let
       exec ${unstable.opencode}/bin/opencode "$@"
     '';
   };
+  opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
+  opencode2 = pkgs.stdenv.mkDerivation {
+    pname = "opencode2";
+    inherit (opencode2Npm) version;
+    src = pkgs.fetchurl {
+      url = opencode2Npm.dist.tarball;
+      hash = opencode2Npm.dist.integrity;
+    };
+    sourceRoot = "package";
+
+    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
+    dontBuild = true;
+    dontStrip = true; # Stripping removes Bun's embedded application payload.
+    installPhase = ''
+      runHook preInstall
+
+      install -Dm755 bin/opencode2 $out/bin/opencode2
+      wrapProgram $out/bin/opencode2 \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
+        --set NPM_CONFIG_FORCE true \
+        --set OPENCODE_DISABLE_AUTOUPDATE true \
+        --set PINENTRY_USER_DATA gui
+
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "OpenCode v2 next-channel preview";
+      homepage = "https://github.com/anomalyco/opencode/tree/v2";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "opencode2";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
   opencodeVimVersion =
     (builtins.fromJSON (builtins.readFile "${inputs.opencode-vim}/package.json")).version;
 
@@ -295,6 +329,8 @@ let
     "direnv status*"
     "opencode --help*"
     "opencode --version*"
+    "opencode2 --help*"
+    "opencode2 --version*"
     "nix eval*"
     "nix build*"
     "nix log*"
@@ -401,6 +437,7 @@ in
     config.services.meridian.package
     libnotify
     opencode
+    opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";

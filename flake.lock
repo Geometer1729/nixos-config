@@ -749,6 +749,18 @@
         "type": "github"
       }
     },
+    "opencode2-npm": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-UKF4wdGG86ZB5yFIyHaDEYKjAHhLaxfHA2lK9l+DfhU=",
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode-ai/cli-linux-x64/next"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode-ai/cli-linux-x64/next"
+      }
+    },
     "prismlauncher": {
       "inputs": {
         "libnbtplusplus": "libnbtplusplus",
@@ -810,6 +822,7 @@
         "nvim-luaref": "nvim-luaref",
         "ocaml-nvim": "ocaml-nvim",
         "opencode-vim": "opencode-vim",
+        "opencode2-npm": "opencode2-npm",
         "prismlauncher": "prismlauncher",
         "recover-vim": "recover-vim",
         "sops-nix": "sops-nix",
