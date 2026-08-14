@@ -15,7 +15,8 @@
       warn-dirty = false;
       accept-flake-config = true;
       log-lines = 25;
-      auto-optimise-store = true;
+      max-jobs = 12;
+      auto-optimise-store = false;
       experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
       trusted-users = [ "root" config.mainUser "yixin" ];
       keep-outputs = true;
