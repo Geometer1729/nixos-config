@@ -17,7 +17,6 @@ in
 
     # System configuration
     system
-    systemd-failure-notifications
     desktop
     development
     media
