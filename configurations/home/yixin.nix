@@ -32,20 +32,20 @@ in
   ];
 
   home.language = {
-    base = "zh_CN.UTF-8";
-    messages = "zh_CN.UTF-8";
-    time = "zh_CN.UTF-8";
-    numeric = "zh_CN.UTF-8";
-    monetary = "zh_CN.UTF-8";
-    paper = "zh_CN.UTF-8";
-    name = "zh_CN.UTF-8";
-    address = "zh_CN.UTF-8";
-    telephone = "zh_CN.UTF-8";
-    measurement = "zh_CN.UTF-8";
+    base = "en_US.UTF-8";
+    messages = "en_US.UTF-8";
+    time = "en_US.UTF-8";
+    numeric = "en_US.UTF-8";
+    monetary = "en_US.UTF-8";
+    paper = "en_US.UTF-8";
+    name = "en_US.UTF-8";
+    address = "en_US.UTF-8";
+    telephone = "en_US.UTF-8";
+    measurement = "en_US.UTF-8";
   };
 
   home.sessionVariables = {
-    LANGUAGE = "zh_CN:zh";
+    LANGUAGE = "en_US:en";
     GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
@@ -59,6 +59,8 @@ in
     qt6Packages.fcitx5-chinese-addons
     qt6Packages.fcitx5-configtool
     kdePackages.fcitx5-qt
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
   ];
 
   xdg.configFile = {
@@ -66,10 +68,10 @@ in
       force = true;
       text = ''
         [Formats]
-        LANG=zh_CN.UTF-8
+        LANG=en_US.UTF-8
 
         [Translations]
-        LANGUAGE=zh_CN
+        LANGUAGE=en_US
       '';
     };
     "fcitx5/profile" = {

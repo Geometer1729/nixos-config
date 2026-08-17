@@ -24,6 +24,7 @@
 
   xdg.mimeApps = {
     enable = true;
+    defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
     defaultApplications."application/vnd.openxmlformats-officedocument.wordprocessingml.document" =
       "libreoffice-writer.desktop";
   };
