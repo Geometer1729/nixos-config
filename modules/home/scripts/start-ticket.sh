@@ -50,6 +50,14 @@ done < <(git -C "$repo" worktree list --porcelain)
 if [[ -z $worktree ]]; then
   worktree_name=${branch:0:30}
   worktree=$work/wts/${worktree_name//\//-}
+
+  if [[ -d $worktree ]]; then
+    repo_common_dir=$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)
+    worktree_common_dir=$(git -C "$worktree" rev-parse --path-format=absolute --git-common-dir)
+    if [[ $repo_common_dir != "$worktree_common_dir" ]]; then
+      worktree=$worktree-${repo##*/}
+    fi
+  fi
 fi
 session=${worktree##*/}
 
