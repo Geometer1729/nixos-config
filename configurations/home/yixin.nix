@@ -53,6 +53,9 @@ in
     INPUT_METHOD = "fcitx";
   };
 
+  # KDE rewrites this file, so Home Manager cannot safely use a fixed backup name.
+  gtk.gtk2.force = true;
+
   home.packages = with pkgs; [
     google-chrome
     fcitx5
