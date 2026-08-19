@@ -8,13 +8,19 @@ trap 'notify-send -u critical start-ticket "failed: $BASH_COMMAND"' ERR
 work=$HOME/Code/work
 
 cleanup_merged_worktrees() {
-  local candidate branch state common_dir
+  local candidate branch state merged_at merged_epoch common_dir
+  local cutoff=$(( $(date +%s) - 48 * 60 * 60 ))
 
   for candidate in "$work/wts"/*; do
     [[ -d $candidate && $candidate != "$worktree" ]] || continue
     branch=$(git -C "$candidate" symbolic-ref --quiet --short HEAD 2>/dev/null) || continue
-    state=$(cd "$candidate" && gh pr view "$branch" --json state --jq .state 2>/dev/null) || continue
-    [[ $state == MERGED ]] || continue
+    IFS=$'\t' read -r state merged_at < <(
+      cd "$candidate" && gh pr view "$branch" --json state,mergedAt \
+        --jq '[.state, .mergedAt] | @tsv' 2>/dev/null
+    ) || continue
+    [[ $state == MERGED && -n $merged_at ]] || continue
+    merged_epoch=$(date --date="$merged_at" +%s) || continue
+    (( merged_epoch <= cutoff )) || continue
     common_dir=$(git -C "$candidate" rev-parse --path-format=absolute --git-common-dir) || continue
 
     if git --git-dir="$common_dir" worktree remove "$candidate"; then
