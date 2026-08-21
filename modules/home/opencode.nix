@@ -420,10 +420,11 @@ let
       command = [ "rust-analyzer" ];
       extensions = [ ".rs" ];
     };
-    hls = {
-      command = [ "haskell-language-server" "--lsp" ];
-      extensions = [ ".hs" ".lhs" ];
-    };
+    #default one seems to work better?
+    #hls = {
+    #  command = [ "haskell-language-server" "--lsp" ];
+    #  extensions = [ ".hs" ".lhs" ];
+    #};
     "yaml-ls" = {
       command = [ "yaml-language-server" "--stdio" ];
       extensions = [ ".yaml" ".yml" ];
