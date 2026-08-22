@@ -1,11 +1,18 @@
 { config, pkgs, ... }:
+let
+  geProton10 =
+    (pkgs.proton-ge-bin.override { steamDisplayName = "GE-Proton10-33 (Infinity Nikki)"; }).overrideAttrs
+      (finalAttrs: _: {
+        version = "GE-Proton10-33";
+        src = pkgs.fetchzip {
+          url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${finalAttrs.version}/${finalAttrs.version}.tar.gz";
+          hash = "sha256-vuPqz9vD/B1H6IFA7Wi/YEPbklNTbVbEZ2Erm62kBnk=";
+        };
+      });
+in
 {
-
-
   users.users.${config.mainUser} = {
     packages = with pkgs; [
-      steam
-      steam-run
       libgdiplus
       #glxinfo
       mesa-demos # TODO do I need this?
@@ -13,11 +20,14 @@
   };
   users.users.yixin = {
     packages = with pkgs; [
-      steam
-      steam-run
       libgdiplus
       mesa-demos
     ];
+  };
+
+  programs.steam = {
+    enable = true;
+    extraCompatPackages = [ geProton10 ];
   };
 
   services.pulseaudio.support32Bit = true;
