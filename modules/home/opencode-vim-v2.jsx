@@ -226,8 +226,11 @@ export default {
       if (pending) {
         const operator = pending
         pending = ""
-        if (operator === "g" && key === "g") setCursor(0)
-        else applyOperator(operator, key)
+        if (operator === "g") {
+          if (key === "g") setCursor(0)
+          else if (key === "t") context.keymap.dispatch("session.tab.next")
+          else if (key === "T") context.keymap.dispatch("session.tab.previous")
+        } else applyOperator(operator, key)
         return
       }
 
@@ -314,12 +317,11 @@ export default {
     const Controller = () => {
       cursorTimer ??= setInterval(syncCursorStyle, 50)
       queueMicrotask(syncCursorStyle)
-      context.keymap.layer(() => ({
+        context.keymap.layer(() => ({
           mode: "global",
           priority: 1000,
-          target: editor,
           commands: [
-            bind("ctrl+o", () => context.keymap.dispatch("prompt.editor"), () => true),
+            bind("ctrl+o", () => context.keymap.dispatch("prompt.editor"), () => Boolean(editor())),
             {
               id: "opencode-vim.toggle",
               title: "Toggle Vim mode",
@@ -333,11 +335,15 @@ export default {
                 context.ui.toast.show({ message: `Vim mode ${enabled ? "enabled" : "disabled"}` })
               },
             },
-            bind("escape", enterNormal, () => enabled && mode === "insert"),
-            bind("ctrl+[", enterNormal, () => enabled && mode === "insert"),
-            bind("ctrl+c", enterNormal, () => enabled && mode === "insert"),
+            bind("escape", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
+            bind("ctrl+[", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
+            bind("ctrl+c", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
             ...[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((key) =>
-              bind(`shift+${key.toLowerCase()}`, () => handleNormal(key), () => enabled && mode === "normal"),
+              bind(
+                `shift+${key.toLowerCase()}`,
+                () => handleNormal(key),
+                () => Boolean(editor()) && enabled && mode === "normal",
+              ),
             ),
             ...[
               ...printable,
@@ -359,7 +365,7 @@ export default {
               "ctrl+u",
               "ctrl+w",
             ].map((key) =>
-              bind(key, () => handleNormal(key), () => enabled && mode === "normal"),
+              bind(key, () => handleNormal(key), () => Boolean(editor()) && enabled && mode === "normal"),
             ),
           ],
         }))
