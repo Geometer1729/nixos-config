@@ -32,8 +32,11 @@ let
       runHook preInstall
 
       install -Dm755 bin/opencode2 $out/bin/opencode2
+      # OpenTUI dlopens libwayland-client.so.0 by soname for host clipboard reads,
+      # and Bun extracts its copy at runtime where autoPatchelfHook never sees it.
       wrapProgram $out/bin/opencode2 \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
+        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland ]} \
         --set NPM_CONFIG_FORCE true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
         --set PINENTRY_USER_DATA gui
