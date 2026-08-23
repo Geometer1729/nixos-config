@@ -1,60 +1,5 @@
-{ flake, pkgs, config, ... }:
+{ config }:
 let
-  inherit (flake) inputs;
-  unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.stdenv.hostPlatform.system;
-  };
-  opencode1 = pkgs.writeShellApplication {
-    name = "opencode1";
-    runtimeEnv = {
-      # opencode-vim's broad peer ranges otherwise resolve to a conflicting OpenTUI tree.
-      NPM_CONFIG_FORCE = "true";
-      PINENTRY_USER_DATA = "gui";
-    };
-    text = ''
-      exec ${unstable.opencode}/bin/opencode "$@"
-    '';
-  };
-  opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
-  opencode2 = pkgs.stdenv.mkDerivation {
-    pname = "opencode2";
-    inherit (opencode2Npm) version;
-    src = pkgs.fetchurl {
-      url = opencode2Npm.dist.tarball;
-      hash = opencode2Npm.dist.integrity;
-    };
-    sourceRoot = "package";
-
-    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
-    dontBuild = true;
-    dontStrip = true; # Stripping removes Bun's embedded application payload.
-    installPhase = ''
-      runHook preInstall
-
-      install -Dm755 bin/opencode2 $out/bin/opencode2
-      wrapProgram $out/bin/opencode2 \
-        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
-        --set NPM_CONFIG_FORCE true \
-        --set OPENCODE_DISABLE_AUTOUPDATE true \
-        --set PINENTRY_USER_DATA gui
-
-      runHook postInstall
-    '';
-
-    meta = {
-      description = "OpenCode v2 next-channel preview";
-      homepage = "https://github.com/anomalyco/opencode/tree/v2";
-      license = pkgs.lib.licenses.mit;
-      mainProgram = "opencode2";
-      platforms = [ "x86_64-linux" ];
-    };
-  };
-  opencode = pkgs.writeShellApplication {
-    name = "opencode";
-    text = ''
-      exec ${opencode2}/bin/opencode2 "$@"
-    '';
-  };
   developmentBashCommands = [
     "cargo build*"
     "cargo fmt*"
@@ -408,170 +353,43 @@ let
   ++ ghReadOnlyBashCommands
   ++ gcloudReadOnlyBashCommands;
 
-  lspServers = {
-    nixd = {
-      command = [ "nixd" ];
-      extensions = [ ".nix" ];
-    };
-    "lua-ls" = {
-      command = [ "lua-language-server" ];
-      extensions = [ ".lua" ];
-    };
-    bash = {
-      command = [ "bash-language-server" "start" ];
-      extensions = [ ".sh" ".bash" ".zsh" ".ksh" ];
-    };
-    rust = {
-      command = [ "rust-analyzer" ];
-      extensions = [ ".rs" ];
-    };
-    # Resolve HLS from the project's dev shell so its GHC version matches.
-    hls = {
-      command = [ "haskell-language-server" "--lsp" ];
-      extensions = [ ".hs" ".lhs" ];
-    };
-    "yaml-ls" = {
-      command = [ "yaml-language-server" "--stdio" ];
-      extensions = [ ".yaml" ".yml" ];
-    };
-  };
 in
 {
-  imports = [ inputs.meridian.homeModules.default ];
-
-  home.packages = with pkgs; [
-    config.services.meridian.package
-    libnotify
-    opencode
-    opencode1
-    opencode2
-  ];
-  home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
-  home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
-
-  services.meridian = {
-    enable = true;
-    environment = {
-      CLAUDE_CONFIG_DIR = "${config.home.homeDirectory}/.claude-work";
-    };
+  external_directory = {
+    "/nix/store/**" = "allow";
+    "/tmp/**" = "allow";
+    "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
   };
-
-  xdg.configFile."meridian/sdk-features.json" = {
-    force = true;
-    text = builtins.toJSON {
-      opencode = {
-        clientSystemPrompt = false;
-        codeSystemPrompt = true;
-      };
-    };
+  lsp = "allow";
+  # Slack MCP: reads are allowed by default; anything that publishes asks first.
+  # Drafts stay allowed — they are the review-first posting workflow.
+  "slack_slack_send_message" = "ask";
+  "slack_slack_schedule_message" = "ask";
+  "slack_slack_add_reaction" = "ask";
+  "slack_slack_create_conversation" = "ask";
+  "slack_slack_create_canvas" = "ask";
+  "slack_slack_update_canvas" = "ask";
+  read = {
+    "/nix/store/**" = "allow";
+    "/tmp/**" = "allow";
   };
-
-  xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
-    "$schema" = "https://opencode.ai/config.json";
-    autoupdate = false;
-    lsp = lspServers;
-    mcp.slack = {
-      type = "remote";
-      url = "https://mcp.slack.com/mcp";
-      # Slack requires MCP clients to be backed by a registered Slack app
-      # (no dynamic client registration). Read-only user scopes only.
-      oauth = {
-        clientId = "{file:/run/secrets/slack_mcp_client_id}";
-        clientSecret = "{file:/run/secrets/slack_mcp_client_secret}";
-        scope = builtins.concatStringsSep " " [
-          "search:read.public"
-          "search:read.private"
-          "search:read.mpim"
-          "search:read.im"
-          "search:read.files"
-          "search:read.users"
-          "files:read"
-          "emoji:read"
-          "channels:history"
-          "groups:history"
-          "mpim:history"
-          "im:history"
-          "channels:read"
-          "groups:read"
-          "mpim:read"
-          "users:read"
-          "users:read.email"
-          "canvases:read"
-        ];
-      };
-    };
-    model = "openai/gpt-5.6-sol";
-    plugin = [ config.services.meridian.opencode.pluginPath ];
-    plugins = [
+  bash = builtins.listToAttrs (
+    [
       {
-        package = "${config.xdg.configHome}/opencode/lsp-v2.js";
-        options.servers = lspServers;
+        name = "*";
+        value = "ask";
       }
-    ];
-    provider.anthropic.options = {
-      apiKey = "x";
-      baseURL = "http://127.0.0.1:3456";
-    };
-    permission = {
-      external_directory = {
-        "/nix/store/**" = "allow";
-        "/tmp/**" = "allow";
-        "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
-      };
-      lsp = "allow";
-      # Slack MCP: reads are allowed by default; anything that publishes asks first.
-      # Drafts stay allowed — they are the review-first posting workflow.
-      "slack_slack_send_message" = "ask";
-      "slack_slack_schedule_message" = "ask";
-      "slack_slack_add_reaction" = "ask";
-      "slack_slack_create_conversation" = "ask";
-      "slack_slack_create_canvas" = "ask";
-      "slack_slack_update_canvas" = "ask";
-      read = {
-        "/nix/store/**" = "allow";
-        "/tmp/**" = "allow";
-      };
-      bash = builtins.listToAttrs (
-        [
-          {
-            name = "*";
-            value = "ask";
-          }
-        ]
-        ++ map
-          (command: {
-            name = command;
-            value = "allow";
-          })
-          allowedBashCommands
-      );
-      edit = {
-        "*" = "ask";
-        "/nix/store/**" = "deny";
-        "/tmp/**" = "allow";
-      };
-    };
+    ]
+    ++ map
+      (command: {
+        name = command;
+        value = "allow";
+      })
+      allowedBashCommands
+  );
+  edit = {
+    "*" = "ask";
+    "/nix/store/**" = "deny";
+    "/tmp/**" = "allow";
   };
-
-  xdg.configFile."opencode/plugins/notifications.js".text = ''
-    export const NotificationPlugin = async ({ directory }) => {
-      const notify = (eventType) => {
-        Bun.spawn({
-          cmd: ["opencode-notify", eventType, directory],
-          stdout: "ignore",
-          stderr: "ignore",
-        })
-      }
-
-      return {
-        event: async ({ event }) => {
-          if (event.type === "session.idle") notify("ready")
-          if (event.type === "permission.asked") notify("permission")
-        },
-      }
-    }
-  '';
-
-  xdg.configFile."opencode/lsp-v2.js".source = ./opencode-lsp-v2.js;
-  xdg.configFile."opencode/plugins/tui/vim.jsx".source = ./opencode-vim-v2.jsx;
 }
