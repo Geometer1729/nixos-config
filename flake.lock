@@ -733,26 +733,10 @@
         "type": "github"
       }
     },
-    "opencode-vim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1783909675,
-        "narHash": "sha256-YMpqwD5HBonzLAbvqkmvYRZov+cgoTumEZFQguhlN30=",
-        "owner": "Tarquinen",
-        "repo": "opencode-vim",
-        "rev": "d7489db5129b756246910c5e591f8d76be526fc8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Tarquinen",
-        "repo": "opencode-vim",
-        "type": "github"
-      }
-    },
     "opencode2-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-UKF4wdGG86ZB5yFIyHaDEYKjAHhLaxfHA2lK9l+DfhU=",
+        "narHash": "sha256-JmNEBbvAa2mWB98zjYW17L7Usy/K09uIr459Fn/iFGI=",
         "type": "file",
         "url": "https://registry.npmjs.org/@opencode-ai/cli-linux-x64/next"
       },
@@ -821,7 +805,6 @@
         "nur": "nur",
         "nvim-luaref": "nvim-luaref",
         "ocaml-nvim": "ocaml-nvim",
-        "opencode-vim": "opencode-vim",
         "opencode2-npm": "opencode2-npm",
         "prismlauncher": "prismlauncher",
         "recover-vim": "recover-vim",

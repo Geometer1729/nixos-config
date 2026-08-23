@@ -4,8 +4,8 @@ let
   unstable = import inputs.nixpkgs-unstable {
     system = pkgs.stdenv.hostPlatform.system;
   };
-  opencode = pkgs.writeShellApplication {
-    name = "opencode";
+  opencode1 = pkgs.writeShellApplication {
+    name = "opencode1";
     runtimeEnv = {
       # opencode-vim's broad peer ranges otherwise resolve to a conflicting OpenTUI tree.
       NPM_CONFIG_FORCE = "true";
@@ -49,9 +49,28 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
-  opencodeVimVersion =
-    (builtins.fromJSON (builtins.readFile "${inputs.opencode-vim}/package.json")).version;
+  opencode = pkgs.writeShellApplication {
+    name = "opencode";
+    text = ''
+      exec ${opencode2}/bin/opencode2 "$@"
+    '';
+  };
+  opencodeHls = pkgs.writeShellApplication {
+    name = "opencode-hls";
+    runtimeInputs = [ pkgs.nix ];
+    text = ''
+      if command -v haskell-language-server >/dev/null; then
+        exec haskell-language-server --lsp
+      fi
 
+      if [[ -f flake.nix ]]; then
+        exec nix develop --command haskell-language-server --lsp
+      fi
+
+      echo "opencode-hls: haskell-language-server is not available and no flake.nix was found" >&2
+      exit 127
+    '';
+  };
   developmentBashCommands = [
     "cargo build*"
     "cargo fmt*"
@@ -329,6 +348,8 @@ let
     "direnv status*"
     "opencode --help*"
     "opencode --version*"
+    "opencode1 --help*"
+    "opencode1 --version*"
     "opencode2 --help*"
     "opencode2 --version*"
     "nix eval*"
@@ -420,11 +441,11 @@ let
       command = [ "rust-analyzer" ];
       extensions = [ ".rs" ];
     };
-    #default one seems to work better?
-    #hls = {
-    #  command = [ "haskell-language-server" "--lsp" ];
-    #  extensions = [ ".hs" ".lhs" ];
-    #};
+    # Resolve HLS from the project's dev shell so its GHC version matches.
+    hls = {
+      command = [ "opencode-hls" ];
+      extensions = [ ".hs" ".lhs" ];
+    };
     "yaml-ls" = {
       command = [ "yaml-language-server" "--stdio" ];
       extensions = [ ".yaml" ".yml" ];
@@ -438,7 +459,9 @@ in
     config.services.meridian.package
     libnotify
     opencode
+    opencode1
     opencode2
+    opencodeHls
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
@@ -560,26 +583,5 @@ in
     }
   '';
 
-  xdg.configFile."opencode/tui.json".text = builtins.toJSON {
-    "$schema" = "https://opencode.ai/tui.json";
-    attention = {
-      enabled = true;
-      notifications = true;
-      sound = false;
-    };
-    plugin = [
-      [
-        "opencode-vim@${opencodeVimVersion}"
-        {
-          autoUpdate = false;
-          vim = {
-            defaultMode = "insert";
-          };
-        }
-      ]
-    ];
-    keybinds = {
-      editor_open = "ctrl+o";
-    };
-  };
+  xdg.configFile."opencode/plugins/tui/vim.jsx".source = ./opencode-vim-v2.jsx;
 }
