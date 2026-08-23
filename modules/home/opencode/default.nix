@@ -81,6 +81,8 @@ in
   };
 
   xdg.configFile = {
+    "opencode/AGENTS.md".source = ./AGENTS.md;
+
     "meridian/sdk-features.json" = {
       force = true;
       text = builtins.toJSON {
