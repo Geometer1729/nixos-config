@@ -1,4 +1,6 @@
 { flake, pkgs, config, lib, ... }:
+# OpenCode V2 is still incomplete, so this config intentionally contains temporary hacks.
+# Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
   unstable = import inputs.nixpkgs-unstable {
@@ -127,7 +129,7 @@ in
       plugin = [ config.services.meridian.opencode.pluginPath ];
       plugins = [
         {
-          package = "${config.xdg.configHome}/opencode/plugins/configured/lsp-v2.js";
+          package = "file://${config.xdg.configHome}/opencode/plugins/configured/lsp-v2.js";
           options.servers = lspServers;
         }
       ];

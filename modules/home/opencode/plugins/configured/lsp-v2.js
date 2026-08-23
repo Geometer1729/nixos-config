@@ -42,7 +42,8 @@ function direnvChanges(cwd, env) {
         return resolve({ changes: {}, error: Buffer.concat(errors).toString().trim() || `direnv exited with ${code}` })
       }
       try {
-        resolve({ changes: JSON.parse(Buffer.concat(chunks).toString()) })
+        const output = Buffer.concat(chunks).toString().trim()
+        resolve({ changes: output ? JSON.parse(output) : {} })
       } catch {
         resolve({ changes: {}, error: "direnv returned invalid JSON" })
       }
@@ -70,6 +71,7 @@ function rpc(server, root, env) {
   let stopped = false
   const pending = new Map()
   const diagnostics = new Map()
+  const diagnosticVersions = new Map()
   const diagnosticWaiters = new Map()
   process.stderr.resume()
 
@@ -102,6 +104,7 @@ function rpc(server, root, env) {
 
   const publishDiagnostics = (params) => {
     diagnostics.set(params.uri, params.diagnostics ?? [])
+    diagnosticVersions.set(params.uri, (diagnosticVersions.get(params.uri) ?? 0) + 1)
     const waiters = diagnosticWaiters.get(params.uri)
     if (!waiters) return
     diagnosticWaiters.delete(params.uri)
@@ -170,6 +173,7 @@ function rpc(server, root, env) {
     request,
     notify,
     diagnostics,
+    diagnosticVersions,
     diagnosticWaiters,
     process,
   }
@@ -215,8 +219,11 @@ async function findRoot(server, file, boundary) {
   }
 }
 
-function waitForDiagnostics(client, uri) {
+function waitForDiagnostics(client, uri, since, timeout = 30_000) {
   return new Promise((resolve) => {
+    if ((client.diagnosticVersions.get(uri) ?? 0) > since) {
+      return setTimeout(() => resolve(client.diagnostics.get(uri) ?? []), 300)
+    }
     const timer = setTimeout(() => {
       const waiters = client.diagnosticWaiters.get(uri) ?? []
       client.diagnosticWaiters.set(
@@ -224,7 +231,7 @@ function waitForDiagnostics(client, uri) {
         waiters.filter((waiter) => waiter !== done),
       )
       resolve(client.diagnostics.get(uri) ?? [])
-    }, 30_000)
+    }, timeout)
     const done = (items) => {
       clearTimeout(timer)
       setTimeout(() => resolve(client.diagnostics.get(uri) ?? items), 300)
@@ -236,6 +243,7 @@ function waitForDiagnostics(client, uri) {
 async function open(client, file) {
   const text = await readFile(file, "utf8")
   const uri = pathToFileURL(file).href
+  const diagnosticVersion = client.diagnosticVersions.get(uri) ?? 0
   const previous = client.documents?.get(uri)
   if (!client.documents) client.documents = new Map()
   if (previous === undefined) {
@@ -243,7 +251,7 @@ async function open(client, file) {
     client.notify("textDocument/didOpen", {
       textDocument: { uri, languageId: languageIDs[path.extname(file)] ?? "plaintext", version: 0, text },
     })
-    return { uri, changed: true }
+    return { uri, changed: true, diagnosticVersion }
   } else if (previous.text !== text) {
     const version = previous.version + 1
     client.documents.set(uri, { version, text })
@@ -251,9 +259,20 @@ async function open(client, file) {
       textDocument: { uri, version },
       contentChanges: [{ text }],
     })
-    return { uri, changed: true }
+    return { uri, changed: true, diagnosticVersion }
   }
-  return { uri, changed: false }
+  return { uri, changed: false, diagnosticVersion }
+}
+
+function formatDiagnostics(file, diagnostics) {
+  const labels = ["", "error", "warning", "information", "hint"]
+  const lines = diagnostics.map((diagnostic) => {
+    const start = diagnostic.range?.start ?? {}
+    const location = `${(start.line ?? 0) + 1}:${(start.character ?? 0) + 1}`
+    const severity = labels[diagnostic.severity] ?? "diagnostic"
+    return `${severity} ${location}: ${diagnostic.message}`
+  })
+  return `LSP diagnostics for ${file}:\n${lines.join("\n")}`
 }
 
 function position(input) {
@@ -317,13 +336,13 @@ export default {
             clients.set(key, starting)
           }
           const client = await clients.get(key)
-          const { uri, changed } = await open(client, file)
+          const { uri, changed, diagnosticVersion } = await open(client, file)
           let result
 
           if (input.operation === "diagnostics") {
             result =
               changed || !client.diagnostics.has(uri)
-                ? await waitForDiagnostics(client, uri)
+                ? await waitForDiagnostics(client, uri, diagnosticVersion)
                 : (client.diagnostics.get(uri) ?? [])
           } else if (input.operation === "hover") {
             result = await client.request("textDocument/hover", {
@@ -344,6 +363,53 @@ export default {
           return { content: JSON.stringify(result ?? null, null, 2) }
         },
       })
+    })
+
+    await ctx.tool.hook("execute.after", async (event) => {
+      if (event.status !== "completed" || !["edit", "patch", "write"].includes(event.tool)) return
+
+      const output = event.result.output
+      const paths =
+        event.tool === "patch"
+          ? (output?.applied ?? []).filter((item) => item.type !== "delete").map((item) => item.target)
+          : event.tool === "write"
+            ? [output?.target]
+            : [event.input?.path]
+      const session = await ctx.session.get({ sessionID: event.sessionID })
+      const messages = []
+
+      for (const value of new Set(paths.filter((item) => typeof item === "string"))) {
+        const file = path.resolve(session.location.directory, value)
+        const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
+        if (!server) continue
+        try {
+          const root = await findRoot(server, file, session.location.directory)
+          const key = `${server.id}\0${root}`
+          if (!clients.has(key)) {
+            const starting = start(server, root).catch((error) => {
+              clients.delete(key)
+              throw error
+            })
+            clients.set(key, starting)
+          }
+          const client = await clients.get(key)
+          const { uri, changed, diagnosticVersion } = await open(client, file)
+          const diagnostics =
+            changed || !client.diagnostics.has(uri)
+              ? await waitForDiagnostics(client, uri, diagnosticVersion, 10_000)
+              : (client.diagnostics.get(uri) ?? [])
+          if (diagnostics.length > 0) messages.push(formatDiagnostics(value, diagnostics))
+        } catch (error) {
+          messages.push(`LSP diagnostics unavailable for ${value}: ${error.message ?? String(error)}`)
+        }
+      }
+
+      if (messages.length > 0) {
+        const text = messages.join("\n\n")
+        event.result.content = Array.isArray(event.result.content)
+          ? [...event.result.content, { type: "text", text }]
+          : `${event.result.content ?? ""}${event.result.content ? "\n\n" : ""}${text}`
+      }
     })
 
     return async () => {
