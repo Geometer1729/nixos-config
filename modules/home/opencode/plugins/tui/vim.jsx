@@ -216,6 +216,17 @@ export default {
       const value = input.plainText
       const current = cursor()
 
+      // Escape cancels a pending operator or count. Otherwise this layer would
+      // swallow the key, so hand it to opencode's own escape binding.
+      if (key === "escape") {
+        const cancelled = Boolean(pending || count)
+        pending = ""
+        count = ""
+        desiredColumn = undefined
+        if (!cancelled) context.keymap.dispatch("session.interrupt")
+        return
+      }
+
       if (/^[1-9]$/.test(key) || (count && key === "0")) {
         count += key
         return
@@ -299,10 +310,6 @@ export default {
       else if (key === "ctrl+b") context.keymap.dispatch("session.page.up")
       else if (key === "ctrl+f") context.keymap.dispatch("session.page.down")
       else if (key === "return") context.keymap.dispatch("input.submit")
-      else if (key === "escape") {
-        pending = ""
-        count = ""
-      }
       desiredColumn = key === "j" || key === "k" || key === "up" || key === "down" ? desiredColumn : undefined
     }
 
