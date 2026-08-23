@@ -55,22 +55,6 @@ let
       exec ${opencode2}/bin/opencode2 "$@"
     '';
   };
-  opencodeHls = pkgs.writeShellApplication {
-    name = "opencode-hls";
-    runtimeInputs = [ pkgs.nix ];
-    text = ''
-      if command -v haskell-language-server >/dev/null; then
-        exec haskell-language-server --lsp
-      fi
-
-      if [[ -f flake.nix ]]; then
-        exec nix develop --command haskell-language-server --lsp
-      fi
-
-      echo "opencode-hls: haskell-language-server is not available and no flake.nix was found" >&2
-      exit 127
-    '';
-  };
   developmentBashCommands = [
     "cargo build*"
     "cargo fmt*"
@@ -443,7 +427,7 @@ let
     };
     # Resolve HLS from the project's dev shell so its GHC version matches.
     hls = {
-      command = [ "opencode-hls" ];
+      command = [ "haskell-language-server" "--lsp" ];
       extensions = [ ".hs" ".lhs" ];
     };
     "yaml-ls" = {
@@ -461,7 +445,6 @@ in
     opencode
     opencode1
     opencode2
-    opencodeHls
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
@@ -519,6 +502,12 @@ in
     };
     model = "openai/gpt-5.6-sol";
     plugin = [ config.services.meridian.opencode.pluginPath ];
+    plugins = [
+      {
+        package = "${config.xdg.configHome}/opencode/lsp-v2.js";
+        options.servers = lspServers;
+      }
+    ];
     provider.anthropic.options = {
       apiKey = "x";
       baseURL = "http://127.0.0.1:3456";
@@ -583,5 +572,6 @@ in
     }
   '';
 
+  xdg.configFile."opencode/lsp-v2.js".source = ./opencode-lsp-v2.js;
   xdg.configFile."opencode/plugins/tui/vim.jsx".source = ./opencode-vim-v2.jsx;
 }
