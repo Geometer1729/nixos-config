@@ -1,4 +1,17 @@
 { config, pkgs, ... }:
+let
+  nhWithSleepInhibit = pkgs.writeShellScriptBin "nh" ''
+    if [[ "''${1-}" == os ]]; then
+      exec ${pkgs.systemd}/bin/systemd-inhibit \
+        --what=sleep \
+        --who=nh \
+        --why="NixOS operation in progress" \
+        ${pkgs.nh}/bin/nh "$@"
+    fi
+
+    exec ${pkgs.nh}/bin/nh "$@"
+  '';
+in
 {
   home.packages = with pkgs; [
     # System utilities
@@ -8,7 +21,7 @@
     dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
-    nh # nix helper
+    nhWithSleepInhibit # nix helper
     sops # needed to edit sops-nix secrets
 
     # Monitoring and status tools
