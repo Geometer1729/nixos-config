@@ -60,7 +60,9 @@
     # Work
     linearis.url = "github:linearis-oss/linearis";
     linearis.flake = false;
-    linearis-npm.url = "file+https://registry.npmjs.org/linearis/next";
+    # Keep the published artifact aligned with the source input; the mutable
+    # `next` tag can move ahead before the repository version is bumped.
+    linearis-npm.url = "file+https://registry.npmjs.org/linearis/2026.8.0";
     linearis-npm.flake = false;
 
     # PrismLauncher nightly for new auth system
