@@ -266,13 +266,13 @@ async function open(client, file) {
 
 function formatDiagnostics(file, diagnostics) {
   const labels = ["", "error", "warning", "information", "hint"]
-  const lines = diagnostics.map((diagnostic) => {
+  return diagnostics.map((diagnostic) => {
     const start = diagnostic.range?.start ?? {}
     const location = `${(start.line ?? 0) + 1}:${(start.character ?? 0) + 1}`
     const severity = labels[diagnostic.severity] ?? "diagnostic"
-    return `${severity} ${location}: ${diagnostic.message}`
-  })
-  return `LSP diagnostics for ${file}:\n${lines.join("\n")}`
+    const message = String(diagnostic.message ?? "").replace(/\s+/g, " ").trim()
+    return `${file}:${location}: ${severity}: ${message}`
+  }).join("\n")
 }
 
 function position(input) {
@@ -325,6 +325,7 @@ export default {
           const directory = session.location.directory
           const file = path.resolve(directory, input.file)
           const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
+          if (!server && input.operation === "diagnostics") return { content: "" }
           if (!server) throw new Error(`No configured language server for: ${file}`)
           const root = await findRoot(server, file, directory)
           const key = `${server.id}\0${root}`
@@ -344,6 +345,7 @@ export default {
               changed || !client.diagnostics.has(uri)
                 ? await waitForDiagnostics(client, uri, diagnosticVersion)
                 : (client.diagnostics.get(uri) ?? [])
+            return { content: result.length > 0 ? formatDiagnostics(input.file, result) : "" }
           } else if (input.operation === "hover") {
             result = await client.request("textDocument/hover", {
               textDocument: { uri },
