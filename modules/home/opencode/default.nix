@@ -82,6 +82,11 @@ in
 
   xdg.configFile = {
     "opencode/AGENTS.md".source = ./AGENTS.md;
+    # Add global skills as ./skills/<id>/SKILL.md.
+    "opencode/skills" = {
+      source = ./skills;
+      recursive = true;
+    };
 
     "meridian/sdk-features.json" = {
       force = true;
