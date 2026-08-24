@@ -109,6 +109,7 @@ let
       "accessibility.typeaheadfind.enablesound" = false;
       "browser.shell.checkDefaultBrowser" = false;
       "browser.compactmode.show" = true;
+      "browser.uidensity" = 1;
       "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
       "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
