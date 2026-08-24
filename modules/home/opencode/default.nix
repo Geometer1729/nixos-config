@@ -87,6 +87,10 @@ in
       source = ./skills;
       recursive = true;
     };
+    "opencode/commands" = {
+      source = ./commands;
+      recursive = true;
+    };
 
     "meridian/sdk-features.json" = {
       force = true;
