@@ -31,7 +31,11 @@ function rootsFor(extensions) {
 
 function direnvChanges(cwd, env) {
   return new Promise((resolve) => {
-    const child = spawn("direnv", ["export", "json"], { cwd, env, stdio: ["ignore", "pipe", "pipe"] })
+    const child = spawn("direnv", ["export", "json"], {
+      cwd,
+      env: { ...env, DIRENV_NO_TMUX_RENAME: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
+    })
     const chunks = []
     const errors = []
     child.stdout.on("data", (chunk) => chunks.push(chunk))
@@ -291,6 +295,28 @@ export default {
       return [{ ...server, id, extensions, roots: rootsFor(extensions) }]
     })
 
+    const diagnosticsFor = async (directory, value, timeout = 30_000) => {
+      const file = path.resolve(directory, value)
+      const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
+      if (!server) return ""
+      const root = await findRoot(server, file, directory)
+      const key = `${server.id}\0${root}`
+      if (!clients.has(key)) {
+        const starting = start(server, root).catch((error) => {
+          clients.delete(key)
+          throw error
+        })
+        clients.set(key, starting)
+      }
+      const client = await clients.get(key)
+      const { uri, changed, diagnosticVersion } = await open(client, file)
+      const diagnostics =
+        changed || !client.diagnostics.has(uri)
+          ? await waitForDiagnostics(client, uri, diagnosticVersion, timeout)
+          : (client.diagnostics.get(uri) ?? [])
+      return diagnostics.length > 0 ? formatDiagnostics(value, diagnostics) : ""
+    }
+
     await ctx.shell.hook("create.before", async (invocation) => {
       const loaded = await direnvChanges(invocation.cwd, invocation.env)
       for (const [key, value] of Object.entries(loaded.changes)) {
@@ -303,7 +329,7 @@ export default {
       tools.add({
         name: "lsp",
         description:
-          "Query the configured Bash, Haskell, Lua, Nix, Rust, or YAML language server. Use diagnostics after reading or editing supported files; use hover, definition, or symbols for language-aware navigation.",
+          "Query the configured Bash, Haskell, Lua, Nix, Rust, or YAML language server. Diagnostics are added automatically to supported file reads and changes; use diagnostics only for an explicit recheck.",
         input: {
           type: "object",
           properties: {
@@ -323,9 +349,11 @@ export default {
         execute: async (input, toolContext) => {
           const session = await ctx.session.get({ sessionID: toolContext.sessionID })
           const directory = session.location.directory
+          if (input.operation === "diagnostics") {
+            return { content: await diagnosticsFor(directory, input.file) }
+          }
           const file = path.resolve(directory, input.file)
           const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
-          if (!server && input.operation === "diagnostics") return { content: "" }
           if (!server) throw new Error(`No configured language server for: ${file}`)
           const root = await findRoot(server, file, directory)
           const key = `${server.id}\0${root}`
@@ -340,13 +368,7 @@ export default {
           const { uri, changed, diagnosticVersion } = await open(client, file)
           let result
 
-          if (input.operation === "diagnostics") {
-            result =
-              changed || !client.diagnostics.has(uri)
-                ? await waitForDiagnostics(client, uri, diagnosticVersion)
-                : (client.diagnostics.get(uri) ?? [])
-            return { content: result.length > 0 ? formatDiagnostics(input.file, result) : "" }
-          } else if (input.operation === "hover") {
+          if (input.operation === "hover") {
             result = await client.request("textDocument/hover", {
               textDocument: { uri },
               position: position(input),
@@ -368,7 +390,7 @@ export default {
     })
 
     await ctx.tool.hook("execute.after", async (event) => {
-      if (event.status !== "completed" || !["edit", "patch", "write"].includes(event.tool)) return
+      if (event.status !== "completed" || !["edit", "patch", "read", "write"].includes(event.tool)) return
 
       const output = event.result.output
       const paths =
@@ -381,26 +403,9 @@ export default {
       const messages = []
 
       for (const value of new Set(paths.filter((item) => typeof item === "string"))) {
-        const file = path.resolve(session.location.directory, value)
-        const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
-        if (!server) continue
         try {
-          const root = await findRoot(server, file, session.location.directory)
-          const key = `${server.id}\0${root}`
-          if (!clients.has(key)) {
-            const starting = start(server, root).catch((error) => {
-              clients.delete(key)
-              throw error
-            })
-            clients.set(key, starting)
-          }
-          const client = await clients.get(key)
-          const { uri, changed, diagnosticVersion } = await open(client, file)
-          const diagnostics =
-            changed || !client.diagnostics.has(uri)
-              ? await waitForDiagnostics(client, uri, diagnosticVersion, 10_000)
-              : (client.diagnostics.get(uri) ?? [])
-          if (diagnostics.length > 0) messages.push(formatDiagnostics(value, diagnostics))
+          const message = await diagnosticsFor(session.location.directory, value, 10_000)
+          if (message) messages.push(message)
         } catch (error) {
           messages.push(`LSP diagnostics unavailable for ${value}: ${error.message ?? String(error)}`)
         }
