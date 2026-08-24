@@ -63,10 +63,9 @@ test-remote-builds:
 deploy:
   nixpkgs-fmt "{{flake}}"
   nh os build "{{flake}}" -H am
-  nh os build "{{flake}}" -H torag
   nix flake check "{{flake}}"
   nixos-rebuild --flake "{{flake}}#am" --target-host bbrian@am --sudo switch
-  nixos-rebuild --flake "{{flake}}#torag" --target-host bbrian@torag --use-substitutes --sudo switch
+  ssh torag nh os switch 'git+ssh://am/home/bbrian/conf#torag'
 
 
 gnome-check:
