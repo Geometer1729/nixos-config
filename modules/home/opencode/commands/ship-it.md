@@ -13,8 +13,11 @@ Ship the current work end-to-end:
 - Find the pull request for the branch. Open a non-draft pull request with an
   accurate title and description if one does not exist.
 - Monitor required CI checks and automated review feedback. If a check fails or
-  an automated reviewer identifies an actionable problem, investigate it, make
-  the appropriate fix, test it, commit it, push it, and repeat.
+  an automated reviewer identifies an actionable problem, investigate.
+  In the case of a CI failure propose a fix.
+  In the case of a review describe the identified problem as a tangible scenario.
+  Grill me about the assumptions going into this scenario and the possible fix.
+  Once that's settled implement the fix.
 - Merge the pull request using the repository's expected merge method only
   after required CI passes and automated reviews approve or have no unresolved
   actionable feedback. Do not bypass branch protections or merge with pending
