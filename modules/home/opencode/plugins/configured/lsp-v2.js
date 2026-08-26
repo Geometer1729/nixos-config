@@ -4,6 +4,7 @@ import path from "node:path"
 import { pathToFileURL } from "node:url"
 
 const clients = new Map()
+const defaultIdleTimeoutMs = 30 * 60 * 1000
 
 const languageIDs = {
   ".bash": "shellscript",
@@ -64,7 +65,7 @@ function applyEnvironment(env, changes) {
   return result
 }
 
-function rpc(server, root, env) {
+function rpc(server, root, env, onStop) {
   const process = spawn(server.command[0], server.command.slice(1), {
     cwd: root,
     env,
@@ -169,6 +170,7 @@ function rpc(server, root, env) {
     stopped = true
     for (const waiter of pending.values()) waiter.reject(error)
     pending.clear()
+    onStop()
   }
   process.on("error", fail)
   process.on("exit", (code) => fail(new Error(`${server.command[0]} exited with status ${code}`)))
@@ -183,12 +185,12 @@ function rpc(server, root, env) {
   }
 }
 
-async function start(server, root) {
+async function start(server, root, onStop) {
   const loaded = await direnvChanges(root, globalThis.process.env)
   if (loaded.error) throw new Error(`Failed to load the project direnv environment: ${loaded.error}`)
   const changes = loaded.changes
   const env = { ...applyEnvironment(globalThis.process.env, changes), ...(server.env ?? {}) }
-  const client = rpc(server, root, env)
+  const client = rpc(server, root, env, onStop)
   await client.request(
     "initialize",
     {
@@ -209,6 +211,36 @@ async function start(server, root) {
   )
   client.notify("initialized", {})
   return { ...client, server }
+}
+
+function waitForExit(process, timeout) {
+  if (process.exitCode !== null) return Promise.resolve(true)
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      process.off("exit", exited)
+      resolve(false)
+    }, timeout)
+    const exited = () => {
+      clearTimeout(timer)
+      resolve(true)
+    }
+    process.once("exit", exited)
+  })
+}
+
+async function stop(client) {
+  if (client.process.exitCode !== null) return
+  await client.request("shutdown", null, 5_000).catch(() => undefined)
+  if (client.process.exitCode !== null) return
+  try {
+    client.notify("exit")
+  } catch {
+    // Continue to signals if the server closed its input without exiting.
+  }
+  if (await waitForExit(client.process, 2_000)) return
+  client.process.kill("SIGTERM")
+  if (await waitForExit(client.process, 2_000)) return
+  client.process.kill("SIGKILL")
 }
 
 async function findRoot(server, file, boundary) {
@@ -289,26 +321,48 @@ function position(input) {
 export default {
   id: "bbrian.lsp",
   setup: async (ctx) => {
+    const idleTimeoutMs =
+      Number.isFinite(ctx.options.idleTimeoutMs) && ctx.options.idleTimeoutMs > 0
+        ? ctx.options.idleTimeoutMs
+        : defaultIdleTimeoutMs
     const servers = Object.entries(ctx.options.servers ?? {}).flatMap(([id, server]) => {
       if (!server || server.disabled || !Array.isArray(server.command)) return []
       const extensions = Array.isArray(server.extensions) ? server.extensions : []
       return [{ ...server, id, extensions, roots: rootsFor(extensions) }]
     })
 
+    const clientFor = async (server, root) => {
+      const key = `${server.id}\0${root}`
+      let entry = clients.get(key)
+      if (!entry) {
+        entry = {}
+        const remove = () => {
+          if (clients.get(key) !== entry) return
+          clearTimeout(entry.idleTimer)
+          clients.delete(key)
+        }
+        entry.promise = start(server, root, remove).catch((error) => {
+          remove()
+          throw error
+        })
+        clients.set(key, entry)
+      }
+      clearTimeout(entry.idleTimer)
+      entry.idleTimer = setTimeout(() => {
+        if (clients.get(key) !== entry) return
+        clients.delete(key)
+        void entry.promise.then(stop).catch(() => undefined)
+      }, idleTimeoutMs)
+      entry.idleTimer.unref()
+      return entry.promise
+    }
+
     const diagnosticsFor = async (directory, value, timeout = 30_000) => {
       const file = path.resolve(directory, value)
       const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
       if (!server) return ""
       const root = await findRoot(server, file, directory)
-      const key = `${server.id}\0${root}`
-      if (!clients.has(key)) {
-        const starting = start(server, root).catch((error) => {
-          clients.delete(key)
-          throw error
-        })
-        clients.set(key, starting)
-      }
-      const client = await clients.get(key)
+      const client = await clientFor(server, root)
       const { uri, changed, diagnosticVersion } = await open(client, file)
       const diagnostics =
         changed || !client.diagnostics.has(uri)
@@ -356,15 +410,7 @@ export default {
           const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
           if (!server) throw new Error(`No configured language server for: ${file}`)
           const root = await findRoot(server, file, directory)
-          const key = `${server.id}\0${root}`
-          if (!clients.has(key)) {
-            const starting = start(server, root).catch((error) => {
-              clients.delete(key)
-              throw error
-            })
-            clients.set(key, starting)
-          }
-          const client = await clients.get(key)
+          const client = await clientFor(server, root)
           const { uri, changed, diagnosticVersion } = await open(client, file)
           let result
 
@@ -423,11 +469,11 @@ export default {
       const running = [...clients.values()]
       clients.clear()
       await Promise.all(
-        running.map(async (value) => {
-          const client = await value.catch(() => undefined)
+        running.map(async (entry) => {
+          clearTimeout(entry.idleTimer)
+          const client = await entry.promise.catch(() => undefined)
           if (!client) return
-          client.notify("exit")
-          client.process.kill("SIGTERM")
+          await stop(client)
         }),
       )
     }
