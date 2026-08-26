@@ -234,6 +234,7 @@ let
     "sleep *"
     "echo*"
     "printf*"
+    "notify-send *"
     "true"
     "test*"
     "expr*"
