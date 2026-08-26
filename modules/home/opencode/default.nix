@@ -140,7 +140,7 @@ in
       plugin = [ config.services.meridian.opencode.pluginPath ];
       plugins = [
         {
-          package = "file://${config.xdg.configHome}/opencode/plugins/configured/lsp-v2.js";
+          package = "file://${config.xdg.configHome}/opencode/plugins/configured/lsp-v2.ts";
           options.servers = lspServers;
         }
       ];

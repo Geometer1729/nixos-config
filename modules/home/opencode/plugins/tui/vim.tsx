@@ -1,3 +1,14 @@
+import { Plugin } from "@opencode-ai/plugin/tui"
+import type { EditBufferRenderable, EditorTraits } from "@opentui/core"
+import { onCleanup, onMount } from "solid-js"
+
+type Mode = "insert" | "normal"
+type Operator = "c" | "d" | "y"
+type Pending = "" | "g" | Operator
+type Snapshot = { cursor: number; text: string }
+type HostEditorTraits = EditorTraits & { owner?: string; role?: string }
+type Word = { index: number; text: string }
+
 const printable = [
   ..."abcdefghijklmnopqrstuvwxyz0123456789",
   "space",
@@ -33,37 +44,37 @@ const printable = [
   "~",
 ]
 
-export default {
+export default Plugin.define({
   id: "local.opencode-vim-v2",
   setup(context) {
     let enabled = true
-    let mode = "insert"
-    let pending = ""
+    let mode: Mode = "insert"
+    let pending: Pending = ""
     let count = ""
-    let desiredColumn
+    let desiredColumn: number | undefined
     let yank = ""
     let yankLinewise = false
-    let insertSnapshot
-    let cursorTimer
-    const undo = []
-    const redo = []
+    let insertSnapshot: Snapshot | undefined
+    const undo: Snapshot[] = []
+    const redo: Snapshot[] = []
 
-    const editor = () => {
+    const editor = (): EditBufferRenderable | undefined => {
       const current = context.renderer.currentFocusedEditor
-      if (current?.traits?.owner !== "opencode" || current?.traits?.role !== "prompt") return
+      const traits = current?.traits as HostEditorTraits | undefined
+      if (!current || traits?.owner !== "opencode" || traits.role !== "prompt") return
       return current
     }
 
     const text = () => editor()?.plainText ?? ""
     const cursor = () => editor()?.cursorOffset ?? 0
-    const clamp = (value, min, max) => Math.max(min, Math.min(value, max))
-    const lineStart = (value, offset) => value.lastIndexOf("\n", Math.max(0, offset - 1)) + 1
-    const lineEnd = (value, offset) => {
+    const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(value, max))
+    const lineStart = (value: string, offset: number): number => value.lastIndexOf("\n", Math.max(0, offset - 1)) + 1
+    const lineEnd = (value: string, offset: number): number => {
       const end = value.indexOf("\n", offset)
       return end < 0 ? value.length : end
     }
 
-    const setCursor = (offset, allowEnd = false) => {
+    const setCursor = (offset: number, allowEnd = false): void => {
       const input = editor()
       if (!input) return
       const value = input.plainText
@@ -75,44 +86,47 @@ export default {
       input.cursorOffset = clamp(offset, 0, max)
     }
 
-    const setMode = (next) => {
+    const setMode = (next: Mode): void => {
       const input = editor()
       mode = next
       pending = ""
       count = ""
       desiredColumn = undefined
       if (!input) return
-      input.traits = {
-        ...input.traits,
-        status: enabled && next === "normal" ? "NORMAL" : undefined,
-      }
+      const traits = { ...input.traits }
+      if (enabled && next === "normal") traits.status = "NORMAL"
+      else delete traits.status
+      input.traits = traits
       syncCursorStyle()
     }
 
     const syncCursorStyle = () => {
       const input = editor()
       if (!input) return
-      const desired = enabled && mode === "normal" ? { style: "block", blinking: false } : { style: "line", blinking: true }
+      const desired =
+        enabled && mode === "normal"
+          ? ({ style: "block", blinking: false } as const)
+          : ({ style: "line", blinking: true } as const)
       if (input.cursorStyle?.style === desired.style && input.cursorStyle?.blinking === desired.blinking) return
       input.cursorStyle = desired
-      context.renderer.requestRender?.()
+      context.renderer.requestRender()
     }
 
-    const snapshot = () => ({ text: text(), cursor: cursor() })
-    const restore = (state) => {
+    const snapshot = (): Snapshot => ({ text: text(), cursor: cursor() })
+    const restore = (state: Snapshot): void => {
       const input = editor()
       if (!input) return
       input.setText(state.text)
       setCursor(state.cursor, mode === "insert")
     }
-    const change = (fn) => {
+    const change = (fn: () => void): void => {
       const before = snapshot()
       fn()
       if (before.text === text()) return
       undo.push(before)
       redo.length = 0
     }
-    const replace = (start, end, replacement = "") => {
+    const replace = (start: number, end: number, replacement = ""): void => {
       const input = editor()
       if (!input) return
       const value = input.plainText
@@ -120,18 +134,23 @@ export default {
       setCursor(start, mode === "insert")
     }
 
-    const words = (value) => [...value.matchAll(/[A-Za-z0-9_]+|[^\sA-Za-z0-9_]+/g)]
-    const wordForward = (value, offset) => words(value).find((match) => match.index > offset)?.index ?? value.length
-    const wordBackward = (value, offset) => {
+    const words = (value: string): Word[] =>
+      Array.from(value.matchAll(/[A-Za-z0-9_]+|[^\sA-Za-z0-9_]+/g), (match) => ({
+        index: match.index ?? 0,
+        text: match[0],
+      }))
+    const wordForward = (value: string, offset: number): number =>
+      words(value).find((match) => match.index > offset)?.index ?? value.length
+    const wordBackward = (value: string, offset: number): number => {
       const previous = words(value).filter((match) => match.index < offset)
       return previous.at(-1)?.index ?? 0
     }
-    const wordEnd = (value, offset) => {
-      const match = words(value).find((item) => item.index + item[0].length - 1 > offset)
-      return match ? match.index + match[0].length - 1 : Math.max(0, value.length - 1)
+    const wordEnd = (value: string, offset: number): number => {
+      const match = words(value).find((item) => item.index + item.text.length - 1 > offset)
+      return match ? match.index + match.text.length - 1 : Math.max(0, value.length - 1)
     }
 
-    const vertical = (delta) => {
+    const vertical = (delta: number): void => {
       const value = text()
       const current = cursor()
       const start = lineStart(value, current)
@@ -150,12 +169,12 @@ export default {
       setCursor(Math.min(targetStart + column, Math.max(targetStart, targetEnd - 1)))
     }
 
-    const enterInsert = (offset) => {
+    const enterInsert = (offset: number): void => {
       insertSnapshot = snapshot()
       setCursor(offset, true)
       setMode("insert")
     }
-    const enterNormal = () => {
+    const enterNormal = (): void => {
       if (insertSnapshot && insertSnapshot.text !== text()) {
         undo.push(insertSnapshot)
         redo.length = 0
@@ -168,7 +187,7 @@ export default {
       else setCursor(current)
     }
 
-    const deleteLine = (enterInsertAfter = false) => {
+    const deleteLine = (enterInsertAfter = false): void => {
       const value = text()
       const start = lineStart(value, cursor())
       let end = lineEnd(value, cursor())
@@ -178,7 +197,7 @@ export default {
       if (enterInsertAfter) enterInsert(start)
     }
 
-    const applyOperator = (operator, motion) => {
+    const applyOperator = (operator: Operator, motion: string): void => {
       const value = text()
       const current = cursor()
       if (motion === operator) {
@@ -210,7 +229,7 @@ export default {
       if (operator === "c") enterInsert(start)
     }
 
-    const handleNormal = (key) => {
+    const handleNormal = (key: string): void => {
       const input = editor()
       if (!input) return
       const value = input.plainText
@@ -257,9 +276,12 @@ export default {
       } else if (key === "k" || key === "up") {
         if (!value) context.keymap.dispatch("prompt.history.previous")
         else for (let i = 0; i < repeat; i++) vertical(-1)
-      } else if (key === "w") setCursor(Array.from({ length: repeat }).reduce((offset) => wordForward(value, offset), current))
-      else if (key === "b") setCursor(Array.from({ length: repeat }).reduce((offset) => wordBackward(value, offset), current))
-      else if (key === "e") setCursor(Array.from({ length: repeat }).reduce((offset) => wordEnd(value, offset), current))
+      } else if (key === "w")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordForward(value, offset), current))
+      else if (key === "b")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordBackward(value, offset), current))
+      else if (key === "e")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordEnd(value, offset), current))
       else if (key === "0") setCursor(lineStart(value, current))
       else if (key === "^") {
         const start = lineStart(value, current)
@@ -270,29 +292,32 @@ export default {
       else if (key === "a") enterInsert(Math.min(value.length, current + 1))
       else if (key === "I") enterInsert(lineStart(value, current))
       else if (key === "A") enterInsert(lineEnd(value, current))
-      else if (key === "o") change(() => {
-        const end = lineEnd(value, current)
-        replace(end, end, "\n")
-        enterInsert(end + 1)
-      })
-      else if (key === "O") change(() => {
-        const start = lineStart(value, current)
-        replace(start, start, "\n")
-        enterInsert(start)
-      })
+      else if (key === "o")
+        change(() => {
+          const end = lineEnd(value, current)
+          replace(end, end, "\n")
+          enterInsert(end + 1)
+        })
+      else if (key === "O")
+        change(() => {
+          const start = lineStart(value, current)
+          replace(start, start, "\n")
+          enterInsert(start)
+        })
       else if (key === "x") change(() => replace(current, Math.min(value.length, current + repeat)))
       else if (key === "D") applyOperator("d", "$")
       else if (key === "C") applyOperator("c", "$")
-      else if (key === "p" || key === "P") change(() => {
-        if (!yank) return
-        if (yankLinewise) {
-          const offset = key === "p" ? Math.min(value.length, lineEnd(value, current) + 1) : lineStart(value, current)
-          replace(offset, offset, yank)
-        } else {
-          const offset = key === "p" ? Math.min(value.length, current + 1) : current
-          replace(offset, offset, yank)
-        }
-      })
+      else if (key === "p" || key === "P")
+        change(() => {
+          if (!yank) return
+          if (yankLinewise) {
+            const offset = key === "p" ? Math.min(value.length, lineEnd(value, current) + 1) : lineStart(value, current)
+            replace(offset, offset, yank)
+          } else {
+            const offset = key === "p" ? Math.min(value.length, current + 1) : current
+            replace(offset, offset, yank)
+          }
+        })
       else if (key === "u") {
         const previous = undo.pop()
         if (previous) {
@@ -313,7 +338,7 @@ export default {
       desiredColumn = key === "j" || key === "k" || key === "up" || key === "down" ? desiredColumn : undefined
     }
 
-    const bind = (key, run, active) => ({
+    const bind = (key: string, run: () => void, active: () => boolean) => ({
       bind: key,
       enabled: active,
       run: () => {
@@ -322,67 +347,77 @@ export default {
     })
 
     const Controller = () => {
-      cursorTimer ??= setInterval(syncCursorStyle, 50)
-      queueMicrotask(syncCursorStyle)
-        context.keymap.layer(() => ({
-          mode: "global",
-          priority: 1000,
-          commands: [
-            bind("ctrl+o", () => context.keymap.dispatch("prompt.editor"), () => Boolean(editor())),
-            {
-              id: "opencode-vim.toggle",
-              title: "Toggle Vim mode",
-              group: "Vim",
-              palette: true,
-              slash: { name: "vim" },
-              bind: false,
-              run: () => {
-                enabled = !enabled
-                setMode("insert")
-                context.ui.toast.show({ message: `Vim mode ${enabled ? "enabled" : "disabled"}` })
-              },
+      onMount(() => {
+        syncCursorStyle()
+        const timer = setInterval(syncCursorStyle, 50)
+        onCleanup(() => clearInterval(timer))
+      })
+      context.keymap.layer(() => ({
+        mode: "global",
+        priority: 1000,
+        commands: [
+          bind(
+            "ctrl+o",
+            () => context.keymap.dispatch("prompt.editor"),
+            () => Boolean(editor()),
+          ),
+          {
+            id: "opencode-vim.toggle",
+            title: "Toggle Vim mode",
+            group: "Vim",
+            palette: true,
+            slash: { name: "vim" },
+            bind: false,
+            run: () => {
+              enabled = !enabled
+              setMode("insert")
+              context.ui.toast.show({ message: `Vim mode ${enabled ? "enabled" : "disabled"}` })
             },
-            bind("escape", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
-            bind("ctrl+[", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
-            bind("ctrl+c", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
-            ...[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((key) =>
-              bind(
-                `shift+${key.toLowerCase()}`,
-                () => handleNormal(key),
-                () => Boolean(editor()) && enabled && mode === "normal",
-              ),
+          },
+          bind("escape", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
+          bind("ctrl+[", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
+          bind("ctrl+c", enterNormal, () => Boolean(editor()) && enabled && mode === "insert"),
+          ...[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((key) =>
+            bind(
+              `shift+${key.toLowerCase()}`,
+              () => handleNormal(key),
+              () => Boolean(editor()) && enabled && mode === "normal",
             ),
-            ...[
-              ...printable,
-              "return",
-              "escape",
-              "backspace",
-              "delete",
-              "left",
-              "right",
-              "up",
-              "down",
-              "ctrl+a",
-              "ctrl+b",
-              "ctrl+d",
-              "ctrl+e",
-              "ctrl+f",
-              "ctrl+k",
-              "ctrl+r",
-              "ctrl+u",
-              "ctrl+w",
-            ].map((key) =>
-              bind(key, () => handleNormal(key), () => Boolean(editor()) && enabled && mode === "normal"),
+          ),
+          ...[
+            ...printable,
+            "return",
+            "escape",
+            "backspace",
+            "delete",
+            "left",
+            "right",
+            "up",
+            "down",
+            "ctrl+a",
+            "ctrl+b",
+            "ctrl+d",
+            "ctrl+e",
+            "ctrl+f",
+            "ctrl+k",
+            "ctrl+r",
+            "ctrl+u",
+            "ctrl+w",
+          ].map((key) =>
+            bind(
+              key,
+              () => handleNormal(key),
+              () => Boolean(editor()) && enabled && mode === "normal",
             ),
-          ],
-        }))
+          ),
+        ],
+      }))
       return <box height={0} />
     }
 
-    context.ui.slot({
+    return context.ui.slot({
       append: "app",
       render: () => <Controller />,
     })
-    return () => clearInterval(cursorTimer)
   },
-}
+})

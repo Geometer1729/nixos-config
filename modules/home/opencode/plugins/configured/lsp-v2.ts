@@ -1,12 +1,69 @@
 import { spawn } from "node:child_process"
+import type { ChildProcessWithoutNullStreams } from "node:child_process"
 import { readFile, readdir } from "node:fs/promises"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 
-const clients = new Map()
+import { Plugin } from "@opencode-ai/plugin"
+
+interface ServerConfig {
+  command: readonly [string, ...string[]]
+  disabled?: boolean
+  env?: NodeJS.ProcessEnv
+  extensions: string[]
+  initialization?: unknown
+}
+
+interface Server extends ServerConfig {
+  id: string
+  roots: string[]
+}
+
+interface Diagnostic {
+  message?: unknown
+  range?: { start?: { character?: number; line?: number } }
+  severity?: number
+}
+
+interface RpcMessage {
+  error?: { message?: string }
+  id?: number
+  jsonrpc?: "2.0"
+  method?: string
+  params?: unknown
+  result?: unknown
+}
+
+type DiagnosticWaiter = (items: Diagnostic[]) => void
+
+interface Client {
+  diagnosticVersions: Map<string, number>
+  diagnosticWaiters: Map<string, DiagnosticWaiter[]>
+  diagnostics: Map<string, Diagnostic[]>
+  documents?: Map<string, { text: string; version: number }>
+  notify(method: string, params?: unknown): void
+  process: ChildProcessWithoutNullStreams
+  request<Result = unknown>(method: string, params?: unknown, timeout?: number): Promise<Result>
+  server?: Server
+}
+
+interface ClientEntry {
+  idleTimer?: NodeJS.Timeout
+  promise: Promise<Client>
+}
+
+interface LspInput {
+  character?: number
+  file: string
+  line?: number
+  operation: "definition" | "diagnostics" | "document_symbols" | "hover" | "workspace_symbols"
+  query?: string
+}
+
+const clients = new Map<string, ClientEntry>()
 const defaultIdleTimeoutMs = 30 * 60 * 1000
 
-const languageIDs = {
+const languageIDs: Record<string, string> = {
   ".bash": "shellscript",
   ".hs": "haskell",
   ".ksh": "shellscript",
@@ -20,7 +77,7 @@ const languageIDs = {
   ".zsh": "shellscript",
 }
 
-function rootsFor(extensions) {
+function rootsFor(extensions: string[]): string[] {
   if (extensions.some((extension) => extension === ".hs" || extension === ".lhs")) {
     return ["hie.yaml", "cabal.project", "stack.yaml", "*.cabal"]
   }
@@ -30,15 +87,18 @@ function rootsFor(extensions) {
   return [".git"]
 }
 
-function direnvChanges(cwd, env) {
+function direnvChanges(
+  cwd: string,
+  env: NodeJS.ProcessEnv,
+): Promise<{ changes: Record<string, unknown>; error?: string }> {
   return new Promise((resolve) => {
     const child = spawn("direnv", ["export", "json"], {
       cwd,
       env: { ...env, DIRENV_NO_TMUX_RENAME: "1" },
       stdio: ["ignore", "pipe", "pipe"],
     })
-    const chunks = []
-    const errors = []
+    const chunks: Buffer[] = []
+    const errors: Buffer[] = []
     child.stdout.on("data", (chunk) => chunks.push(chunk))
     child.stderr.on("data", (chunk) => errors.push(chunk))
     child.on("error", (error) => resolve({ changes: {}, error: error.message }))
@@ -48,7 +108,7 @@ function direnvChanges(cwd, env) {
       }
       try {
         const output = Buffer.concat(chunks).toString().trim()
-        resolve({ changes: output ? JSON.parse(output) : {} })
+        resolve({ changes: output ? (JSON.parse(output) as Record<string, unknown>) : {} })
       } catch {
         resolve({ changes: {}, error: "direnv returned invalid JSON" })
       }
@@ -56,7 +116,7 @@ function direnvChanges(cwd, env) {
   })
 }
 
-function applyEnvironment(env, changes) {
+function applyEnvironment(env: NodeJS.ProcessEnv, changes: Record<string, unknown>): NodeJS.ProcessEnv {
   const result = { ...env }
   for (const [key, value] of Object.entries(changes)) {
     if (value === null) delete result[key]
@@ -65,7 +125,7 @@ function applyEnvironment(env, changes) {
   return result
 }
 
-function rpc(server, root, env, onStop) {
+function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () => void): Client {
   const process = spawn(server.command[0], server.command.slice(1), {
     cwd: root,
     env,
@@ -74,40 +134,42 @@ function rpc(server, root, env, onStop) {
   let buffer = Buffer.alloc(0)
   let nextID = 1
   let stopped = false
-  const pending = new Map()
-  const diagnostics = new Map()
-  const diagnosticVersions = new Map()
-  const diagnosticWaiters = new Map()
+  const pending = new Map<number, { reject: (error: Error) => void; resolve: (value: unknown) => void }>()
+  const diagnostics = new Map<string, Diagnostic[]>()
+  const diagnosticVersions = new Map<string, number>()
+  const diagnosticWaiters = new Map<string, DiagnosticWaiter[]>()
   process.stderr.resume()
 
-  const send = (message) => {
+  const send = (message: RpcMessage): void => {
     const body = JSON.stringify(message)
     process.stdin.write(`Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`)
   }
 
-  const notify = (method, params) => send({ jsonrpc: "2.0", method, params })
+  const notify = (method: string, params?: unknown): void =>
+    send(params === undefined ? { jsonrpc: "2.0", method } : { jsonrpc: "2.0", method, params })
 
-  const request = (method, params, timeout = 30_000) =>
-    new Promise((resolve, reject) => {
+  const request = <Result = unknown>(method: string, params?: unknown, timeout = 30_000): Promise<Result> =>
+    new Promise<Result>((resolve, reject) => {
       const id = nextID++
       const timer = setTimeout(() => {
         pending.delete(id)
         reject(new Error(`${method} timed out`))
       }, timeout)
       pending.set(id, {
-        resolve: (value) => {
+        resolve: (value: unknown) => {
           clearTimeout(timer)
-          resolve(value)
+          resolve(value as Result)
         },
         reject: (error) => {
           clearTimeout(timer)
           reject(error)
         },
       })
-      send({ jsonrpc: "2.0", id, method, params })
+      send(params === undefined ? { jsonrpc: "2.0", id, method } : { jsonrpc: "2.0", id, method, params })
     })
 
-  const publishDiagnostics = (params) => {
+  const publishDiagnostics = (params: { diagnostics?: Diagnostic[]; uri?: string }): void => {
+    if (!params.uri) return
     diagnostics.set(params.uri, params.diagnostics ?? [])
     diagnosticVersions.set(params.uri, (diagnosticVersions.get(params.uri) ?? 0) + 1)
     const waiters = diagnosticWaiters.get(params.uri)
@@ -116,7 +178,7 @@ function rpc(server, root, env, onStop) {
     for (const resolve of waiters) resolve(params.diagnostics ?? [])
   }
 
-  const handle = (message) => {
+  const handle = (message: RpcMessage): void => {
     if (message.id !== undefined && (message.result !== undefined || message.error !== undefined)) {
       const waiter = pending.get(message.id)
       if (!waiter) return
@@ -127,14 +189,15 @@ function rpc(server, root, env, onStop) {
     }
 
     if (message.method === "textDocument/publishDiagnostics") {
-      publishDiagnostics(message.params)
+      publishDiagnostics((message.params ?? {}) as { diagnostics?: Diagnostic[]; uri?: string })
       return
     }
 
     if (message.id === undefined) return
     let result = null
     if (message.method === "workspace/configuration") {
-      result = (message.params?.items ?? []).map(() => server.initialization ?? null)
+      const params = (message.params ?? {}) as { items?: unknown[] }
+      result = (params.items ?? []).map(() => server.initialization ?? null)
     }
     if (message.method === "workspace/workspaceFolders") {
       result = [{ name: path.basename(root), uri: pathToFileURL(root).href }]
@@ -158,14 +221,14 @@ function rpc(server, root, env, onStop) {
       const body = buffer.subarray(bodyStart, bodyStart + length).toString()
       buffer = buffer.subarray(bodyStart + length)
       try {
-        handle(JSON.parse(body))
+        handle(JSON.parse(body) as RpcMessage)
       } catch {
         // Ignore malformed server output and continue processing later messages.
       }
     }
   })
 
-  const fail = (error) => {
+  const fail = (error: Error): void => {
     if (stopped) return
     stopped = true
     for (const waiter of pending.values()) waiter.reject(error)
@@ -185,7 +248,7 @@ function rpc(server, root, env, onStop) {
   }
 }
 
-async function start(server, root, onStop) {
+async function start(server: Server, root: string, onStop: () => void): Promise<Client> {
   const loaded = await direnvChanges(root, globalThis.process.env)
   if (loaded.error) throw new Error(`Failed to load the project direnv environment: ${loaded.error}`)
   const changes = loaded.changes
@@ -213,7 +276,7 @@ async function start(server, root, onStop) {
   return { ...client, server }
 }
 
-function waitForExit(process, timeout) {
+function waitForExit(process: ChildProcessWithoutNullStreams, timeout: number): Promise<boolean> {
   if (process.exitCode !== null) return Promise.resolve(true)
   return new Promise((resolve) => {
     const timer = setTimeout(() => {
@@ -228,7 +291,7 @@ function waitForExit(process, timeout) {
   })
 }
 
-async function stop(client) {
+async function stop(client: Client): Promise<void> {
   if (client.process.exitCode !== null) return
   await client.request("shutdown", null, 5_000).catch(() => undefined)
   if (client.process.exitCode !== null) return
@@ -243,11 +306,15 @@ async function stop(client) {
   client.process.kill("SIGKILL")
 }
 
-async function findRoot(server, file, boundary) {
+async function findRoot(server: Server, file: string, boundary: string): Promise<string> {
   let directory = path.dirname(file)
   while (true) {
-    const entries = await readdir(directory).catch(() => [])
-    if (server.roots.some((marker) => (marker.startsWith("*.") ? entries.some((entry) => entry.endsWith(marker.slice(1))) : entries.includes(marker)))) {
+    const entries: string[] = await readdir(directory).catch(() => [])
+    if (
+      server.roots.some((marker) =>
+        marker.startsWith("*.") ? entries.some((entry) => entry.endsWith(marker.slice(1))) : entries.includes(marker),
+      )
+    ) {
       return directory
     }
     if (directory === boundary || directory === path.dirname(directory)) return boundary
@@ -255,8 +322,8 @@ async function findRoot(server, file, boundary) {
   }
 }
 
-function waitForDiagnostics(client, uri, since, timeout = 30_000) {
-  return new Promise((resolve) => {
+function waitForDiagnostics(client: Client, uri: string, since: number, timeout = 30_000): Promise<Diagnostic[]> {
+  return new Promise<Diagnostic[]>((resolve) => {
     if ((client.diagnosticVersions.get(uri) ?? 0) > since) {
       return setTimeout(() => resolve(client.diagnostics.get(uri) ?? []), 300)
     }
@@ -268,7 +335,7 @@ function waitForDiagnostics(client, uri, since, timeout = 30_000) {
       )
       resolve(client.diagnostics.get(uri) ?? [])
     }, timeout)
-    const done = (items) => {
+    const done = (items: Diagnostic[]): void => {
       clearTimeout(timer)
       setTimeout(() => resolve(client.diagnostics.get(uri) ?? items), 300)
     }
@@ -276,7 +343,10 @@ function waitForDiagnostics(client, uri, since, timeout = 30_000) {
   })
 }
 
-async function open(client, file) {
+async function open(
+  client: Client,
+  file: string,
+): Promise<{ changed: boolean; diagnosticVersion: number; uri: string }> {
   const text = await readFile(file, "utf8")
   const uri = pathToFileURL(file).href
   const diagnosticVersion = client.diagnosticVersions.get(uri) ?? 0
@@ -300,52 +370,65 @@ async function open(client, file) {
   return { uri, changed: false, diagnosticVersion }
 }
 
-function formatDiagnostics(file, diagnostics) {
+function formatDiagnostics(file: string, diagnostics: Diagnostic[]): string {
   const labels = ["", "error", "warning", "information", "hint"]
-  return diagnostics.map((diagnostic) => {
-    const start = diagnostic.range?.start ?? {}
-    const location = `${(start.line ?? 0) + 1}:${(start.character ?? 0) + 1}`
-    const severity = labels[diagnostic.severity] ?? "diagnostic"
-    const message = String(diagnostic.message ?? "").replace(/\s+/g, " ").trim()
-    return `${file}:${location}: ${severity}: ${message}`
-  }).join("\n")
+  return diagnostics
+    .map((diagnostic) => {
+      const start = diagnostic.range?.start ?? {}
+      const location = `${(start.line ?? 0) + 1}:${(start.character ?? 0) + 1}`
+      const severity = labels[diagnostic.severity ?? 0] ?? "diagnostic"
+      const message = String(diagnostic.message ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+      return `${file}:${location}: ${severity}: ${message}`
+    })
+    .join("\n")
 }
 
-function position(input) {
+function position(input: Pick<LspInput, "character" | "line">): { character: number; line: number } {
   return {
     line: Math.max(0, (input.line ?? 1) - 1),
     character: Math.max(0, (input.character ?? 1) - 1),
   }
 }
 
-export default {
+export default Plugin.define({
   id: "bbrian.lsp",
   setup: async (ctx) => {
+    const options = ctx.options as { idleTimeoutMs?: unknown; servers?: Record<string, unknown> }
     const idleTimeoutMs =
-      Number.isFinite(ctx.options.idleTimeoutMs) && ctx.options.idleTimeoutMs > 0
-        ? ctx.options.idleTimeoutMs
+      typeof options.idleTimeoutMs === "number" && Number.isFinite(options.idleTimeoutMs) && options.idleTimeoutMs > 0
+        ? options.idleTimeoutMs
         : defaultIdleTimeoutMs
-    const servers = Object.entries(ctx.options.servers ?? {}).flatMap(([id, server]) => {
-      if (!server || server.disabled || !Array.isArray(server.command)) return []
-      const extensions = Array.isArray(server.extensions) ? server.extensions : []
-      return [{ ...server, id, extensions, roots: rootsFor(extensions) }]
+    const servers = Object.entries(options.servers ?? {}).flatMap(([id, value]): Server[] => {
+      if (!value || typeof value !== "object") return []
+      const configured = value as Partial<ServerConfig>
+      const command = Array.isArray(configured.command)
+        ? configured.command.filter((item): item is string => typeof item === "string")
+        : []
+      if (configured.disabled || command.length === 0) return []
+      const extensions = Array.isArray(configured.extensions)
+        ? configured.extensions.filter((item): item is string => typeof item === "string")
+        : []
+      return [{ ...configured, command: command as [string, ...string[]], id, extensions, roots: rootsFor(extensions) }]
     })
 
-    const clientFor = async (server, root) => {
+    const clientFor = async (server: Server, root: string): Promise<Client> => {
       const key = `${server.id}\0${root}`
       let entry = clients.get(key)
       if (!entry) {
-        entry = {}
+        const created = {} as ClientEntry
+        entry = created
         const remove = () => {
-          if (clients.get(key) !== entry) return
-          clearTimeout(entry.idleTimer)
+          if (clients.get(key) !== created) return
+          clearTimeout(created.idleTimer)
           clients.delete(key)
         }
-        entry.promise = start(server, root, remove).catch((error) => {
+        created.promise = start(server, root, remove).catch((error: unknown) => {
           remove()
           throw error
         })
-        clients.set(key, entry)
+        clients.set(key, created)
       }
       clearTimeout(entry.idleTimer)
       entry.idleTimer = setTimeout(() => {
@@ -357,7 +440,7 @@ export default {
       return entry.promise
     }
 
-    const diagnosticsFor = async (directory, value, timeout = 30_000) => {
+    const diagnosticsFor = async (directory: string, value: string, timeout = 30_000): Promise<string> => {
       const file = path.resolve(directory, value)
       const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
       if (!server) return ""
@@ -391,7 +474,10 @@ export default {
               type: "string",
               enum: ["diagnostics", "hover", "definition", "document_symbols", "workspace_symbols"],
             },
-            file: { type: "string", description: "Supported source file, absolute or relative to the session directory" },
+            file: {
+              type: "string",
+              description: "Supported source file, absolute or relative to the session directory",
+            },
             line: { type: "integer", minimum: 1, description: "1-based line for hover or definition" },
             character: { type: "integer", minimum: 1, description: "1-based character for hover or definition" },
             query: { type: "string", description: "Query for workspace_symbols" },
@@ -400,7 +486,8 @@ export default {
           additionalProperties: false,
         },
         options: { codemode: false, permission: "lsp" },
-        execute: async (input, toolContext) => {
+        execute: async (rawInput, toolContext) => {
+          const input = rawInput as LspInput
           const session = await ctx.session.get({ sessionID: toolContext.sessionID })
           const directory = session.location.directory
           if (input.operation === "diagnostics") {
@@ -438,30 +525,36 @@ export default {
     await ctx.tool.hook("execute.after", async (event) => {
       if (event.status !== "completed" || !["edit", "patch", "read", "write"].includes(event.tool)) return
 
-      const output = event.result.output
-      const paths =
+      const output = event.result.output as
+        | { applied?: Array<{ target?: unknown; type?: unknown }>; target?: unknown }
+        | undefined
+      const input = event.input as { path?: unknown } | undefined
+      const paths: unknown[] =
         event.tool === "patch"
           ? (output?.applied ?? []).filter((item) => item.type !== "delete").map((item) => item.target)
           : event.tool === "write"
             ? [output?.target]
-            : [event.input?.path]
+            : [input?.path]
       const session = await ctx.session.get({ sessionID: event.sessionID })
-      const messages = []
+      const messages: string[] = []
 
-      for (const value of new Set(paths.filter((item) => typeof item === "string"))) {
+      for (const value of new Set(paths.filter((item): item is string => typeof item === "string"))) {
         try {
           const message = await diagnosticsFor(session.location.directory, value, 10_000)
           if (message) messages.push(message)
-        } catch (error) {
-          messages.push(`LSP diagnostics unavailable for ${value}: ${error.message ?? String(error)}`)
+        } catch (error: unknown) {
+          messages.push(
+            `LSP diagnostics unavailable for ${value}: ${error instanceof Error ? error.message : String(error)}`,
+          )
         }
       }
 
       if (messages.length > 0) {
         const text = messages.join("\n\n")
-        event.result.content = Array.isArray(event.result.content)
-          ? [...event.result.content, { type: "text", text }]
-          : `${event.result.content ?? ""}${event.result.content ? "\n\n" : ""}${text}`
+        const result = event.result as { content: unknown }
+        result.content = Array.isArray(result.content)
+          ? [...result.content, { type: "text", text }]
+          : `${result.content ?? ""}${result.content ? "\n\n" : ""}${text}`
       }
     })
 
@@ -478,4 +571,4 @@ export default {
       )
     }
   },
-}
+})

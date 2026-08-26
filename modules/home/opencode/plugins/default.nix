@@ -11,7 +11,9 @@ let
       (builtins.attrNames (builtins.readDir directory));
 
   pluginFiles = builtins.filter
-    (path: lib.hasSuffix ".js" path || lib.hasSuffix ".jsx" path)
+    (path:
+      (lib.hasSuffix ".ts" path || lib.hasSuffix ".tsx" path)
+      && !lib.hasSuffix ".test.ts" path)
     (filesIn ./.);
 in
 builtins.listToAttrs (map

@@ -4,9 +4,15 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 import test from "node:test"
 
-import plugin from "./lsp-v2.js"
+import { Plugin } from "@opencode-ai/plugin"
 
-async function eventually(check, timeout = 3_000) {
+import lspPlugin from "./lsp-v2.ts"
+
+interface LspTool {
+  execute(input: { file: string; operation: string }, context: { sessionID: string }): Promise<unknown>
+}
+
+async function eventually(check: () => boolean | Promise<boolean>, timeout = 3_000): Promise<void> {
   const deadline = Date.now() + timeout
   while (Date.now() < deadline) {
     if (await check()) return
@@ -23,7 +29,7 @@ test("idle language servers are shut down and terminated", async (t) => {
   const pidFile = path.join(directory, "server.pid")
   const server = path.join(directory, "server.mjs")
   const originalPath = process.env.PATH
-  let cleanup
+  let cleanup: (() => Promise<void> | void) | undefined
 
   t.after(async () => {
     if (cleanup) await cleanup()
@@ -77,7 +83,7 @@ process.stdin.on("data", (chunk) => {
   )
   process.env.PATH = `${bin}:${originalPath}`
 
-  let lspTool
+  let lspTool: LspTool | undefined
   const ctx = {
     options: {
       idleTimeoutMs: 100,
@@ -87,7 +93,7 @@ process.stdin.on("data", (chunk) => {
     shell: { hook: async () => undefined },
     tool: {
       hook: async () => undefined,
-      transform: async (transform) =>
+      transform: async (transform: (tools: { add(tool: LspTool): void }) => void) =>
         transform({
           add: (tool) => {
             lspTool = tool
@@ -96,7 +102,8 @@ process.stdin.on("data", (chunk) => {
     },
   }
 
-  cleanup = await plugin.setup(ctx)
+  cleanup = (await lspPlugin.setup(ctx as unknown as Plugin.Context)) ?? undefined
+  assert.ok(lspTool)
   await lspTool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" })
   const pid = Number(await readFile(pidFile, "utf8"))
 
@@ -105,8 +112,8 @@ process.stdin.on("data", (chunk) => {
     try {
       process.kill(pid, 0)
       return false
-    } catch (error) {
-      return error.code === "ESRCH"
+    } catch (error: unknown) {
+      return error instanceof Error && "code" in error && error.code === "ESRCH"
     }
   })
 })
