@@ -14,6 +14,7 @@ in
     # GUI applications
     ghostty
     ranger
+    brave
     firefox
     hyprland
 

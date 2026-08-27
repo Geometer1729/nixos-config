@@ -37,6 +37,7 @@
         ".config/ncspot"
         ".config/chromium"
         ".config/google-chrome"
+        ".config/BraveSoftware/Brave-Origin"
         ".config/meridian"
         ".gnupg"
         ".hoogle"

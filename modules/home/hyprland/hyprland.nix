@@ -202,7 +202,9 @@ in
           "workspace 21 silent, match:class signal"
           "workspace 21 silent, match:class Slack"
           "workspace 10 silent, match:title Steam"
-        ];
+        ] ++ map
+          (workspace: "workspace ${toString workspace} silent, match:title ^Brave WS ${toString workspace}$")
+          (lib.range 1 22);
 
         # Keybindings - translating your XMonad bindings
         "$mod" = "ALT"; # Using Alt like your XMonad setup
@@ -215,6 +217,7 @@ in
           "$mod, s, exec, rofi -show ssh"
           "$mod, r, exec, rofi -show run"
           "$mod SHIFT, n, exec, start-ticket"
+          "$mod SHIFT, Return, exec, brave-workspace-window"
 
           # Window management
           "$mod, q, killactive"
@@ -343,11 +346,8 @@ in
           # waybar, hypridle, and hyprpaper are started by systemd via their respective service enables
           "mako"
           "blueman-applet"
-          # Launch all Firefox profiles directly to their workspaces
-          "[workspace 1 silent]  firefox -P youtube --new-instance"
-          "[workspace 2 silent]  firefox -P default"
-          "[workspace 18 silent] firefox -P work --new-instance"
-          "[workspace 20 silent] firefox -P ttrpg --new-instance"
+          # Brave restores the previously named windows; the listener places them.
+          "[workspace 2 silent] brave-restore-session"
           "[workspace 21 silent] discord"
           "[workspace 21 silent] signal-desktop"
           # Auto-connect to Bluetooth headphones

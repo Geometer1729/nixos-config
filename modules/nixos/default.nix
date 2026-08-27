@@ -39,6 +39,7 @@ in
       inputs.sops-nix.nixosModules.sops
       #self
       boot
+      brave
       bt
       disko
       docker
