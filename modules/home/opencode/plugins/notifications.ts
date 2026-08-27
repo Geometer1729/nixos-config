@@ -16,6 +16,7 @@ function notify(kind: NotificationKind, directory: string): void {
 export default Plugin.define({
   id: "local.notifications",
   setup(context) {
+    const location = (context as typeof context & { location: { directory: string } }).location
     const controller = new AbortController()
     const task = (async () => {
       for await (const event of context.event.subscribe({ signal: controller.signal })) {
@@ -23,6 +24,7 @@ export default Plugin.define({
         const directory =
           event.location?.directory ??
           (await context.session.get({ sessionID: event.data.sessionID })).location.directory
+        if (directory !== location.directory) continue
         notify(event.type === "session.idle" ? "ready" : "permission", directory)
       }
     })()

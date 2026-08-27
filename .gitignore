@@ -26,6 +26,7 @@ cabal.project.local~
 .ghc.environment.*
 
 .direnv/
+node_modules/
 
 secrets
 todo
