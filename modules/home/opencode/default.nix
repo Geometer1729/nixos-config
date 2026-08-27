@@ -40,6 +40,7 @@ let
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
         --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland ]} \
         --set NPM_CONFIG_FORCE true \
+        --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
         --set PINENTRY_USER_DATA gui
 
@@ -151,5 +152,5 @@ in
       permission = import ./permissions.nix { inherit config; };
     };
   }
-  // import ./plugins { inherit lib; };
+  // import ./plugins { inherit lib pkgs; };
 }

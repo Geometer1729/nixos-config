@@ -1,5 +1,6 @@
 import { Plugin } from "@opencode-ai/plugin/tui"
 import type { EditBufferRenderable, EditorTraits } from "@opentui/core"
+import { jsx } from "@opentui/solid/jsx-runtime"
 import { onCleanup, onMount } from "solid-js"
 
 type Mode = "insert" | "normal"
@@ -412,12 +413,12 @@ export default Plugin.define({
           ),
         ],
       }))
-      return <box height={0} />
+      return jsx("box", { height: 0 })
     }
 
     return context.ui.slot({
       append: "app",
-      render: () => <Controller />,
+      render: () => jsx(Controller),
     })
   },
 })
