@@ -70,11 +70,16 @@ in
     config.services.meridian.package
     libnotify
     opencode
-    opencode1
     opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
+
+  programs.opencode = {
+    enable = true;
+    package = opencode1;
+  };
+  stylix.targets.opencode.enable = true;
 
   services.meridian = {
     enable = true;
@@ -83,6 +88,29 @@ in
 
   xdg.configFile = {
     "opencode/AGENTS.md".source = ./AGENTS.md;
+    "opencode/cli.json" = {
+      force = true;
+      text = builtins.toJSON {
+        "$schema" = "https://opencode.ai/v2/cli.json";
+        animations = true;
+        attention.enabled = true;
+        diffs.wrap = "word";
+        session = {
+          markdown = "rendered";
+          scrollbar = false;
+          sidebar = "auto";
+          thinking = "show";
+        };
+        tabs = {
+          enabled = true;
+          layout = "horizontal";
+        };
+        theme = {
+          mode = "dark";
+          name = "stylix";
+        };
+      };
+    };
     # Add global skills as ./skills/<id>/SKILL.md.
     "opencode/skills" = {
       source = ./skills;
