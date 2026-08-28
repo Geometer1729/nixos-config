@@ -6,6 +6,9 @@ let
   rgb = name: map (component name) [ "r" "g" "b" ];
   # base03 works as an accent but is overpowering as the window frame.
   half = name: map (c: c / 2) (rgb name);
+  # Container badge colors are SkColors: signed 32-bit ARGB, alpha 0xFF.
+  skColor = name: 65536 * component name "r" + 256 * component name "g" + component name "b" - 16777216;
+  workContainerColor = toString (skColor "base04");
   braveTheme = pkgs.writeTextDir "manifest.json" (builtins.toJSON {
     manifest_version = 3;
     name = "Stylix Joker";
@@ -63,6 +66,7 @@ let
           or .brave.today.should_show_toolbar_button != false
           or .media_router.enable_media_router != false
           or .brave.enable_media_router_on_restart != false
+          or (.brave.containers.used // {} | any(.[]; .name == "Work" and .background_color != ${workContainerColor}))
         ' "$preferences" >/dev/null; then
         temporary=$(mktemp "''${preferences}.XXXXXX")
         trap 'rm -f "$temporary"' EXIT
@@ -83,6 +87,7 @@ let
           | .brave.today.should_show_toolbar_button = false
           | .media_router.enable_media_router = false
           | .brave.enable_media_router_on_restart = false
+          | .brave.containers.used = ((.brave.containers.used // {}) | map_values(if .name == "Work" then .background_color = ${workContainerColor} else . end))
         ' "$preferences" > "$temporary"
         chmod --reference="$preferences" "$temporary"
         mv "$temporary" "$preferences"
