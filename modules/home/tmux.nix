@@ -1,4 +1,24 @@
 { config, pkgs, ... }:
+let
+  resurrect = pkgs.tmuxPlugins.resurrect;
+  saveTmux = pkgs.writeShellApplication {
+    name = "save-tmux";
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gawk
+      gnugrep
+      gnused
+      procps
+      tmux
+    ];
+    text = ''
+      if tmux has-session 2>/dev/null; then
+        ${resurrect}/share/tmux-plugins/resurrect/scripts/save.sh quiet
+      fi
+    '';
+  };
+in
 {
   programs.tmux = {
     enable = true;
@@ -8,6 +28,22 @@
         vim-tmux-navigator
         yank
         plumb
+        {
+          plugin = resurrect;
+          extraConfig = ''
+            # Set before continuum starts its background restore.
+            set -g @resurrect-processes '"~opencode2->opencode2 --continue" "~lazygit->lazygit" "~nvim->nvim"'
+          '';
+        }
+        {
+          plugin = continuum;
+          extraConfig = ''
+            # Autosave uses a systemd timer because continuum stops saving when
+            # the status line below is hidden for one-window sessions.
+            set -g @continuum-save-interval '0'
+            set -g @continuum-restore 'on'
+          '';
+        }
       ];
     mouse = true;
     keyMode = "vi";
@@ -49,5 +85,22 @@
 
         bind u send-keys C-l \; run-shell "sleep .5s" \; clear-history
       '';
+  };
+
+  systemd.user.services.save-tmux = {
+    Unit.Description = "Save tmux sessions";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${saveTmux}/bin/save-tmux";
+    };
+  };
+
+  systemd.user.timers.save-tmux = {
+    Unit.Description = "Save tmux sessions every 15 minutes";
+    Timer = {
+      OnStartupSec = "15min";
+      OnUnitActiveSec = "15min";
+    };
+    Install.WantedBy = [ "timers.target" ];
   };
 }

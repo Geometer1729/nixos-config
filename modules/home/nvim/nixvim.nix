@@ -23,6 +23,10 @@
         (builtins.attrNames (builtins.readDir ./lua))
       );
   plugins = {
+    auto-session = {
+      enable = true;
+      settings.args_allow_files_auto_save = true;
+    };
     telescope.enable = true;
     which-key.enable = true;
     web-devicons.enable = true;
