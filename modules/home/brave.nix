@@ -191,6 +191,22 @@ let
       external_update_url = "https://clients2.google.com/service/update2/crx";
     };
   };
+  browserpassNative = pkgs.writeShellApplication {
+    name = "browserpass-native";
+    text = ''
+      export PASSWORD_STORE_DIR=${config.home.homeDirectory}/password-store
+      export PINENTRY_USER_DATA=gui
+      exec ${pkgs.browserpass}/bin/browserpass "$@"
+    '';
+  };
+  browserpassManifest =
+    let
+      manifest = builtins.fromJSON (builtins.unsafeDiscardStringContext (builtins.readFile
+        "${pkgs.browserpass}/lib/browserpass/hosts/chromium/com.github.browserpass.native.json"));
+    in
+    pkgs.writeText "com.github.browserpass.native.json" (builtins.toJSON (manifest // {
+      path = "${browserpassNative}/bin/browserpass-native";
+    }));
 in
 {
   programs.brave = {
@@ -210,7 +226,7 @@ in
     "BraveSoftware/Brave-Origin/External Extensions/naepdomgkenhinolocfifgehidddafch.json" =
       externalExtension; # Browserpass
     "BraveSoftware/Brave-Origin/NativeMessagingHosts/com.github.browserpass.native.json".source =
-      "${pkgs.browserpass}/lib/browserpass/hosts/chromium/com.github.browserpass.native.json";
+      browserpassManifest;
   };
 
   xdg.mimeApps = {

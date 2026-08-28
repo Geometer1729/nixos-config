@@ -10,6 +10,7 @@ in
 
   environment.etc."brave/policies/managed/browser.json".text = builtins.toJSON {
     RestoreOnStartup = 1;
+    PasswordManagerEnabled = false;
     DefaultSearchProviderEnabled = true;
     DefaultSearchProviderName = "DuckDuckGo";
     DefaultSearchProviderKeyword = "duckduckgo.com";
