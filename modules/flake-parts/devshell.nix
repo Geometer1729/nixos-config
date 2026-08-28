@@ -17,6 +17,9 @@
         lua-language-server # for nvim config stuff
         bash-language-server
         shellcheck
+        nodejs_24
+        typescript
+        typescript-language-server
         yaml-language-server
         ssh-to-age
       ];

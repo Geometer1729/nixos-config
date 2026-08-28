@@ -72,6 +72,8 @@ const languageIDs: Record<string, string> = {
   ".nix": "nix",
   ".rs": "rust",
   ".sh": "shellscript",
+  ".ts": "typescript",
+  ".tsx": "typescriptreact",
   ".yaml": "yaml",
   ".yml": "yaml",
   ".zsh": "shellscript",

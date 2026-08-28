@@ -15,6 +15,10 @@
     command = [ "rust-analyzer" ];
     extensions = [ ".rs" ];
   };
+  typescript = {
+    command = [ "typescript-language-server" "--stdio" ];
+    extensions = [ ".ts" ".tsx" ];
+  };
   # Resolve HLS from the project's dev shell so its GHC version matches.
   hls = {
     command = [ "haskell-language-server" "--lsp" ];
