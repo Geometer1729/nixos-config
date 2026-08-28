@@ -4,28 +4,34 @@ let
   inherit (config.lib.stylix) colors;
   component = name: channel: builtins.fromJSON colors."${name}-rgb-${channel}";
   rgb = name: map (component name) [ "r" "g" "b" ];
+  # base03 works as an accent but is overpowering as the window frame.
+  half = name: map (c: c / 2) (rgb name);
   braveTheme = pkgs.writeTextDir "manifest.json" (builtins.toJSON {
     manifest_version = 3;
     name = "Stylix Joker";
     version = "1.0";
+    # The active tab is painted with the toolbar color, so toolbar must
+    # contrast with frame or pinned tabs are indistinguishable.
+    # Purple frame, black active tab, joker green accents.
     theme.colors = {
-      frame = rgb "base00";
-      frame_inactive = rgb "base00";
-      background_tab = rgb "base00";
-      background_tab_inactive = rgb "base00";
-      tab_text = rgb "base05";
-      tab_background_text = rgb "base05";
+      frame = half "base03";
+      frame_inactive = rgb "base01";
+      background_tab = half "base03";
+      background_tab_inactive = rgb "base01";
+      tab_text = rgb "base0B";
+      tab_background_text = rgb "base06";
       tab_background_text_inactive = rgb "base04";
       toolbar = rgb "base00";
       toolbar_text = rgb "base05";
-      toolbar_button_icon = rgb "base05";
-      bookmark_text = rgb "base05";
+      toolbar_button_icon = rgb "base0B";
+      bookmark_text = rgb "base04";
       button_background = rgb "base01";
-      omnibox_background = rgb "base00";
-      omnibox_text = rgb "base05";
+      omnibox_background = rgb "base01";
+      omnibox_text = rgb "base06";
       ntp_background = rgb "base00";
       ntp_text = rgb "base05";
-      ntp_link = rgb "base0D";
+      ntp_link = rgb "base0B";
+      ntp_header = half "base03";
     };
   });
   unstable = import inputs.nixpkgs-unstable {
