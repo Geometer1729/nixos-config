@@ -1,6 +1,19 @@
 { config, pkgs, ... }:
 let
   resurrect = pkgs.tmuxPlugins.resurrect;
+  restoreTerminals = pkgs.writeShellApplication {
+    name = "restore-terminals";
+    runtimeInputs = with pkgs; [
+      coreutils
+      ghostty
+      gnugrep
+      hyprland
+      jq
+      procps
+      tmux
+    ];
+    text = builtins.readFile ./restore-terminals.sh;
+  };
   saveTmux = pkgs.writeShellApplication {
     name = "save-tmux";
     runtimeInputs = with pkgs; [
@@ -14,6 +27,8 @@ let
       tmux
     ];
     text = ''
+      ${restoreTerminals}/bin/restore-terminals save
+
       shopt -s nullglob
       for socket in "''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim-session-*.sock; do
         nvim --server "$socket" --remote-expr \
@@ -41,6 +56,7 @@ in
           extraConfig = ''
             # Set before continuum starts its background restore.
             set -g @resurrect-processes '"~opencode2->opencode2 --continue" "~lazygit->lazygit" "~nvim->nvim"'
+            set -g @resurrect-hook-post-restore-all '${pkgs.coreutils}/bin/touch "$XDG_RUNTIME_DIR/tmux-resurrected"'
           '';
         }
         {
@@ -59,6 +75,9 @@ in
       ''
         # Send prefix to nested tmux with double press
         bind C-b send-prefix
+
+        # Checkpoint terminals, Neovim, and tmux together.
+        bind C-s run-shell '${saveTmux}/bin/save-tmux'
 
         # better splits
         unbind %
@@ -95,6 +114,21 @@ in
       '';
   };
 
+  home.packages = [ restoreTerminals ];
+
+  systemd.user.services.restore-terminals = {
+    Unit = {
+      Description = "Restore terminal windows and tmux attachments";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${restoreTerminals}/bin/restore-terminals";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   systemd.user.services.save-tmux = {
     Unit.Description = "Save tmux sessions";
     Service = {
@@ -126,6 +160,6 @@ in
       ExecStop = "${saveTmux}/bin/save-tmux";
       TimeoutStopSec = "10s";
     };
-    Install.WantedBy = [ "default.target" ];
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 }
