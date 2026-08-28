@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 let
   siteSearch = name: shortcut: url: {
     inherit name shortcut url;
@@ -6,10 +6,10 @@ let
   };
 in
 {
+  stylix.targets.chromium.colors.enable = false;
+
   environment.etc."brave/policies/managed/browser.json".text = builtins.toJSON {
     RestoreOnStartup = 1;
-    BrowserThemeColor = config.lib.stylix.colors.withHashtag.base00;
-
     DefaultSearchProviderEnabled = true;
     DefaultSearchProviderName = "DuckDuckGo";
     DefaultSearchProviderKeyword = "duckduckgo.com";

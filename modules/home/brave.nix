@@ -1,12 +1,39 @@
-{ flake, pkgs, ... }:
+{ config, flake, pkgs, ... }:
 let
   inherit (flake) inputs;
+  inherit (config.lib.stylix) colors;
+  component = name: channel: builtins.fromJSON colors."${name}-rgb-${channel}";
+  rgb = name: map (component name) [ "r" "g" "b" ];
+  braveTheme = pkgs.writeTextDir "manifest.json" (builtins.toJSON {
+    manifest_version = 3;
+    name = "Stylix Joker";
+    version = "1.0";
+    theme.colors = {
+      frame = rgb "base00";
+      frame_inactive = rgb "base00";
+      background_tab = rgb "base00";
+      background_tab_inactive = rgb "base00";
+      tab_text = rgb "base05";
+      tab_background_text = rgb "base05";
+      tab_background_text_inactive = rgb "base04";
+      toolbar = rgb "base00";
+      toolbar_text = rgb "base05";
+      toolbar_button_icon = rgb "base05";
+      bookmark_text = rgb "base05";
+      button_background = rgb "base01";
+      omnibox_background = rgb "base00";
+      omnibox_text = rgb "base05";
+      ntp_background = rgb "base00";
+      ntp_text = rgb "base05";
+      ntp_link = rgb "base0D";
+    };
+  });
   unstable = import inputs.nixpkgs-unstable {
     system = pkgs.stdenv.hostPlatform.system;
     config.allowUnfree = true;
   };
   brave = unstable.brave-origin.override {
-    commandLineArgs = "--ozone-platform=wayland --profile-directory=Default";
+    commandLineArgs = "--ozone-platform=wayland --profile-directory=Default --load-extension=${braveTheme}";
   };
 
   restoreSession = pkgs.writeShellApplication {
@@ -15,10 +42,42 @@ let
     text = ''
       preferences="$HOME/.config/BraveSoftware/Brave-Origin/Default/Preferences"
       if [[ -f "$preferences" ]] \
-        && [[ "$(jq -r '.profile.exit_type // empty' "$preferences")" == Crashed ]]; then
+        && jq -e '
+          .profile.exit_type == "Crashed"
+          or .browser.theme.color_scheme != 2
+          or .browser.theme.color_scheme2 != 2
+          or .browser.theme.color_variant != 3
+          or .browser.theme.color_variant2 != 3
+          or .brave.show_side_panel_button != false
+          or .brave.location_bar_is_wide != true
+          or .brave.ai_chat.show_toolbar_button != false
+          or .brave.rewards.show_brave_rewards_button_in_location_bar != false
+          or .brave.wallet.show_wallet_icon_on_toolbar != false
+          or .brave_vpn.show_button != false
+          or .brave.today.should_show_toolbar_button != false
+          or .media_router.enable_media_router != false
+          or .brave.enable_media_router_on_restart != false
+        ' "$preferences" >/dev/null; then
         temporary=$(mktemp "''${preferences}.XXXXXX")
         trap 'rm -f "$temporary"' EXIT
-        jq '.profile.exit_type = "Normal"' "$preferences" > "$temporary"
+        jq '
+          if .profile.exit_type == "Crashed" then
+            .profile.exit_type = "Normal"
+          else . end
+          | .browser.theme.color_scheme = 2
+          | .browser.theme.color_scheme2 = 2
+          | .browser.theme.color_variant = 3
+          | .browser.theme.color_variant2 = 3
+          | .brave.show_side_panel_button = false
+          | .brave.location_bar_is_wide = true
+          | .brave.ai_chat.show_toolbar_button = false
+          | .brave.rewards.show_brave_rewards_button_in_location_bar = false
+          | .brave.wallet.show_wallet_icon_on_toolbar = false
+          | .brave_vpn.show_button = false
+          | .brave.today.should_show_toolbar_button = false
+          | .media_router.enable_media_router = false
+          | .brave.enable_media_router_on_restart = false
+        ' "$preferences" > "$temporary"
         chmod --reference="$preferences" "$temporary"
         mv "$temporary" "$preferences"
         trap - EXIT
@@ -139,7 +198,7 @@ in
     package = brave;
   };
 
-  home.packages = [ restoreSession workspaceWindow xdgOpen placeWorkspaceWindows ];
+  home.packages = [ pkgs.browserpass restoreSession workspaceWindow xdgOpen placeWorkspaceWindows ];
 
   # Home Manager assumes every programs.brave package uses Brave-Browser.
   # Origin has a distinct data directory, so install its extensions explicitly.
@@ -148,6 +207,10 @@ in
       externalExtension; # Vimium
     "BraveSoftware/Brave-Origin/External Extensions/nffaoalbilbmmfgbnbgppjihopabppdk.json" =
       externalExtension; # Video Speed Controller
+    "BraveSoftware/Brave-Origin/External Extensions/naepdomgkenhinolocfifgehidddafch.json" =
+      externalExtension; # Browserpass
+    "BraveSoftware/Brave-Origin/NativeMessagingHosts/com.github.browserpass.native.json".source =
+      "${pkgs.browserpass}/lib/browserpass/hosts/chromium/com.github.browserpass.native.json";
   };
 
   xdg.mimeApps = {
