@@ -9,10 +9,18 @@ let
       gawk
       gnugrep
       gnused
+      config.programs.nixvim.build.package
       procps
       tmux
     ];
     text = ''
+      shopt -s nullglob
+      for socket in "''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim-session-*.sock; do
+        nvim --server "$socket" --remote-expr \
+          'execute("lua require(\"auto-session\").save_session(nil, { show_message = false, is_autosave = true })")' \
+          >/dev/null 2>&1 || true
+      done
+
       if tmux has-session 2>/dev/null; then
         ${resurrect}/share/tmux-plugins/resurrect/scripts/save.sh quiet
       fi
@@ -102,5 +110,22 @@ in
       OnUnitActiveSec = "15min";
     };
     Install.WantedBy = [ "timers.target" ];
+  };
+
+  systemd.user.services.save-tmux-on-exit = {
+    Unit = {
+      Description = "Save Neovim and tmux sessions on logout";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+      Before = [ "shutdown.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/true";
+      ExecStop = "${saveTmux}/bin/save-tmux";
+      TimeoutStopSec = "10s";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 }

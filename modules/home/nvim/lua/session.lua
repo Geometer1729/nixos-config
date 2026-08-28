@@ -1,4 +1,7 @@
 local group = vim.api.nvim_create_augroup("auto-session-checkpoint", { clear = true })
+local socket = vim.fn.stdpath("run") .. "/nvim-session-" .. vim.fn.getpid() .. ".sock"
+
+pcall(vim.fn.serverstart, socket)
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "CursorHold", "CursorHoldI", "FocusLost" }, {
   group = group,
