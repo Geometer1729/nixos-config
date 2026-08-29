@@ -67,6 +67,9 @@ let
           or .media_router.enable_media_router != false
           or .brave.enable_media_router_on_restart != false
           or (.brave.containers.used // {} | any(.[]; .name == "Work" and .background_color != ${workContainerColor}))
+          or (.brave.containers.list // [] | any(.[]; .name == "Work" and .background_color != ${workContainerColor}))
+          or ((.brave.containers.used // {}) as $used | (.brave.containers.list // []) as $list
+              | any($used[]; .name == "Work" and (.id as $id | all($list[]; .id != $id))))
         ' "$preferences" >/dev/null; then
         temporary=$(mktemp "''${preferences}.XXXXXX")
         trap 'rm -f "$temporary"' EXIT
@@ -87,6 +90,17 @@ let
           | .brave.today.should_show_toolbar_button = false
           | .media_router.enable_media_router = false
           | .brave.enable_media_router_on_restart = false
+          # used is only a local snapshot cache; list is the registry Brave
+          # resolves containers against. Brave drops list entries that fail to
+          # parse, so restore Work from its snapshot if it went missing.
+          | .brave.containers.list = (
+              (.brave.containers.list // []) as $list
+              | $list + [ (.brave.containers.used // {})[]
+                          | select(.name == "Work")
+                          | .id as $id
+                          | select(all($list[]; .id != $id)) ]
+              | map(if .name == "Work" then .background_color = ${workContainerColor} else . end)
+            )
           | .brave.containers.used = ((.brave.containers.used // {}) | map_values(if .name == "Work" then .background_color = ${workContainerColor} else . end))
         ' "$preferences" > "$temporary"
         chmod --reference="$preferences" "$temporary"
