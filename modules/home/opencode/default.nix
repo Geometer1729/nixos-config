@@ -99,7 +99,7 @@ in
           markdown = "rendered";
           scrollbar = false;
           sidebar = "auto";
-          thinking = "show";
+          thinking = "hide";
         };
         tabs = {
           enabled = true;
