@@ -7,7 +7,9 @@ let
           path = directory + "/${name}";
           type = (builtins.readDir directory).${name};
         in
-        if type == "directory" then filesIn path else lib.optional (type == "regular") path)
+        if name == "node_modules" then [ ]
+        else if type == "directory" then filesIn path
+        else lib.optional (type == "regular") path)
       (builtins.attrNames (builtins.readDir directory));
 
   pluginFiles = builtins.filter
