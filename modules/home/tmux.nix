@@ -4,11 +4,8 @@ let
   restoreTerminals = pkgs.writeShellApplication {
     name = "restore-terminals";
     runtimeInputs = with pkgs;
-      [ coreutils ]
-      ++ lib.optionals machine.hasGui [ ghostty ]
-      ++ [ gnugrep ]
-      ++ lib.optionals machine.hasGui [ hyprland ]
-      ++ [ jq procps tmux ];
+      [ coreutils gnugrep jq procps tmux ]
+      ++ lib.optionals machine.hasGui [ ghostty hyprland ];
     text = builtins.readFile ./restore-terminals.sh;
   };
   saveTmux = pkgs.writeShellApplication {

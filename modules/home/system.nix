@@ -17,9 +17,6 @@ in
     # System utilities
     home-manager
     openssh
-  ] ++ lib.optionals machine.hasGui [
-    pkgs.wl-clipboard
-  ] ++ (with pkgs; [
     dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
@@ -28,13 +25,13 @@ in
 
     # Monitoring and status tools
     htop
-  ]) ++ lib.optionals machine.hasGui [
-    pkgs.radeontop
-  ] ++ (with pkgs; [
     fastfetch
     lsof # list open files
 
     # Custom utilities moved to modules/home/scripts/
+  ] ++ lib.optionals machine.hasGui (with pkgs; [
+    wl-clipboard
+    radeontop
   ]);
 
   # System monitoring configuration

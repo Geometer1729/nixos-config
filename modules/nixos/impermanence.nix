@@ -5,6 +5,11 @@
     hideMounts = true;
     directories = [
       "/var/log"
+      "/var/lib/tailscale"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+      "/etc/nixos/"
+      "/root/.ssh"
     ] ++ lib.optionals config.machine.hasGui [
       {
         directory = "/var/cache/tuigreet";
@@ -13,15 +18,7 @@
         mode = "0755";
       }
       "/var/lib/bluetooth"
-    ] ++ [
-      "/var/lib/tailscale"
-      "/var/lib/nixos"
-      "/var/lib/systemd/coredump"
-    ] ++ lib.optionals config.machine.hasGui [
       "/var/lib/hass"
-    ] ++ [
-      "/etc/nixos/"
-      "/root/.ssh"
     ];
     files = [
       "/etc/ssh/ssh_host_ed25519_key"
@@ -32,27 +29,8 @@
       "/root/.config/tailscale/ssh_known_hosts"
     ];
     users.bbrian = {
-      directories = lib.optionals config.machine.hasGui [
-        ".config/Signal"
-        ".config/discord"
-        ".config/spotify"
-        ".config/Slack"
-        ".config/clorio-wallet"
-        ".config/ncspot"
-        ".config/chromium"
-        ".config/google-chrome"
-        ".config/BraveSoftware/Brave-Origin"
-        ".config/meridian"
-      ] ++ lib.optionals (!config.machine.hasGui) [
-        ".config/meridian"
-      ] ++ [
+      directories = [
         ".gnupg"
-      ] ++ lib.optionals config.machine.hasGui [
-        ".hoogle"
-        ".local/share/PrismLauncher"
-        ".local/share/Steam"
-        ".local/share/Anki2"
-      ] ++ [
         ".local/share/direnv"
         ".local/share/opencode"
         ".local/share/nvim/sessions"
@@ -64,15 +42,8 @@
         ".tmux/resurrect"
         ".claude-work"
         ".claude-personal"
+        ".config/meridian"
         ".config/opencode"
-      ] ++ lib.optionals config.machine.hasGui [
-        ".mozilla/firefox/default"
-        ".mozilla/firefox/youtube"
-        ".mozilla/firefox/work"
-        ".mozilla/firefox/ttrpg"
-        ".cache/mozilla/firefox"
-        ".cache/meridian"
-      ] ++ [
         ".ssh"
         ".tldrc"
         "Code"
@@ -81,22 +52,41 @@
         "conf"
         "memes"
         "password-store"
+      ] ++ lib.optionals config.machine.hasGui [
+        ".config/Signal"
+        ".config/discord"
+        ".config/spotify"
+        ".config/Slack"
+        ".config/clorio-wallet"
+        ".config/ncspot"
+        ".config/chromium"
+        ".config/google-chrome"
+        ".config/BraveSoftware/Brave-Origin"
+        ".hoogle"
+        ".local/share/PrismLauncher"
+        ".local/share/Steam"
+        ".local/share/Anki2"
+        ".mozilla/firefox/default"
+        ".mozilla/firefox/youtube"
+        ".mozilla/firefox/work"
+        ".mozilla/firefox/ttrpg"
+        ".cache/mozilla/firefox"
+        ".cache/meridian"
       ];
       files = [
         # zsh_history is written directly to /persist so rename-based updates work.
         ".config/lazygit/state.yml"
         ".cache/nix-index/files"
-      ] ++ lib.optionals config.machine.hasGui [
-        ".cache/rofi3.druncache"
-        ".cache/rofi-2.sshcache"
-        ".cache/rofi-entry-history.txt"
-      ] ++ [
         ".local/share/nix/trusted-settings.json"
         ".local/share/nix/repl-history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
         ".local/state/syncthing/cert.pem"
         ".local/state/syncthing/key.pem"
+      ] ++ lib.optionals config.machine.hasGui [
+        ".cache/rofi3.druncache"
+        ".cache/rofi-2.sshcache"
+        ".cache/rofi-entry-history.txt"
       ];
     };
     users.yixin.directories = lib.mkIf config.machine.hasGui [ "." ];

@@ -7,14 +7,8 @@
     nixpkgs-fmt
     nix-inspect
     neovim-remote
-  ] ++ lib.optionals machine.hasGui [
-    pkgs.postman
-  ] ++ (with pkgs; [
     nixd # nix lsp
     bash-language-server # shell lsp
-  ]) ++ lib.optionals machine.hasGui [
-    pkgs.okteta
-  ] ++ (with pkgs; [
 
     # Command line utilities
     arp-scan # network scanner
@@ -46,6 +40,9 @@
       ])
     )
     haskellPackages.hoogle
+  ] ++ lib.optionals machine.hasGui (with pkgs; [
+    postman
+    okteta
   ]);
 
   # GHC configuration
