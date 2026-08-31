@@ -25,8 +25,9 @@ fmt:
 
 # Clean old generations (keep 3)
 clean:
-  ssh am nh clean all --keep 3
-  ssh torag nh clean all --keep 3
+  ssh am nh clean all --keep 3 --optimise
+  ssh torag nh clean all --keep 3 --optimise
+  ssh balrog nh clean all --keep 3 --optimise
 
 # Garbage collect Nix store
 gc:
@@ -65,6 +66,7 @@ deploy:
   nh os build "{{flake}}" -H am
   nix flake check "{{flake}}"
   nixos-rebuild --flake "{{flake}}#am" --target-host bbrian@am --sudo switch
+  nixos-rebuild --flake "{{flake}}#balrog" --target-host bbrian@balrog --use-substitutes --sudo switch
   ssh torag nh os switch 'git+ssh://am/home/bbrian/conf#torag'
 
 
