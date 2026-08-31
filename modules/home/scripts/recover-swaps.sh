@@ -65,9 +65,9 @@ main() {
 
         echo "$original_file" "$swap_file"
         if [ -f "$original_file" ]; then
-          vim "$original_file"
+          vim "$original_file" </dev/tty
         else
-          vim -r "$swap_file"
+          vim -r "$swap_file" </dev/tty
         fi
         mv "$swap_file" "/tmp/$(basename "$swap_file")" || true
         echo "---"
