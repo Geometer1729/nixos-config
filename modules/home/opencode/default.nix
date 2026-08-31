@@ -1,4 +1,4 @@
-{ flake, pkgs, config, lib, ... }:
+{ flake, pkgs, config, machine, lib, ... }:
 # OpenCode V2 is still incomplete, so this config intentionally contains temporary hacks.
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
@@ -11,7 +11,7 @@ let
     runtimeEnv = {
       # opencode-vim's broad peer ranges otherwise resolve to a conflicting OpenTUI tree.
       NPM_CONFIG_FORCE = "true";
-      PINENTRY_USER_DATA = "gui";
+      PINENTRY_USER_DATA = if machine.hasGui then "gui" else "curses";
     };
     text = ''
       exec ${unstable.opencode}/bin/opencode "$@"
@@ -42,7 +42,7 @@ let
         --set NPM_CONFIG_FORCE true \
         --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
-        --set PINENTRY_USER_DATA gui
+        --set PINENTRY_USER_DATA ${if machine.hasGui then "gui" else "curses"}
 
       runHook postInstall
     '';
@@ -68,7 +68,7 @@ in
 
   home.packages = with pkgs; [
     config.services.meridian.package
-    libnotify
+  ] ++ lib.optional machine.hasGui libnotify ++ [
     opencode
     opencode2
   ];
@@ -135,34 +135,36 @@ in
       "$schema" = "https://opencode.ai/config.json";
       autoupdate = false;
       lsp = lspServers;
-      mcp.slack = {
-        type = "remote";
-        url = "https://mcp.slack.com/mcp";
-        # Slack requires MCP clients to be backed by a registered Slack app
-        # (no dynamic client registration). Read-only user scopes only.
-        oauth = {
-          clientId = "{file:/run/secrets/slack_mcp_client_id}";
-          clientSecret = "{file:/run/secrets/slack_mcp_client_secret}";
-          scope = builtins.concatStringsSep " " [
-            "search:read.public"
-            "search:read.private"
-            "search:read.mpim"
-            "search:read.im"
-            "search:read.files"
-            "search:read.users"
-            "files:read"
-            "emoji:read"
-            "channels:history"
-            "groups:history"
-            "mpim:history"
-            "im:history"
-            "channels:read"
-            "groups:read"
-            "mpim:read"
-            "users:read"
-            "users:read.email"
-            "canvases:read"
-          ];
+      mcp = lib.optionalAttrs machine.hasGui {
+        slack = {
+          type = "remote";
+          url = "https://mcp.slack.com/mcp";
+          # Slack requires MCP clients to be backed by a registered Slack app
+          # (no dynamic client registration). Read-only user scopes only.
+          oauth = {
+            clientId = "{file:/run/secrets/slack_mcp_client_id}";
+            clientSecret = "{file:/run/secrets/slack_mcp_client_secret}";
+            scope = builtins.concatStringsSep " " [
+              "search:read.public"
+              "search:read.private"
+              "search:read.mpim"
+              "search:read.im"
+              "search:read.files"
+              "search:read.users"
+              "files:read"
+              "emoji:read"
+              "channels:history"
+              "groups:history"
+              "mpim:history"
+              "im:history"
+              "channels:read"
+              "groups:read"
+              "mpim:read"
+              "users:read"
+              "users:read.email"
+              "canvases:read"
+            ];
+          };
         };
       };
       model = "openai/gpt-5.6-sol";

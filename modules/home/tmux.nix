@@ -1,17 +1,14 @@
-{ config, pkgs, ... }:
+{ config, machine, lib, pkgs, ... }:
 let
   resurrect = pkgs.tmuxPlugins.resurrect;
   restoreTerminals = pkgs.writeShellApplication {
     name = "restore-terminals";
-    runtimeInputs = with pkgs; [
-      coreutils
-      ghostty
-      gnugrep
-      hyprland
-      jq
-      procps
-      tmux
-    ];
+    runtimeInputs = with pkgs;
+      [ coreutils ]
+      ++ lib.optionals machine.hasGui [ ghostty ]
+      ++ [ gnugrep ]
+      ++ lib.optionals machine.hasGui [ hyprland ]
+      ++ [ jq procps tmux ];
     text = builtins.readFile ./restore-terminals.sh;
   };
   saveTmux = pkgs.writeShellApplication {
@@ -27,7 +24,7 @@ let
       tmux
     ];
     text = ''
-      ${restoreTerminals}/bin/restore-terminals save
+      ${lib.optionalString machine.hasGui "${restoreTerminals}/bin/restore-terminals save"}
 
       shopt -s nullglob
       for socket in "''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim-session-*.sock; do
@@ -114,9 +111,9 @@ in
       '';
   };
 
-  home.packages = [ restoreTerminals ];
+  home.packages = lib.optional machine.hasGui restoreTerminals;
 
-  systemd.user.services.restore-terminals = {
+  systemd.user.services.restore-terminals = lib.mkIf machine.hasGui {
     Unit = {
       Description = "Restore terminal windows and tmux attachments";
       PartOf = [ "graphical-session.target" ];
@@ -146,7 +143,7 @@ in
     Install.WantedBy = [ "timers.target" ];
   };
 
-  systemd.user.services.save-tmux-on-exit = {
+  systemd.user.services.save-tmux-on-exit = lib.mkIf machine.hasGui {
     Unit = {
       Description = "Save Neovim and tmux sessions on logout";
       PartOf = [ "graphical-session.target" ];

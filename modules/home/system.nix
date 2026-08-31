@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, machine, pkgs, lib, ... }:
 let
   nhWithSleepInhibit = pkgs.writeShellScriptBin "nh" ''
     if [[ "''${1-}" == os ]]; then
@@ -17,7 +17,9 @@ in
     # System utilities
     home-manager
     openssh
-    wl-clipboard
+  ] ++ lib.optionals machine.hasGui [
+    pkgs.wl-clipboard
+  ] ++ (with pkgs; [
     dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
@@ -26,12 +28,14 @@ in
 
     # Monitoring and status tools
     htop
-    radeontop
+  ]) ++ lib.optionals machine.hasGui [
+    pkgs.radeontop
+  ] ++ (with pkgs; [
     fastfetch
     lsof # list open files
 
     # Custom utilities moved to modules/home/scripts/
-  ];
+  ]);
 
   # System monitoring configuration
   programs.btop = {

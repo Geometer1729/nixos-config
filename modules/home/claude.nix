@@ -1,4 +1,4 @@
-{ flake, pkgs, config, ... }:
+{ flake, pkgs, config, machine, lib, ... }:
 let
   inherit (flake) inputs;
   # Fetch Claude icon as a derivation
@@ -17,7 +17,7 @@ in
     # Settings for ~/.claude/settings.json
     settings = {
       showThinkingSummaries = true;
-      voiceEnabled = true;
+      voiceEnabled = machine.hasGui;
       autoMemoryEnabled = false;
       # Disable claude.ai MCP integrations (Gmail, Calendar, Drive, Slack, Linear)
       mcpServers = { };
@@ -110,7 +110,7 @@ in
           ];
         };
       };
-      hooks = {
+      hooks = lib.optionalAttrs machine.hasGui {
         Notification = [
           {
             matcher = "";
@@ -165,14 +165,10 @@ in
     '';
   };
 
-  home.packages = with pkgs; [
-    libnotify
-    sox # Required for Claude Code /voice command (audio recording)
-    # Claude notification scripts are now in modules/home/scripts/
+  home.packages = lib.optionals machine.hasGui [
+    pkgs.libnotify
+    pkgs.sox
   ];
-
-  # Install Claude icon for notifications
-  home.file.".local/share/icons/claude-icon.svg".source = claudeIcon;
 
   # Claude account isolation: separate config directories for work/personal
   # Direnv sets CLAUDE_CONFIG_DIR based on current directory (see zsh/direnv.nix)
@@ -188,5 +184,7 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
       force = true;
     };
+  } // lib.optionalAttrs machine.hasGui {
+    ".local/share/icons/claude-icon.svg".source = claudeIcon;
   };
 }

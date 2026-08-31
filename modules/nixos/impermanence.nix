@@ -1,10 +1,11 @@
-{ ... }:
+{ config, lib, ... }:
 {
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;
     directories = [
       "/var/log"
+    ] ++ lib.optionals config.machine.hasGui [
       {
         directory = "/var/cache/tuigreet";
         user = "greeter";
@@ -12,11 +13,14 @@
         mode = "0755";
       }
       "/var/lib/bluetooth"
+    ] ++ [
       "/var/lib/tailscale"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
+    ] ++ lib.optionals config.machine.hasGui [
       "/var/lib/hass"
-      "/etc/nixos/" # currently manually symlinked to "~/conf" ideally the config would do that
+    ] ++ [
+      "/etc/nixos/"
       "/root/.ssh"
     ];
     files = [
@@ -28,7 +32,7 @@
       "/root/.config/tailscale/ssh_known_hosts"
     ];
     users.bbrian = {
-      directories = [
+      directories = lib.optionals config.machine.hasGui [
         ".config/Signal"
         ".config/discord"
         ".config/spotify"
@@ -39,11 +43,16 @@
         ".config/google-chrome"
         ".config/BraveSoftware/Brave-Origin"
         ".config/meridian"
+      ] ++ lib.optionals (!config.machine.hasGui) [
+        ".config/meridian"
+      ] ++ [
         ".gnupg"
+      ] ++ lib.optionals config.machine.hasGui [
         ".hoogle"
         ".local/share/PrismLauncher"
         ".local/share/Steam"
         ".local/share/Anki2"
+      ] ++ [
         ".local/share/direnv"
         ".local/share/opencode"
         ".local/share/nvim/sessions"
@@ -53,16 +62,17 @@
         ".local/state/opencode"
         ".local/state/tmux"
         ".tmux/resurrect"
-        # Claude Code: persist entire directories to avoid file-level bind mount issues
         ".claude-work"
         ".claude-personal"
         ".config/opencode"
+      ] ++ lib.optionals config.machine.hasGui [
         ".mozilla/firefox/default"
         ".mozilla/firefox/youtube"
         ".mozilla/firefox/work"
         ".mozilla/firefox/ttrpg"
-        ".cache/mozilla/firefox" # maybe this is needed to not lose tabs sometimes?
+        ".cache/mozilla/firefox"
         ".cache/meridian"
+      ] ++ [
         ".ssh"
         ".tldrc"
         "Code"
@@ -73,28 +83,23 @@
         "password-store"
       ];
       files = [
-        # zsh_history: NOT bind-mounted here — zsh writes directly to /persist via history.path
-        # Bind-mounting a single file breaks zsh's write-new-then-rename strategy
+        # zsh_history is written directly to /persist so rename-based updates work.
         ".config/lazygit/state.yml"
         ".cache/nix-index/files"
+      ] ++ lib.optionals config.machine.hasGui [
         ".cache/rofi3.druncache"
         ".cache/rofi-2.sshcache"
         ".cache/rofi-entry-history.txt"
-        ".local/share/nix/trusted-settings.json" # stop having to retrust flakes
-        ".local/share/nix/repl-history" # nix repl command history
+      ] ++ [
+        ".local/share/nix/trusted-settings.json"
+        ".local/share/nix/repl-history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
-        # Syncthing device identity only — config.xml is regenerated declaratively
         ".local/state/syncthing/cert.pem"
         ".local/state/syncthing/key.pem"
-        #".config/task/taskrc" # persisted just for news.version :(
       ];
     };
-    users.yixin = {
-      directories = [
-        "."
-      ];
-    };
+    users.yixin.directories = lib.mkIf config.machine.hasGui [ "." ];
   };
 
   fileSystems."/persist".neededForBoot = true;

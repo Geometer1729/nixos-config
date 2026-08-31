@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ machine, lib, pkgs, ... }:
 {
   home.packages = with pkgs; [
     tmate
@@ -7,10 +7,14 @@
     nixpkgs-fmt
     nix-inspect
     neovim-remote
-    postman # rest-api tool
+  ] ++ lib.optionals machine.hasGui [
+    pkgs.postman
+  ] ++ (with pkgs; [
     nixd # nix lsp
     bash-language-server # shell lsp
-    okteta # hex editor
+  ]) ++ lib.optionals machine.hasGui [
+    pkgs.okteta
+  ] ++ (with pkgs; [
 
     # Command line utilities
     arp-scan # network scanner
@@ -42,7 +46,7 @@
       ])
     )
     haskellPackages.hoogle
-  ];
+  ]);
 
   # GHC configuration
   home.file.".ghc/ghci.conf".source = ./ghci.repl;

@@ -48,6 +48,7 @@ in
       impermanence
       kde
       main
+      machine
       nix
       secrets
       ssh

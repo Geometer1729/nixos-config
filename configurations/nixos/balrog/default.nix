@@ -1,4 +1,4 @@
-{ flake, pkgs, ... }:
+{ flake, lib, pkgs, ... }:
 let
   inherit (flake) inputs;
   keys = import ../../../ssh-authorized-keys.nix;
@@ -6,14 +6,34 @@ in
 {
   imports = [
     inputs.disko.nixosModules.default
+    inputs.home-manager.nixosModules.home-manager
+    inputs.impermanence.nixosModules.impermanence
+    inputs.stylix.nixosModules.stylix
     inputs.self.nixosModules.boot
     inputs.self.nixosModules.disko
+    inputs.self.nixosModules.impermanence
+    inputs.self.nixosModules.machine
+    inputs.self.nixosModules.stylix
     ./hardware.nix
   ];
 
   networking.hostName = "balrog";
   networking.useDHCP = true;
   hardware.enableRedistributableFirmware = true;
+  machine.hasGui = false;
+
+  nixpkgs.overlays = lib.attrValues inputs.self.overlays;
+  nixpkgs.config.allowUnfree = true;
+
+  home-manager = {
+    backupFileExtension = "bkp";
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.bbrian = {
+      imports = [ (inputs.self + /configurations/home/bbrian.nix) ];
+      programs.git.signing.signByDefault = lib.mkForce false;
+    };
+  };
 
   # Samsung SSD 860 EVO 250GB, serial S3YHNX0KB88921Z.
   drive = "/dev/disk/by-id/wwn-0x5002538e40a0ae76";
@@ -63,9 +83,12 @@ in
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     hashedPassword = "!";
+    linger = true;
     openssh.authorizedKeys.keys = keys;
+    shell = pkgs.zsh;
   };
   security.sudo.wheelNeedsPassword = false;
+  programs.zsh.enable = true;
 
   environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan ];
   nix = {

@@ -1,6 +1,9 @@
-{ config, pkgs, ... }:
+{ config, machine, lib, pkgs, ... }:
 let
-  passPackage = pkgs.pass-wayland.override { dmenuSupport = false; };
+  passPackage =
+    if machine.hasGui
+    then pkgs.pass-wayland.override { dmenuSupport = false; }
+    else pkgs.pass;
   passmenu = pkgs.writeShellApplication {
     name = "passmenu";
     runtimeInputs = [ passPackage pkgs.rofi ];
@@ -35,8 +38,7 @@ in
     # Password management
     gnupg
     passPackage
-    passmenu
-  ];
+  ] ++ lib.optional machine.hasGui passmenu;
 
   # GPG agent configuration for YubiKey support
   services.gpg-agent = {

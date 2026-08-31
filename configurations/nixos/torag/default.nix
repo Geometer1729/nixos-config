@@ -6,6 +6,7 @@ in
 {
 
   networking.hostName = "torag";
+  machine.hasGui = true;
   drive = "/dev/nvme0n1";
 
   # NixOS-level wifi configuration
