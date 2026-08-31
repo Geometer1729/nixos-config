@@ -15,15 +15,29 @@ save() {
   while IFS=$'\t' read -r client_pid session; do
     [ -n "$client_pid" ] || continue
     pid=$client_pid
-    workspace=""
-
-    while [ "$pid" -gt 1 ]; do
-      workspace=$(jq -r --argjson pid "$pid" '
+    workspace=$(jq -r --arg title "tmux:$session" '
+      [
         .[]
-        | select(.pid == $pid)
+        | select(.title == $title)
         | select(.workspace.id > 0)
         | select(.class | ascii_downcase | contains("ghostty"))
         | .workspace.id
+      ]
+      | unique
+      | if length == 1 then .[0] else empty end
+    ' <<<"$windows")
+
+    while [ -z "$workspace" ] && [ "$pid" -gt 1 ]; do
+      workspace=$(jq -r --argjson pid "$pid" '
+        [
+          .[]
+          | select(.pid == $pid)
+          | select(.workspace.id > 0)
+          | select(.class | ascii_downcase | contains("ghostty"))
+          | .workspace.id
+        ]
+        | unique
+        | if length == 1 then .[0] else empty end
       ' <<<"$windows")
       [ -z "$workspace" ] || break
       pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')

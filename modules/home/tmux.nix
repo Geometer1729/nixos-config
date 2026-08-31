@@ -95,6 +95,10 @@ in
 
         set -g default-terminal tmux-256color
 
+        # Give each terminal window a stable session identifier for workspace restore.
+        set -g set-titles on
+        set -g set-titles-string 'tmux:#{session_name}'
+
         # Allow passthrough of escape sequences (needed for kitty image protocol in ranger)
         set -g allow-passthrough on
 
