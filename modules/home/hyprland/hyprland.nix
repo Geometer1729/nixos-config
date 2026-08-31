@@ -1,6 +1,17 @@
 { pkgs, lib, config, osConfig, flake, ... }:
 let
   cfg = config.programs.hyprland-custom;
+  scratchpads = [
+    { name = "sp"; key = "n"; }
+    { name = "ghci"; key = "m"; }
+    { name = "vim"; key = "v"; }
+    { name = "calcurse"; key = "c"; }
+    { name = "vit"; key = "b"; }
+  ];
+  scratchpadPattern = lib.concatMapStringsSep "|" (scratchpad: scratchpad.name) scratchpads;
+  scratchpadBindings = map
+    (scratchpad: "$mod, ${scratchpad.key}, exec, scratchPad ${scratchpad.name}")
+    scratchpads;
 in
 {
   options.programs.hyprland-custom = {
@@ -203,6 +214,9 @@ in
           "workspace 21 silent, match:class Slack"
           "workspace 10 silent, match:title Steam"
         ] ++ map
+          (rule: "${rule}, match:title ^(${scratchpadPattern})$")
+          [ "float on" "size monitor_w*0.5 monitor_h*0.5" "center on" ]
+        ++ map
           (workspace: "workspace ${toString workspace} silent, match:title ^Brave WS ${toString workspace}$")
           (lib.range 1 22);
 
@@ -298,12 +312,8 @@ in
           "$mod SHIFT, bracketleft, movecurrentworkspacetomonitor,+1"
           "$mod SHIFT, bracketright, movecurrentworkspacetomonitor, -1"
 
-          # Scratchpads (using special workspaces to mimic your scratchpads)
-          "$mod, n, exec, scratchPad sp"
-          "$mod, m, exec, scratchPad ghci"
-          "$mod, v, exec, scratchPad vim"
-          "$mod, c, exec, scratchPad calcurse"
-          "$mod, b, exec, scratchPad vit"
+          # Scratchpads (using special workspaces)
+        ] ++ scratchpadBindings ++ [
           "$mod, t, exec, onScratchPad --hide-after vit quickadd quick-add-task"
           "$mod SHIFT, t, exec, onScratchPad --hide-after vim quicknote quick-note"
           "$mod, p, exec, onScratchPad --hide-after vit process process"

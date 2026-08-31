@@ -32,12 +32,11 @@ launch(){
       timeout=$((timeout - 1))
     done
 
-    if [ "$client" ]; then
-      hyprctl dispatch togglefloating
-    fi
+  else
+    # Refit an existing scratchpad to the monitor it was summoned on.
+    hyprctl dispatch resizeactive exact 50% 50%
+    hyprctl dispatch centerwindow
   fi
-  hyprctl dispatch resizeactive exact 50% 50%
-  hyprctl dispatch centerwindow
 }
 
 
