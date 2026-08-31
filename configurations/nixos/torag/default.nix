@@ -1,7 +1,23 @@
-{ flake, config, ... }:
+{ flake, config, pkgs, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  wakeupAm = pkgs.writeShellScriptBin "wakeup-am" ''
+    exec ${pkgs.openssh}/bin/ssh balrog wakeonlan 24:4b:fe:57:0b:55
+  '';
+  sshAmProxy = pkgs.writeShellScript "ssh-am-proxy" ''
+    ${wakeupAm}/bin/wakeup-am >&2
+
+    for _ in {1..60}; do
+      if ${pkgs.netcat-openbsd}/bin/nc -z -w 1 "$1" "$2"; then
+        exec ${pkgs.netcat-openbsd}/bin/nc "$1" "$2"
+      fi
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+
+    echo "Timed out waiting for $1:$2 after waking am" >&2
+    exit 1
+  '';
 in
 {
 
@@ -17,6 +33,8 @@ in
 
   home-manager.users.${config.mainUser} = {
     fast_lock = true;
+    home.packages = [ wakeupAm ];
+    programs.ssh.matchBlocks.am.proxyCommand = "${sshAmProxy} %h %p";
     #programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
 
     # Single monitor setup for laptop
