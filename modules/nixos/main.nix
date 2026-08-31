@@ -39,6 +39,11 @@ in
               subject.isInGroup("wheel")) {
             return polkit.Result.YES;
           }
+
+          if (action.id == "org.freedesktop.login1.inhibit-block-sleep" &&
+              subject.isInGroup("wheel")) {
+            return polkit.Result.YES;
+          }
         });
       '';
     };
