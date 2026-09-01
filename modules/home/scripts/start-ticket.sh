@@ -89,6 +89,10 @@ if [[ -f $worktree/apps/panharmonicon/.envrc ]]; then
   direnv allow "$worktree/apps/panharmonicon"
 fi
 
+if [[ ${_state,,} != "in progress" ]]; then
+  linearis issues update "$identifier" --status "In Progress" >/dev/null
+fi
+
 if ! tmux has-session -t "=$session" 2>/dev/null; then
   tmux new-session -d -s "$session" -c "$worktree"
 fi
