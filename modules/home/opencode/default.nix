@@ -168,6 +168,22 @@ in
         };
       };
       model = "openai/gpt-5.6-sol";
+      agents = {
+        build.model = "openai/gpt-5.6-sol#xhigh";
+        explore.model = "openai/gpt-5.6-terra#xhigh";
+        expert = {
+          description = "Handles architecture, difficult diagnosis, and independent code review";
+          mode = "subagent";
+          model = "anthropic/claude-fable-5#xhigh";
+          permissions = [
+            {
+              action = "edit";
+              resource = "*";
+              effect = "deny";
+            }
+          ];
+        };
+      };
       plugin = [ config.services.meridian.opencode.pluginPath ];
       plugins = [
         {
