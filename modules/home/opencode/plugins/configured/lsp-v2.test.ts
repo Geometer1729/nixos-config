@@ -12,6 +12,17 @@ interface LspTool {
   execute(input: { file: string; operation: string }, context: { sessionID: string }): Promise<unknown>
 }
 
+interface ShellInvocation {
+  cwd: string
+  env: NodeJS.ProcessEnv
+}
+
+interface ToolInvocation {
+  input: unknown
+  sessionID: string
+  tool: string
+}
+
 async function eventually(check: () => boolean | Promise<boolean>, timeout = 3_000): Promise<void> {
   const deadline = Date.now() + timeout
   while (Date.now() < deadline) {
@@ -38,7 +49,7 @@ test("idle language servers are shut down and terminated", async (t) => {
   })
 
   await mkdir(bin)
-  await writeFile(path.join(bin, "direnv"), "#!/bin/sh\nprintf '{}\\n'\n")
+  await writeFile(path.join(bin, "direnv"), "#!/bin/sh\nprintf '{\"DIRENV_TEST_CWD\":\"%s\"}\\n' \"$PWD\"\n")
   await chmod(path.join(bin, "direnv"), 0o755)
   await writeFile(source, "test\n")
   await writeFile(
@@ -84,15 +95,23 @@ process.stdin.on("data", (chunk) => {
   process.env.PATH = `${bin}:${originalPath}`
 
   let lspTool: LspTool | undefined
+  let shellHook: ((invocation: ShellInvocation) => Promise<void> | void) | undefined
+  let toolHook: ((invocation: ToolInvocation) => Promise<void> | void) | undefined
   const ctx = {
     options: {
       idleTimeoutMs: 100,
       servers: { fake: { command: [process.execPath, server, log, pidFile], extensions: [".fake"] } },
     },
     session: { get: async () => ({ location: { directory } }) },
-    shell: { hook: async () => undefined },
+    shell: {
+      hook: async (_name: string, hook: (invocation: ShellInvocation) => Promise<void> | void) => {
+        shellHook = hook
+      },
+    },
     tool: {
-      hook: async () => undefined,
+      hook: async (name: string, hook: (invocation: ToolInvocation) => Promise<void> | void) => {
+        if (name === "execute.before") toolHook = hook
+      },
       transform: async (transform: (tools: { add(tool: LspTool): void }) => void) =>
         transform({
           add: (tool) => {
@@ -104,6 +123,14 @@ process.stdin.on("data", (chunk) => {
 
   cleanup = (await lspPlugin.setup(ctx as unknown as Plugin.Context)) ?? undefined
   assert.ok(lspTool)
+  assert.ok(shellHook)
+  assert.ok(toolHook)
+  const toolInvocation: ToolInvocation = { tool: "shell", sessionID: "test", input: { workdir: "." } }
+  await toolHook(toolInvocation)
+  assert.deepEqual(toolInvocation.input, { workdir: directory })
+  const shellInvocation: ShellInvocation = { cwd: directory, env: { PATH: process.env.PATH } }
+  await shellHook(shellInvocation)
+  assert.equal(shellInvocation.env.DIRENV_TEST_CWD, directory)
   await lspTool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" })
   const pid = Number(await readFile(pidFile, "utf8"))
 

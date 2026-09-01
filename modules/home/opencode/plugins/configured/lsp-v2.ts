@@ -456,8 +456,19 @@ export default Plugin.define({
       return diagnostics.length > 0 ? formatDiagnostics(value, diagnostics) : ""
     }
 
+    await ctx.tool.hook("execute.before", async (invocation) => {
+      if (invocation.tool !== "shell" || !invocation.input || typeof invocation.input !== "object") return
+      const input = invocation.input as { workdir?: unknown }
+      const session = await ctx.session.get({ sessionID: invocation.sessionID })
+      input.workdir = path.resolve(
+        session.location.directory,
+        typeof input.workdir === "string" ? input.workdir : session.location.directory,
+      )
+    })
+
     await ctx.shell.hook("create.before", async (invocation) => {
       const loaded = await direnvChanges(invocation.cwd, invocation.env)
+      if (loaded.error) throw new Error(`Failed to load the shell direnv environment: ${loaded.error}`)
       for (const [key, value] of Object.entries(loaded.changes)) {
         if (value === null) delete invocation.env[key]
         else invocation.env[key] = String(value)
