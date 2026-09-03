@@ -5,12 +5,13 @@
 
     package = pkgs.nixVersions.latest;
     settings = {
-      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
-      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" ];
+      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
+      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="
         "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s="
+        "balrog:uh4ZkAwvEmgCQRz6Ihl3wPHL09RqO2e2uraO44olABI="
       ];
       warn-dirty = false;
       accept-flake-config = true;

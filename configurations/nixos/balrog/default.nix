@@ -10,11 +10,13 @@ in
     inputs.impermanence.nixosModules.impermanence
     inputs.stylix.nixosModules.stylix
     inputs.self.nixosModules.boot
+    inputs.self.nixosModules.cache
     inputs.self.nixosModules.disko
     inputs.self.nixosModules.impermanence
     inputs.self.nixosModules.machine
     inputs.self.nixosModules.stylix
     inputs.self.nixosModules.taskchampion
+    inputs.self.nixosModules.useBuilders
     ./hardware.nix
   ];
 
@@ -95,6 +97,7 @@ in
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
+      max-jobs = 2;
       trusted-users = [ "root" "bbrian" ];
     };
     gc = {
