@@ -2,6 +2,31 @@
 let
   inherit (flake) inputs;
   keys = import ../../../ssh-authorized-keys.nix;
+  scheduleReboot = pkgs.writeShellScriptBin "schedule-balrog-reboot" ''
+    set -euo pipefail
+    export TZ=America/New_York
+
+    now=$(${pkgs.coreutils}/bin/date +%s)
+    next=$(${pkgs.coreutils}/bin/date -d "today 02:00" +%s)
+    if (( next <= now )); then
+      next=$(${pkgs.coreutils}/bin/date -d "tomorrow 02:00" +%s)
+    fi
+
+    unit="balrog-reboot-$next"
+    if ${pkgs.systemd}/bin/systemctl is-active --quiet "$unit.timer"; then
+      echo "Reboot already scheduled for $(${pkgs.coreutils}/bin/date -d "@$next")"
+      exit 0
+    fi
+
+    ${pkgs.systemd}/bin/systemd-run \
+      --unit="$unit" \
+      --description="Reboot balrog after cache update" \
+      --on-active="$((next - now))s" \
+      --timer-property=AccuracySec=1min \
+      --collect \
+      ${pkgs.systemd}/bin/systemctl reboot
+    echo "Reboot scheduled for $(${pkgs.coreutils}/bin/date -d "@$next")"
+  '';
 in
 {
   imports = [
@@ -90,10 +115,56 @@ in
     openssh.authorizedKeys.keys = keys;
     shell = pkgs.zsh;
   };
+  users.groups.github-runner = { };
+  users.users.github-runner = {
+    isSystemUser = true;
+    group = "github-runner";
+  };
   security.sudo.wheelNeedsPassword = false;
+  security.sudo.extraRules = [
+    {
+      users = [ "github-runner" ];
+      commands = [
+        {
+          command = "${pkgs.nixos-rebuild}/bin/nixos-rebuild";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "${scheduleReboot}/bin/schedule-balrog-reboot";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
   programs.zsh.enable = true;
 
-  environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan ];
+  environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan scheduleReboot ];
+  environment.persistence."/persist/system".directories = [
+    {
+      directory = "/var/lib/github-runner/cache-warmer";
+      user = "github-runner";
+      group = "github-runner";
+      mode = "0700";
+    }
+    {
+      directory = "/var/lib/cache-warmer";
+      user = "github-runner";
+      group = "github-runner";
+      mode = "0750";
+    }
+  ];
+
+  services.github-runners.cache-warmer = {
+    enable = true;
+    url = "https://github.com/Geometer1729/nixos-config";
+    tokenFile = "/persist/system/secrets/github-runner-token";
+    user = "github-runner";
+    group = "github-runner";
+    extraLabels = [ "balrog" "cache-warmer" ];
+    extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
+  };
+  systemd.services.github-runner-cache-warmer.restartIfChanged = false;
+
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
