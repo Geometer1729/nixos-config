@@ -7,6 +7,7 @@
       # Add am as a substitute server
       substituters = [ "ssh-ng://bbrian@am" ];
       trusted-substituters = [ "ssh-ng://bbrian@am" ];
+      trusted-public-keys = [ "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s=" ];
     };
     distributedBuilds = true;
     buildMachines = [
