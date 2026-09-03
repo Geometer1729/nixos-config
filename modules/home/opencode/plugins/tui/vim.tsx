@@ -5,7 +5,7 @@ import { onCleanup, onMount } from "solid-js"
 
 type Mode = "insert" | "normal"
 type Operator = "c" | "d" | "y"
-type Pending = "" | "g" | Operator
+type Pending = "" | "f" | "g" | "r" | "t" | Operator
 type Snapshot = { cursor: number; text: string }
 type HostEditorTraits = EditorTraits & { owner?: string; role?: string }
 type Word = { index: number; text: string }
@@ -51,6 +51,7 @@ export default Plugin.define({
     let enabled = true
     let mode: Mode = "insert"
     let pending: Pending = ""
+    let pendingCount = 1
     let count = ""
     let desiredColumn: number | undefined
     let yank = ""
@@ -91,6 +92,7 @@ export default Plugin.define({
       const input = editor()
       mode = next
       pending = ""
+      pendingCount = 1
       count = ""
       desiredColumn = undefined
       if (!input) return
@@ -146,9 +148,30 @@ export default Plugin.define({
       const previous = words(value).filter((match) => match.index < offset)
       return previous.at(-1)?.index ?? 0
     }
+    const WORDBackward = (value: string, offset: number): number => {
+      let target = Math.max(0, offset - 1)
+      while (target > 0 && /\s/.test(value[target] ?? "")) target--
+      while (target > 0 && !/\s/.test(value[target - 1] ?? "")) target--
+      return target
+    }
+    const WORDForward = (value: string, offset: number): number => {
+      let target = offset
+      while (target < value.length && !/\s/.test(value[target] ?? "")) target++
+      while (target < value.length && /\s/.test(value[target] ?? "")) target++
+      return target
+    }
     const wordEnd = (value: string, offset: number): number => {
       const match = words(value).find((item) => item.index + item.text.length - 1 > offset)
       return match ? match.index + match.text.length - 1 : Math.max(0, value.length - 1)
+    }
+    const findForward = (value: string, offset: number, character: string, repeat: number): number | undefined => {
+      const end = lineEnd(value, offset)
+      let target = offset
+      for (let index = 0; index < repeat; index++) {
+        target = value.indexOf(character, target + 1)
+        if (target < 0 || target >= end) return
+      }
+      return target
     }
 
     const vertical = (delta: number): void => {
@@ -215,6 +238,8 @@ export default Plugin.define({
 
       let target
       if (motion === "w") target = wordForward(value, current)
+      if (motion === "W") target = WORDForward(value, current)
+      if (motion === "B") target = WORDBackward(value, current)
       if (motion === "e") target = wordEnd(value, current) + 1
       if (motion === "$" || motion === "D" || motion === "C") target = lineEnd(value, current)
       if (motion === "0") target = lineStart(value, current)
@@ -241,9 +266,31 @@ export default Plugin.define({
       if (key === "escape") {
         const cancelled = Boolean(pending || count)
         pending = ""
+        pendingCount = 1
         count = ""
         desiredColumn = undefined
         if (!cancelled) context.keymap.dispatch("session.interrupt")
+        return
+      }
+
+      if (pending === "f" || pending === "t") {
+        const motion = pending
+        pending = ""
+        const target = findForward(value, current, key === "space" ? " " : key, pendingCount)
+        pendingCount = 1
+        if (target !== undefined) setCursor(motion === "t" ? Math.max(current, target - 1) : target)
+        return
+      }
+      if (pending === "r") {
+        pending = ""
+        const repeat = pendingCount
+        pendingCount = 1
+        if (current + repeat > lineEnd(value, current)) return
+        const replacement = key === "space" ? " " : key
+        change(() => {
+          replace(current, current + repeat, replacement.repeat(repeat))
+          setCursor(current + repeat - 1)
+        })
         return
       }
 
@@ -269,6 +316,16 @@ export default Plugin.define({
         pending = key
         return
       }
+      if (key === "f" || key === "t") {
+        pending = key
+        pendingCount = repeat
+        return
+      }
+      if (key === "r") {
+        pending = "r"
+        pendingCount = repeat
+        return
+      }
       if (key === "h" || key === "left") setCursor(current - repeat)
       else if (key === "l" || key === "right") setCursor(current + repeat)
       else if (key === "j" || key === "down") {
@@ -279,8 +336,12 @@ export default Plugin.define({
         else for (let i = 0; i < repeat; i++) vertical(-1)
       } else if (key === "w")
         setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordForward(value, offset), current))
+      else if (key === "W")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => WORDForward(value, offset), current))
       else if (key === "b")
         setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordBackward(value, offset), current))
+      else if (key === "B")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => WORDBackward(value, offset), current))
       else if (key === "e")
         setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordEnd(value, offset), current))
       else if (key === "0") setCursor(lineStart(value, current))
