@@ -1,19 +1,22 @@
 { config, lib, ... }:
 let
-  owned = { owner = config.mainUser; };
+  owned = { owner = config.mainUser or "bbrian"; };
 in
 {
   sops = {
     defaultSopsFile = ./secrets.yaml;
     defaultSopsFormat = "yaml";
     age = {
-      keyFile = "/persist/system/home/${config.mainUser}/.config/sops/age/keys.txt";
-      sshKeyPaths = [ "/persist/system/home/${config.mainUser}/.ssh/id_ed25519" ];
+      keyFile = "/persist/system/home/${config.mainUser or "bbrian"}/.config/sops/age/keys.txt";
+      sshKeyPaths = [
+        "/persist/system/home/${config.mainUser or "bbrian"}/.ssh/id_ed25519"
+        "/etc/ssh/ssh_host_ed25519_key"
+      ];
       generateKey = true;
     };
 
     secrets = {
-      wifi = lib.mkIf config.wifi.enable { owner = "wpa_supplicant"; };
+      wifi = lib.mkIf (config.wifi.enable or false) { owner = "wpa_supplicant"; };
       hashedPassword = owned // { neededForUsers = true; };
       yixinHashedPassword = owned // { neededForUsers = true; };
       hosts = owned;

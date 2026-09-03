@@ -33,12 +33,14 @@ in
     inputs.disko.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     inputs.impermanence.nixosModules.impermanence
+    inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
     inputs.self.nixosModules.boot
     inputs.self.nixosModules.cache
     inputs.self.nixosModules.disko
     inputs.self.nixosModules.impermanence
     inputs.self.nixosModules.machine
+    inputs.self.nixosModules.secrets
     inputs.self.nixosModules.stylix
     inputs.self.nixosModules.taskchampion
     inputs.self.nixosModules.useBuilders

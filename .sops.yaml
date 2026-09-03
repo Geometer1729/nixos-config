@@ -3,9 +3,11 @@
 keys:
   - &am age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
   - &torag age14hrt2y2xr4jejp4p6jcms62m2f5sy6w6sr3g6yw8lvl6wtpy9f0s0r7df0
+  - &balrog age16xlrlgrwk38yjcvwkdq66x2tcr8rgcluuesce776k63xlwddj5yq3lnp9d
 creation_rules:
   - path_regex: modules/nixos/secrets.yaml
     key_groups:
     - age:
       - *am
       - *torag
+      - *balrog
