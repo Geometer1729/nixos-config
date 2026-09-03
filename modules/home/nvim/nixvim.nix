@@ -69,6 +69,7 @@
     [
       vim-hoogle
       vimwiki
+      render-markdown-nvim
       nerdtree
       purescript-vim
       (pkgs.vimUtils.buildVimPlugin
