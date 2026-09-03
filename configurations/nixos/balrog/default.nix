@@ -164,7 +164,9 @@ in
     extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
     serviceOverrides = {
       NoNewPrivileges = false;
+      PrivateUsers = false;
       ReadWritePaths = [ "/var/lib/cache-warmer" ];
+      RestrictSUIDSGID = false;
     };
   };
   systemd.services.github-runner-cache-warmer.restartIfChanged = false;
