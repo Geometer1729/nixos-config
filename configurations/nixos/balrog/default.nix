@@ -21,8 +21,8 @@ let
     ${pkgs.systemd}/bin/systemd-run \
       --unit="$unit" \
       --description="Reboot balrog after cache update" \
-      --on-active="$((next - now))s" \
-      --timer-property=AccuracySec=1min \
+      --on-calendar="*-*-* 02:00:00 America/New_York" \
+      --timer-property=AccuracySec=1s \
       --collect \
       ${pkgs.systemd}/bin/systemctl reboot
     echo "Reboot scheduled for $(${pkgs.coreutils}/bin/date -d "@$next")"
