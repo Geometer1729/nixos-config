@@ -10,7 +10,7 @@ in
       # Taskchampion sync configuration
       sync = {
         server = {
-          url = "http://am:8888";
+          url = "http://balrog:8888";
           client_id = clientId;
         };
         # Encryption secret is set via activation script from sops

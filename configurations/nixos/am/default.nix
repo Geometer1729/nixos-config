@@ -33,7 +33,6 @@ in
   ] ++ (with self.nixosModules; [
     default
     builder
-    taskchampion
     foundryvtt
   ]);
 }

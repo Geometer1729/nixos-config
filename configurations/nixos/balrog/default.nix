@@ -14,6 +14,7 @@ in
     inputs.self.nixosModules.impermanence
     inputs.self.nixosModules.machine
     inputs.self.nixosModules.stylix
+    inputs.self.nixosModules.taskchampion
     ./hardware.nix
   ];
 

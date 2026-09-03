@@ -2,6 +2,7 @@
 {
   services.taskchampion-sync-server = {
     enable = true;
+    dynamicUser = false;
     host = "0.0.0.0"; # Listen on all interfaces (Tailscale will be accessible)
     port = 8888;
     openFirewall = true;
