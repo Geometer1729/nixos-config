@@ -126,7 +126,7 @@ in
       users = [ "github-runner" ];
       commands = [
         {
-          command = "${pkgs.nixos-rebuild}/bin/nixos-rebuild";
+          command = "${pkgs.systemd}/bin/systemctl start cache-warmer-activate.service";
           options = [ "NOPASSWD" ];
         }
         {
@@ -162,8 +162,25 @@ in
     group = "github-runner";
     extraLabels = [ "balrog" "cache-warmer" ];
     extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
+    serviceOverrides.ReadWritePaths = [ "/var/lib/cache-warmer" ];
   };
   systemd.services.github-runner-cache-warmer.restartIfChanged = false;
+  systemd.services.cache-warmer-activate = {
+    description = "Activate the balrog closure built by the cache warmer";
+    restartIfChanged = false;
+    serviceConfig.Type = "oneshot";
+    script = ''
+      target=$(${pkgs.coreutils}/bin/readlink -e /var/lib/cache-warmer/balrog)
+      case "$target" in
+        /nix/store/*-nixos-system-balrog-*) ;;
+        *)
+          echo "Refusing to activate unexpected path: $target" >&2
+          exit 1
+          ;;
+      esac
+      exec "$target/bin/switch-to-configuration" switch
+    '';
+  };
 
   nix = {
     settings = {

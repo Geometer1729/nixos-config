@@ -101,8 +101,8 @@ jobs:
 
     - name: Activate balrog
       run: |
-        sudo "$(readlink -f /run/current-system/sw/bin/nixos-rebuild)" \
-          switch --flake "$GITHUB_WORKSPACE#balrog"
+        sudo "$(readlink -f /run/current-system/sw/bin/systemctl)" \
+          start cache-warmer-activate.service
 
     - name: Schedule reboot
       run: sudo "$(readlink -f /run/current-system/sw/bin/schedule-balrog-reboot)"
