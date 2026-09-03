@@ -232,6 +232,7 @@ in
           "$mod, r, exec, rofi -show run"
           "$mod SHIFT, n, exec, start-ticket"
           "$mod SHIFT, Return, exec, brave-workspace-window"
+          "$mod, u, exec, clean-url"
 
           # Window management
           "$mod, q, killactive"
@@ -322,6 +323,7 @@ in
           "$mod SHIFT, s, exec, suspend-with-dpms-fix"
           "$mod SHIFT, r, exec, onScratchPad --hide-after sp rebuild rebuild"
           "$mod SHIFT, w, exec, systemctl --user start rotate-wallpaper.service"
+          "$mod SHIFT, m, exec, toggle-mono-output"
 
           # Screenshots
           ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"

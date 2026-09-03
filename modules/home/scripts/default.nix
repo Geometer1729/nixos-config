@@ -8,6 +8,8 @@ let
     git
     jq
     libnotify
+    pipewire
+    pulseaudioFull
     python3
   ];
 in
