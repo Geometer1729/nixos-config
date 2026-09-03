@@ -161,7 +161,7 @@ in
     user = "github-runner";
     group = "github-runner";
     extraLabels = [ "balrog" "cache-warmer" ];
-    extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
+    extraPackages = with pkgs; [ netcat-openbsd sudo wakeonlan ];
     serviceOverrides.ReadWritePaths = [ "/var/lib/cache-warmer" ];
   };
   systemd.services.github-runner-cache-warmer.restartIfChanged = false;
