@@ -121,24 +121,9 @@ in
     group = "github-runner";
   };
   security.sudo.wheelNeedsPassword = false;
-  security.sudo.extraRules = [
-    {
-      users = [ "github-runner" ];
-      commands = [
-        {
-          command = "${pkgs.systemd}/bin/systemctl start cache-warmer-activate.service";
-          options = [ "NOPASSWD" ];
-        }
-        {
-          command = "${scheduleReboot}/bin/schedule-balrog-reboot";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
   programs.zsh.enable = true;
 
-  environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan scheduleReboot ];
+  environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan ];
   environment.persistence."/persist/system".directories = [
     {
       directory = "/var/lib/github-runner/cache-warmer";
@@ -162,19 +147,27 @@ in
     group = "github-runner";
     extraLabels = [ "balrog" "cache-warmer" ];
     extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
-    serviceOverrides = {
-      NoNewPrivileges = false;
-      PrivateUsers = false;
-      ReadWritePaths = [ "/var/lib/cache-warmer" ];
-      RestrictSUIDSGID = false;
-    };
+    serviceOverrides.ReadWritePaths = [ "/var/lib/cache-warmer" ];
   };
   systemd.services.github-runner-cache-warmer.restartIfChanged = false;
+  systemd.paths.cache-warmer-activate = {
+    description = "Watch for a cache-warmer activation request";
+    wantedBy = [ "multi-user.target" ];
+    pathConfig = {
+      PathExists = "/var/lib/cache-warmer/activate";
+      Unit = "cache-warmer-activate.service";
+    };
+  };
   systemd.services.cache-warmer-activate = {
-    description = "Activate the balrog closure built by the cache warmer";
+    description = "Activate balrog and schedule its reboot";
     restartIfChanged = false;
     serviceConfig.Type = "oneshot";
     script = ''
+      set -euo pipefail
+      status_dir=/var/lib/cache-warmer
+      rm -f "$status_dir/activate" "$status_dir/activation-success" "$status_dir/activation-failed"
+      trap 'printf "Activation failed with exit code %s\n" "$?" > "$status_dir/activation-failed"' ERR
+
       target=$(${pkgs.coreutils}/bin/readlink -e /var/lib/cache-warmer/balrog)
       case "$target" in
         /nix/store/*-nixos-system-balrog-*) ;;
@@ -183,7 +176,9 @@ in
           exit 1
           ;;
       esac
-      exec "$target/bin/switch-to-configuration" switch
+      "$target/bin/switch-to-configuration" switch
+      ${scheduleReboot}/bin/schedule-balrog-reboot
+      printf 'Activated %s\n' "$target" > "$status_dir/activation-success"
     '';
   };
 

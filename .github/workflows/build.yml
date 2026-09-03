@@ -99,10 +99,20 @@ jobs:
         nix build --out-link /var/lib/cache-warmer/balrog \
           .#nixosConfigurations.balrog.config.system.build.toplevel
 
-    - name: Activate balrog
+    - name: Activate balrog and schedule reboot
       run: |
-        /run/wrappers/bin/sudo "$(readlink -f /run/current-system/sw/bin/systemctl)" \
-          start cache-warmer-activate.service
-
-    - name: Schedule reboot
-      run: /run/wrappers/bin/sudo "$(readlink -f /run/current-system/sw/bin/schedule-balrog-reboot)"
+        rm -f /var/lib/cache-warmer/activation-{success,failed}
+        touch /var/lib/cache-warmer/activate
+        for _ in {1..300}; do
+          if [[ -f /var/lib/cache-warmer/activation-success ]]; then
+            cat /var/lib/cache-warmer/activation-success
+            exit 0
+          fi
+          if [[ -f /var/lib/cache-warmer/activation-failed ]]; then
+            cat /var/lib/cache-warmer/activation-failed >&2
+            exit 1
+          fi
+          sleep 1
+        done
+        echo "Timed out waiting for balrog activation" >&2
+        exit 1
