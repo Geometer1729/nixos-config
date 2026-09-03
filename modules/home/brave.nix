@@ -66,6 +66,7 @@ let
           or .brave.today.should_show_toolbar_button != false
           or .media_router.enable_media_router != false
           or .brave.enable_media_router_on_restart != false
+          or .brave.containers.enabled != true
           or (.brave.containers.used // {} | any(.[]; .name == "Work" and .background_color != ${workContainerColor}))
           or (.brave.containers.list // [] | any(.[]; .name == "Work" and .background_color != ${workContainerColor}))
           or ((.brave.containers.used // {}) as $used | (.brave.containers.list // []) as $list
@@ -90,6 +91,7 @@ let
           | .brave.today.should_show_toolbar_button = false
           | .media_router.enable_media_router = false
           | .brave.enable_media_router_on_restart = false
+          | .brave.containers.enabled = true
           # used is only a local snapshot cache; list is the registry Brave
           # resolves containers against. Brave drops list entries that fail to
           # parse, so restore Work from its snapshot if it went missing.
