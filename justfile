@@ -67,7 +67,7 @@ deploy:
   nix flake check "{{flake}}"
   nixos-rebuild --flake "{{flake}}#am" --target-host bbrian@am --sudo switch
   nixos-rebuild --flake "{{flake}}#balrog" --target-host bbrian@balrog --use-substitutes --sudo switch
-  ssh torag nh os switch 'git+ssh://am/home/bbrian/conf#torag'
+  nixos-rebuild --flake "{{flake}}#torag" --target-host bbrian@torag --use-substitutes --sudo switch
 
 
 gnome-check:
