@@ -40,8 +40,7 @@ help from someone else.
 
 ## Evidence Window
 
-Use today in the machine's local timezone unless the user supplies another
-date or range.
+The evidence window should run back till the last post, but don't double count if I took credit in the last post for something actually done afterward.
 
 ```bash
 DATE=$(date +%F)
@@ -153,3 +152,12 @@ Distinguish suggestions and plans from completed work.
    separately and briefly.
 
 Never post the result automatically.
+
+## Style
+
+- Technical is fine flowery jargon is not
+- Do not overstate importance or scale of what was done
+- Blunt short expressive pragmatic not overly professional
+
+Terrible: Made topical voting recover from transient upstream failures and invalid candidate selections.
+Good: Fixed topic generation crashes (we now retry).
