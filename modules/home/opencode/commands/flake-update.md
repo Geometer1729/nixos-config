@@ -1,9 +1,12 @@
 ---
-description: Update flake inputs, test the configuration, and write an update report
+description: Update flake inputs in an isolated worktree, verify and deploy them, and write the update report
 ---
 
-Use the flake-update skill to update this repository's flake inputs. Analyze
-relevant upstream changes, build and test the configuration, and write the
-update report. Follow any additional constraints below.
+Load and follow the `flake-update` skill in full. Preserve its exhaustive
+per-input analysis and unmatched nixpkgs scan. Work only in its dated update
+worktree, deploy that worktree directly, and commit only after deployment and
+health checks finish.
+
+Treat the following arguments as additional constraints:
 
 $ARGUMENTS
