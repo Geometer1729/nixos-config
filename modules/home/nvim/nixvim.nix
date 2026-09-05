@@ -47,7 +47,10 @@
     undotree.enable = true;
     fugitive.enable = true;
     startify.enable = true;
-    vimtex.enable = true;
+    vimtex = {
+      enable = true;
+      settings.view_method = "zathura";
+    };
     trouble.enable = true;
     tmux-navigator.enable = true;
     lazygit.enable = true;
