@@ -24,3 +24,5 @@ If a tool you are supposed to have does not work that's P1
 
 When you decide to make something more complicated to fix a problem flag that.
 Explain the problem and the solution and get my input on the tradeoff.
+
+Report times in the time zone of the user.
