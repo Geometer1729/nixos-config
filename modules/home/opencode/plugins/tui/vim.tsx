@@ -164,6 +164,12 @@ export default Plugin.define({
       const match = words(value).find((item) => item.index + item.text.length - 1 > offset)
       return match ? match.index + match.text.length - 1 : Math.max(0, value.length - 1)
     }
+    const WORDEnd = (value: string, offset: number): number => {
+      const match = Array.from(value.matchAll(/\S+/g)).find(
+        (item) => (item.index ?? 0) + item[0].length - 1 > offset,
+      )
+      return match ? (match.index ?? 0) + match[0].length - 1 : Math.max(0, value.length - 1)
+    }
     const findForward = (value: string, offset: number, character: string, repeat: number): number | undefined => {
       const end = lineEnd(value, offset)
       let target = offset
@@ -241,6 +247,7 @@ export default Plugin.define({
       if (motion === "W") target = WORDForward(value, current)
       if (motion === "B") target = WORDBackward(value, current)
       if (motion === "e") target = wordEnd(value, current) + 1
+      if (motion === "E") target = WORDEnd(value, current) + 1
       if (motion === "$" || motion === "D" || motion === "C") target = lineEnd(value, current)
       if (motion === "0") target = lineStart(value, current)
       if (target === undefined) return
@@ -344,6 +351,8 @@ export default Plugin.define({
         setCursor(Array.from({ length: repeat }).reduce<number>((offset) => WORDBackward(value, offset), current))
       else if (key === "e")
         setCursor(Array.from({ length: repeat }).reduce<number>((offset) => wordEnd(value, offset), current))
+      else if (key === "E")
+        setCursor(Array.from({ length: repeat }).reduce<number>((offset) => WORDEnd(value, offset), current))
       else if (key === "0") setCursor(lineStart(value, current))
       else if (key === "^") {
         const start = lineStart(value, current)
