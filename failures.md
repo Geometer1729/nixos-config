@@ -14,6 +14,7 @@
 - **plasma-apply-lookandfeel**: `"applications.menu" not found` during Home Manager activation — one-shot menu lookup noise; activation still succeeds
 - **FoundryVTT auth DNS**: `getaddrinfo EAI_AGAIN foundryvtt.com` during boot/authentication — transient DNS/network timing unless it persists
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
+- **Discord speech worker**: `ThreadPoolForeg` coredumps through `libspeechd` during login, while Discord continues running — reproduced on multiple pre-update boots
 
 ### `just vim-health`
 - **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
@@ -35,6 +36,7 @@
 - **ucsi_acpi**: `PPM init failed` — USB Type-C firmware issue, hardware
 - **spd5118**: `Failed to write` / `failed to resume async: error -6` — RAM SPD sensor resume error after sleep, hardware
 - **Taskwarrior sync**: intermittent failure, typically after wake from sleep
+- **Discord speech worker**: `ThreadPoolForeg` coredumps through `libspeechd` during login, while Discord continues running — reproduced on multiple pre-update boots
 
 ### `just vim-health`
 - **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
