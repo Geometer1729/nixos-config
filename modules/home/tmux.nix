@@ -25,7 +25,7 @@ let
 
       shopt -s nullglob
       for socket in "''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim-session-*.sock; do
-        nvim --server "$socket" --remote-expr \
+        timeout 5s nvim --server "$socket" --remote-expr \
           'execute("lua require(\"auto-session\").save_session(nil, { show_message = false, is_autosave = true })")' \
           >/dev/null 2>&1 || true
       done
