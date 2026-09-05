@@ -47,7 +47,7 @@ clear-notos:
 
 # Check neovim health (shows errors only)
 vim-health:
-  @nvim --headless -c "checkhealth" -c "w! /tmp/nvim-health.txt" -c "qa" 2>/dev/null || true
+  @if [ "${OPENCODE_TERMINAL:-}" = 1 ] && [ -n "${TMUX:-}" ]; then export TERM="$(tmux show-options -gv default-terminal)"; fi; nvim --headless -c "checkhealth" -c "w! /tmp/nvim-health.txt" -c "qa" 2>/dev/null || true
   @echo "=== Neovim Checkhealth Summary ==="
   @grep -E '^- (❌|⚠)' /tmp/nvim-health.txt | grep -v 'is not executable. Configuration will not be used' || echo "No errors or warnings found"
 

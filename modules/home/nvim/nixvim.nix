@@ -6,6 +6,18 @@
   };
   viAlias = true;
   vimAlias = true;
+  opts.sessionoptions = [
+    "blank"
+    "buffers"
+    "curdir"
+    "folds"
+    "help"
+    "tabpages"
+    "winsize"
+    "winpos"
+    "terminal"
+    "localoptions"
+  ];
   extraPackages = with pkgs; [
     tree-sitter # Required by nvim-treesitter for grammar compilation
     fd # Required by telescope for faster file finding

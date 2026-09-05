@@ -17,12 +17,9 @@
 - **Discord speech worker**: `ThreadPoolForeg` coredumps through `libspeechd` during login, while Discord continues running — reproduced on multiple pre-update boots
 
 ### `just vim-health`
-- **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
 - **ERROR**: Nix-managed nvim-treesitter parser directory is not writable or in `runtimepath` — parser grammars are supplied from the Nix store and render-markdown confirms they load
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
 - **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4
-- **ERROR**: headless check inherits `TERM=xterm-256color` inside tmux while tmux uses a different `default-terminal`
-- **WARNING**: LSP log size is large — stale local Neovim state, not config evaluation
 - **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
@@ -39,7 +36,6 @@
 - **Discord speech worker**: `ThreadPoolForeg` coredumps through `libspeechd` during login, while Discord continues running — reproduced on multiple pre-update boots
 
 ### `just vim-health`
-- **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
 - **ERROR**: Nix-managed nvim-treesitter parser directory is not in `runtimepath` — parser grammars are supplied from the Nix store and render-markdown confirms they load
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
 - **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4

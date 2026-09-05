@@ -6,7 +6,11 @@ vim.lsp.config.hls = {
   cmd = { "haskell-language-server", "--lsp" },
   root_markers = { "cabal.project", "hie.yaml", "stack.yaml" },
 }
-vim.lsp.config.leanls = {}
+vim.lsp.config.leanls = {
+  cmd = { "lake", "serve", "--" },
+  filetypes = { "lean" },
+  root_markers = { "lakefile.toml", "lakefile.lean", "lean-toolchain", ".git" },
+}
 vim.lsp.config.purescriptls = {}
 vim.lsp.config.rust_analyzer = {
   cmd = { "rust-analyzer" },
@@ -40,7 +44,7 @@ vim.lsp.config.nixd = {
             expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.am.options',
         },
         home_manager = {
-            expr = '(builtins.getFlake "/home/bbrian/conf").legacyPackages.x86_64-linux.homeConfigurations.bbrian.options',
+            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.am.options.home-manager.users.type.getSubOptions []',
         },
       },
     },
