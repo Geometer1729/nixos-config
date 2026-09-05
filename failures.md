@@ -1,4 +1,4 @@
-# Known Health Check Failures (baseline updated 2026-08-05, nixpkgs 531670d)
+# Known Health Check Failures (baseline updated 2026-09-04, nixpkgs a5cc6f2)
 
 ## am (primary desktop)
 
@@ -16,6 +16,11 @@
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
 
 ### `just vim-health`
+- **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
+- **ERROR**: Nix-managed nvim-treesitter parser directory is not writable or in `runtimepath` — parser grammars are supplied from the Nix store and render-markdown confirms they load
+- **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
+- **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4
+- **ERROR**: headless check inherits `TERM=xterm-256color` inside tmux while tmux uses a different `default-terminal`
 - **WARNING**: LSP log size is large — stale local Neovim state, not config evaluation
 - **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
@@ -32,7 +37,11 @@
 - **Taskwarrior sync**: intermittent failure, typically after wake from sleep
 
 ### `just vim-health`
-- **ERROR**: `tree-sitter-cli v0.26.1 is required` — same as am
+- **WARNING**: auto-session recommends `localoptions` in `sessionoptions`, despite reporting the recommended value as the current value
+- **ERROR**: Nix-managed nvim-treesitter parser directory is not in `runtimepath` — parser grammars are supplied from the Nix store and render-markdown confirms they load
+- **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
+- **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4
+- **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `No clipboard tool found` — expected on headless/no-desktop torag
 - **WARNING**: `biber is not executable!` — same as am
 
