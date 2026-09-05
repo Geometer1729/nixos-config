@@ -1,7 +1,7 @@
 { config, machine, pkgs, lib, ... }:
 let
   nhWithSleepInhibit = pkgs.writeShellScriptBin "nh" ''
-    if [[ "''${1-}" == os ]]; then
+    if [[ "''${1-}" == os ]] && ${lib.boolToString machine.hasGui}; then
       exec ${pkgs.systemd}/bin/systemd-inhibit \
         --what=sleep \
         --who=nh \
