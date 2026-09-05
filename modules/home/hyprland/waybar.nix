@@ -150,7 +150,7 @@ let
       "custom/inbox" =
         let
           inboxCounter = pkgs.writeShellScript "inbox-counter" ''
-            COUNT=$(${pkgs.taskwarrior3}/bin/task status:pending -next -waiting -someday count 2>/dev/null || echo "0")
+            COUNT=$(${pkgs.taskwarrior3}/bin/task rc.gc=0 status:pending -next -waiting -someday count 2>/dev/null || echo "0")
 
             if [ "$COUNT" -eq 0 ]; then
               CLASS="empty"

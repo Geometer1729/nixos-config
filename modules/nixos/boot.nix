@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, pkgs, ... }:
 {
   boot = {
     #kernel.sysctl = {
@@ -39,6 +39,9 @@
 
   # Prevent services from waiting for network
   systemd.services = {
+    # Nixpkgs' reload command reads nonexistent /etc/dhcpcd.conf before sending
+    # SIGHUP; signal the daemon directly to perform the same rebind without noise.
+    dhcpcd.serviceConfig.ExecReload = lib.mkForce "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
     NetworkManager-wait-online.enable = false;
     systemd-networkd-wait-online.enable = false;
   };

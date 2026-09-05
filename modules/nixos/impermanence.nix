@@ -33,6 +33,7 @@
         ".gnupg"
         ".local/share/direnv"
         ".local/share/opencode"
+        ".local/share/nvim/site"
         ".local/share/nvim/auto_session"
         ".local/share/nvim/sessions"
         ".local/share/nvim/spell"

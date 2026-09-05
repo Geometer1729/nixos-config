@@ -45,6 +45,7 @@ in
   ]);
 
   # Disable speech-dispatcher - comes as a dependency but not needed
+  home.sessionVariables.NIXOS_SPEECH = "False";
   systemd.user.services.speech-dispatcher = lib.mkForce { };
   systemd.user.sockets.speech-dispatcher = lib.mkForce { };
 

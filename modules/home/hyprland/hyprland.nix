@@ -360,7 +360,7 @@ in
           "blueman-applet"
           # Brave restores the previously named windows; the listener places them.
           "[workspace 2 silent] brave-restore-session"
-          "[workspace 21 silent] discord"
+          "[workspace 21 silent] env NIXOS_SPEECH=False discord"
           "[workspace 21 silent] signal-desktop"
           # Auto-connect to Bluetooth headphones
           "bluetooth-autoconnect"
