@@ -21,3 +21,6 @@ When I say "let me know", notify me with `notify-send --expire-time=300000` when
 
 Value your dev env!
 If a tool you are supposed to have does not work that's P1
+
+When you decide to make something more complicated to fix a problem flag that.
+Explain the problem and the solution and get my input on the tradeoff.
