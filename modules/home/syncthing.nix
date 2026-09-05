@@ -27,13 +27,6 @@ in
     settings = {
       devices = otherDevices;
       folders = {
-        wiki = {
-          path = "${config.home.homeDirectory}/Documents/vw";
-          devices = builtins.attrNames otherDevices;
-          ignorePerms = false;
-          # Watch for changes to sync quickly
-          fsWatcherEnabled = true;
-        };
         pass = {
           path = "${config.home.homeDirectory}/password-store";
           devices = builtins.attrNames otherDevices;
