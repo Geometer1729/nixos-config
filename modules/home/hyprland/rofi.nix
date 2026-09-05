@@ -1,4 +1,3 @@
-{ pkgs, ... }:
 {
   # rofi launcher configuration
   programs.rofi = {

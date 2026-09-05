@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  perSystem = { pkgs, system, lib, ... }:
+  perSystem = { system, lib, ... }:
     let
       pkgsForNixvim = import inputs.nixpkgs {
         inherit system;

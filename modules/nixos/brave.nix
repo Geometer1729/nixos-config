@@ -1,4 +1,3 @@
-{ ... }:
 let
   siteSearch = name: shortcut: url: {
     inherit name shortcut url;

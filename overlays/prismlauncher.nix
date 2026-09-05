@@ -1,4 +1,4 @@
-{ ... }:
+_:
 final: prev: {
   # Keep extra runtime libs for PrismLauncher and launched instances. Remove
   # entries once upstream packages the required runtime libs by default.

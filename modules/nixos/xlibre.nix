@@ -1,4 +1,4 @@
-{ flake, pkgs, ... }:
+{ flake, ... }:
 let
   inherit (flake) inputs;
 in
@@ -14,7 +14,7 @@ in
   # so xvfb fails to build from xlibre source. Reuse the Xvfb binary
   # that xlibre-xserver already builds via -Dxvfb=true.
   nixpkgs.overlays = [
-    (final: prev: {
+    (_final: prev: {
       xvfb = prev.runCommand "xvfb-${prev.xorg-server.version}"
         {
           meta = prev.xvfb.meta // { mainProgram = "Xvfb"; };

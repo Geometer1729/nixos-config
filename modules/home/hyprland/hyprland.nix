@@ -1,4 +1,4 @@
-{ pkgs, lib, config, osConfig, flake, ... }:
+{ pkgs, lib, config, ... }:
 let
   cfg = config.programs.hyprland-custom;
   scratchpads = [

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, ... }:
+{ lib, pkgs, ... }:
 let
   # Use the same client_id across all machines to share the same task list
   # Each user should have their own unique client_id

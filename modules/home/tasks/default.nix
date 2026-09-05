@@ -1,7 +1,4 @@
-{ pkgs, flake, ... }:
-let
-  inherit (pkgs) lib;
-in
+{ pkgs, ... }:
 {
   programs.taskwarrior = {
     enable = true;

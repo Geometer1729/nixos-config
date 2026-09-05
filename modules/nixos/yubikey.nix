@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, config, ... }:
 let
   smartPinentry = import ../lib/smart-pinentry.nix { inherit pkgs; };
 in

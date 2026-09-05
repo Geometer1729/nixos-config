@@ -1,0 +1,2 @@
+# Dotted option assignments are idiomatic and often clearer in NixOS modules.
+disabled = ["repeated_keys"]

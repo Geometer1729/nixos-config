@@ -25,7 +25,7 @@ in
       secretsFile = config.sops.secrets.wifi.path;
       userControlled = true;
       networks =
-        lib.attrsets.foldAttrs (l: r: l) { }
+        lib.attrsets.foldAttrs (l: _r: l) { }
           (
             map (name: { ${name}.pskRaw = "ext:${name}"; })
               [

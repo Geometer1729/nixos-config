@@ -1,4 +1,4 @@
-{ flake, pkgs, config, ... }:
+{ pkgs, config, ... }:
 let
   inherit (pkgs) lib;
 in

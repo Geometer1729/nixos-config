@@ -20,40 +20,42 @@
       let
         # Colors from vim-j
         black = "#000000";
-        darkred = "#800000";
-        darkgreen = "#008000";
-        darkyellow = "#808000";
-        darkblue = "#000080";
-        darkmagenta = "#800080";
-        darkcyan = "#008080";
         gray = "#c0c0c0";
-        darkgray = "#808080";
-        red = "#a8361b";
-        green = "#00ff00";
-        yellow = "#ffff00";
-        blue = "#0000ff";
-        magenta = "#ff00ff";
-        cyan = "#00ffff";
         white = "#d7d4cd";
         jbrown = "#FA3B17";
-        jred = "#ff0000";
         jgray = "#4e4e4e";
         jgreen = "#58FF1E";
         jdarkgreen = "#5f875f";
         jpurple = "#bd93f9";
-        jblack = "#121212";
         jorange = "#FF8B00";
         jyellow = "#ffff00";
 
-        # Colors from claude
-        soft_green = "#87af87"; # Much easier on eyes than #00ff00
-        soft_yellow = "#d7d75f"; # Toned down yellow
-        soft_blue = "#5f87d7"; # Softer than pure blue
+        # Colors from Claude
         soft_cyan = "#5fafaf"; # Muted cyan
         soft_purple = "#af87d7"; # Gentler purple
         dark_purple = "#6b5b95"; # Darker purple for contrast
-        soft_red = "#d75f5f"; # Softer red
         darker_gray = "#1a1a1a"; # Slightly lighter background
+
+        # Previous palette candidates, retained for future theme tweaks:
+        # darkred = "#800000";
+        # darkgreen = "#008000";
+        # darkyellow = "#808000";
+        # darkblue = "#000080";
+        # darkmagenta = "#800080";
+        # darkcyan = "#008080";
+        # darkgray = "#808080";
+        # red = "#a8361b";
+        # green = "#00ff00";
+        # yellow = "#ffff00";
+        # blue = "#0000ff";
+        # magenta = "#ff00ff";
+        # cyan = "#00ffff";
+        # jred = "#ff0000";
+        # jblack = "#121212";
+        # soft_green = "#87af87";
+        # soft_yellow = "#d7d75f";
+        # soft_blue = "#5f87d7";
+        # soft_red = "#d75f5f";
       in
       # Note terminal.sexy is kinda okay for testing themes
       {

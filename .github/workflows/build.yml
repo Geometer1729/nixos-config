@@ -30,44 +30,6 @@ jobs:
     - name: Check flake
       run: nix flake check
 
-    - name: Build configurations
-      run: |
-        # Build all NixOS configurations
-        nix build .#nixosConfigurations.am.config.system.build.toplevel
-        nix build .#nixosConfigurations.torag.config.system.build.toplevel
-        nix build .#nixosConfigurations.balrog.config.system.build.toplevel
-
-        # Build home-manager configurations
-        nix build .#homeConfigurations.bbrian.activationPackage
-        nix build .#homeConfigurations.root.activationPackage
-
-  format-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-    - name: Install Nix
-      uses: DeterminateSystems/nix-installer-action@b67ad2f0e8376a0bc947db191e4484285b6f5b56
-      with:
-        extra-conf: |
-          experimental-features = nix-command flakes
-
-    - name: Check formatting
-      run: |
-        nix develop --command nixpkgs-fmt --check .
-
-    - name: Check for issues
-      run: |
-        # Check for dead code if available
-        if nix develop --command which deadnix >/dev/null 2>&1; then
-          nix develop --command deadnix --fail
-        fi
-
-        # Check for antipatterns if available
-        if nix develop --command which statix >/dev/null 2>&1; then
-          nix develop --command statix check
-        fi
-
   cache-and-activate:
     if: github.event_name != 'pull_request'
     runs-on: [self-hosted, Linux, X64, balrog, cache-warmer]

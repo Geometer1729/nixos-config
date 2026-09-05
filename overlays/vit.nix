@@ -1,4 +1,4 @@
-{ ... }:
+_:
 final: prev:
 {
   # Keep taskwarrior2 consumers on taskwarrior3 for this task setup. Remove
@@ -7,7 +7,7 @@ final: prev:
 
   # tasklib still expects taskwarrior2 in nixpkgs.
   python3Packages = prev.python3Packages.override {
-    overrides = pythonSelf: pythonSuper: {
+    overrides = _pythonSelf: pythonSuper: {
       tasklib = pythonSuper.tasklib.override {
         taskwarrior2 = final.taskwarrior3;
       };

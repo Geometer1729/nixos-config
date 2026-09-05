@@ -20,7 +20,7 @@ in
       # Use Tailscale SSH for all .tail-scale.ts.net hosts
       "*.tail-scale.ts.net" = {
         proxyCommand = "${pkgs.tailscale}/bin/tailscale nc %h %p";
-        user = me.user;
+        inherit (me) user;
       };
       tub = me // {
         hostname = "jsh.gov";

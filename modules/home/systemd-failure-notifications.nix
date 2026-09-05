@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   # Simple systemd failure notification via periodic checking
   # Checks every 5 minutes for failed services and sends notifications

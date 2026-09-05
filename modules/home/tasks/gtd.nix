@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ lib, ... }:
 let
   # Global mapping of column names to their display labels
   columnLabels = {

@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ lib, config, ... }:
 {
   options.fast_lock = with lib; mkOption
     {
