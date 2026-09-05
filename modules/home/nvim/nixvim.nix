@@ -49,7 +49,7 @@
     startify.enable = true;
     vimtex = {
       enable = true;
-      settings.view_method = "zathura";
+      settings.view_method = "zathura_simple";
     };
     trouble.enable = true;
     tmux-navigator.enable = true;
