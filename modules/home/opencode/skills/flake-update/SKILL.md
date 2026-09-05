@@ -188,8 +188,10 @@ was needed. Compare results with `failures.md`. Report only new failures or
 warnings, and update that baseline when a known failure appears or disappears.
 
 After local checks pass, run `just deploy` from the update worktree. This must
-deploy the update worktree directly to `am` and `torag`. Then run these checks
-on torag:
+deploy the update worktree directly to `am`, `balrog`, and `torag`. Confirm
+that Balrog activated the expected update-worktree system, then reboot it and
+verify the running kernel and that `systemctl --failed` reports no failed units.
+Run these checks on torag:
 
 ```bash
 ssh torag just health
@@ -198,9 +200,9 @@ ssh torag just gnome-check
 ssh torag just test-remote-builds
 ```
 
-Do not run `just deploy` again on torag. If torag is unavailable, ask the user
-whether to wait or skip its deployment and checks. An explicit skip counts as
-completion but must be recorded in the report.
+Do not run `just deploy` again on torag. If Balrog or torag is unavailable, ask
+the user whether to wait or skip that host's deployment and checks. An explicit
+skip counts as completion but must be recorded in the report.
 
 ## 7. Write The Report
 
