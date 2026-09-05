@@ -41,6 +41,7 @@
         ".local/share/git"
         ".local/state/nvim"
         ".local/state/opencode"
+        ".local/state/syncthing"
         ".local/state/tmux"
         ".tmux/resurrect"
         ".claude-work"
@@ -85,8 +86,6 @@
         ".local/share/nvim/telescope_history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
-        ".local/state/syncthing/cert.pem"
-        ".local/state/syncthing/key.pem"
       ] ++ lib.optionals config.machine.hasGui [
         ".cache/rofi3.druncache"
         ".cache/rofi-2.sshcache"
