@@ -78,39 +78,47 @@ sort -u "$PACKAGES_FILE" -o "$PACKAGES_FILE" 2>/dev/null || true
 PACKAGE_COUNT=$(wc -l < "$PACKAGES_FILE" 2>/dev/null || echo "0")
 log_info "Found $PACKAGE_COUNT unique packages in config"
 
-# Step 2: Fetch commits from nixpkgs
+# Step 2: Fetch the exact comparison range from nixpkgs
 log_info "Fetching nixpkgs commits from $OLD_REV to $NEW_REV..."
 
 COMMITS_FILE="$FLAKE_UPDATE_DIR/nixpkgs-commits.json"
 PAGE_FILE="$FLAKE_UPDATE_DIR/page.json"
+rm -f \
+  "$FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt" \
+  "$FLAKE_UPDATE_DIR/matched-nixpkgs-shas.txt" \
+  "$FLAKE_UPDATE_DIR/unmatched-nixpkgs-commits.txt"
+rm -rf "$FLAKE_UPDATE_DIR/nixpkgs-batches"
 echo "[]" > "$COMMITS_FILE"
+RANGE_COMPLETE=false
 
 for page in $(seq 1 $MAX_PAGES); do
   log_info "  Fetching page $page..."
 
-  if ! gh api "repos/NixOS/nixpkgs/commits?sha=$NEW_REV&per_page=100&page=$page" > "$PAGE_FILE" 2>/dev/null; then
+  if ! gh api "repos/NixOS/nixpkgs/compare/$OLD_REV...$NEW_REV?per_page=100&page=$page" > "$PAGE_FILE" 2>/dev/null; then
     log_warn "Failed to fetch page $page"
     break
   fi
 
-  # Check if empty
-  if [[ ! -s "$PAGE_FILE" ]] || jq -e '. == []' "$PAGE_FILE" >/dev/null 2>&1; then
+  if ! jq -e '.total_commits | type == "number"' "$PAGE_FILE" >/dev/null 2>&1; then
+    log_warn "GitHub returned an invalid comparison response on page $page"
     break
   fi
 
-  # Check if we've gone past the old revision
-  if jq -e ".[] | select(.sha == \"$OLD_REV\")" "$PAGE_FILE" >/dev/null 2>&1; then
-    # Filter commits up to old revision and merge
-    jq "[.[] | select(.sha != \"$OLD_REV\")]" "$PAGE_FILE" > "$PAGE_FILE.filtered"
-    jq -s '.[0] + .[1]' "$COMMITS_FILE" "$PAGE_FILE.filtered" > "$COMMITS_FILE.tmp"
-    mv -f "$COMMITS_FILE.tmp" "$COMMITS_FILE"
-    rm -f "$PAGE_FILE.filtered"
+  TOTAL_COMMITS=$(jq '.total_commits' "$PAGE_FILE")
+  jq '.commits' "$PAGE_FILE" > "$PAGE_FILE.commits"
+  jq -s '.[0] + .[1] | unique_by(.sha)' "$COMMITS_FILE" "$PAGE_FILE.commits" > "$COMMITS_FILE.tmp"
+  mv -f "$COMMITS_FILE.tmp" "$COMMITS_FILE"
+  rm -f "$PAGE_FILE.commits"
+
+  COMMIT_COUNT=$(jq 'length' "$COMMITS_FILE")
+  if (( COMMIT_COUNT == TOTAL_COMMITS )); then
+    RANGE_COMPLETE=true
     break
   fi
-
-  # Merge this page using file-based slurp
-  jq -s '.[0] + .[1]' "$COMMITS_FILE" "$PAGE_FILE" > "$COMMITS_FILE.tmp"
-  mv "$COMMITS_FILE.tmp" "$COMMITS_FILE"
+  if (( COMMIT_COUNT > TOTAL_COMMITS )) || [[ $(jq '.commits | length' "$PAGE_FILE") -eq 0 ]]; then
+    log_warn "GitHub comparison pagination ended before the complete range was collected"
+    break
+  fi
 
   # Rate limit protection
   sleep 0.5
@@ -119,6 +127,13 @@ done
 rm -f "$PAGE_FILE"
 COMMIT_COUNT=$(jq 'length' "$COMMITS_FILE")
 log_info "Fetched $COMMIT_COUNT commits"
+
+if ! $RANGE_COMPLETE; then
+  log_warn "Did not reach old nixpkgs revision; the fetched range is incomplete"
+fi
+
+ALL_COMMITS_FILE="$FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt"
+jq -r '.[] | "\(.sha)\t\(.commit.message | split("\n")[0])"' "$COMMITS_FILE" > "$ALL_COMMITS_FILE"
 
 # Step 3: Filter commits by package names
 log_info "Filtering commits by config packages..."
@@ -210,6 +225,21 @@ rm -f "$FLAKE_UPDATE_DIR/matches.txt"
 MATCH_COUNT=$(jq 'length' "$MATCHES_FILE")
 log_info "Found $MATCH_COUNT relevant changes"
 
+if $RANGE_COMPLETE; then
+  MATCHED_SHAS_FILE="$FLAKE_UPDATE_DIR/matched-nixpkgs-shas.txt"
+  UNMATCHED_COMMITS_FILE="$FLAKE_UPDATE_DIR/unmatched-nixpkgs-commits.txt"
+  BATCH_DIR="$FLAKE_UPDATE_DIR/nixpkgs-batches"
+
+  jq -r '.[].sha' "$MATCHES_FILE" | sort -u > "$MATCHED_SHAS_FILE"
+  awk 'FILENAME == ARGV[1] { matched[$1] = 1; next } !($1 in matched)' \
+    "$MATCHED_SHAS_FILE" "$ALL_COMMITS_FILE" > "$UNMATCHED_COMMITS_FILE"
+  mkdir -p "$BATCH_DIR"
+  if [[ -s "$UNMATCHED_COMMITS_FILE" ]]; then
+    split -d -a 3 -l 100 "$UNMATCHED_COMMITS_FILE" "$BATCH_DIR/batch-"
+  fi
+  log_info "Prepared $(wc -l < "$UNMATCHED_COMMITS_FILE") unmatched commits for exhaustive review"
+fi
+
 # Step 5: Output results
 if $JSON_OUTPUT; then
   jq -n \
@@ -218,10 +248,12 @@ if $JSON_OUTPUT; then
     --argjson matches "$(cat "$MATCHES_FILE")" \
     --arg packages_file "$PACKAGES_FILE" \
     --arg total_commits "$COMMIT_COUNT" \
+    --argjson range_complete "$RANGE_COMPLETE" \
     '{
       old_rev: $old_rev,
       new_rev: $new_rev,
       total_commits_scanned: ($total_commits | tonumber),
+      range_complete: $range_complete,
       relevant_changes: $matches,
       packages_file: $packages_file
     }'

@@ -277,6 +277,7 @@ let
     "gh api*"
     "gh repo clone * /tmp/flake-update/* -- --no-checkout"
     "bash -n *"
+    "direnv allow ${config.home.homeDirectory}/Code/conf-update-*"
     "direnv reload"
     "direnv status*"
     "opencode --help*"
@@ -308,6 +309,7 @@ let
     "nix-store --query*"
     "flake-update*"
     "flake-changelog*"
+    "flake-repo-checkout*"
     "nixpkgs-changelog*"
     "nh os build*"
     "nh os test*"
@@ -404,5 +406,6 @@ in
     "*" = "ask";
     "/nix/store/**" = "deny";
     "/tmp/**" = "allow";
+    "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
   };
 }

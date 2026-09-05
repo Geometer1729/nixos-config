@@ -234,6 +234,13 @@ echo "Changelog: $CHANGELOG"
 if [[ -f "$FLAKE_UPDATE_DIR/nixpkgs-changelog.json" ]]; then
   echo "nixpkgs analysis: $FLAKE_UPDATE_DIR/nixpkgs-changelog.json"
 fi
+if [[ -f "$FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt" ]]; then
+  echo "All nixpkgs commits: $FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt"
+fi
+if [[ -f "$FLAKE_UPDATE_DIR/unmatched-nixpkgs-commits.txt" ]]; then
+  echo "Unmatched nixpkgs commits: $FLAKE_UPDATE_DIR/unmatched-nixpkgs-commits.txt"
+  echo "Nixpkgs review batches: $FLAKE_UPDATE_DIR/nixpkgs-batches"
+fi
 if [[ -f "$FLAKE_UPDATE_DIR/config-packages.txt" ]]; then
   echo "Config packages: $FLAKE_UPDATE_DIR/config-packages.txt"
 fi

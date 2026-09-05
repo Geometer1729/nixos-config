@@ -39,6 +39,9 @@ and any reused worktree path in every command.
 
 After finding or creating the worktree:
 
+- Run `direnv allow <worktree>` immediately after finding or creating it and
+  before making any edits. The worktree starts from the already trusted
+  committed `HEAD`; doing this up front avoids a blocked shell environment.
 - Use it as `workdir` for every repository command.
 - Pass its path explicitly to every `nh`, `nix`, and `nixos-rebuild` command.
   Do not rely on `NH_FLAKE`, which points at `~/conf`.
@@ -63,6 +66,9 @@ Read every generated artifact:
 
 - `changelog.json`: changes for all inputs;
 - `nixpkgs-changelog.json`: nixpkgs commits matched to configured packages;
+- `all-nixpkgs-commits.txt`: every fetched nixpkgs commit in the range;
+- `unmatched-nixpkgs-commits.txt`: commits not selected by the package filter;
+- `nixpkgs-batches/`: complete review batches of about 100 unmatched commits;
 - `config-packages.txt`: packages extracted from the configuration;
 - `old-flake.lock`: the lock file before the update.
 
@@ -91,18 +97,20 @@ assuming the marker affects this configuration.
 The package-name filter misses NixOS modules, `lib`, and infrastructure changes.
 Perform an exhaustive second scan.
 
-1. Fetch all nixpkgs commit messages between the old and new revisions. Prefer
-   the GitHub compare API when the range fits:
+1. Check `range_complete` in `nixpkgs-changelog.json`. When it is `true`, use
+   the generated `all-nixpkgs-commits.txt`, `unmatched-nixpkgs-commits.txt`, and
+   `nixpkgs-batches/` artifacts directly. Do not fetch or repartition them.
+2. If `range_complete` is `false`, prepare a range repository and regenerate
+   the complete commit and batch artifacts:
 
    ```bash
-   gh api "repos/nixos/nixpkgs/compare/<old_rev>...<new_rev>" --paginate -q '.commits[].commit.message' > /tmp/flake-update/update-MM-DD-YY/all-nixpkgs-commits.txt
+   flake-repo-checkout --no-worktrees nixos/nixpkgs <old_rev> <new_rev> /tmp/flake-update/update-MM-DD-YY/repos/nixpkgs
    ```
 
-   If the API cannot return the full range, use `git log` from a local filtered
-   checkout under the artifact directory.
-
-2. Remove commits already represented in `nixpkgs-changelog.json`.
-3. Split all remaining commits into batches of about 100. Spawn parallel
+   Set the shell tool's `workdir` to the printed bare repository path and use
+   `git log` there. Do not claim exhaustive coverage until the helper verifies
+   the range and every commit is batched.
+3. Spawn parallel
    `general` subagents for every batch. Do not sample or reduce the batch count.
 4. Each subagent must cross-reference its messages against the update
    worktree's NixOS modules and options. It should report potentially relevant
@@ -110,12 +118,14 @@ Perform an exhaustive second scan.
    changes with commit identifiers.
 5. Investigate each candidate and include every relevant result in the report.
 
-When local upstream repositories are needed:
+When source trees for other upstream repositories are needed, run:
 
-- clone them under the run's artifact directory, for example
-  `/tmp/flake-update/update-MM-DD-YY/repos/nixpkgs`;
-- prefer filtered, no-checkout clones;
-- use `git -C <repository>` for fetches and detached checkouts;
+```bash
+flake-repo-checkout owner/repo <old_rev> <new_rev> /tmp/flake-update/update-MM-DD-YY/repos/name
+```
+
+Then use its `old` and `new` detached worktrees. In all cases:
+
 - never clone an upstream repository into the update worktree.
 
 The unmatched scan is complete only when every unmatched commit belongs to a
