@@ -12,11 +12,13 @@ let
         else lib.optional (type == "regular") path)
       (builtins.attrNames (builtins.readDir directory));
 
-  pluginFiles = builtins.filter
+  sourceFiles = builtins.filter
     (path:
       (lib.hasSuffix ".ts" path || lib.hasSuffix ".tsx" path)
       && !lib.hasSuffix ".test.ts" path)
     (filesIn ./.);
+
+  pluginFiles = builtins.filter (path: path != ./tui/vim-engine.ts) sourceFiles;
 
   plugins = pkgs.buildNpmPackage {
     pname = "opencode-plugins";
@@ -41,7 +43,7 @@ let
         ''
           mkdir -p "$out/$(dirname '${relative}')"
           cp '${relative}' "$out/${relative}"
-        '') pluginFiles}
+        '') sourceFiles}
       runHook postInstall
     '';
   };
