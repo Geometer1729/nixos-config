@@ -97,7 +97,9 @@ let
         format-ethernet = "{ifname} ";
         format-disconnected = "Disconnected ";
         max-length = 50;
-        on-click = if (osConfig.wifi.interface or null) != null then "wpa_gui -i ${osConfig.wifi.interface}" else "wpa_gui";
+        on-click = "ghostty --title='Wi-Fi picker' -e wifi-picker";
+        on-click-right = "captive-browser";
+        tooltip-format = "{ifname}: {essid}\nLeft: select Wi-Fi\nRight: captive portal";
       };
 
       # Battery

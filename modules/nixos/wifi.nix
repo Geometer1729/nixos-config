@@ -1,6 +1,19 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.wifi;
+  wifiPicker = pkgs.writeShellApplication {
+    name = "wifi-picker";
+    runtimeInputs = with pkgs; [
+      coreutils
+      fzf
+      gawk
+      gnugrep
+      libnotify
+      wpa_supplicant
+    ];
+    runtimeEnv.WIFI_INTERFACE = cfg.interface;
+    text = builtins.readFile ./wifi-picker.sh;
+  };
 in
 {
   options.wifi = {
@@ -41,10 +54,26 @@ in
               ]
           );
     };
+    programs.captive-browser = {
+      enable = true;
+      inherit (cfg) interface;
+      browser = ''
+        env XDG_CONFIG_HOME="$PREV_CONFIG_HOME" ${pkgs.brave}/bin/brave \
+          --user-data-dir="''${XDG_DATA_HOME:-$HOME/.local/share}/brave-captive" \
+          --proxy-server="socks5://$PROXY" \
+          --host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost" \
+          --no-first-run \
+          --test-type \
+          --new-window \
+          --incognito \
+          --no-default-browser-check \
+          http://cache.nixos.org/
+      '';
+    };
     environment.systemPackages = with pkgs;
       [
         wpa_supplicant
-        wpa_supplicant_gui
+        wifiPicker
       ];
   };
 }
