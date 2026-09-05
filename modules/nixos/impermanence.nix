@@ -82,6 +82,7 @@
         ".cache/nix-index/files"
         ".local/share/nix/trusted-settings.json"
         ".local/share/nix/repl-history"
+        ".local/share/nvim/telescope_history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
         ".local/state/syncthing/cert.pem"
