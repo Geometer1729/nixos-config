@@ -119,9 +119,11 @@ in
       Description = "Restore terminal windows and tmux attachments";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
+      Before = [ "save-tmux-on-exit.service" ];
     };
     Service = {
       Type = "oneshot";
+      RemainAfterExit = true;
       ExecStart = "${restoreTerminals}/bin/restore-terminals";
     };
     Install.WantedBy = [ "graphical-session.target" ];
