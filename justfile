@@ -67,11 +67,10 @@ test-remote-builds:
 
 deploy:
   nixpkgs-fmt "{{flake}}"
-  nh os build "{{flake}}" -H am
   nix flake check "{{flake}}"
-  nixos-rebuild --flake "{{flake}}#am" --target-host bbrian@am --sudo switch
-  nixos-rebuild --flake "{{flake}}#balrog" --target-host bbrian@balrog --use-substitutes --sudo switch
-  nixos-rebuild --flake "{{flake}}#torag" --target-host bbrian@torag --use-substitutes --sudo switch
+  nh os switch "{{flake}}" -H am --target-host bbrian@am
+  nh os switch "{{flake}}" -H balrog --target-host bbrian@balrog --use-substitutes
+  nh os switch "{{flake}}" -H torag --target-host bbrian@torag --use-substitutes
 
 
 gnome-check:

@@ -36,9 +36,8 @@ log(){
 	$@ &| tee log
 }
 
-nixos-deploy(){
-  nh os build -H $1
-  \nixos-rebuild --flake ~/conf\#$1 --target-host bbrian@$1 --use-substitutes --sudo $2
+nhd(){
+  nh os "$2" -H "$1" --target-host "bbrian@$1" --use-substitutes
 }
 
 jqcb(){
