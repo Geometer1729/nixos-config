@@ -33,6 +33,10 @@ clean:
 gc:
   nix-collect-garbage -d
 
+# Stop a machine suspending (default: torag for 24h; `just awake torag off` cancels)
+awake host="torag" duration="24h":
+  ssh {{host}} keep-awake {{duration}}
+
 # Check system health
 health:
   systemctl --failed
