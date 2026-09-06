@@ -51,9 +51,9 @@ in
           fi
         '';
       initContent = ''
-        source ${./helpers.sh}
-        source ${./viCursor.sh}
-        source ${./notify.sh}
+        source ${./helpers.zsh}
+        source ${./viCursor.zsh}
+        source ${./notify.zsh}
         bindkey  clear-screen
       ''; #If this gets any more substantial it may be time for a file
       localVariables =

@@ -791,11 +791,29 @@
         "opencode2-npm": "opencode2-npm",
         "prismlauncher": "prismlauncher",
         "recover-vim": "recover-vim",
+        "shuck": "shuck",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "telescope-vimwiki-nvim": "telescope-vimwiki-nvim",
         "xlibre-overlay": "xlibre-overlay",
         "zsh-nix-shell": "zsh-nix-shell"
+      }
+    },
+    "shuck": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778120822,
+        "narHash": "sha256-J0u53uabBu6q+Arjvijt8t9xp9TYWWRRITQm5MBTYq8=",
+        "owner": "ewhauser",
+        "repo": "shuck",
+        "rev": "faf74aaa1354d115fd4398163bfdd2d8ec2b1232",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ewhauser",
+        "ref": "v0.0.38",
+        "repo": "shuck",
+        "type": "github"
       }
     },
     "sops-nix": {

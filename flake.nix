@@ -38,6 +38,8 @@
     homeassistant-smartrent.flake = false;
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
+    shuck.url = "github:ewhauser/shuck/v0.0.38";
+    shuck.flake = false;
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
     # 1.62.x rejects OpenCode's concurrent title and primary requests.
