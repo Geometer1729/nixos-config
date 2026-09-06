@@ -61,64 +61,67 @@ flake-update --output-dir /tmp/flake-update/update-MM-DD-YY /home/bbrian/Code/co
 ```
 
 The command updates `flake.lock`, backs up the old lock file, fetches commit
-details, and performs an initial package-name filter over nixpkgs changes.
-Read every generated artifact:
+details, prepares the stable nixpkgs range in `/home/bbrian/Code/nixpkgs`, and
+performs an initial package-name filter. The parent reads only these summaries:
 
-- `changelog.json`: changes for all inputs;
-- `nixpkgs-changelog.json`: nixpkgs commits matched to configured packages;
-- `all-nixpkgs-commits.txt`: every fetched nixpkgs commit in the range;
-- `unmatched-nixpkgs-commits.txt`: commits not selected by the package filter;
-- `nixpkgs-batches/`: complete review batches of about 100 unmatched commits;
-- `config-packages.txt`: packages extracted from the configuration;
-- `old-flake.lock`: the lock file before the update.
+- changed input names, revisions, commit counts, and errors from
+  `changelog.json`;
+- `range_complete`, revisions, counts, and errors from
+  `nixpkgs-changelog.json`;
+- line counts for `all-nixpkgs-commits.txt`,
+  `unmatched-nixpkgs-commits.txt`, and `nixpkgs-batches/`.
+
+Raw commit lists, batches, package lists, and lock files are subagent evidence.
+Do not read them into the parent context unless investigating a specific
+reported candidate or an artifact consistency failure.
 
 Confirm that the old lock file exists and that the changelog accounts for each
 changed top-level input before continuing.
 
 ## 2. Analyze Every Input
 
-For each changed non-nixpkgs input, use parallel `general` subagents when the
-analyses are independent. Each prompt must include the exact worktree and
-artifact paths. Ask each subagent to:
+For each changed non-nixpkgs input, use one parallel `explore` subagent. Each
+prompt must include the exact worktree and artifact paths. Ask each subagent to:
 
 - find how the input is used in this configuration;
 - inspect its commits and release notes;
 - identify changes to features or options used here;
 - flag breaking changes, deprecations, removals, migrations, and renames;
-- return evidence and a relevance assessment for the report.
+- return only applicable findings with evidence and a relevance assessment;
+- use at most 10 concise bullets, or one line when no relevant change exists.
 
-For nixpkgs, inspect all package-matched commits in
-`nixpkgs-changelog.json`. Read linked pull request descriptions and migration
-notes. Investigate every entry marked `"package": "BREAKING"` instead of
-assuming the marker affects this configuration.
+Escalate a specific finding to a `general` subagent only when it requires a
+complicated migration analysis or remains ambiguous after targeted inspection.
+Do not repeat the entire input analysis during escalation.
+
+Use a separate `explore` subagent for the package-matched nixpkgs commits. It
+reads `nixpkgs-changelog.json`, linked pull request descriptions, and migration
+notes. It must investigate every entry marked `"package": "BREAKING"` instead
+of assuming the marker affects this configuration, and return only applicable
+findings in at most 10 concise bullets.
 
 ## 3. Scan Unmatched Nixpkgs Commits
 
 The package-name filter misses NixOS modules, `lib`, and infrastructure changes.
 Perform an exhaustive second scan.
 
-1. Check `range_complete` in `nixpkgs-changelog.json`. When it is `true`, use
-   the generated `all-nixpkgs-commits.txt`, `unmatched-nixpkgs-commits.txt`, and
-   `nixpkgs-batches/` artifacts directly. Do not fetch or repartition them.
-2. If `range_complete` is `false`, prepare a range repository and regenerate
-   the complete commit and batch artifacts:
+1. Require `range_complete` in `nixpkgs-changelog.json` to be `true`. Stop and
+   diagnose the script when it is false.
+2. Spawn one parallel `explore` subagent for every generated batch. Do not
+   sample or reduce the batch count. Give it the batch path, update worktree,
+   artifact directory, and `/home/bbrian/Code/nixpkgs` as the source repository.
+3. Each subagent classifies every commit subject in its batch against the
+   actual NixOS, Home Manager, and Nixvim configuration. It uses the source
+   repository only to inspect plausible candidates, with that path as the
+   shell tool's `workdir` so existing read-only Git permissions apply.
+4. Each subagent confirms the number of classified commits, then returns only
+   potentially relevant module, service, library, security, evaluation, and
+   build-infrastructure candidates. Limit the response to 10 concise candidate
+   bullets plus the coverage confirmation. Do not return rejected commits.
+5. Escalate only ambiguous candidates to `general` subagents. Investigate every
+   candidate and include every relevant result in the report.
 
-   ```bash
-   flake-repo-checkout --no-worktrees nixos/nixpkgs <old_rev> <new_rev> /tmp/flake-update/update-MM-DD-YY/repos/nixpkgs
-   ```
-
-   Set the shell tool's `workdir` to the printed bare repository path and use
-   `git log` there. Do not claim exhaustive coverage until the helper verifies
-   the range and every commit is batched.
-3. Spawn parallel
-   `general` subagents for every batch. Do not sample or reduce the batch count.
-4. Each subagent must cross-reference its messages against the update
-   worktree's NixOS modules and options. It should report potentially relevant
-   module, service, library, security, evaluation, and build-infrastructure
-   changes with commit identifiers.
-5. Investigate each candidate and include every relevant result in the report.
-
-When source trees for other upstream repositories are needed, run:
+When source trees for non-nixpkgs upstream repositories are needed, run:
 
 ```bash
 flake-repo-checkout owner/repo <old_rev> <new_rev> /tmp/flake-update/update-MM-DD-YY/repos/name
@@ -133,7 +136,9 @@ reviewed batch and every candidate has a relevance decision.
 
 ## 4. Review Every Overlay
 
-Review every file under `overlays/`, even when its input did not change.
+Use one `explore` subagent to review every file under `overlays/`, even when its
+input did not change. Give it the update worktree, artifact directory, and
+shared nixpkgs repository paths.
 
 For each overlay:
 
@@ -145,7 +150,8 @@ For each overlay:
 
 When an overlay remains necessary, make sure its comments state the reason and,
 when knowable, the condition for removal. Remove obsolete overlays and record
-the evidence in the report.
+the evidence in the report. The subagent returns one concise decision with
+evidence per overlay and no unrelated upstream details.
 
 ## 5. Assess Relevance And Required Fixes
 
@@ -186,6 +192,9 @@ just test-remote-builds
 `nh os test` must activate the update worktree even when no configuration fix
 was needed. Compare results with `failures.md`. Report only new failures or
 warnings, and update that baseline when a known failure appears or disappears.
+Use `nix store diff-closures` and targeted queries for closure analysis. Record
+raw store-path lists as artifacts when needed; do not read complete closure
+listings into the parent context.
 
 After local checks pass, run `just deploy` from the update worktree. This must
 deploy the update worktree directly to `am`, `balrog`, and `torag`. Confirm

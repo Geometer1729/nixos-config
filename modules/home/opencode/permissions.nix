@@ -374,6 +374,7 @@ in
     "/nix/store/**" = "allow";
     "/tmp/**" = "allow";
     "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
+    "${config.home.homeDirectory}/Code/nixpkgs/**" = "allow";
   };
   lsp = "allow";
   # Slack MCP: reads are allowed by default; anything that publishes asks first.

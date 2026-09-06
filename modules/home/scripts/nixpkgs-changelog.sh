@@ -9,15 +9,12 @@
 
 source "$SCRIPTS_LIB/flake-update-lib.sh"
 
-# Number of commit pages to fetch (100 per page)
-# 14k commits = 140 pages, but let's cap at 200 to be safe
-MAX_PAGES=200
-
 # Parse arguments
 OLD_REV=""
 NEW_REV=""
 JSON_OUTPUT=false
 FLAKE_PATH="${FLAKE_PATH:-.}"
+NIXPKGS_REPO="${NIXPKGS_REPO:-$HOME/Code/nixpkgs}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -78,59 +75,62 @@ sort -u "$PACKAGES_FILE" -o "$PACKAGES_FILE" 2>/dev/null || true
 PACKAGE_COUNT=$(wc -l < "$PACKAGES_FILE" 2>/dev/null || echo "0")
 log_info "Found $PACKAGE_COUNT unique packages in config"
 
-# Step 2: Fetch the exact comparison range from nixpkgs
-log_info "Fetching nixpkgs commits from $OLD_REV to $NEW_REV..."
+# Step 2: Prepare the exact comparison range in the shared nixpkgs repository
+log_info "Preparing nixpkgs commits from $OLD_REV to $NEW_REV..."
 
 COMMITS_FILE="$FLAKE_UPDATE_DIR/nixpkgs-commits.json"
-PAGE_FILE="$FLAKE_UPDATE_DIR/page.json"
 rm -f \
   "$FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt" \
   "$FLAKE_UPDATE_DIR/matched-nixpkgs-shas.txt" \
   "$FLAKE_UPDATE_DIR/unmatched-nixpkgs-commits.txt"
 rm -rf "$FLAKE_UPDATE_DIR/nixpkgs-batches"
-echo "[]" > "$COMMITS_FILE"
-RANGE_COMPLETE=false
-
-for page in $(seq 1 $MAX_PAGES); do
-  log_info "  Fetching page $page..."
-
-  if ! gh api "repos/NixOS/nixpkgs/compare/$OLD_REV...$NEW_REV?per_page=100&page=$page" > "$PAGE_FILE" 2>/dev/null; then
-    log_warn "Failed to fetch page $page"
-    break
-  fi
-
-  if ! jq -e '.total_commits | type == "number"' "$PAGE_FILE" >/dev/null 2>&1; then
-    log_warn "GitHub returned an invalid comparison response on page $page"
-    break
-  fi
-
-  TOTAL_COMMITS=$(jq '.total_commits' "$PAGE_FILE")
-  jq '.commits' "$PAGE_FILE" > "$PAGE_FILE.commits"
-  jq -s '.[0] + .[1] | unique_by(.sha)' "$COMMITS_FILE" "$PAGE_FILE.commits" > "$COMMITS_FILE.tmp"
-  mv -f "$COMMITS_FILE.tmp" "$COMMITS_FILE"
-  rm -f "$PAGE_FILE.commits"
-
-  COMMIT_COUNT=$(jq 'length' "$COMMITS_FILE")
-  if (( COMMIT_COUNT == TOTAL_COMMITS )); then
-    RANGE_COMPLETE=true
-    break
-  fi
-  if (( COMMIT_COUNT > TOTAL_COMMITS )) || [[ $(jq '.commits | length' "$PAGE_FILE") -eq 0 ]]; then
-    log_warn "GitHub comparison pagination ended before the complete range was collected"
-    break
-  fi
-
-  # Rate limit protection
-  sleep 0.5
-done
-
-rm -f "$PAGE_FILE"
-COMMIT_COUNT=$(jq 'length' "$COMMITS_FILE")
-log_info "Fetched $COMMIT_COUNT commits"
-
-if ! $RANGE_COMPLETE; then
-  log_warn "Did not reach old nixpkgs revision; the fetched range is incomplete"
+if ! git -C "$NIXPKGS_REPO" rev-parse --git-dir >/dev/null 2>&1; then
+  log_error "Shared nixpkgs repository not found: $NIXPKGS_REPO"
+  exit 1
 fi
+
+NIXPKGS_REMOTE=$(git -C "$NIXPKGS_REPO" remote get-url origin 2>/dev/null || true)
+if [[ ! $NIXPKGS_REMOTE =~ github\.com[:/]NixOS/nixpkgs(\.git)?$ ]]; then
+  log_error "$NIXPKGS_REPO origin is not the canonical NixOS/nixpkgs repository: $NIXPKGS_REMOTE"
+  exit 1
+fi
+
+MISSING_REVS=()
+for rev in "$OLD_REV" "$NEW_REV"; do
+  if ! git -C "$NIXPKGS_REPO" cat-file -e "$rev^{commit}" 2>/dev/null; then
+    MISSING_REVS+=("$rev")
+  fi
+done
+if (( ${#MISSING_REVS[@]} > 0 )); then
+  log_info "Fetching ${#MISSING_REVS[@]} missing revision(s) into $NIXPKGS_REPO..."
+  git -C "$NIXPKGS_REPO" fetch --filter=blob:none --no-tags origin "${MISSING_REVS[@]}"
+fi
+
+for rev in "$OLD_REV" "$NEW_REV"; do
+  if ! git -C "$NIXPKGS_REPO" cat-file -e "$rev^{commit}" 2>/dev/null; then
+    log_error "Revision was not available after fetch: $rev"
+    exit 1
+  fi
+done
+if ! git -C "$NIXPKGS_REPO" merge-base --is-ancestor "$OLD_REV" "$NEW_REV"; then
+  log_error "Old nixpkgs revision is not an ancestor of the new revision"
+  exit 1
+fi
+
+# Keep related commits together for review instead of sorting batches by SHA.
+git -C "$NIXPKGS_REPO" log --reverse --topo-order --format='%H%x09%s' "$OLD_REV..$NEW_REV" |
+  jq -R -s '
+    split("\n")
+    | map(
+        select(length > 0)
+        | split("\t") as $fields
+        | {sha: $fields[0], commit: {message: ($fields[1:] | join("\t"))}}
+      )
+  ' > "$COMMITS_FILE"
+
+RANGE_COMPLETE=true
+COMMIT_COUNT=$(jq 'length' "$COMMITS_FILE")
+log_info "Prepared $COMMIT_COUNT commits from $NIXPKGS_REPO"
 
 ALL_COMMITS_FILE="$FLAKE_UPDATE_DIR/all-nixpkgs-commits.txt"
 jq -r '.[] | "\(.sha)\t\(.commit.message | split("\n")[0])"' "$COMMITS_FILE" > "$ALL_COMMITS_FILE"
@@ -247,6 +247,7 @@ if $JSON_OUTPUT; then
     --arg new_rev "$NEW_REV" \
     --argjson matches "$(cat "$MATCHES_FILE")" \
     --arg packages_file "$PACKAGES_FILE" \
+    --arg repository "$NIXPKGS_REPO" \
     --arg total_commits "$COMMIT_COUNT" \
     --argjson range_complete "$RANGE_COMPLETE" \
     '{
@@ -255,7 +256,8 @@ if $JSON_OUTPUT; then
       total_commits_scanned: ($total_commits | tonumber),
       range_complete: $range_complete,
       relevant_changes: $matches,
-      packages_file: $packages_file
+      packages_file: $packages_file,
+      repository: $repository
     }'
 else
   echo ""
