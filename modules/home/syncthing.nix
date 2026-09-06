@@ -19,6 +19,23 @@ let
 
   # Remove current machine from device list
   otherDevices = lib.filterAttrs (name: _: name != osConfig.networking.hostName) devices;
+
+  # balrog is a pure backup target, so it never pushes local changes upstream
+  folderType = if osConfig.networking.hostName == "balrog" then "receiveonly" else "sendreceive";
+
+  syncedFolder = path: {
+    inherit path;
+    type = folderType;
+    devices = builtins.attrNames otherDevices;
+    ignorePerms = false;
+    # Watch for changes to sync quickly
+    fsWatcherEnabled = true;
+    # Keep deleted/overwritten files around so a bad merge is recoverable
+    versioning = {
+      type = "staggered";
+      params.maxAge = toString (90 * 24 * 60 * 60);
+    };
+  };
 in
 {
   services.syncthing = {
@@ -27,6 +44,9 @@ in
     settings = {
       devices = otherDevices;
       folders = {
+        documents = syncedFolder "${config.home.homeDirectory}/Documents";
+        pictures = syncedFolder "${config.home.homeDirectory}/Pictures";
+        memes = syncedFolder "${config.home.homeDirectory}/memes";
         pass = {
           path = "${config.home.homeDirectory}/password-store";
           devices = builtins.attrNames otherDevices;
@@ -48,4 +68,18 @@ in
       };
     };
   };
+
+  # Syncthing reads this from the folder root; it is never synced itself.
+  home.file."Documents/.stignore".text = ''
+    // Git repos. Syncthing has no notion of merging divergent history, and
+    // .git never converges byte-for-byte even when the working trees agree,
+    // so it would manufacture conflicts forever. These travel over git.
+    /P1-wiki
+    /Spivak
+    /paragore/paragore_vimwiki
+
+    // direnv caches are symlinks into this machine's nix store, which are
+    // dangling anywhere else.
+    .direnv
+  '';
 }
