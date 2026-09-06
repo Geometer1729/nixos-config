@@ -50,13 +50,14 @@ save() {
     fi
   done <<<"$clients"
 
+  jq -e 'length > 0' <<<"$entries" >/dev/null || return 0
   mkdir -p "$state_dir"
   printf '%s\n' "$entries" >"$manifest.tmp"
   mv "$manifest.tmp" "$manifest"
 }
 
 restore() {
-  local started_server=false session workspace command
+  local all_sessions_ready=false session workspace command
 
   [ -s "$manifest" ] || return 0
 
@@ -66,17 +67,48 @@ restore() {
   done
   hyprctl monitors -j >/dev/null 2>&1 || return 0
 
-  if ! tmux has-session 2>/dev/null; then
-    rm -f "$restore_marker"
-    tmux new-session -d -s 0
-    started_server=true
-  fi
+  all_sessions_ready=true
+  while IFS= read -r session; do
+    [[ "$session" =~ [[:space:]] ]] && continue
+    if ! tmux has-session -t "=$session" 2>/dev/null; then
+      all_sessions_ready=false
+      break
+    fi
+  done < <(jq -r '.[].session' "$manifest")
 
-  if $started_server; then
+  if ! $all_sessions_ready; then
+    if ! tmux has-session 2>/dev/null; then
+      rm -f "$restore_marker"
+      tmux new-session -d -s 0 2>/dev/null || tmux has-session -t '=0'
+    fi
+
     for _ in $(seq 1 200); do
       [ -e "$restore_marker" ] && break
       sleep 0.1
     done
+
+    if [ ! -e "$restore_marker" ]; then
+      echo "Timed out waiting for tmux-resurrect to finish" >&2
+      return 1
+    fi
+  fi
+
+  for _ in $(seq 1 200); do
+    all_sessions_ready=true
+    while IFS= read -r session; do
+      [[ "$session" =~ [[:space:]] ]] && continue
+      if ! tmux has-session -t "=$session" 2>/dev/null; then
+        all_sessions_ready=false
+        break
+      fi
+    done < <(jq -r '.[].session' "$manifest")
+    $all_sessions_ready && break
+    sleep 0.1
+  done
+
+  if ! $all_sessions_ready; then
+    echo "Timed out waiting for tmux-resurrect to restore terminal sessions" >&2
+    return 1
   fi
 
   while IFS=$'\t' read -r session workspace; do
