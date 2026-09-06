@@ -49,7 +49,7 @@ in
           plugin = resurrect;
           extraConfig = ''
             # Set before continuum starts its background restore.
-            set -g @resurrect-processes '"~opencode2->opencode2 --continue" "~lazygit->lazygit" "~nvim->nvim"'
+            set -g @resurrect-processes '"~opencode2->opencode2 --continue" "~lazygit->lazygit" "~nvim->env NVIM_AUTO_RESTORE=1 nvim"'
             set -g @resurrect-hook-post-restore-all '${pkgs.coreutils}/bin/touch "$XDG_RUNTIME_DIR/tmux-resurrected"'
           '';
         }
