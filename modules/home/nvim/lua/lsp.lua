@@ -19,9 +19,10 @@ vim.lsp.config.rust_analyzer = {
       cargo = {
         allFeatures = true,
       },
-      checkOnSave = {
+      check = {
         command = "clippy",
       },
+      checkOnSave = true,
       procMacro = {
         enable = true,
       },
