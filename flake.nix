@@ -57,7 +57,7 @@
     recover-vim.flake = false;
     zsh-nix-shell.url = "github:chisui/zsh-nix-shell";
     zsh-nix-shell.flake = false;
-    opencode2-npm.url = "file+https://registry.npmjs.org/@opencode-ai/cli-linux-x64/next";
+    opencode2-npm.url = "file+https://registry.npmjs.org/@opencode-ai/cli-linux-x64/beta";
     opencode2-npm.flake = false;
 
     # Work

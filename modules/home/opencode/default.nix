@@ -167,9 +167,9 @@ in
           };
         };
       };
-      model = "openai/gpt-5.6-sol";
+      model = "openai/gpt-6-astra";
       agents = {
-        build.model = "openai/gpt-5.6-sol#xhigh";
+        build.model = "openai/gpt-6-astra#xhigh";
         explore.model = "openai/gpt-5.6-terra#xhigh";
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review";
@@ -191,9 +191,30 @@ in
           options.servers = lspServers;
         }
       ];
-      provider.anthropic.options = {
-        apiKey = "x";
-        baseURL = "http://127.0.0.1:3456";
+      provider = {
+        anthropic.options = {
+          apiKey = "x";
+          baseURL = "http://127.0.0.1:3456";
+        };
+        openai.models."gpt-6-astra" = {
+          modelID = "gpt-6-astra";
+          name = "GPT-6 Astra";
+          capabilities = {
+            tools = true;
+            input = [ "text" "image" ];
+            output = [ "text" ];
+          };
+          limit = {
+            context = 1050000;
+            output = 128000;
+          };
+          variants = map
+            (reasoningEffort: {
+              id = reasoningEffort;
+              settings = { inherit reasoningEffort; };
+            })
+            [ "low" "medium" "high" "xhigh" "max" ];
+        };
       };
       permission = import ./permissions.nix { inherit config; };
     };
