@@ -184,10 +184,9 @@ in
           ];
         };
       };
-      plugin = [ config.services.meridian.opencode.pluginPath ];
       plugins = [
         {
-          package = "file://${config.xdg.configHome}/opencode/plugins/configured/lsp-v2.ts";
+          package = "file://${config.xdg.configHome}/opencode/plugins/lsp";
           options.servers = lspServers;
         }
       ];

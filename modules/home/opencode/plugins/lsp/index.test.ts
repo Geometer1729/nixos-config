@@ -6,7 +6,7 @@ import test from "node:test"
 
 import { Plugin } from "@opencode-ai/plugin"
 
-import lspPlugin from "./lsp-v2.ts"
+import lspPlugin from "./index.ts"
 
 interface LspTool {
   execute(input: { file: string; operation: string }, context: { sessionID: string }): Promise<unknown>
