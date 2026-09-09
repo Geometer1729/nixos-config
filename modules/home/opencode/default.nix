@@ -170,7 +170,7 @@ in
       model = "openai/gpt-6-astra";
       agents = {
         build.model = "openai/gpt-6-astra#xhigh";
-        explore.model = "openai/gpt-5.6-terra#xhigh";
+        explore.model = "openai/gpt-5.6-sol#xhigh";
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review";
           mode = "subagent";
