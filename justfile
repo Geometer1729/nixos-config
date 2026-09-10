@@ -65,12 +65,30 @@ secrets:
 test-remote-builds:
   test-remote-builds
 
+# Build once and retain the config devshell on both development machines
+deploy-devshell:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  # Keep the root outside .direnv and avoid result* names, which nh clean removes.
+  shell=$(nix build "{{flake}}#devShells.x86_64-linux.default" --out-link "{{flake}}/.deploy-devshell" --print-out-paths)
+  for host in am torag; do
+    nix copy --substitute-on-destination --to "ssh://bbrian@$host" "$shell"
+    ssh "bbrian@$host" nix-store --realise "$shell" --add-root /home/bbrian/conf/.deploy-devshell
+  done
+
 deploy:
+  #!/usr/bin/env bash
+  set -euo pipefail
   nixpkgs-fmt "{{flake}}"
   nix flake check "{{flake}}"
-  nh os switch "{{flake}}" -H am --target-host bbrian@am --elevation-strategy passwordless
-  nh os switch "{{flake}}" -H balrog --target-host bbrian@balrog --use-substitutes --elevation-strategy passwordless
-  nh os switch "{{flake}}" -H torag --target-host bbrian@torag --use-substitutes --elevation-strategy passwordless
+  just deploy-devshell
+  for host in am balrog torag; do
+    extra_args=()
+    if [[ "$host" != am ]]; then
+      extra_args+=(--use-substitutes)
+    fi
+    nh os switch "{{flake}}" -H "$host" --target-host "bbrian@$host" --elevation-strategy passwordless "${extra_args[@]}"
+  done
 
 
 gnome-check:

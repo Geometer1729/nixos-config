@@ -1,5 +1,6 @@
 #nix
 result*
+/.deploy-devshell
 #haskell
 dist
 dist-*
