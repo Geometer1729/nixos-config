@@ -1,6 +1,16 @@
 { config, machine, lib, pkgs, ... }:
 let
   resurrect = pkgs.tmuxPlugins.resurrect;
+  appScratchpadPattern = lib.concatMapStringsSep "|" (scratchpad: scratchpad.name)
+    (lib.filter (scratchpad: scratchpad.name != "sp") (import ./hyprland/scratchpads.nix));
+  filterScratchpads = pkgs.writeShellScript "tmux-filter-scratchpads" ''
+    # Work around tmux-resurrect restoring direct-exec app scratchpads as empty
+    # shells. Exclude them so scratchPad launches their apps fresh after reboot.
+    ${pkgs.gnused}/bin/sed -i -E \
+      -e '/^(pane|window)\t(${appScratchpadPattern})\t/d' \
+      -e '/^(state|grouped_session)\t/ { /\t(${appScratchpadPattern})(\t|$)/d; }' \
+      "$1"
+  '';
   restoreTerminals = pkgs.writeShellApplication {
     name = "restore-terminals";
     runtimeInputs = with pkgs;
@@ -56,6 +66,7 @@ in
               "~ghc.*--interactive->ghci" \
               "~calcurse->calcurse" \
               "~vit->vit"'
+            set -g @resurrect-hook-post-save-layout '${filterScratchpads}'
             set -g @resurrect-hook-post-restore-all '${pkgs.coreutils}/bin/touch "$XDG_RUNTIME_DIR/tmux-resurrected"'
           '';
         }

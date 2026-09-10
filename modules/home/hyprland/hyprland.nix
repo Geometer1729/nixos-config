@@ -1,13 +1,7 @@
 { pkgs, lib, config, ... }:
 let
   cfg = config.programs.hyprland-custom;
-  scratchpads = [
-    { name = "sp"; key = "n"; }
-    { name = "ghci"; key = "m"; }
-    { name = "vim"; key = "v"; }
-    { name = "calcurse"; key = "c"; }
-    { name = "vit"; key = "b"; }
-  ];
+  scratchpads = import ./scratchpads.nix;
   scratchpadPattern = lib.concatMapStringsSep "|" (scratchpad: scratchpad.name) scratchpads;
   scratchpadBindings = map
     (scratchpad: "$mod, ${scratchpad.key}, exec, scratchPad ${scratchpad.name}")
