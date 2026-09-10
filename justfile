@@ -68,9 +68,9 @@ test-remote-builds:
 deploy:
   nixpkgs-fmt "{{flake}}"
   nix flake check "{{flake}}"
-  nh os switch "{{flake}}" -H am --target-host bbrian@am
-  nh os switch "{{flake}}" -H balrog --target-host bbrian@balrog --use-substitutes
-  nh os switch "{{flake}}" -H torag --target-host bbrian@torag --use-substitutes
+  nh os switch "{{flake}}" -H am --target-host bbrian@am --elevation-strategy passwordless
+  nh os switch "{{flake}}" -H balrog --target-host bbrian@balrog --use-substitutes --elevation-strategy passwordless
+  nh os switch "{{flake}}" -H torag --target-host bbrian@torag --use-substitutes --elevation-strategy passwordless
 
 
 gnome-check:
