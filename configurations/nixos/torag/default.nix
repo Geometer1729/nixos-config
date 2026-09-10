@@ -2,9 +2,6 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
-  wakeupAm = pkgs.writeShellScriptBin "wakeup-am" ''
-    exec ${pkgs.openssh}/bin/ssh balrog wakeonlan 24:4b:fe:57:0b:55
-  '';
 in
 {
 
@@ -20,7 +17,10 @@ in
 
   home-manager.users.${config.mainUser} = {
     fast_lock = true;
-    home.packages = [ wakeupAm ];
+    scripts.wakeup-am = {
+      source = ./wakeup-am.sh;
+      runtimeInputs = [ pkgs.openssh ];
+    };
     #programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
 
     # Single monitor setup for laptop
