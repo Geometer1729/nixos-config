@@ -2,6 +2,9 @@
 
 This repository is a NixOS configuration repo built with flakes, `nixos-unified`, NixOS modules, and home-manager modules.
 
+The north star of everything here is declaritive configuration.
+Nearly all configuration of this machine should come from this repo.
+
 ## Placement Rules
 
 - Keep shared logic in `modules/`.
@@ -17,6 +20,10 @@ This repository is a NixOS configuration repo built with flakes, `nixos-unified`
 - Default verification for NixOS changes is `nixos-rebuild test`.
 
 ## Impermanence
+
+A big part of keeping this machine declaritive is impermanence.
+State is only allowed via a narrow whitelist to minimize the risk of
+persistent configuration not controled by this config.
 
 - Root is ephemeral.
 - Only explicitly persisted paths survive reboot.
