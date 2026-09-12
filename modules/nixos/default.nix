@@ -22,9 +22,9 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     users = {
-      ${config.mainUser}.imports = [ (self + /configurations/home/bbrian.nix) ];
-      yixin.imports = [ (self + /configurations/home/yixin.nix) ];
-      root.imports = [ (self + /configurations/home/root.nix) ];
+      ${config.mainUser}.imports = [ (self + /configurations/users/bbrian.nix) ];
+      yixin.imports = [ (self + /configurations/users/yixin.nix) ];
+      root.imports = [ (self + /configurations/users/root.nix) ];
     };
   };
 

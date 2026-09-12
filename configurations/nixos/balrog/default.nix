@@ -60,7 +60,7 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     users.bbrian = {
-      imports = [ (inputs.self + /configurations/home/bbrian.nix) ];
+      imports = [ (inputs.self + /configurations/users/bbrian.nix) ];
       home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
       programs.git.signing.signByDefault = lib.mkForce false;
     };

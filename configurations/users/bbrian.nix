@@ -1,3 +1,4 @@
+# Home Manager profile, composed by the NixOS configuration.
 { flake, lib, machine, ... }:
 let
   inherit (flake) inputs;
