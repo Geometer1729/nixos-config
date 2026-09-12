@@ -57,14 +57,15 @@ in
     fi
   '';
 
-  programs.ssh.matchBlocks =
+  programs.ssh.settings =
     let
       me = {
-        identityFile = "/home/bbrian/.ssh/id_ed25519";
+        IdentityFile = "/home/bbrian/.ssh/id_ed25519";
       };
     in
     {
-      vault = me // { hostname = "vault.geosurge.ai"; user = "doma"; };
-      geomancer = me // { hostname = "geomancer.geosurge.ai"; user = "operator"; };
+      firefly = me // { HostName = "35.197.253.212"; User = "root"; };
+      vault = me // { HostName = "vault.geosurge.ai"; User = "doma"; };
+      geomancer = me // { HostName = "geomancer.geosurge.ai"; User = "operator"; };
     };
 }

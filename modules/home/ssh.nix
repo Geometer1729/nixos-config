@@ -1,8 +1,8 @@
 { pkgs, ... }:
 let
   me = {
-    user = "bbrian";
-    identityFile = "/home/bbrian/.ssh/id_ed25519";
+    User = "bbrian";
+    IdentityFile = "/home/bbrian/.ssh/id_ed25519";
   };
 in
 {
@@ -12,26 +12,22 @@ in
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       # Set TERM for hosts that don't have ghostty terminfo
       "*" = {
-        setEnv = { TERM = "xterm-256color"; };
+        SetEnv = { TERM = "xterm-256color"; };
       };
       # Use Tailscale SSH for all .tail-scale.ts.net hosts
       "*.tail-scale.ts.net" = {
-        proxyCommand = "${pkgs.tailscale}/bin/tailscale nc %h %p";
-        inherit (me) user;
+        ProxyCommand = "${pkgs.tailscale}/bin/tailscale nc %h %p";
+        inherit (me) User;
       };
       tub = me // {
-        hostname = "jsh.gov";
+        HostName = "jsh.gov";
       };
       capitol = me // {
-        hostname = "192.168.1.227";
-        proxyJump = "tub";
-      };
-      firefly = me // {
-        hostname = "35.197.253.212";
-        user = "root";
+        HostName = "192.168.1.227";
+        ProxyJump = "tub";
       };
     };
   };
