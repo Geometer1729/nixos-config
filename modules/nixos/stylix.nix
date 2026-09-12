@@ -1,6 +1,6 @@
 # Programs I want this to work for
 # vit (not really, needs a stylix module)
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   # Disable GNOME stylix target for all HM users - not using GNOME
   home-manager.sharedModules = [
@@ -14,6 +14,8 @@
     image = ./grub/sand.jpg;
     targets.grub.useWallpaper = true;
     targets.gnome.enable = false;
+    # Use Stylix's supported Qtct/Kvantum theming even when Plasma is enabled.
+    targets.qt.platform = lib.mkForce "qtct";
     opacity.terminal = 0.5;
     polarity = "dark";
     base16Scheme =
