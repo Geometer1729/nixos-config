@@ -33,7 +33,6 @@ in
     opencode
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
-    brave
     firefox
     hyprland
     systemd-failure-notifications

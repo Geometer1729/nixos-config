@@ -1,3 +1,4 @@
+# Per-user browser configuration.
 { config, flake, pkgs, ... }:
 let
   inherit (flake) inputs;

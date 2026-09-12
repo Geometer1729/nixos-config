@@ -65,7 +65,6 @@
         ".config/ncspot"
         ".config/chromium"
         ".config/google-chrome"
-        ".config/BraveSoftware/Brave-Origin"
         ".hoogle"
         ".local/share/PrismLauncher"
         ".local/share/Steam"
