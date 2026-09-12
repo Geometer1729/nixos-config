@@ -10,6 +10,7 @@ in
   home.homeDirectory = "/home/bbrian";
 
   imports = (with self.homeModules; [
+    ./bbrian/git.nix
     inputs.nixvim.homeModules.nixvim
 
     ranger

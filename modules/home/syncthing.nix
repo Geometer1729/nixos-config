@@ -20,12 +20,9 @@ let
   # Remove current machine from device list
   otherDevices = lib.filterAttrs (name: _: name != osConfig.networking.hostName) devices;
 
-  # balrog is a pure backup target, so it never pushes local changes upstream
-  folderType = if osConfig.networking.hostName == "balrog" then "receiveonly" else "sendreceive";
-
   syncedFolder = path: {
     inherit path;
-    type = folderType;
+    type = lib.mkDefault "sendreceive";
     devices = builtins.attrNames otherDevices;
     ignorePerms = false;
     # Watch for changes to sync quickly

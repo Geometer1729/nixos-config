@@ -3,8 +3,6 @@
   programs.git = {
     enable = true;
     settings = {
-      user.email = "16kuhnb@gmail.com";
-      user.name = "Geometer1729";
       push.autoSetupRemote = true;
       push.default = "current";
       advice.forceDeleteBranch = false;
@@ -22,13 +20,6 @@
         cl = "clean -fdX";
         recommit = "commit -eF .git/COMMIT_EDITMSG";
       };
-    };
-    signing = {
-      signByDefault = true;
-      key = "0xA1314A37485AD93E"; # YubiKey signing key
-      # On a new machine with YubiKey plugged in, run:
-      #   gpg --recv-keys A1314A37485AD93E
-      #   gpg-connect-agent "learn --force" /bye
     };
   };
   programs.diff-so-fancy = {

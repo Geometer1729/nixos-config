@@ -45,6 +45,9 @@ in
     imports = [ ../../../modules/nixos/yubikey/home.nix ];
     home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
     programs.git.signing.signByDefault = lib.mkForce false;
+    # These folders are backup targets on this host.
+    services.syncthing.settings.folders = lib.genAttrs [ "documents" "pictures" "memes" ]
+      (_: { type = "receiveonly"; });
   };
 
   # Samsung SSD 860 EVO 250GB, serial S3YHNX0KB88921Z.

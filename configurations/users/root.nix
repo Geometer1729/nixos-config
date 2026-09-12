@@ -10,6 +10,8 @@ in
   home.homeDirectory = "/root";
 
   imports = with self.homeModules; [
+    # Root currently uses Brian's Git identity and signing policy too.
+    ./bbrian/git.nix
     inputs.nixvim.homeModules.nixvim
     git
     nvim
