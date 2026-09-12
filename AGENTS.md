@@ -37,3 +37,8 @@ persistent configuration not controled by this config.
 - `nix develop` enters the development shell.
 - `am` is the primary desktop.
 - `torag` is the secondary machine.
+
+## Update Reports
+
+Especially if I mention something used to work there's a good chance it was broken by a recent update. The ./update-reports directory may already contain helpful info.
+

@@ -190,8 +190,10 @@ just test-remote-builds
 ```
 
 `nh os test` must activate the update worktree even when no configuration fix
-was needed. Compare results with `failures.md`. Report only new failures or
-warnings, and update that baseline when a known failure appears or disappears.
+was needed. Load the `failures` skill to reconcile the build, evaluation,
+activation, and local check results with this worktree's `failures.md` before
+deciding whether checks pass.
+
 Use `nix store diff-closures` and targeted queries for closure analysis. Record
 raw store-path lists as artifacts when needed; do not read complete closure
 listings into the parent context.
@@ -213,6 +215,9 @@ Do not run `just deploy` again on torag. If Balrog or torag is unavailable, ask
 the user whether to wait or skip that host's deployment and checks. An explicit
 skip counts as completion but must be recorded in the report.
 
+Reconcile the remote results using the loaded `failures` skill before writing
+the report.
+
 ## 7. Write The Report
 
 Write the report to
@@ -228,6 +233,7 @@ format of existing reports and include:
 - every breaking marker and whether it applies here;
 - packages added to or removed from the closure;
 - deployment and local and remote health-check results;
+- the failure-baseline reconciliation summary;
 - remaining risks, suggested manual tests, and follow-up work.
 
 Run a general web search for reported breaking changes and targeted searches
