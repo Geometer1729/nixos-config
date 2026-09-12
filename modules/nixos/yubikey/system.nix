@@ -1,7 +1,4 @@
 { pkgs, config, ... }:
-let
-  smartPinentry = import ../../lib/smart-pinentry.nix { inherit pkgs; };
-in
 {
   # Enable smartcard daemon for YubiKey GPG support
   services = {
@@ -23,7 +20,7 @@ in
   # GPG support for YubiKey
   programs.gnupg.agent = {
     enable = true;
-    pinentryPackage = smartPinentry;
+    pinentryPackage = config.home-manager.users.${config.mainUser}.scripts.pinentry.package;
   };
 
   # Add udev rules for YubiKey

@@ -31,9 +31,10 @@ let
       pass show --clip "$password"
     '';
   };
-  smartPinentry = import ../../lib/smart-pinentry.nix { inherit pkgs; };
 in
 {
+  imports = [ ../../home/scripts ];
+
   home.packages = with pkgs; [
     # Password management
     gnupg
@@ -43,7 +44,7 @@ in
   # GPG agent configuration for YubiKey support
   services.gpg-agent = {
     enable = true;
-    pinentry.package = smartPinentry;
+    pinentry.package = config.scripts.pinentry.package;
 
     # Cache settings for YubiKey
     defaultCacheTtl = 600;
