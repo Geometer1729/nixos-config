@@ -11,6 +11,7 @@ in
   amd = true;
   drive = "/dev/nvme0n1";
   system.stateVersion = "25.05";
+  nix.settings.max-jobs = 12;
 
   # Cross-compilation support via QEMU binfmt emulation
   nix.settings.extra-platforms = [ "i686-linux" "aarch64-linux" ];
@@ -78,7 +79,7 @@ in
   imports = [
     ./hardware.nix
   ] ++ (with self.nixosModules; [
-    default
+    workstation
     builder
     foundryvtt
   ]);

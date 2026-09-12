@@ -10,11 +10,6 @@ in
       description = "Enable options that make sense for amd";
     };
 
-    mainUser = lib.mkOption {
-      type = lib.types.str;
-      default = "user";
-      description = "main user of the system";
-    };
   };
 
   config = {
@@ -26,12 +21,8 @@ in
       "zh_CN.UTF-8/UTF-8"
     ];
 
-    nixpkgs.config.allowUnfree = true;
-    hardware.enableRedistributableFirmware = true;
-
     security = {
       rtkit.enable = true;
-      sudo.wheelNeedsPassword = false;
       # No password for systemctl
       polkit.extraConfig = ''
         polkit.addRule(function(action, subject) {
@@ -50,12 +41,6 @@ in
 
     # services
     services = {
-      openssh = {
-        enable = true;
-        settings = {
-          PasswordAuthentication = false;
-        };
-      };
       pipewire = {
         enable = true;
         alsa.enable = true;
@@ -79,21 +64,9 @@ in
     };
     users.users.${config.mainUser} = {
       hashedPasswordFile = config.sops.secrets.hashedPassword.path;
-      isNormalUser = true;
       description = config.mainUser;
-      shell = pkgs.zsh; # TODO: can home-manager do this? (currently here as workaround for completion issues)
-      # https://github.com/nix-community/home-manager/issues/2562
-      extraGroups = [ "networkmanager" "wheel" ];
-    };
-    users.users.yixin = {
-      hashedPasswordFile = config.sops.secrets.yixinHashedPassword.path;
-      isNormalUser = true;
-      description = "Yixin";
-      shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" ];
     };
 
-    programs.zsh.enable = true;
-    # required for nix tab completion
   };
 }

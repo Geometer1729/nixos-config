@@ -1,9 +1,9 @@
-{ flake, config, pkgs, ... }:
+{ flake, config, lib, pkgs, ... }:
 {
   nix = {
     nixPath = [ "nixpkgs=${flake.inputs.nixpkgs}" ];
 
-    package = pkgs.nixVersions.latest;
+    package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
       substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
       trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
@@ -15,17 +15,15 @@
       warn-dirty = false;
       accept-flake-config = true;
       log-lines = 25;
-      max-jobs = 12;
       auto-optimise-store = false;
       experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
-      trusted-users = [ "root" config.mainUser "yixin" ];
+      trusted-users = [ "root" config.mainUser ];
       keep-outputs = true;
     };
     gc = {
       automatic = true;
-      options = "--delete-older-than 21d";
-      # cleans up old home-manager genrations
       dates = "weekly";
+      options = "--delete-older-than 21d";
     };
   };
 }

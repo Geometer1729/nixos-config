@@ -5,7 +5,6 @@ let
 in
 {
 
-  mainUser = "bbrian";
   nixos-unified.sshTarget = "${config.mainUser}@${config.networking.hostName}";
   system.stateVersion = "25.05";
 
@@ -13,19 +12,19 @@ in
   virtualisation.virtualbox.guest.enable = false;
   services.tcsd.enable = false;
 
-  nixpkgs.overlays = [
+  nixpkgs.overlays = lib.mkBefore [
     # PrismLauncher nightly overlay (new auth system)
     inputs.prismlauncher.overlays.default
-  ] ++ lib.attrValues self.overlays;
-  home-manager = {
-    backupFileExtension = "bkp";
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users = {
-      ${config.mainUser}.imports = [ (self + /configurations/users/bbrian.nix) ];
-      yixin.imports = [ (self + /configurations/users/yixin.nix) ];
-      root.imports = [ (self + /configurations/users/root.nix) ];
-    };
+  ];
+  home-manager.users = {
+    root.imports = [ (self + /configurations/users/root.nix) ];
+  };
+
+  nix.sshServe.keys = import ../../ssh-authorized-keys.nix;
+
+  services.tailscale = {
+    useRoutingFeatures = "server";
+    extraUpFlags = lib.mkAfter [ "--advertise-exit-node" ];
   };
 
   imports =
@@ -33,28 +32,17 @@ in
     [
       #inputs
       inputs.nur.modules.nixos.default
-      inputs.disko.nixosModules.default
-      inputs.impermanence.nixosModules.impermanence
-      inputs.stylix.nixosModules.stylix
-      inputs.sops-nix.nixosModules.sops
+      (self + /configurations/users/yixin)
       #self
-      boot
+      base
       brave
       bt
-      disko
       docker
       gh-noto
       hyprland
-      impermanence
       kde
       main
-      machine
-      nix
-      secrets
-      ssh
       steam
-      stylix
-      tailscale
       work
       wifi
       #xlibre #honestly I think nixpkgs is breaking this on purpose :(

@@ -1,7 +1,6 @@
-{ flake, lib, pkgs, ... }:
+{ flake, config, lib, pkgs, ... }:
 let
   inherit (flake) inputs;
-  keys = import ../../../ssh-authorized-keys.nix;
   scheduleReboot = pkgs.writeShellScriptBin "schedule-balrog-reboot" ''
     set -euo pipefail
     export TZ=America/New_York
@@ -30,18 +29,8 @@ let
 in
 {
   imports = [
-    inputs.disko.nixosModules.default
-    inputs.home-manager.nixosModules.home-manager
-    inputs.impermanence.nixosModules.impermanence
-    inputs.sops-nix.nixosModules.sops
-    inputs.stylix.nixosModules.stylix
-    inputs.self.nixosModules.boot
+    inputs.self.nixosModules.base
     inputs.self.nixosModules.cache
-    inputs.self.nixosModules.disko
-    inputs.self.nixosModules.impermanence
-    inputs.self.nixosModules.machine
-    inputs.self.nixosModules.secrets
-    inputs.self.nixosModules.stylix
     inputs.self.nixosModules.taskchampion
     inputs.self.nixosModules.useBuilders
     ./hardware.nix
@@ -49,84 +38,47 @@ in
 
   networking.hostName = "balrog";
   networking.useDHCP = true;
-  hardware.enableRedistributableFirmware = true;
   machine.hasGui = false;
 
-  nixpkgs.overlays = lib.attrValues inputs.self.overlays;
-  nixpkgs.config.allowUnfree = true;
-
-  home-manager = {
-    backupFileExtension = "bkp";
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.bbrian = {
-      imports = [ (inputs.self + /configurations/users/bbrian.nix) ];
-      home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
-      programs.git.signing.signByDefault = lib.mkForce false;
-    };
+  home-manager.users.${config.mainUser} = {
+    home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
+    programs.git.signing.signByDefault = lib.mkForce false;
   };
 
   # Samsung SSD 860 EVO 250GB, serial S3YHNX0KB88921Z.
   drive = "/dev/disk/by-id/wwn-0x5002538e40a0ae76";
 
   services.openssh = {
-    enable = true;
     openFirewall = true;
     settings = {
-      PasswordAuthentication = false;
       PermitRootLogin = "prohibit-password";
     };
   };
 
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "client";
-  };
-  networking.firewall.trustedInterfaces = [ "tailscale0" ];
-
   systemd.services.tailscale-reset-prefs = {
     description = "Apply declarative Tailscale preferences";
-    after = [ "tailscaled.service" ];
-    wants = [ "tailscaled.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
     script = ''
       # Initial tailnet authentication is intentionally interactive.
       if ! ${pkgs.tailscale}/bin/tailscale status >/dev/null 2>&1; then
         exit 0
       fi
-      ${pkgs.tailscale}/bin/tailscale up --reset \
-        --ssh \
-        --accept-routes \
-        --accept-dns \
-        --operator=bbrian
+      ${pkgs.tailscale}/bin/tailscale up --reset ${lib.escapeShellArgs config.services.tailscale.extraUpFlags}
     '';
   };
 
   users.users.root = {
     hashedPassword = "!";
-    openssh.authorizedKeys.keys = keys;
   };
-  users.users.bbrian = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
+  users.users.${config.mainUser} = {
     hashedPassword = "!";
     linger = true;
-    openssh.authorizedKeys.keys = keys;
-    shell = pkgs.zsh;
   };
   users.groups.github-runner = { };
   users.users.github-runner = {
     isSystemUser = true;
     group = "github-runner";
   };
-  security.sudo.wheelNeedsPassword = false;
-  programs.zsh.enable = true;
-
-  environment.systemPackages = with pkgs; [ git tailscale tmux vim wakeonlan ];
+  environment.systemPackages = with pkgs; [ git tmux vim wakeonlan ];
   environment.persistence."/persist/system".directories = [
     {
       directory = "/var/lib/github-runner/cache-warmer";
@@ -186,15 +138,16 @@ in
   };
 
   nix = {
+    package = pkgs.nixVersions.stable;
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
       max-jobs = 2;
-      trusted-users = [ "root" "bbrian" ];
-    };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 21d";
+      # Preserve this cache server's upstreams rather than substituting from itself.
+      substituters = lib.mkForce [ "ssh-ng://bbrian@am" "https://cache.nixos.org/" ];
+      trusted-substituters = lib.mkForce [ "ssh-ng://bbrian@am" ];
+      trusted-public-keys = lib.mkForce [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s="
+      ];
     };
   };
 

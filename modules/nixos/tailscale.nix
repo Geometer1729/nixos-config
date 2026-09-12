@@ -4,14 +4,13 @@
   # Enable Tailscale VPN
   services.tailscale = {
     enable = true;
-    useRoutingFeatures = "server";
+    useRoutingFeatures = lib.mkDefault "client";
     # These are only applied by the tailscale-reset thing.
     extraUpFlags = [
       "--ssh"
       "--accept-routes"
       "--accept-dns"
       "--operator=${config.mainUser}"
-      "--advertise-exit-node"
     ];
   };
 
@@ -19,7 +18,7 @@
   # This ensures manual `tailscale set` commands don't persist unexpectedly
   # Uses `tailscale up --reset` to enforce complete desired state
   systemd.services.tailscale-reset-prefs = {
-    description = "Reset Tailscale preferences to NixOS defaults";
+    description = lib.mkDefault "Reset Tailscale preferences to NixOS defaults";
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
     wantedBy = [ "multi-user.target" ];
@@ -27,7 +26,7 @@
       Type = "oneshot";
       RemainAfterExit = true;
     };
-    script = ''
+    script = lib.mkDefault ''
       # Wait for tailscaled to be ready
       sleep 2
       ${pkgs.tailscale}/bin/tailscale up --reset ${lib.concatStringsSep " " config.services.tailscale.extraUpFlags}
@@ -35,7 +34,7 @@
   };
 
   # Enable the required kernel module for NAT traversal
-  boot.kernel.sysctl = {
+  boot.kernel.sysctl = lib.mkIf (config.services.tailscale.useRoutingFeatures == "server") {
     "net.ipv4.ip_forward" = 1;
     "net.ipv6.conf.all.forwarding" = 1;
   };
@@ -43,7 +42,7 @@
   # Open firewall ports for Tailscale
   networking.firewall = {
     # Allow Tailscale traffic
-    allowedUDPPorts = [ 41641 ];
+    allowedUDPPorts = lib.mkIf (config.services.tailscale.useRoutingFeatures == "server") [ 41641 ];
     # Trust the Tailscale interface
     trustedInterfaces = [ "tailscale0" ];
   };

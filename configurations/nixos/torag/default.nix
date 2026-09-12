@@ -8,6 +8,7 @@ in
   networking.hostName = "torag";
   machine.hasGui = true;
   drive = "/dev/nvme0n1";
+  nix.settings.max-jobs = 12;
 
   # NixOS-level wifi configuration
   wifi = {
@@ -35,7 +36,7 @@ in
     with self.nixosModules;
     [
       ./hardware.nix
-      default
+      workstation
       useBuilders
     ];
 }
