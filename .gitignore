@@ -30,6 +30,7 @@ cabal.project.local~
 node_modules/
 
 secrets
+!/modules/nixos/secrets/
 todo
 
 .session.vim

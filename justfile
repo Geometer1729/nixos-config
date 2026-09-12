@@ -59,7 +59,7 @@ vim-health:
 secrets:
   mkdir -p ~/.config/sops/age
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
-  sops edit ./modules/nixos/secrets.yaml
+  sops edit ./modules/nixos/secrets/secrets.yaml
 
 # Test remote build infrastructure (am <-> torag)
 test-remote-builds:

@@ -1,4 +1,4 @@
-{ flake, config, pkgs, ... }:
+{ flake, config, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -18,10 +18,6 @@ in
 
   home-manager.users.${config.mainUser} = {
     fast_lock = true;
-    scripts.wakeup-am = {
-      source = ./wakeup-am.sh;
-      runtimeInputs = [ pkgs.openssh ];
-    };
     #programs.alacritty.settings.font.size = pkgs.lib.mkForce 9;
 
     # Single monitor setup for laptop

@@ -11,13 +11,7 @@ let
       -e '/^(state|grouped_session)\t/ { /\t(${appScratchpadPattern})(\t|$)/d; }' \
       "$1"
   '';
-  restoreTerminals = pkgs.writeShellApplication {
-    name = "restore-terminals";
-    runtimeInputs = with pkgs;
-      [ coreutils gnugrep jq procps tmux ]
-      ++ lib.optionals machine.hasGui [ ghostty hyprland ];
-    text = builtins.readFile ./restore-terminals.sh;
-  };
+  restoreTerminals = config.scripts.restore-terminals.package;
   saveTmux = pkgs.writeShellApplication {
     name = "save-tmux";
     runtimeInputs = with pkgs; [
@@ -47,6 +41,15 @@ let
   };
 in
 {
+  imports = [ ./scripts/module.nix ];
+
+  scripts.restore-terminals = {
+    enable = machine.hasGui;
+    extra = with pkgs;
+      [ gnugrep procps tmux ]
+      ++ lib.optionals machine.hasGui [ ghostty hyprland ];
+  };
+
   programs.tmux = {
     enable = true;
     secureSocket = false;
@@ -128,8 +131,6 @@ in
         bind u send-keys C-l \; run-shell "sleep .5s" \; clear-history
       '';
   };
-
-  home.packages = lib.optional machine.hasGui restoreTerminals;
 
   systemd.user.services.restore-terminals = lib.mkIf machine.hasGui {
     Unit = {
