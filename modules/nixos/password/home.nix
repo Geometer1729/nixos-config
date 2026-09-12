@@ -31,7 +31,7 @@ let
       pass show --clip "$password"
     '';
   };
-  smartPinentry = import ../lib/smart-pinentry.nix { inherit pkgs; };
+  smartPinentry = import ../../lib/smart-pinentry.nix { inherit pkgs; };
 in
 {
   home.packages = with pkgs; [

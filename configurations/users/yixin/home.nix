@@ -22,7 +22,6 @@ in
     development
     media
     communication
-    gaming
 
     # Core functionality
     nvim

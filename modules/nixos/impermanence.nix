@@ -11,12 +11,6 @@
       "/etc/nixos/"
       "/root/.ssh"
     ] ++ lib.optionals config.machine.hasGui [
-      {
-        directory = "/var/cache/tuigreet";
-        user = "greeter";
-        group = "greeter";
-        mode = "0755";
-      }
       "/var/lib/bluetooth"
       "/var/lib/hass"
     ];
@@ -30,7 +24,6 @@
     ];
     users.bbrian = {
       directories = [
-        ".gnupg"
         ".local/share/direnv"
         ".local/share/opencode"
         ".local/share/nvim/site"
@@ -55,7 +48,6 @@
         "Pictures"
         "conf"
         "memes"
-        "password-store"
       ] ++ lib.optionals config.machine.hasGui [
         ".config/Signal"
         ".config/discord"
@@ -66,8 +58,6 @@
         ".config/chromium"
         ".config/google-chrome"
         ".hoogle"
-        ".local/share/PrismLauncher"
-        ".local/share/Steam"
         ".local/share/Anki2"
         ".mozilla/firefox/default"
         ".mozilla/firefox/youtube"
@@ -85,10 +75,6 @@
         ".local/share/nvim/telescope_history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
-      ] ++ lib.optionals config.machine.hasGui [
-        ".cache/rofi3.druncache"
-        ".cache/rofi-2.sshcache"
-        ".cache/rofi-entry-history.txt"
       ];
     };
     users.yixin.directories = lib.mkIf config.machine.hasGui [ "." ];

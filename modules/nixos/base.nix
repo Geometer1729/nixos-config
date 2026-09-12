@@ -15,6 +15,7 @@ in
     impermanence
     machine
     nix
+    password
     secrets
     ssh
     stylix

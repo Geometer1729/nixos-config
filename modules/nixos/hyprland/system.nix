@@ -1,3 +1,4 @@
+# System session, greeter, and portal configuration.
 { config, lib, pkgs, ... }:
 let
   hyprlandSession = pkgs.writeShellScript "greetd-hyprland" ''

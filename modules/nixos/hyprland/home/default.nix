@@ -1,3 +1,4 @@
+# Per-user Hyprland session.
 {
   imports = [
     ./hyprland.nix

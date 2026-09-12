@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  smartPinentry = import ../lib/smart-pinentry.nix { inherit pkgs; };
+  smartPinentry = import ../../lib/smart-pinentry.nix { inherit pkgs; };
 in
 {
   # Enable smartcard daemon for YubiKey GPG support

@@ -2,7 +2,7 @@
 let
   resurrect = pkgs.tmuxPlugins.resurrect;
   appScratchpadPattern = lib.concatMapStringsSep "|" (scratchpad: scratchpad.name)
-    (lib.filter (scratchpad: scratchpad.name != "sp") (import ./hyprland/scratchpads.nix));
+    (lib.filter (scratchpad: scratchpad.name != "sp") (import ../nixos/hyprland/home/scratchpads.nix));
   filterScratchpads = pkgs.writeShellScript "tmux-filter-scratchpads" ''
     # Work around tmux-resurrect restoring direct-exec app scratchpads as empty
     # shells. Exclude them so scratchPad launches their apps fresh after reboot.

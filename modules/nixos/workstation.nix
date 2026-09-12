@@ -12,10 +12,6 @@ in
   virtualisation.virtualbox.guest.enable = false;
   services.tcsd.enable = false;
 
-  nixpkgs.overlays = lib.mkBefore [
-    # PrismLauncher nightly overlay (new auth system)
-    inputs.prismlauncher.overlays.default
-  ];
   home-manager.users = {
     root.imports = [ (self + /configurations/users/root.nix) ];
   };
@@ -38,11 +34,11 @@ in
       brave
       bt
       docker
+      gaming
       gh-noto
       hyprland
       kde
       main
-      steam
       work
       wifi
       #xlibre #honestly I think nixpkgs is breaking this on purpose :(

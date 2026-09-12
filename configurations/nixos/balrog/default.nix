@@ -41,6 +41,8 @@ in
   machine.hasGui = false;
 
   home-manager.users.${config.mainUser} = {
+    # Keep management tools without enabling workstation hardware authentication.
+    imports = [ ../../../modules/nixos/yubikey/home.nix ];
     home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
     programs.git.signing.signByDefault = lib.mkForce false;
   };

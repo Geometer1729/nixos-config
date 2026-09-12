@@ -17,7 +17,6 @@ in
     # System configuration
     system
     development
-    password
 
     # Core functionality
     git
@@ -27,19 +26,16 @@ in
     syncthing
     tasks
     tmux
-    yubikey
     zsh
     claude
     opencode
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
     firefox
-    hyprland
     systemd-failure-notifications
     desktop
     media
     communication
-    gaming
     work
     webapps
   ]);
