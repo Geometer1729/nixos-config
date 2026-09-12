@@ -93,7 +93,7 @@ in
         } //
         (# always sudo
           builtins.listToAttrs
-            (builtins.map
+            (map
               (name: { inherit name; value = "sudo ${name}"; })
               [
                 "dd"
@@ -108,7 +108,7 @@ in
         );
       shellGlobalAliases =
         builtins.listToAttrs (
-          builtins.map
+          map
             (n: {
               name = builtins.concatStringsSep "" (builtins.genList (_: ".") (n + 1));
               value = builtins.concatStringsSep "/" (builtins.genList (_: "..") n);

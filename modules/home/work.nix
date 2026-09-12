@@ -4,11 +4,11 @@ let
   linearisPackage = builtins.fromJSON (builtins.readFile "${linearisSource}/package.json");
   linearisLock = builtins.fromJSON (builtins.readFile "${linearisSource}/package-lock.json");
   linearisNpm = builtins.fromJSON (builtins.readFile flake.inputs.linearis-npm);
-  linearisRuntimePackage = builtins.removeAttrs linearisPackage [ "devDependencies" ];
+  linearisRuntimePackage = removeAttrs linearisPackage [ "devDependencies" ];
   linearisRuntimePackages = pkgs.lib.filterAttrs (_: dependency: !(dependency.dev or false)) linearisLock.packages;
   linearisRuntimeLock = linearisLock // {
     packages = linearisRuntimePackages // {
-      "" = builtins.removeAttrs linearisRuntimePackages."" [ "devDependencies" ];
+      "" = removeAttrs linearisRuntimePackages."" [ "devDependencies" ];
     };
   };
 

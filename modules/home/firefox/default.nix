@@ -1,6 +1,5 @@
-{ flake, pkgs, config, ... }:
+{ pkgs, config, ... }:
 let
-  inherit (flake) inputs;
   common = {
     search = {
       default = "ddg";
@@ -158,7 +157,7 @@ let
       let
         cssTemplate = builtins.readFile ./firefox-userchrome.css;
         # Replace placeholders with actual color values
-        replaceColor = placeholder: color: builtins.replaceStrings [ placeholder ] [ color ];
+        replaceColor = token: color: builtins.replaceStrings [ token ] [ color ];
       in
       replaceColor "@base00@" config.lib.stylix.colors.withHashtag.base00 (
         replaceColor "@base01@" config.lib.stylix.colors.withHashtag.base01 (
@@ -167,7 +166,7 @@ let
       );
     extensions = {
       force = true;
-      packages = with inputs.firefox-addons.packages."x86_64-linux"; [
+      packages = [
         # vimium, videospeed, ublock-origin, adblocker-ultimate, and firefox-color
         # are all managed via policies.ExtensionSettings for auto-enabling
       ];

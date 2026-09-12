@@ -41,6 +41,7 @@
       pre-commit.settings.hooks = {
         actionlint.enable = true;
         deadnix.enable = true;
+        nixf-diagnose.enable = true;
         nixpkgs-fmt.enable = true;
         statix.enable = true;
         shuck = {

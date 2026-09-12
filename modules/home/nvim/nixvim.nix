@@ -30,7 +30,7 @@
   extraLuaPackages = ps: with ps; [ plenary-nvim ];
   extraConfigLua =
     lib.strings.concatStrings
-      (builtins.map
+      (map
         (name: builtins.readFile "${./lua}/${name}")
         (builtins.attrNames (builtins.readDir ./lua))
       );

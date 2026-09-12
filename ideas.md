@@ -1,3 +1,0 @@
-- open code memory leak?
-- Firefox auto ulnload tabs?
--
