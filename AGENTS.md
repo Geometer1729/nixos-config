@@ -42,3 +42,6 @@ persistent configuration not controled by this config.
 
 Especially if I mention something used to work there's a good chance it was broken by a recent update. The ./update-reports directory may already contain helpful info.
 
+## Failures
+
+known failures (hopefully mostly warnings) are tracked in failures.md
