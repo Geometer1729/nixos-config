@@ -29,7 +29,6 @@ in
     scripts
     tmux
     zsh
-    webapps
   ];
 
   home.language = {

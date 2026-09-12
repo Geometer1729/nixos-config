@@ -38,7 +38,6 @@ in
     media
     communication
     work
-    webapps
   ]);
 
   # Disable speech-dispatcher - comes as a dependency but not needed
