@@ -181,7 +181,8 @@ index 2e60a95a1..2d651362b 100644
          # combined with automatic check if we share the filesystem using a dummy file
 @@ -730,27 +784,22 @@ def _late_init(self):
              for cmd in self._format_cmd_str(
-                     {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
+-                    {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
++                    {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1},
                      payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
 -                self.stdbout.write(cmd)
 +                self._write(cmd)
