@@ -51,6 +51,8 @@ in
   networking.hostName = "nixos-installer";
   nixpkgs.hostPlatform = "x86_64-linux";
 
+  boot.zfs.forceImportRoot = false;
+
   services.openssh = {
     enable = true;
     openFirewall = true;

@@ -6,15 +6,19 @@ baseline for unchecked hosts or commands.
 ## Evaluation warnings
 
 Verified 2026-09-12 with `nix flake check --no-build --no-write-lock-file`
-(nixpkgs 6713828). Evaluation passed on x86_64-linux; these three warnings remain:
+(nixpkgs 6713828). Evaluation passed on x86_64-linux; these two warnings remain:
 
-- **Installer ZFS default**: `boot.zfs.forceImportRoot` defaults to `true` — the installer enables ZFS support, but uses a tmpfs root; am, balrog, and torag use Btrfs with ZFS support disabled. Set `boot.zfs.forceImportRoot = false` explicitly in `configurations/nixos/installer/default.nix`.
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
 
 ## Flake checks
 
 - **Evaluation-only pass, 2026-09-12**: `nix flake check --no-build --no-write-lock-file` evaluated the x86_64-linux checks and NixOS configurations successfully. Full check builds were not run in this pass; their status is unverified.
+
+## installer
+
+### Build and activation
+- **ISO build passed, 2026-09-12**: `nix build .#nixosConfigurations.installer.config.system.build.isoImage --no-link --no-write-lock-file --print-out-paths` built the installation image with `boot.zfs.forceImportRoot = false`. The image has not been boot-tested.
 
 ## am (primary desktop)
 
