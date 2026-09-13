@@ -20,6 +20,7 @@ in
     development
 
     # Core functionality
+    anki
     git
     nvim
     scripts

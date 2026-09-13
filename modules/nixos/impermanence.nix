@@ -35,6 +35,7 @@
         ".local/state/nvim"
         ".local/state/opencode"
         ".local/state/syncthing"
+        ".local/share/Anki2"
         ".local/state/tmux"
         ".tmux/resurrect"
         ".claude-work"
@@ -58,7 +59,6 @@
         ".config/chromium"
         ".config/google-chrome"
         ".hoogle"
-        ".local/share/Anki2"
         ".cache/meridian"
       ];
       files = [
