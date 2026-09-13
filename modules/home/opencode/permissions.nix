@@ -282,8 +282,6 @@ let
     "direnv status*"
     "opencode --help*"
     "opencode --version*"
-    "opencode1 --help*"
-    "opencode1 --version*"
     "opencode2 --help*"
     "opencode2 --version*"
     "nix eval*"
@@ -356,10 +354,10 @@ let
     "ssh -o BatchMode=yes -o ConnectTimeout=15 torag 'hostname; uptime -p'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 torag 'hostname; readlink /run/current-system'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 am 'hostname; readlink /run/current-system'"
-    "ssh torag just health*"
-    "ssh torag just vim-health*"
-    "ssh torag just gnome-check*"
-    "ssh torag just test-remote-builds*"
+    "ssh torag just --justfile /home/bbrian/conf/justfile health"
+    "ssh torag just --justfile /home/bbrian/conf/justfile vim-health"
+    "ssh torag just --justfile /home/bbrian/conf/justfile gnome-check"
+    "ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds"
   ]
   ++ developmentBashCommands
   ++ wrappedDevelopmentBashCommands
