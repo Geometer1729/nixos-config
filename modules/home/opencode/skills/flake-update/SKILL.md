@@ -202,13 +202,15 @@ After local checks pass, run `just deploy` from the update worktree. This must
 deploy the update worktree directly to `am`, `balrog`, and `torag`. Confirm
 that Balrog activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
-Run these checks on torag:
+Run these checks on torag with an explicit justfile: SSH starts in the remote
+home directory, where `just` cannot discover `~/conf/justfile`. These recipes
+check the activated system; deployment still uses the local update worktree.
 
 ```bash
-ssh torag just health
-ssh torag just vim-health
-ssh torag just gnome-check
-ssh torag just test-remote-builds
+ssh torag just --justfile /home/bbrian/conf/justfile health
+ssh torag just --justfile /home/bbrian/conf/justfile vim-health
+ssh torag just --justfile /home/bbrian/conf/justfile gnome-check
+ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds
 ```
 
 Do not run `just deploy` again on torag. If Balrog or torag is unavailable, ask

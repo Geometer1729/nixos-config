@@ -1,4 +1,4 @@
-{ flake, config, ... }:
+{ flake, config, lib, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -9,6 +9,9 @@ in
   machine.hasGui = true;
   drive = "/dev/nvme0n1";
   nix.settings.max-jobs = 12;
+
+  # The 500 MiB ESP must fit default/rescue initrds and the next update.
+  boot.loader.grub.configurationLimit = lib.mkForce 3;
 
   # NixOS-level wifi configuration
   wifi = {

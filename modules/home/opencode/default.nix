@@ -3,20 +3,6 @@
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
-  unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.stdenv.hostPlatform.system;
-  };
-  opencode1 = pkgs.writeShellApplication {
-    name = "opencode1";
-    runtimeEnv = {
-      # opencode-vim's broad peer ranges otherwise resolve to a conflicting OpenTUI tree.
-      NPM_CONFIG_FORCE = "true";
-      PINENTRY_USER_DATA = if machine.hasGui then "gui" else "curses";
-    };
-    text = ''
-      exec ${unstable.opencode}/bin/opencode "$@"
-    '';
-  };
   opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
   opencode2 = pkgs.stdenv.mkDerivation {
     pname = "opencode2";
@@ -69,7 +55,6 @@ in
   home.packages = with pkgs; [
     config.services.meridian.package
   ] ++ lib.optional machine.hasGui libnotify ++ [
-    opencode
     opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
@@ -77,7 +62,7 @@ in
 
   programs.opencode = {
     enable = true;
-    package = opencode1;
+    package = opencode;
   };
   stylix.targets.opencode.enable = true;
 

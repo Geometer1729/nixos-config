@@ -1,8 +1,8 @@
 _:
 final: prev:
 {
-  # Keep taskwarrior2 consumers on taskwarrior3 for this task setup. Remove
-  # this overlay once vit/tasklib/nixpkgs support taskwarrior3 natively.
+  # Route taskwarrior2 package arguments to taskwarrior3 for this task setup.
+  # Remove these remaps once nixpkgs wires VIT/tasklib to taskwarrior3.
   taskwarrior2 = final.taskwarrior3;
 
   # tasklib still expects taskwarrior2 in nixpkgs.
@@ -14,7 +14,7 @@ final: prev:
     };
   };
 
-  # vit also still assumes taskwarrior2, and upstream search remains
+  # nixpkgs' VIT package still takes taskwarrior2, and upstream search remains
   # case-sensitive. Remove the patch once upstream or nixpkgs grows an
   # equivalent case-insensitive search behavior.
   vit = (prev.vit.override {
