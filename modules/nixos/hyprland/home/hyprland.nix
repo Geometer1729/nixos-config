@@ -192,8 +192,6 @@ in
             (map (i: "${toString i}, monitor:${primaryMonitorName}") (lib.range 1 22));
         # Window rules - using new 0.53 syntax with match:
         windowrule = [
-          # firefox handles this poorly it's not really worth it
-          #"suppressevent fullscreen, match:class firefox"
           # Force prismlauncher to tile to prevent floating positioning issues with swallow
           "tile on, match:class prismlauncher"
           # Maximize messaging apps on workspace 21 (xmonad Full layout style)

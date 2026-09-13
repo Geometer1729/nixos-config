@@ -32,7 +32,6 @@ in
     opencode
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
-    firefox
     systemd-failure-notifications
     desktop
     media

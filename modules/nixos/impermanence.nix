@@ -59,11 +59,6 @@
         ".config/google-chrome"
         ".hoogle"
         ".local/share/Anki2"
-        ".mozilla/firefox/default"
-        ".mozilla/firefox/youtube"
-        ".mozilla/firefox/work"
-        ".mozilla/firefox/ttrpg"
-        ".cache/mozilla/firefox"
         ".cache/meridian"
       ];
       files = [

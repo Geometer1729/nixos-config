@@ -27,8 +27,6 @@
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     stylix.inputs.flake-parts.follows = "flake-parts";
     stylix.inputs.nur.follows = "nur";
-    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nur.url = "github:nix-community/NUR";

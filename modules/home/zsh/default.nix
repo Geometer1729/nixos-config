@@ -59,7 +59,6 @@ in
       localVariables =
         {
           EDITOR = "vim";
-          BROWSER = "firefox";
           READER = "zathura";
           REPORTTIME = 1;
         };

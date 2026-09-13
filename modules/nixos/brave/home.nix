@@ -243,6 +243,7 @@ in
   };
 
   home.packages = [ pkgs.browserpass restoreSession workspaceWindow xdgOpen placeWorkspaceWindows ];
+  home.sessionVariables.BROWSER = "${xdgOpen}/bin/brave-xdg-open";
 
   # Home Manager assumes every programs.brave package uses Brave-Browser.
   # Origin has a distinct data directory, so install its extensions explicitly.
