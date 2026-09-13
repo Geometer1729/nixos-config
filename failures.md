@@ -5,15 +5,15 @@ baseline for unchecked hosts or commands.
 
 ## Evaluation warnings
 
-Verified 2026-09-13 with full `nix flake check /home/bbrian/Code/conf-update-09-12-26`
-(nixpkgs 21a67dc). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
+Verified 2026-09-13 with full `nix flake check /home/bbrian/conf`
+(merged master 1957a7c, nixpkgs 21a67dc). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
 
 ## Flake checks
 
-- **Passed, 2026-09-13**: full `nix flake check /home/bbrian/Code/conf-update-09-12-26` passed after Torag's boot-retention change and the final remote-check skill/permission correction, including pre-commit, Neovim configuration, OpenCode plugin type/load checks, and am/balrog/torag system builds. Installer configuration evaluated; its ISO was not rebuilt in this update. Other advertised systems were omitted as noted above.
+- **Passed, 2026-09-13**: full `nix flake check /home/bbrian/conf` passed after merging update 57637eb into master as 1957a7c, including pre-commit/Nix lint checks, Neovim configuration, OpenCode plugin type/load checks, and am/balrog/torag system builds. Installer configuration evaluated; its ISO was not rebuilt in this update. Other advertised systems were omitted as noted above. Remote activation evidence below covers update commit 57637eb; post-merge activation and health verification cover am.
 
 ## installer
 
@@ -23,14 +23,14 @@ Verified 2026-09-13 with full `nix flake check /home/bbrian/Code/conf-update-09-
 ## am (primary desktop)
 
 ### Build and activation
-- **Passed, 2026-09-13**: final `nh os build /home/bbrian/Code/conf-update-09-12-26`, `nh os test /home/bbrian/Code/conf-update-09-12-26 --no-nom --show-activation-logs`, and `just deploy` built, activated, and selected system `1j5zkvn…` (nixpkgs 21a67dc, V2-only, corrected remote-check skill/permissions). Running kernel remains 6.18.49 pending desktop reboot.
+- **Passed, 2026-09-13**: `nh os build /home/bbrian/conf`, `nh os test /home/bbrian/conf --no-nom --show-activation-logs`, and `nh os switch /home/bbrian/conf --no-nom --show-activation-logs` built, activated, and selected merged-master system `snqgzrd…` (master 1957a7c, nixpkgs 21a67dc). Current/default systems match the verified build. Running kernel remains 6.18.49 pending desktop reboot.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher compiler warnings, newly recorded**: local builds warn that Java source/target 7 and Applet/AppletStub APIs are obsolete. The build succeeds; these belong to upstream legacy-Minecraft launcher support. Track upstream's compatibility/compiler migration rather than removing that support locally.
 - **System-path collisions, newly recorded**: `pkgs.buildEnv` ignores duplicate PostgreSQL 18.6 `bin/postgres` and Xwayland/Xorg `protocol.txt` / `Xserver.1.gz`. The PostgreSQL service explicitly uses `postgresql-and-plugins` and is active; the global CLI selects the base package. X-server collisions concern documentation. Review duplicate package exposure if these warnings are to be eliminated.
 - **Info-index warning, newly recorded**: `install-info` reports no directory entry in `gawknotes.info`. Build succeeds; the supplemental document lacks index metadata. Follow upstream packaging if an index entry is needed.
 
 ### `just health`
-Checked 2026-09-13 on system `1j5zkvn…` (nixpkgs 21a67dc): no failed system units; Syncthing reports two peers connected. The journal slice matches the duplicate D-Bus/menu warnings below. Earlier intermittent boot/hardware findings are retained because their original conditions were not re-exercised.
+Checked 2026-09-13 at 08:05 EDT on merged-master system `snqgzrd…` (nixpkgs 21a67dc): no failed system units; Syncthing reports two peers connected; root remains 96% used with about 36 GiB available. The journal slice matches the duplicate D-Bus/menu warnings below. Earlier intermittent boot/hardware findings are retained because their original conditions were not re-exercised.
 
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
 - **kvm_amd**: `SVM not supported by CPU 23` — hardware doesn't support nested virtualization
@@ -43,7 +43,7 @@ Checked 2026-09-13 on system `1j5zkvn…` (nixpkgs 21a67dc): no failed system un
 - **Filesystem capacity, newly recorded 2026-09-12**: `/` is 96% used, with about 36 GiB available. No space-related check failure occurred; review capacity before substantially larger builds. No cleanup was performed by the update.
 
 ### `just vim-health`
-Rechecked 2026-09-13 on system `1j5zkvn…` (nixpkgs 21a67dc); the following existing warnings remain.
+Rechecked 2026-09-13 on merged-master system `snqgzrd…` (nixpkgs 21a67dc); the following existing warnings remain.
 
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
 - **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4
@@ -51,7 +51,7 @@ Rechecked 2026-09-13 on system `1j5zkvn…` (nixpkgs 21a67dc); the following exi
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
 ### `just gnome-check`
-- Clean on 2026-09-13: `just gnome-check` found no GNOME packages on system `1j5zkvn…` (nixpkgs 21a67dc).
+- Clean on 2026-09-13: `just gnome-check` found no GNOME packages on merged-master system `snqgzrd…` (nixpkgs 21a67dc).
 
 ## balrog
 
@@ -86,7 +86,7 @@ Rechecked 2026-09-13 with `ssh torag just --justfile /home/bbrian/conf/justfile 
 - Clean on 2026-09-13: `ssh torag just --justfile /home/bbrian/conf/justfile gnome-check` found no GNOME packages on system `qh9nqrp…` (nixpkgs 21a67dc).
 
 ## Remote builds (`just test-remote-builds`)
-- Passed from am on 2026-09-13, system `1j5zkvn…` (nixpkgs 21a67dc): both client SSH connections, fresh balrog/torag builds on am, six HTTP-cache reachability checks, two locally built signed paths, and four signature-verified cache transfers passed (16 assertions). The final Torag invocation, `ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds` on system `qh9nqrp…`, also passed all 16 assertions.
+- Passed from am on 2026-09-13, merged-master system `snqgzrd…` (nixpkgs 21a67dc): both client SSH connections, fresh balrog/torag builds on am, six HTTP-cache reachability checks, two locally built signed paths, and four signature-verified cache transfers passed (16 assertions). The pre-merge Torag invocation, `ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds` on system `qh9nqrp…`, also passed all 16 assertions.
 
 ## Update tooling
 
