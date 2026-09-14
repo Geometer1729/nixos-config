@@ -3,6 +3,11 @@
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
+  notify = pkgs.writeShellApplication {
+    name = "opencode-notify";
+    runtimeInputs = with pkgs; [ coreutils jq libnotify mako util-linux ];
+    text = builtins.readFile ./notify.sh;
+  };
   opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
   opencode2 = pkgs.stdenv.mkDerivation {
     pname = "opencode2";
@@ -54,7 +59,7 @@ in
 
   home.packages = with pkgs; [
     config.services.meridian.package
-  ] ++ lib.optional machine.hasGui libnotify ++ [
+  ] ++ lib.optionals machine.hasGui [ libnotify notify ] ++ [
     opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
@@ -65,6 +70,16 @@ in
     package = opencode;
   };
   stylix.targets.opencode.enable = true;
+
+  services.mako.settings = lib.mkIf machine.hasGui {
+    "app-name=OpenCode category=opencode.waiting" = {
+      width = 500;
+      height = 900;
+      default-timeout = 0;
+      ignore-timeout = true;
+      history = false;
+    };
+  };
 
   services.meridian = {
     enable = true;
@@ -79,6 +94,8 @@ in
         "$schema" = "https://opencode.ai/v2/cli.json";
         animations = true;
         attention.enabled = true;
+        attention.notifications = !machine.hasGui;
+        plugins = lib.optional machine.hasGui "file://${config.xdg.configHome}/opencode/plugins/notifications";
         diffs.wrap = "word";
         session = {
           markdown = "rendered";
@@ -174,7 +191,10 @@ in
           package = "file://${config.xdg.configHome}/opencode/plugins/lsp";
           options.servers = lspServers;
         }
-      ];
+      ] ++ lib.optional machine.hasGui {
+        package = "file://${config.xdg.configHome}/opencode/plugins/notifications";
+        options.command = "${notify}/bin/opencode-notify";
+      };
       provider = {
         anthropic.options = {
           apiKey = "x";

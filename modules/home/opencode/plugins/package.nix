@@ -65,6 +65,13 @@ in
           mkdir -p "$out/$(dirname '${relative}')"
           cp '${relative}' "$out/${relative}"
         '') sourceFiles}
+      # Keep dependency lookup valid through Home Manager's directory symlinks,
+      # including when OpenCode hot-loads a plugin using its config-directory path.
+      for plugin in "$out"/*/; do
+        if [ "$(basename "$plugin")" != node_modules ]; then
+          ln -s ../node_modules "$plugin/node_modules"
+        fi
+      done
       runHook postInstall
     '';
   });

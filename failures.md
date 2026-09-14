@@ -11,6 +11,10 @@ Verified 2026-09-13 with full `nix flake check /home/bbrian/conf`
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
 
+Notification-change verification on 2026-09-13: targeted OpenCode check builds and
+`sudo -n nixos-rebuild test/switch --flake /home/bbrian/conf#am` emitted no additional
+evaluation warnings. This was not a full flake-check refresh.
+
 ## Flake checks
 
 - **Passed, 2026-09-13**: full `nix flake check /home/bbrian/conf` passed after merging update 57637eb into master as 1957a7c, including pre-commit/Nix lint checks, Neovim configuration, OpenCode plugin type/load checks, and am/balrog/torag system builds. Installer configuration evaluated; its ISO was not rebuilt in this update. Other advertised systems were omitted as noted above. Remote activation evidence below covers update commit 57637eb; post-merge activation and health verification cover am.
@@ -18,11 +22,13 @@ Verified 2026-09-13 with full `nix flake check /home/bbrian/conf`
 ## installer
 
 ### Build and activation
+- **Attached-session notification follow-up passed, 2026-09-14**: targeted OpenCode plugin checks passed with 33 tests; `nixos-rebuild test` and `switch` activated/selected am system `wacp778…`. A disposable real TUI verified attachment filtering for ready responses and questions, removal on last-client exit, dismissal surviving unrelated events and a 65-second wait, and renewed notification for a new request. Socket tests covered multiple clients, full tab-list replacement, crashed clients, and reconnection. Pre-existing TUIs must load the new companion (reopen them once) before their tabs count as attached. Other hosts were not deployed.
 - **Pre-update ISO build passed, 2026-09-12 (nixpkgs 6713828)**: `nix build .#nixosConfigurations.installer.config.system.build.isoImage --no-link --no-write-lock-file --print-out-paths` built the installation image with `boot.zfs.forceImportRoot = false`. The image has not been boot-tested. With updated nixpkgs 21a67dc, only configuration evaluation was checked; the updated ISO build remains unverified.
 
 ## am (primary desktop)
 
 ### Build and activation
+- **Notification changes passed, 2026-09-13**: `sudo -n nixos-rebuild test --flake /home/bbrian/conf#am` and the corresponding `switch` activated/selected system `z2jsr9b…`. Targeted `opencode-plugins` and `opencode-plugin-load` checks passed, including 28 tests. Live Mako replacement, completion/viewed state, questions, child approvals, and Ghostty/tmux focus behavior were exercised using disposable sessions. The plugin recovered after `opencode2 service restart`; location reload reconstructed a deliberately stale notification, and a session event restored a missing notification with the same waiting list. Other hosts were not deployed in this verification.
 - **Passed, 2026-09-13**: `nh os build /home/bbrian/conf`, `nh os test /home/bbrian/conf --no-nom --show-activation-logs`, and `nh os switch /home/bbrian/conf --no-nom --show-activation-logs` built, activated, and selected merged-master system `snqgzrd…` (master 1957a7c, nixpkgs 21a67dc). Current/default systems match the verified build. Running kernel remains 6.18.49 pending desktop reboot.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher compiler warnings, newly recorded**: local builds warn that Java source/target 7 and Applet/AppletStub APIs are obsolete. The build succeeds; these belong to upstream legacy-Minecraft launcher support. Track upstream's compatibility/compiler migration rather than removing that support locally.
@@ -95,3 +101,15 @@ Newly recorded 2026-09-12 during the update; recovered coverage and raw evidence
 - **Suppressed package-extraction errors**: `nixpkgs-changelog` silently continued after the Linearis version assertion prevented Home Manager evaluation (231 rather than 408 package names). Fix individual evaluation error reporting and inventory coverage; the current extractor omits some profiles and option-injected dependencies. The update repaired the pin and reviewed the complete commit range independently.
 - **Regex package false positives**: `[26.05]` was passed unescaped to `grep`, producing an unrelated `jwx` match. Use literal package matching; this false positive was rejected by configuration/source review.
 - **Missing non-Git inputs**: `flake-changelog` compares only `.rev`, omitting changed `linearis-npm` registry metadata. Compare locked content for file inputs and report their non-Git identity. The final artifact has an explicitly labeled manual entry and complete direct-input accounting.
+
+## OpenCode runtime
+
+Newly recorded while verifying notifications on am, 2026-09-13, using
+OpenCode `0.0.0-beta-19271`. These are runtime/CLI observations, separate from the
+passing notification tests and Nix activation above.
+
+- **Truncated large API output**: `opencode2 api get '/api/session?limit=500' | jq ...` failed with `Unfinished string at EOF` around byte 159744. The native client returned valid complete pages (517 sessions across two pages). Investigate the CLI's stdout/output handling; the notification plugin uses the native client.
+- **Directory watcher unavailable**: the server logs `watcher backend not supported`, `platform=linux`, for the OpenCode configuration and skill directories; individual file watchers report `backend=node`. Existing locations retained old plugin registrations after activation while newly loaded locations saw the new configuration. Investigate directory watching and hot-discovery in the packaged runtime.
+- **OpenAI override normalization**: loading a location logs `configuration normalization diagnostic`, `path=$.provider.openai`, `kind=invalid`, `skipped malformed recognized value`. The exact rejected field is not identified by this warning. Inspect normalization/resolved provider configuration before relying on these custom overrides.
+- **Slack resource-template discovery**: location activation logs `failed to list MCP resource templates`, `MCP error -32601: Method not found: resources/templates/list`. Template discovery is unavailable on that integration; investigate capability-aware probing upstream.
+- **TUI tab API verification limitation, 2026-09-14**: in a disposable TUI on `0.0.0-beta-19271`, `context.ui.tabs.open(second)` navigated to the second session and left only that tab in `tabs.list()`. A live two-tab open/close notification test could not establish its intended background-tab fixture; no notification-code failure was demonstrated by that test. This differs from the current V2 CLI plugin guide's background-opening semantics. Single-TUI attachment/detachment and multi-client socket inventories passed as recorded above.
