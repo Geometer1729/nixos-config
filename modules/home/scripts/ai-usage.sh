@@ -7,7 +7,7 @@ if [[ -r "$CACHE" ]] && jq -ce --argjson now "$(date +%s)" '
   if (.updatedAt | type) != "number" or (.text | type) != "string" or (.tooltip | type) != "string" then error("invalid snapshot")
   elif $now * 1000 - .updatedAt > 660000 then
     .text = (.text | sub(" \\?$"; "") + " ?") |
-    .tooltip = "OpenCode usage monitor is stale. Start OpenCode to resume updates.\n\n" + .tooltip |
+    .tooltip = "Usage monitor has not updated for over 11 minutes. The values below are stale.\n\n" + .tooltip |
     .class += ["incomplete"]
   else . end | del(.updatedAt)
 ' "$CACHE" 2>/dev/null; then

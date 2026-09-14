@@ -78,8 +78,10 @@ export default Plugin.define({
     const runtime = process.env.XDG_RUNTIME_DIR
     if (!runtime || !process.env.DBUS_SESSION_BUS_ADDRESS) return
     const timezone = typeof context.options.timezone === "string" ? context.options.timezone : "America/New_York"
-    // Global plugins load once per location; share one poller across them, as
-    // with the notification plugin. A reload drains the previous generation.
+    // Ownership spans code generations: a short-lived location can load a new
+    // copy while older projects remain open. Keep their contexts, and let their
+    // cleanup release the current poller rather than the retired generation.
+    const contexts = host.__confAIUsage?.contexts ?? new Set<Plugin.Context>()
     let previous = Promise.resolve()
     if (host.__confAIUsage && (host.__confAIUsage.generation !== generation || host.__confAIUsage.controller.signal.aborted)) {
       host.__confAIUsage.controller.abort()
@@ -87,18 +89,19 @@ export default Plugin.define({
       delete host.__confAIUsage
     }
     const shared = host.__confAIUsage ??= (() => {
-      const state: Shared = { generation, contexts: new Set<Plugin.Context>(), controller: new AbortController(), task: Promise.resolve() }
+      const state: Shared = { generation, contexts, controller: new AbortController(), task: Promise.resolve() }
       state.task = previous.then(() => run(state, join(runtime, "opencode-ai-usage.json"), timezone))
         .catch(() => console.error("AI usage monitor stopped; Waybar will mark its last reading stale"))
       return state
     })()
     shared.contexts.add(context)
     return async () => {
-      shared.contexts.delete(context)
-      if (shared.contexts.size !== 0) return
-      shared.controller.abort()
-      await shared.task
-      if (host.__confAIUsage === shared) delete host.__confAIUsage
+      if (!shared.contexts.delete(context) || shared.contexts.size !== 0) return
+      const current = host.__confAIUsage
+      if (current?.contexts !== shared.contexts) return
+      current.controller.abort()
+      await current.task
+      if (host.__confAIUsage === current) delete host.__confAIUsage
     }
   },
 })
