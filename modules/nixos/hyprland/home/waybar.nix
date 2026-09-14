@@ -20,6 +20,7 @@ let
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ "clock" ];
       modules-right = [
+        "custom/ai-usage"
         "custom/inbox"
         "pulseaudio#source"
         "pulseaudio"
@@ -148,6 +149,14 @@ let
         interval = 1;
       };
 
+      "custom/ai-usage" = {
+        exec = lib.getExe config.scripts.ai-usage.package;
+        return-type = "json";
+        interval = 30;
+        format = " {} ";
+        tooltip = true;
+      };
+
       # Custom inbox counter
       "custom/inbox" =
         let
@@ -211,6 +220,21 @@ in
       window#waybar #workspaces button.active {
         background-color: @base0D;
         color: @base00;
+      }
+
+      #custom-ai-usage.warning {
+        background-color: @base0A;
+        color: @base00;
+      }
+
+      #custom-ai-usage.critical {
+        background-color: @base08;
+        color: @base00;
+        font-weight: bold;
+      }
+
+      #custom-ai-usage.incomplete {
+        font-style: italic;
       }
 
       /* inbox theme */

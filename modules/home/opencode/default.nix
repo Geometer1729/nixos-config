@@ -3,6 +3,7 @@
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
+  plugins = (import ./plugins/package.nix { inherit lib pkgs; }).package;
   notify = pkgs.writeShellApplication {
     name = "opencode-notify";
     runtimeInputs = with pkgs; [ coreutils jq libnotify mako util-linux ];
@@ -84,6 +85,15 @@ in
   services.meridian = {
     enable = true;
     environment.CLAUDE_CONFIG_DIR = "${config.home.homeDirectory}/.claude-work";
+    # The quota API requires explicit paths (it ignores CLAUDE_CONFIG_DIR).
+    # Keep the existing default profile ID so SDK sessions retain their owner.
+    environment.MERIDIAN_DEFAULT_PROFILE = "default";
+    # Meridian's module emits Environment= literally; systemd must preserve the
+    # JSON quotes rather than interpreting them as unit-file quoting.
+    environment.MERIDIAN_PROFILES = lib.escapeShellArg (builtins.toJSON [
+      { id = "default"; claudeConfigDir = "${config.home.homeDirectory}/.claude-work"; }
+      { id = "personal"; claudeConfigDir = "${config.home.homeDirectory}/.claude-personal"; }
+    ]);
   };
 
   xdg.configFile = {
@@ -95,7 +105,8 @@ in
         animations = true;
         attention.enabled = true;
         attention.notifications = !machine.hasGui;
-        plugins = lib.optional machine.hasGui "file://${config.xdg.configHome}/opencode/plugins/notifications";
+        plugins = [ "file://${plugins}/vim" ]
+          ++ lib.optional machine.hasGui "file://${plugins}/notifications";
         diffs.wrap = "word";
         session = {
           markdown = "rendered";
@@ -188,13 +199,20 @@ in
       };
       plugins = [
         {
-          package = "file://${config.xdg.configHome}/opencode/plugins/lsp";
+          # The loader caches canonical paths. Mutable Home Manager symlinks can
+          # silently lose registrations after a generation change and reload.
+          package = "file://${plugins}/lsp";
           options.servers = lspServers;
         }
-      ] ++ lib.optional machine.hasGui {
-        package = "file://${config.xdg.configHome}/opencode/plugins/notifications";
+        { package = "file://${plugins}/meridian"; }
+      ] ++ lib.optionals machine.hasGui [{
+        package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";
-      };
+      }
+        {
+          package = "file://${plugins}/usage";
+          options.timezone = "America/New_York";
+        }];
       provider = {
         anthropic.options = {
           apiKey = "x";
@@ -222,6 +240,5 @@ in
       };
       permission = import ./permissions.nix { inherit config; };
     };
-  }
-  // import ./plugins { inherit lib pkgs; };
+  };
 }

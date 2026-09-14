@@ -1,8 +1,9 @@
 import assert from "node:assert/strict"
 import test from "node:test"
+import { setTimeout as sleep } from "node:timers/promises"
 import type { OpenCodeClient } from "@opencode-ai/client"
 
-import { notification as render, relevantEvent, snapshot } from "./snapshot.ts"
+import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
 
 const empty = { summary: "", body: "", key: "[]" }
@@ -112,6 +113,56 @@ test("attention lifecycle events invalidate snapshots without refreshing for str
   ]) assert.equal(relevantEvent(type), true, type)
   for (const type of ["session.text.delta", "session.reasoning.delta", "session.usage.updated", "session.tool.progress"])
     assert.equal(relevantEvent(type), false, type)
+})
+
+test("approval confirmation suppresses Auto's short-lived requests and uses fresh session state", async () => {
+  const running = state([session("ses_open")], {
+    active: { ses_open: {} }, permissions: [{ sessionID: "ses_open", id: "per_auto" }],
+  })
+  const completed = state([session("ses_open", { title: "Finished during confirmation" })])
+  let latest = running
+  let reads = 0
+  const result = confirmedSnapshot(async () => { reads++; return latest }, new AbortController().signal,
+    () => assert.fail("No unconfirmed requests remain"))
+  // The live Auto reply took 699 ms. It must disappear before confirmation.
+  await sleep(700)
+  assert.equal(reads, 1, "Do not confirm while Auto is still handling the request")
+  latest = completed
+  const current = await result
+  assert.equal(reads, 2)
+  assert.deepEqual(current.permissions, [])
+  assert.match(notification(current).body, /Finished during confirmation — ready/)
+})
+
+test("persistent approvals are shown, while replacement requests get their own confirmation", async () => {
+  const stable = { sessionID: "ses_open", id: "per_stable" }
+  const old = { sessionID: "ses_open", id: "per_old" }
+  const replacement = { sessionID: "ses_open", id: "per_new" }
+  let current = state([session("ses_open")], { permissions: [stable, old] })
+  let queued = 0
+  const read = async () => current
+  const first = confirmedSnapshot(read, new AbortController().signal, () => queued++)
+  await Promise.resolve()
+  current = { ...current, permissions: [stable, replacement] }
+  const confirmed = await first
+  assert.deepEqual(confirmed.permissions, [stable])
+  assert.match(notification(confirmed).body, /— approval needed/)
+  assert.equal(queued, 1)
+  const next = confirmedSnapshot(read, new AbortController().signal, () => queued++)
+  await Promise.resolve()
+  assert.deepEqual((await next).permissions, [stable, replacement])
+  assert.equal(queued, 1)
+})
+
+test("approval confirmation adds no delay without permissions and is cancelled on unload", async () => {
+  const current = state([session("ses_open")])
+  const controller = new AbortController()
+  const request = () => assert.fail("No replacement request")
+  assert.equal(await confirmedSnapshot(async () => current, controller.signal, request), current)
+  const result = confirmedSnapshot(async () => ({ ...current, permissions: [{ sessionID: "ses_open", id: "per_wait" }] }), controller.signal, request)
+  await Promise.resolve()
+  controller.abort()
+  await assert.rejects(result, { name: "AbortError" })
 })
 
 test("only attached roots appear, including their children's pending requests", () => {

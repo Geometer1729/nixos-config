@@ -5,15 +5,15 @@ baseline for unchecked hosts or commands.
 
 ## Evaluation warnings
 
+This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
+
 Verified 2026-09-13 with full `nix flake check /home/bbrian/conf`
 (merged master 1957a7c, nixpkgs 21a67dc). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
 
-Notification-change verification on 2026-09-13: targeted OpenCode check builds and
-`sudo -n nixos-rebuild test/switch --flake /home/bbrian/conf#am` emitted no additional
-evaluation warnings. This was not a full flake-check refresh.
+- **Nix evaluation-cache contention, newly recorded 2026-09-14**: the usage-meter run of `nix build .#checks.x86_64-linux.opencode-plugins .#checks.x86_64-linux.opencode-plugin-load --no-link --print-out-paths` printed `error (ignored): SQLite database '…/.cache/nix/eval-cache-v6/….sqlite' is busy` while another session was building the same worktree. Both checks completed successfully. Recheck if it recurs outside concurrent evaluations; no cache deletion was needed. The subsequent `sudo -n nixos-rebuild test --flake /home/bbrian/conf#am` passed without evaluation warnings.
 
 ## Flake checks
 
@@ -22,18 +22,19 @@ evaluation warnings. This was not a full flake-check refresh.
 ## installer
 
 ### Build and activation
-- **Attached-session notification follow-up passed, 2026-09-14**: targeted OpenCode plugin checks passed with 33 tests; `nixos-rebuild test` and `switch` activated/selected am system `wacp778…`. A disposable real TUI verified attachment filtering for ready responses and questions, removal on last-client exit, dismissal surviving unrelated events and a 65-second wait, and renewed notification for a new request. Socket tests covered multiple clients, full tab-list replacement, crashed clients, and reconnection. Pre-existing TUIs must load the new companion (reopen them once) before their tabs count as attached. Other hosts were not deployed.
 - **Pre-update ISO build passed, 2026-09-12 (nixpkgs 6713828)**: `nix build .#nixosConfigurations.installer.config.system.build.isoImage --no-link --no-write-lock-file --print-out-paths` built the installation image with `boot.zfs.forceImportRoot = false`. The image has not been boot-tested. With updated nixpkgs 21a67dc, only configuration evaluation was checked; the updated ISO build remains unverified.
 
 ## am (primary desktop)
 
 ### Build and activation
-- **Notification changes passed, 2026-09-13**: `sudo -n nixos-rebuild test --flake /home/bbrian/conf#am` and the corresponding `switch` activated/selected system `z2jsr9b…`. Targeted `opencode-plugins` and `opencode-plugin-load` checks passed, including 28 tests. Live Mako replacement, completion/viewed state, questions, child approvals, and Ghostty/tmux focus behavior were exercised using disposable sessions. The plugin recovered after `opencode2 service restart`; location reload reconstructed a deliberately stale notification, and a session event restored a missing notification with the same waiting list. Other hosts were not deployed in this verification.
-- **Passed, 2026-09-13**: `nh os build /home/bbrian/conf`, `nh os test /home/bbrian/conf --no-nom --show-activation-logs`, and `nh os switch /home/bbrian/conf --no-nom --show-activation-logs` built, activated, and selected merged-master system `snqgzrd…` (master 1957a7c, nixpkgs 21a67dc). Current/default systems match the verified build. Running kernel remains 6.18.49 pending desktop reboot.
+- **Passed, 2026-09-14**: OpenCode notification checks, live reload/approval verification, and am `nixos-rebuild test`/`switch`.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher compiler warnings, newly recorded**: local builds warn that Java source/target 7 and Applet/AppletStub APIs are obsolete. The build succeeds; these belong to upstream legacy-Minecraft launcher support. Track upstream's compatibility/compiler migration rather than removing that support locally.
 - **System-path collisions, newly recorded**: `pkgs.buildEnv` ignores duplicate PostgreSQL 18.6 `bin/postgres` and Xwayland/Xorg `protocol.txt` / `Xserver.1.gz`. The PostgreSQL service explicitly uses `postgresql-and-plugins` and is active; the global CLI selects the base package. X-server collisions concern documentation. Review duplicate package exposure if these warnings are to be eliminated.
 - **Info-index warning, newly recorded**: `install-info` reports no directory entry in `gawknotes.info`. Build succeeds; the supplemental document lacks index metadata. Follow upstream packaging if an index entry is needed.
+
+### Desktop runtime
+- **Waybar minimum height, newly recorded 2026-09-14**: restarting `waybar.service` reports `Requested height: 24 is less than the minimum height: 34 required by the modules` on both monitors; both bars run at 34 px. The same warning appears in September 11–12 logs before the AI usage module. Align the requested height with the existing font/padding, or revisit sizing if a 24 px bar is desired.
 
 ### `just health`
 Checked 2026-09-13 at 08:05 EDT on merged-master system `snqgzrd…` (nixpkgs 21a67dc): no failed system units; Syncthing reports two peers connected; root remains 96% used with about 36 GiB available. The journal slice matches the duplicate D-Bus/menu warnings below. Earlier intermittent boot/hardware findings are retained because their original conditions were not re-exercised.

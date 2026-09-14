@@ -106,3 +106,7 @@ logs and detailed history in the calling workflow's artifacts or report.
 - Review the diff for accidental changes to unrelated baseline entries.
 - Summarize new, changed, and resolved findings plus verification gaps. Avoid
   replaying unchanged baseline noise; retain any still-blocking result.
+
+## Brevity
+
+Failures is not an infinitely expanding log of every event that has ever taken place on any computer. Non-failure events should be extremely breif, at most one of the same kind and no information other than what didn't fail and when. Non current failures should be removed.

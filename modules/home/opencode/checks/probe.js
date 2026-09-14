@@ -12,7 +12,7 @@ export default {
     assert.ok(entries.length > 0)
     const expected = []
     for (const entry of entries) {
-      const file = path.join(process.env.XDG_CONFIG_HOME, "opencode/plugins", entry.path)
+      const file = path.join(process.env.OPENCODE_CHECK_PACKAGE, entry.path)
       if (!entry.server) {
         assert.equal(realpathSync(Bun.resolveSync("./tui", path.dirname(file))), realpathSync(file))
       }

@@ -19,7 +19,7 @@ let
 in
 pkgs.runCommand "opencode-plugin-load"
 {
-  nativeBuildInputs = [ opencode pkgs.jq pkgs.git ];
+  nativeBuildInputs = [ opencode pkgs.jq pkgs.git pkgs.nodejs_24 ];
   preferLocalBuild = true;
   meta.timeout = 120;
 }
@@ -29,6 +29,7 @@ pkgs.runCommand "opencode-plugin-load"
     export XDG_STATE_HOME="$HOME/.local/state" XDG_CACHE_HOME="$HOME/.cache"
     export OPENCODE_DISABLE_MODELS_FETCH=true OPENCODE_DISABLE_FILEWATCHER=true
     export OPENCODE_CHECK_ENTRIES=${entries} OPENCODE_CHECK_EXPECTED="$TMPDIR/expected.json"
+    export OPENCODE_CHECK_PACKAGE=${plugins.package}
     mkdir -p "$XDG_CONFIG_HOME/opencode/plugins/load-probe" "$TMPDIR/project"
     ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: file: ''
       ln -s ${lib.escapeShellArg (toString file.source)} "$XDG_CONFIG_HOME/${name}"
@@ -51,5 +52,9 @@ pkgs.runCommand "opencode-plugin-load"
       then $expected[0] | map(.id)
       else error("Missing or failed plugins: " + ($plugins | tojson)) end
     ' "$TMPDIR/plugins.json"
+    node ${./reload.mjs} \
+      ${home.xdg.configFile."opencode/opencode.json".source} \
+      ${home.xdg.configFile."opencode/cli.json".source} \
+      ${plugins.package}
     touch "$out"
   ''

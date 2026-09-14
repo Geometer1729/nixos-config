@@ -19,7 +19,7 @@ test("locations share a reader, setup refreshes it, and code reload cannot be st
   process.env.DBUS_SESSION_BUS_ADDRESS = "notification-lifecycle-test"
   const context = { options: { command: "unused-test-notifier" } } as unknown as Plugin.Context
   const host = globalThis as typeof globalThis & {
-    __confOpenCodeWaiting?: { controller: AbortController; request(): void; users: number }
+    __confOpenCodeWaiting?: { controller: AbortController; request(): void; owners: Set<symbol> }
   }
   const cleanups: Plugin.Cleanup[] = []
   try {
@@ -29,7 +29,7 @@ test("locations share a reader, setup refreshes it, and code reload cannot be st
     cleanups.push(first, second)
     const original = host.__confOpenCodeWaiting
     assert.ok(original)
-    assert.equal(original.users, 2)
+    assert.equal(original.owners.size, 2)
     await first()
     cleanups.shift()
     assert.equal(original.controller.signal.aborted, false)
@@ -53,6 +53,14 @@ test("locations share a reader, setup refreshes it, and code reload cannot be st
     assert.ok(added)
     cleanups.push(added)
     assert.equal(refreshes, 1, "Adding a location immediately requests a new snapshot")
+    // Reverse the ownership order too: a short-lived newly loaded location may
+    // unload before a project that still uses the previous code generation.
+    const newest = (await import(new URL("./index.ts?newest-generation", import.meta.url).href)).default as Plugin.Plugin
+    const temporary = await newest.setup(context)
+    assert.ok(temporary)
+    await temporary()
+    assert.ok(host.__confOpenCodeWaiting, "Unloading a newer location must retain older location owners")
+    assert.equal(host.__confOpenCodeWaiting.controller.signal.aborted, false)
   } finally {
     for (const cleanup of cleanups) await cleanup()
     if (bus === undefined) delete process.env.DBUS_SESSION_BUS_ADDRESS

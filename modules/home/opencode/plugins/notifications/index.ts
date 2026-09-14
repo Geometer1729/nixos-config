@@ -7,7 +7,7 @@ import { Service } from "@opencode-ai/client/service"
 import { Plugin } from "@opencode-ai/plugin"
 
 import { refreshQueue } from "./refresh.ts"
-import { notification, relevantEvent, snapshot } from "./snapshot.ts"
+import { confirmedSnapshot, notification, relevantEvent, snapshot } from "./snapshot.ts"
 import { presenceServer, socketPath } from "./presence.ts"
 
 const exec = promisify(execFile)
@@ -35,7 +35,8 @@ async function run(command: string, shared: Shared): Promise<void> {
 
         const queue = refreshQueue(async () => {
           const timeout = AbortSignal.any([connected, AbortSignal.timeout(15_000)])
-          const content = notification(await snapshot(client, timeout), presence.sessions())
+          const state = await confirmedSnapshot(() => snapshot(client, timeout), timeout, shared.request)
+          const content = notification(state, presence.sessions())
           await exec(command, [content.summary, content.body, content.key], { signal: timeout })
         }, connected, report)
         shared.request = queue.request
@@ -67,7 +68,7 @@ async function run(command: string, shared: Shared): Promise<void> {
 
 interface Shared {
   moduleID: symbol
-  users: number
+  owners: Set<symbol>
   controller: AbortController
   task: Promise<void>
   request(): void
@@ -82,6 +83,9 @@ export default Plugin.define({
 
     // Global plugins are instantiated once per location. They share one reader
     // and renderer; a code reload replaces that reader. No session state is cached.
+    // Ownership spans code generations: older projects can outlive the location
+    // that first loads a new module. Their cleanup must release the current reader.
+    const owners = host.__confOpenCodeWaiting?.owners ?? new Set<symbol>()
     let previous = Promise.resolve()
     if (host.__confOpenCodeWaiting && (host.__confOpenCodeWaiting.moduleID !== moduleID || host.__confOpenCodeWaiting.controller.signal.aborted)) {
       previous = host.__confOpenCodeWaiting.task
@@ -90,18 +94,21 @@ export default Plugin.define({
     }
     const shared = host.__confOpenCodeWaiting ??= (() => {
       const state: Shared = {
-        moduleID, users: 0, controller: new AbortController(), task: Promise.resolve(), request: () => undefined,
+        moduleID, owners, controller: new AbortController(), task: Promise.resolve(), request: () => undefined,
       }
       state.task = previous.then(() => run(command, state)).catch(report)
       return state
     })()
-    shared.users++
+    const owner = Symbol()
+    shared.owners.add(owner)
     shared.request()
     return async () => {
-      if (--shared.users !== 0) return
-      shared.controller.abort()
-      await shared.task
-      if (host.__confOpenCodeWaiting === shared) delete host.__confOpenCodeWaiting
+      if (!shared.owners.delete(owner) || shared.owners.size !== 0) return
+      const current = host.__confOpenCodeWaiting
+      if (current?.owners !== shared.owners) return
+      current.controller.abort()
+      await current.task
+      if (host.__confOpenCodeWaiting === current) delete host.__confOpenCodeWaiting
     }
   },
 })

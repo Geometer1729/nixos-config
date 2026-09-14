@@ -1,5 +1,6 @@
 import type { OpenCodeClient } from "@opencode-ai/client"
 import { basename } from "node:path"
+import { setTimeout as sleep } from "node:timers/promises"
 
 type SessionInfo = Awaited<ReturnType<OpenCodeClient["session"]["get"]>>
 export type Session = Pick<SessionInfo, "id" | "parentID" | "title" | "location" | "time" | "outcome">
@@ -47,6 +48,26 @@ export async function snapshot(client: OpenCodeClient, signal: AbortSignal): Pro
     permissions: requests.flatMap((request) => request.permissions),
     forms: requests.flatMap((request) => request.forms),
   }
+}
+
+export async function confirmedSnapshot(
+  read: () => Promise<Snapshot>,
+  signal: AbortSignal,
+  request: () => void,
+): Promise<Snapshot> {
+  const first = await read()
+  if (!first.permissions.length) return first
+  // Auto approvals briefly appear in the same pending inventory as human
+  // prompts. Confirm against a fresh snapshot; keep no waiting-session cache.
+  const identity = (permission: Snapshot["permissions"][number]) => JSON.stringify([permission.sessionID, permission.id])
+  const candidates = new Set(first.permissions.map(identity))
+  await sleep(1000, undefined, { signal })
+  const current = await read()
+  const permissions = current.permissions.filter((permission) => candidates.has(identity(permission)))
+  // Requests born during confirmation need their own full grace period, even
+  // when their event arrived before this read or the stream missed that event.
+  if (permissions.length !== current.permissions.length) request()
+  return { ...current, permissions }
 }
 
 const statuses = {
