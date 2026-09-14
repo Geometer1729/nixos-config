@@ -9,6 +9,8 @@ Keep `failures.md` an evidence-backed inventory of outstanding warnings and
 failures, including evaluation, build, activation, and runtime checks.
 Repository paths below refer to the active configuration worktree.
 
+The only reason to have this is to avoid the problem of not knowing if a issue is new (and therefore likely related to a new problem) or old and unlikely to be the root cause.
+
 ## 1. Establish Scope And Evidence
 
 Read that worktree's `failures.md`, repository instructions, and the health/test
@@ -110,3 +112,4 @@ logs and detailed history in the calling workflow's artifacts or report.
 ## Brevity
 
 Failures is not an infinitely expanding log of every event that has ever taken place on any computer. Non-failure events should be extremely breif, at most one of the same kind and no information other than what didn't fail and when. Non current failures should be removed.
+
