@@ -103,6 +103,14 @@ Newly recorded 2026-09-12 during the update; recovered coverage and raw evidence
 - **Regex package false positives**: `[26.05]` was passed unescaped to `grep`, producing an unrelated `jwx` match. Use literal package matching; this false positive was rejected by configuration/source review.
 - **Missing non-Git inputs**: `flake-changelog` compares only `.rev`, omitting changed `linearis-npm` registry metadata. Compare locked content for file inputs and report their non-Git identity. The final artifact has an explicitly labeled manual entry and complete direct-input accounting.
 
+## KDE Connect runtime
+
+Verified 2026-09-14 with KDE Connect 26.04.3 on am and torag: `nixos-rebuild test`/`switch`, bidirectional notification forwarding, and Slack/Discord exclusions passed. New upstream runtime warnings remain:
+
+- **Notification resync unsupported, both hosts**: `SendNotificationsPlugin received a packet of type "kdeconnect.notification.request" but doesn't implement receivePacket`. The Linux sender cannot replay existing notifications on reconnect; new notifications pass. Follow upstream resync support; this limitation was accepted when choosing KDE Connect.
+- **Structured notification hints unsupported, both hosts**: `Unimplemented conversation of type 'r' 114`. The Linux D-Bus listener cannot decode struct-valued hints such as image data. Text forwarding passes; icon fidelity is unverified. Follow upstream hint parsing support.
+- **Desktop/discovery logging**: KDE Connect also reports `"applications.menu" not found` on both hosts, extending the existing desktop-menu lookup finding; torag reports `No uuids found` while probing nearby Bluetooth devices. Tailscale pairing and forwarding pass. Investigate upstream menu lookup and Bluetooth discovery if these messages become disruptive.
+
 ## OpenCode runtime
 
 Newly recorded while verifying notifications on am, 2026-09-13, using

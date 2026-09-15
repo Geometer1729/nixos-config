@@ -70,6 +70,11 @@
         ".local/share/nvim/telescope_history"
         ".config/gh/hosts.yml"
         ".config/tailscale/ssh_known_hosts"
+      ] ++ lib.optionals config.machine.hasGui [
+        # Keep device identity and pairing; KDE Connect settings come from Home Manager.
+        ".config/kdeconnect/privateKey.pem"
+        ".config/kdeconnect/certificate.pem"
+        ".config/kdeconnect/trusted_devices"
       ];
     };
     users.yixin.directories = lib.mkIf config.machine.hasGui [ "." ];

@@ -33,6 +33,7 @@ in
     opencode
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
+    kdeconnect
     systemd-failure-notifications
     desktop
     media
