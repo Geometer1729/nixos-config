@@ -32,6 +32,40 @@ async function eventually(check: () => boolean | Promise<boolean>, timeout = 3_0
   assert.fail("condition was not met before timeout")
 }
 
+test("shell environments retain the tmux guard after direnv rolls it back", async (t) => {
+  const directory = await mkdtemp(path.join(tmpdir(), "opencode-direnv-test-"))
+  t.after(() => rm(directory, { recursive: true, force: true }))
+  await writeFile(
+    path.join(directory, "direnv"),
+    '#!/bin/sh\nprintf \'{"DIRENV_NO_TMUX_RENAME":null,"PROJECT_ENV":"loaded","REMOVED":null}\\n\'\n',
+  )
+  await chmod(path.join(directory, "direnv"), 0o755)
+
+  let shellHook: ((invocation: ShellInvocation) => Promise<void> | void) | undefined
+  const cleanup = await lspPlugin.setup({
+    options: {},
+    shell: {
+      hook: async (_name: string, hook: typeof shellHook) => {
+        shellHook = hook
+      },
+    },
+    tool: { hook: async () => {}, transform: async () => {} },
+  } as unknown as Plugin.Context)
+  t.after(async () => {
+    if (cleanup) await cleanup()
+  })
+
+  assert.ok(shellHook)
+  const invocation: ShellInvocation = {
+    cwd: directory,
+    env: { PATH: directory, DIRENV_NO_TMUX_RENAME: "true", REMOVED: "old" },
+  }
+  await shellHook(invocation)
+  assert.equal(invocation.env.PROJECT_ENV, "loaded")
+  assert.equal(invocation.env.REMOVED, undefined)
+  assert.equal(invocation.env.DIRENV_NO_TMUX_RENAME, "1")
+})
+
 test("idle language servers are shut down and terminated", async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), "opencode-lsp-test-"))
   const bin = path.join(directory, "bin")
@@ -49,7 +83,10 @@ test("idle language servers are shut down and terminated", async (t) => {
   })
 
   await mkdir(bin)
-  await writeFile(path.join(bin, "direnv"), "#!/bin/sh\nprintf '{\"DIRENV_TEST_CWD\":\"%s\"}\\n' \"$PWD\"\n")
+  await writeFile(
+    path.join(bin, "direnv"),
+    "#!/bin/sh\nprintf '{\"DIRENV_TEST_CWD\":\"%s\",\"DIRENV_NO_TMUX_RENAME\":null}\\n' \"$PWD\"\n",
+  )
   await chmod(path.join(bin, "direnv"), 0o755)
   await writeFile(source, "test\n")
   await writeFile(
@@ -60,6 +97,7 @@ const log = process.argv[2]
 const pidFile = process.argv[3]
 let buffer = Buffer.alloc(0)
 writeFileSync(pidFile, String(process.pid))
+writeFileSync(pidFile + ".tmux-guard", process.env.DIRENV_NO_TMUX_RENAME ?? "<unset>")
 
 function send(message) {
   const body = JSON.stringify(message)
@@ -133,6 +171,7 @@ process.stdin.on("data", (chunk) => {
   assert.equal(shellInvocation.env.DIRENV_TEST_CWD, directory)
   await lspTool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" })
   const pid = Number(await readFile(pidFile, "utf8"))
+  assert.equal(await readFile(pidFile + ".tmux-guard", "utf8"), "1")
 
   await eventually(async () => (await readFile(log, "utf8").catch(() => "")) === "shutdown\nexit\n")
   await eventually(() => {

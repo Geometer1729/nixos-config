@@ -8,8 +8,9 @@
     #may cause gc issues
     stdlib =
       ''
-        # Tmux session management
-        if [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
+        # Tmux session management is only for terminal-driven direnv loads.
+        # Direnv rollback can remove the opt-out inherited by background tools.
+        if [ -t 0 ] && [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
           git_root=$(git rev-parse --show-toplevel 2>/dev/null)
           session_name=$(basename "''${git_root:-$PWD}")
           current_session=$(tmux display-message -p '#S')

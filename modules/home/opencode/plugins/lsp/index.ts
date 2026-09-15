@@ -254,7 +254,12 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
   const loaded = await direnvChanges(root, globalThis.process.env)
   if (loaded.error) throw new Error(`Failed to load the project direnv environment: ${loaded.error}`)
   const changes = loaded.changes
-  const env = { ...applyEnvironment(globalThis.process.env, changes), ...(server.env ?? {}) }
+  const env = {
+    ...applyEnvironment(globalThis.process.env, changes),
+    ...(server.env ?? {}),
+    // Direnv rollback can remove the opt-out set by the OpenCode wrapper.
+    DIRENV_NO_TMUX_RENAME: "1",
+  }
   const client = rpc(server, root, env, onStop)
   await client.request(
     "initialize",
@@ -473,6 +478,8 @@ export default Plugin.define({
         if (value === null) delete invocation.env[key]
         else invocation.env[key] = String(value)
       }
+      // Preserve the opt-out in commands launched after direnv has rolled back.
+      invocation.env.DIRENV_NO_TMUX_RENAME = "1"
     })
 
     await ctx.tool.transform((tools) => {
