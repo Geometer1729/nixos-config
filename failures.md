@@ -28,6 +28,7 @@ Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-
 
 ### Build and activation
 - **Passed, 2026-09-20**: worktree `nh os build`, `nh os test`, and `just deploy`; active/default system `iqccw0c…` (nixpkgs cf9d2fb) verified.
+- **Shutdown-ordering follow-up passed, 2026-09-20**: `nixos-rebuild test` and `switch`, plus the flake's `pre-commit` check; active/default system `qphqhhg…` verified on am.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete. The September 20 build also reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY` and Qt AutoUic renaming duplicate `verticalLayout` to `verticalLayout1`. Build/tests pass; track upstream compiler/UI packaging rather than removing legacy support.
 - **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
@@ -36,6 +37,7 @@ Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-
 - **Info-index warning, newly recorded**: `install-info` reports no directory entry in `gawknotes.info`. Build succeeds; the supplemental document lacks index metadata. Follow upstream packaging if an index entry is needed.
 
 ### Desktop runtime
+- **Terminal snapshot loss on shutdown, patched 2026-09-20**: tmux pane scopes stopped during the logout save (`no server running`); tmux-resurrect promoted an incomplete snapshot, causing the next boot's terminal-restore timeout. Scope ordering now holds panes and Ghostty-hosted servers until saving finishes. `just test-tmux-shutdown` reproduced early teardown before the fix and passed afterward on am; an end-to-end reboot and Torag deployment remain unverified. Snapshot publication still lacks validation for other save failures.
 - **Waybar minimum height, newly recorded 2026-09-14**: restarting `waybar.service` reports `Requested height: 24 is less than the minimum height: 34 required by the modules` on both monitors; both bars run at 34 px. The same warning appears in September 11–12 logs before the AI usage module. Align the requested height with the existing font/padding, or revisit sizing if a 24 px bar is desired.
 
 ### `just health`
