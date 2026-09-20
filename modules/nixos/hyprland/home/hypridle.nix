@@ -12,9 +12,11 @@
     settings = {
       general = {
         after_sleep_cmd = "hyprctl dispatch dpms on; bluetooth-autoconnect.sh";
-        before_sleep_cmd = "hyprlock";
+        before_sleep_cmd = "loginctl lock-session";
         ignore_dbus_inhibit = false;
-        lock_cmd = "hyprlock";
+        # Wait for the compositor to confirm the session is locked before sleeping.
+        inhibit_sleep = 3;
+        lock_cmd = "pgrep -x hyprlock || hyprlock";
       };
 
       listener =
@@ -23,7 +25,7 @@
           [
             {
               timeout = 10 * 60;
-              on-timeout = "hyprlock";
+              on-timeout = "loginctl lock-session";
             }
             # DPMS disabled - testing if monitor's own power saving is causing blackouts
             # {
@@ -40,7 +42,7 @@
           [
             {
               timeout = 60 * 60;
-              on-timeout = "hyprlock";
+              on-timeout = "loginctl lock-session";
             }
             # DPMS disabled - testing if monitor's own power saving is causing blackouts
             # {
@@ -49,7 +51,7 @@
             #   on-resume = "hyprctl dispatch dpms on";
             # }
             {
-              timeout = 120 * 60;
+              timeout = 60 * 60;
               on-timeout = "sudo systemctl suspend";
             }
           ];

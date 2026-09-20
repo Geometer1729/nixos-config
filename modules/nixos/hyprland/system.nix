@@ -60,6 +60,9 @@ in
     xwayland.enable = true;
   };
 
+  # The Home Manager locker needs a system PAM service to authenticate unlocks.
+  security.pam.services.hyprlock = { };
+
   # XDG portal for Hyprland
   xdg.portal = {
     enable = true;
