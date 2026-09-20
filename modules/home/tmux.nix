@@ -164,6 +164,21 @@ in
     Install.WantedBy = [ "timers.target" ];
   };
 
+  # tmux puts panes in transient scopes. The server can also live in a
+  # Ghostty scope when a terminal starts it before restore-terminals does.
+  # Stop ordering is the reverse of Before=: keep both alive until ExecStop
+  # has finished saving. Prefix drop-ins cover existing and future scopes.
+  xdg.configFile = lib.mkIf machine.hasGui (lib.genAttrs [
+    "systemd/user/tmux-spawn-.scope.d/save-tmux.conf"
+    "systemd/user/app-ghostty-.scope.d/save-tmux.conf"
+  ]
+    (_: {
+      text = ''
+        [Unit]
+        Before=save-tmux-on-exit.service
+      '';
+    }));
+
   systemd.user.services.save-tmux-on-exit = lib.mkIf machine.hasGui {
     Unit = {
       Description = "Save Neovim and tmux sessions on logout";
@@ -176,7 +191,8 @@ in
       RemainAfterExit = true;
       ExecStart = "${pkgs.coreutils}/bin/true";
       ExecStop = "${saveTmux}/bin/save-tmux";
-      TimeoutStopSec = "10s";
+      # Each Neovim checkpoint can take up to 5s before the tmux save starts.
+      TimeoutStopSec = "1min";
     };
     Install.WantedBy = [ "graphical-session.target" ];
   };
