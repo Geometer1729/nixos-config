@@ -54,6 +54,10 @@ while true; do
       if [ "$work" = "y" ]; then
         task "$TASK_ID" modify +@work
       fi
+      read -r -p "$(printf "Agent can work on this (+agent) (y/\033[1mN\033[0m): ")" agent
+      if [ "$agent" = "y" ]; then
+        task "$TASK_ID" modify +agent
+      fi
       read -r -p "Additional tags (space-separated): " extra_tags
       if [ -n "$extra_tags" ]; then
         for tag in $extra_tags; do

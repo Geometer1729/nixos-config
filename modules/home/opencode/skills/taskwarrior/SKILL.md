@@ -1,6 +1,6 @@
 ---
 name: Taskwarrior
-description: Add Taskwarrior tasks with Markdown notes discoverable by taskopen, or search for tasks and read their linked notes.
+description: Add Taskwarrior tasks with Markdown notes discoverable by taskopen, search tasks and read their notes
 ---
 
 # Taskwarrior
@@ -41,3 +41,7 @@ agents should read and write the Markdown file directly.
 4. Return the relevant note content with the task identity and source path.
    If the note is absent, report that rather than invoking the interactive
    opener, which could create an empty note.
+
+## Find work for an agent
+
+`+agent` marks tasks suitable for agent execution.
