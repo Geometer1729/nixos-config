@@ -7,8 +7,8 @@ baseline for unchecked hosts or commands.
 
 This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
 
-Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-20-26`
-(update-09-20-26, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
+Verified 2026-09-21 with full `nix flake check /home/bbrian/conf`
+(storage-health changes, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
@@ -17,7 +17,8 @@ Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-
 
 ## Flake checks
 
-- **Passed, 2026-09-20**: full `nix flake check /home/bbrian/Code/conf-update-09-20-26`, including lint, Neovim, OpenCode plugin type/load checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
+- **Passed, 2026-09-21**: full `nix flake check /home/bbrian/conf`, including lint, Neovim, OpenCode plugin type/load checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
+- **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Build/tests pass; follow the npm hook and dependency updates rather than suppressing the warnings.
 
 ## installer
 
@@ -27,7 +28,7 @@ Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-
 ## am (primary desktop)
 
 ### Build and activation
-- **Passed, 2026-09-20**: worktree `nh os build`, `nh os test`, and `just deploy`; active/default system `iqccw0c…` (nixpkgs cf9d2fb) verified.
+- **Passed, 2026-09-21**: storage-health `nixos-rebuild test --flake .#am --sudo`, followed by `nixos-rebuild boot --store-path … --sudo --no-reexec`; active/default system `8nd6qlf…` verified. Reboot of this configuration remains unverified.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete. The September 20 build also reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY` and Qt AutoUic renaming duplicate `verticalLayout` to `verticalLayout1`. Build/tests pass; track upstream compiler/UI packaging rather than removing legacy support.
 - **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
@@ -39,7 +40,7 @@ Verified 2026-09-20 with full `nix flake check /home/bbrian/Code/conf-update-09-
 - **Waybar minimum height, newly recorded 2026-09-14**: restarting `waybar.service` reports `Requested height: 24 is less than the minimum height: 34 required by the modules` on both monitors; both bars run at 34 px. The same warning appears in September 11–12 logs before the AI usage module. Align the requested height with the existing font/padding, or revisit sizing if a 24 px bar is desired.
 
 ### `just health`
-Checked 2026-09-20 at 08:58 EDT on system `iqccw0c…` (nixpkgs cf9d2fb): no failed units, two Syncthing peers, and the existing duplicate D-Bus/menu journal warnings. Earlier intermittent boot/hardware conditions were not re-exercised.
+Checked 2026-09-21 on system `8nd6qlf…`: no failed system units, root 78% used / 192 GiB available, two Syncthing peers, and the existing duplicate D-Bus/menu journal warnings. Earlier intermittent boot/hardware conditions were not re-exercised.
 
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
 - **kvm_amd**: `SVM not supported by CPU 23` — hardware doesn't support nested virtualization
@@ -49,7 +50,6 @@ Checked 2026-09-20 at 08:58 EDT on system `iqccw0c…` (nixpkgs cf9d2fb): no fai
 - **plasma-apply-lookandfeel**: `"applications.menu" not found` during Home Manager activation — one-shot menu lookup noise; activation still succeeds
 - **FoundryVTT auth DNS**: `getaddrinfo EAI_AGAIN foundryvtt.com` during boot/authentication — transient DNS/network timing unless it persists
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
-- **Filesystem capacity, updated 2026-09-20**: `/` is 97% used, with about 27 GiB available (previously 96% / 36 GiB). No space-related failure occurred; review capacity before larger builds. No cleanup was performed by the update.
 
 ### `just vim-health`
 Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following existing warnings remain.
@@ -65,18 +65,35 @@ Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following exi
 ## balrog
 
 ### Build and activation
-- **Passed, 2026-09-20**: `just deploy` from `/home/bbrian/Code/conf-update-09-20-26`; active/default system `mb6z0br…` (nixpkgs cf9d2fb) verified.
+- **Passed, 2026-09-21**: `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `r7v1p7f…` verified.
+
+### `just health`
+Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands over SSH (Balrog has no `/home/bbrian/conf/justfile`): no failed system units, root 26% used / 168 GiB available, and two Syncthing peers.
+
+- **D-Bus duplicate service names, newly recorded on Balrog**: boot journal reports duplicate dconf and systemd service names, matching the desktop hosts' existing warning class. Review duplicate service exports if eliminating the noise.
+- **Taskwarrior sync fails after reboot, newly recorded 2026-09-21**: user `taskwarrior-sync.service` exits 2 with `sync.server.client_id and sync.encryption_secret are required`. The configured client ID exists, but the encryption secret is absent because `/run/secrets` was not created. Sync succeeded immediately before reboot; fix the SOPS boot failure below and rerun the sync service.
 
 ### Post-deployment boot checks
-- **Passed, 2026-09-20 at 09:20 EDT**: `ssh balrog sudo -n systemctl reboot` after verifying expected system `mb6z0br…`; new boot ID, active/default system, Linux 6.18.52, system state `running`, and zero failed units verified.
+- **Storage checks passed, 2026-09-21 at 16:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, expected active/default `r7v1p7f…`, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. Alert delivery to am also passed after reboot.
+- **SOPS decryption fails in initrd, newly recorded 2026-09-21**: `setupSecretsForUsers` and `setupSecrets` fail with `Error getting data key: 0 successful groups required, got 0`; the `hosts` activation snippet then cannot read `/run/secrets/hosts`. The initrd logs only the persisted user's SSH age key, whereas successful live activation also imported the host SSH keys. Check host-key availability/order in the ephemeral-root initrd and boot-ready key paths. Overall system state still reports `running`, so unit-state checks alone miss this failure.
+
+### Storage health
+- **Unsupported SMART attributes, 2026-09-21**: smartd reports no attributes 197 (`Current_Pending_Sector`) or 198 (`Offline_Uncorrectable`) on the Samsung 860 EVO. `smartctl -a` confirms these are absent from the device's attribute table; supported attributes and overall health are monitored. No suppression or configuration change is needed.
 
 ## torag (secondary machine)
 
 ### Build and activation
-- **Passed, 2026-09-20**: direct update-worktree `just deploy`; active/default system `w2i1207…` (nixpkgs cf9d2fb) verified, with 279 MiB free in `/boot`. Running kernel is 6.18.50; booting the deployed 6.18.52 remains unverified until Torag's next reboot.
+- **Passed, 2026-09-21**: `nixos-rebuild test --flake .#torag --target-host bbrian@torag --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `fdka1cn…` verified, with 279 MiB free in `/boot`.
+
+### Post-deployment boot checks
+- **Passed for storage/system services, 2026-09-21 at 16:59 EDT**: `ssh torag sudo -n systemctl reboot`; expected active/default `fdka1cn…`, new boot ID, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. The user terminal-restoration failure below remains.
+
+### Desktop runtime
+- **Lock screen lost during activation, newly recorded 2026-09-21**: Home Manager restarted `hypridle` at 16:44:35 EDT during `nixos-rebuild test`, after it had launched `hyprlock` at 16:40:17. Hyprland remained locked with no `hyprlock` process and displayed its “Oopsie daisy” recovery screen; there was no new boot or coredump. `hypridle` uses `KillMode=control-group`, strongly implicating termination of its child locker. Recovered by temporarily enabling `misc:allow_session_lock_restore`, launching `hyprlock`, and restoring the option to false. Follow up by giving the locker an independent service lifetime; the underlying configuration is unchanged.
+- **Terminal restore timeout, newly recorded 2026-09-21**: `restore-terminals.service` failed at 16:44:59 EDT during Home Manager activation and again at 17:00:05 after reboot with `Timed out waiting for tmux-resurrect to restore terminal sessions`. Inspect its saved-session/readiness checks; this is a user-service failure even when the system-level `systemctl --failed` is clean.
 
 ### `just health`
-Checked 2026-09-20 at 09:21 EDT with `ssh torag just --justfile /home/bbrian/conf/justfile health`, system `w2i1207…` (nixpkgs cf9d2fb): no failed units, root 37% used / 600 GiB available, two Syncthing peers, and the existing D-Bus/menu journal warnings. Earlier boot/resume conditions were not re-exercised.
+Checked 2026-09-21 with `ssh torag just --justfile /home/bbrian/conf/justfile health`, system `fdka1cn…`: no failed system units, root 37% used / 600 GiB available, two Syncthing peers, the existing D-Bus/menu journal warnings, and the user terminal-restoration failure above. Earlier intermittent hardware conditions were not re-exercised.
 
 - **ucsi_acpi**: `PPM init failed` — USB Type-C firmware issue, hardware
 - **spd5118**: `Failed to write` / `failed to resume async: error -6` — RAM SPD sensor resume error after sleep, hardware

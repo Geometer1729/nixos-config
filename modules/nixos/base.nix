@@ -18,6 +18,7 @@ in
     password
     secrets
     ssh
+    storage-health
     stylix
     tailscale
   ]);

@@ -39,6 +39,7 @@ in
   networking.hostName = "balrog";
   networking.useDHCP = true;
   machine.hasGui = false;
+  storageHealth.notificationHost = "am";
 
   home-manager.users.${config.mainUser} = {
     # Keep management tools without enabling workstation hardware authentication.
