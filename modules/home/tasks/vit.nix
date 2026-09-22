@@ -17,9 +17,10 @@
         o = :!wr taskopen {TASK_UUID}<Enter>
         O = :! ${config.scripts.opencode-task.package}/bin/opencode-task {TASK_UUID}<Enter>
         i = :!wr task {TASK_UUID} info<Enter>
-        ri = :inbox<Enter>
-        rs = :someday<Enter>
-        rn = :next<Enter>
+        r = {ACTION_REFRESH}
+        gi = :inbox<Enter>
+        gs = :someday<Enter>
+        gn = :next<Enter>
         [vit]
         theme = stylix
       '';
