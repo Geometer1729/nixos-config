@@ -37,7 +37,7 @@ async function run(command: string, shared: Shared): Promise<void> {
           const timeout = AbortSignal.any([connected, AbortSignal.timeout(15_000)])
           const state = await confirmedSnapshot(() => snapshot(client, timeout), timeout, shared.request)
           const content = notification(state, presence.sessions())
-          await exec(command, [content.summary, content.body, content.key], { signal: timeout })
+          await exec(command, [content.summary, content.body, content.key, content.sessionID, socketPath(process.pid)], { signal: timeout })
         }, connected, report)
         shared.request = queue.request
         queue.request()

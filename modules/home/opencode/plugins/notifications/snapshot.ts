@@ -16,6 +16,7 @@ export interface Notification {
   summary: string
   body: string
   key: string
+  sessionID: string
 }
 
 export async function snapshot(client: OpenCodeClient, signal: AbortSignal): Promise<Snapshot> {
@@ -129,6 +130,7 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>): No
   for (const row of rows) labels.set(row.label, (labels.get(row.label) ?? 0) + 1)
 
   return {
+    sessionID: rows[0]?.id ?? "",
     key: JSON.stringify(rows.map(({ id, reasons }) => [id, reasons])),
     summary: rows.length ? `OpenCode · ${rows.length} session${rows.length === 1 ? "" : "s"} waiting` : "",
     body: rows.map((row) => {

@@ -65,6 +65,37 @@ test("a killed client leaves no stale attached session", async () => {
   }
 })
 
+test("clicks focus only an attached owner and stop routing after its tab closes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
+  const path = join(directory, "server.sock")
+  const server = await presenceServer(path, () => undefined)
+  const focused: string[] = []
+  const first = presenceClient(async () => path, () => assert.fail("Wrong TUI received focus"))
+  const second = presenceClient(async () => path, (id) => focused.push(id))
+  const click = async () => {
+    const socket = createConnection(path)
+    socket.end('"ses_target"\n')
+    await once(socket, "close")
+  }
+  try {
+    first.update(["ses_other"])
+    second.update(["ses_target"])
+    await until(() => server.sessions().size === 2)
+    await click()
+    await until(() => focused.length === 1)
+    assert.deepEqual(focused, ["ses_target"])
+    second.update([])
+    await until(() => !server.sessions().has("ses_target"))
+    await click()
+    assert.deepEqual(focused, ["ses_target"])
+  } finally {
+    await first.close()
+    await second.close()
+    await server.close()
+    await rm(directory, { recursive: true })
+  }
+})
+
 test("reconnecting after a server restart reports the complete current tab list", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
   const path = join(directory, "server.sock")

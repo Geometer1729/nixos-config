@@ -6,8 +6,13 @@ let
   plugins = (import ./plugins/package.nix { inherit lib pkgs; }).package;
   notify = pkgs.writeShellApplication {
     name = "opencode-notify";
-    runtimeInputs = with pkgs; [ coreutils jq libnotify mako util-linux ];
+    runtimeInputs = with pkgs; [ coreutils jq libnotify mako socat util-linux ];
     text = builtins.readFile ./notify.sh;
+  };
+  focus = pkgs.writeShellApplication {
+    name = "opencode-focus";
+    runtimeInputs = with pkgs; [ coreutils hyprland jq procps tmux ];
+    text = builtins.readFile ./focus.sh;
   };
   opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
   opencode2 = pkgs.stdenv.mkDerivation {
@@ -79,6 +84,7 @@ in
       default-timeout = 0;
       ignore-timeout = true;
       history = false;
+      on-button-left = "exec ${notify}/bin/opencode-notify --focus \"$id\"";
     };
   };
 
@@ -106,7 +112,10 @@ in
         attention.sound = true;
         attention.notifications = !machine.hasGui;
         plugins = [ "file://${plugins}/vim" "file://${plugins}/auto-tabs" ]
-          ++ lib.optional machine.hasGui "file://${plugins}/notifications";
+          ++ lib.optional machine.hasGui {
+          package = "file://${plugins}/notifications";
+          options.focusCommand = "${focus}/bin/opencode-focus";
+        };
         diffs.wrap = "word";
         session = {
           markdown = "rendered";

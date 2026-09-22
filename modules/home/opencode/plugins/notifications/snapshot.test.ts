@@ -6,7 +6,7 @@ import type { OpenCodeClient } from "@opencode/client"
 import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
 
-const empty = { summary: "", body: "", key: "[]" }
+const empty = { summary: "", body: "", key: "[]", sessionID: "" }
 const notification = (state: Snapshot) => render(state, new Set(state.sessions.map((session) => session.id)))
 
 function session(id: string, overrides: Partial<Session> = {}): Session {
@@ -54,6 +54,7 @@ test("nested child requests share the root row and take priority over its comple
   }))
   assert.equal(content.summary, "OpenCode · 1 session waiting")
   assert.equal(content.body, "🔐 conf · ses_root — approval needed")
+  assert.equal(content.sessionID, "ses_root")
   assert.match(notification(state(sessions, { forms: [{ sessionID: "ses_child" }] })).body, /— question/)
   assert.match(notification(state(sessions)).body, /— ready/)
 })
@@ -67,6 +68,8 @@ test("rendering is deterministic, distinguishes duplicate titles, and escapes no
   const content = notification(state(sessions, { permissions: [{ sessionID: "ses_priority" }] }))
   assert.deepEqual(content, notification(state(sessions.toReversed(), { permissions: [{ sessionID: "ses_priority" }] })))
   assert.match(content.body.split("\n")[0]!, /Approval — approval needed/)
+  assert.equal(content.sessionID, "ses_priority")
+  assert.equal(notification(state(sessions)).sessionID, "ses_aaa111")
   assert.match(content.body, /&lt;b&gt;Task &amp; title&lt;\/b&gt; \(aaa111\)/)
   assert.match(content.body, /\(bbb222\)/)
   assert.equal(content.body.split("\n").length, 3)
