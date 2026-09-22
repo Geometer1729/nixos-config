@@ -11,7 +11,8 @@ Nearly all configuration of this machine should come from this repo.
 - Keep machine-specific logic in `configurations/`.
 - Avoid hostname conditionals in shared modules.
 - Put application-specific behavior in the relevant application module.
-- Put general scripts in `modules/home/scripts/`.
+- When an application requires nixos + home-manager put it in nixos with a `home.nix` and `system.nix` similar to brave.
+- Use the scripts option to manage any bash scripts.
 
 ## Testing
 
