@@ -697,13 +697,13 @@
     "opencode2-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-5XHCmJe2P9BcoHdrrsOBwEcJ2Z4/6L8tm9IWS92pwEc=",
+        "narHash": "sha256-Zi+f57hv1NMipenT/4cxNPCI6obQR+3LApJUgt22VuM=",
         "type": "file",
-        "url": "https://registry.npmjs.org/@opencode-ai/cli-linux-x64/beta"
+        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/latest"
       },
       "original": {
         "type": "file",
-        "url": "https://registry.npmjs.org/@opencode-ai/cli-linux-x64/beta"
+        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/latest"
       }
     },
     "prismlauncher": {

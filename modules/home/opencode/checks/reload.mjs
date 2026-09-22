@@ -5,6 +5,7 @@ import { createServer } from "node:net"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
+import { setTimeout as sleep } from "node:timers/promises"
 
 const [serverConfig, cliConfig, packagePath] = process.argv.slice(2)
 // Tie this regression to the deployed configuration, rather than testing a
@@ -16,8 +17,8 @@ for (const file of [serverConfig, cliConfig]) {
   assert.ok(local.length > 0)
   assert.ok(local.every((target) => target.startsWith("file:///nix/store/")), `${file}: local plugin registrations must use immutable paths`)
 }
-const { OpenCode } = await import(pathToFileURL(join(packagePath, "node_modules/@opencode-ai/client/dist/promise/index.js")))
-const { Service } = await import(pathToFileURL(join(packagePath, "node_modules/@opencode-ai/client/dist/promise/service.js")))
+const { OpenCode } = await import(pathToFileURL(join(packagePath, "node_modules/@opencode/client/dist/promise/index.js")))
+const { Service } = await import(pathToFileURL(join(packagePath, "node_modules/@opencode/client/dist/promise/service.js")))
 const root = await mkdtemp(join(tmpdir(), "opencode-reload-"))
 const config = join(root, "config/opencode")
 const env = {
@@ -50,16 +51,19 @@ try {
   const port = reservation.address().port
   await new Promise((resolve) => reservation.close(resolve))
   cli("service", "set", "port", String(port))
-  cli("api", "post", "/api/plugin/await-activation")
+  cli("api", "get", "/api/info")
   const endpoint = await Service.discover({ file: join(env.XDG_STATE_HOME, "opencode/service.json") })
   assert.ok(endpoint)
   const client = OpenCode.make({ baseUrl: endpoint.url, headers: Service.headers(endpoint) })
   const check = async (directory, target) => {
-    const response = await fetch(new URL(`/api/plugin/await-activation?location[directory]=${encodeURIComponent(directory)}`, endpoint.url), {
-      method: "POST", headers: Service.headers(endpoint), signal: AbortSignal.timeout(15000),
-    })
-    assert.ok(response.ok)
-    const plugins = (await client.plugin.list({ location: { directory } })).data
+    let plugins = []
+    const deadline = Date.now() + 15000
+    do {
+      plugins = (await client.plugin.list({ location: { directory } })).data
+      const probe = plugins.find((plugin) => plugin.id === "test.reload")
+      if (probe?.state.status === "active" && probe.source.path === join(target, "index.js")) break
+      await sleep(100)
+    } while (Date.now() < deadline)
     const local = plugins.filter((plugin) => plugin.source.type !== "builtin")
     assert.equal(local.length, 1, JSON.stringify(local))
     const probe = plugins.find((plugin) => plugin.id === "test.reload")

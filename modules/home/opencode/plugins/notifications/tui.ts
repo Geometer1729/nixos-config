@@ -1,5 +1,5 @@
-import { Plugin } from "@opencode-ai/plugin/tui"
-import { Service } from "@opencode-ai/client/service"
+import { Plugin } from "@opencode/plugin/tui"
+import { Service } from "@opencode/client/service"
 import { createEffect, onCleanup } from "solid-js"
 
 import { presenceClient, socketPath } from "./presence.ts"
@@ -14,13 +14,13 @@ export default Plugin.define({
       render() {
         const client = presenceClient(async () => {
           const options = { signal: AbortSignal.timeout(5000) }
-          const [local, server, health] = await Promise.all([
-            Service.discover(), context.client.server.get(options), context.client.health.get(options),
+          const [local, server] = await Promise.all([
+            Service.discover(), context.client.server.info(options),
           ])
           // Presence is for this desktop's managed service, including after its
           // port/PID changes. A TUI connected to a remote server is excluded.
           if (!local || !server.urls.includes(local.url)) throw new Error("Not the local service")
-          return socketPath(health.pid)
+          return socketPath(server.pid)
         })
         createEffect(() => {
           const route = context.ui.router.current()

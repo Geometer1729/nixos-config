@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto"
 
-import { Plugin } from "@opencode-ai/plugin"
+import { Plugin } from "@opencode/plugin"
 
 // V2 adapter for Meridian's V1 chat.headers plugin. Provider configuration
 // still owns proxy routing; this supplies tracking and model-tier metadata.

@@ -3,8 +3,8 @@ import test from "node:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { Service } from "@opencode-ai/client/service"
-import type { Plugin } from "@opencode-ai/plugin"
+import { Service } from "@opencode/client/service"
+import type { Plugin } from "@opencode/plugin"
 
 import notifications from "./index.ts"
 

@@ -43,15 +43,28 @@ pkgs.runCommand "opencode-plugin-load"
     ' ${home.xdg.configFile."opencode/opencode.json".source} > "$XDG_CONFIG_HOME/opencode/opencode.json"
     cd "$TMPDIR/project"
     trap 'opencode2 service stop >/dev/null 2>&1 || true' EXIT
-    opencode2 api post /api/plugin/await-activation
-    opencode2 api get /api/plugin > "$TMPDIR/plugins.json"
-    jq -e --slurpfile expected "$OPENCODE_CHECK_EXPECTED" '
-      [.data[] | select(.source.type != "builtin")] as $plugins |
-      if all($plugins[]; .state.status == "active") and
-         (($expected[0] | map(select(.server) | .id)) - ($plugins | map(.id)) | length == 0)
-      then $expected[0] | map(.id)
-      else error("Missing or failed plugins: " + ($plugins | tojson)) end
-    ' "$TMPDIR/plugins.json"
+    # V2 loads plugins asynchronously; wait for the probe and the complete
+    # active inventory rather than treating an empty initial list as ready.
+    ready=false
+    for attempt in $(seq 1 100); do
+      opencode2 api get /api/plugin > "$TMPDIR/plugins.json"
+      if test -f "$OPENCODE_CHECK_EXPECTED" &&
+        jq -e --slurpfile expected "$OPENCODE_CHECK_EXPECTED" '
+          [.data[] | select(.source.type != "builtin")] as $plugins |
+          all($plugins[]; .state.status == "active") and
+          (($expected[0] | map(select(.server) | .id)) - ($plugins | map(.id)) | length == 0)
+        ' "$TMPDIR/plugins.json" > /dev/null; then
+        ready=true
+        break
+      fi
+      sleep 0.2
+    done
+    if ! "$ready"; then
+      cat "$TMPDIR/plugins.json"
+      echo "Timed out waiting for the plugin probe and active inventory" >&2
+      exit 1
+    fi
+    jq 'map(.id)' "$OPENCODE_CHECK_EXPECTED"
     node ${./reload.mjs} \
       ${home.xdg.configFile."opencode/opencode.json".source} \
       ${home.xdg.configFile."opencode/cli.json".source} \

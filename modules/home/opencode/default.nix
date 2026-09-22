@@ -25,7 +25,7 @@ let
     installPhase = ''
       runHook preInstall
 
-      install -Dm755 bin/opencode2 $out/bin/opencode2
+      install -Dm755 bin/opencode $out/bin/opencode2
       # OpenTUI dlopens libwayland-client.so.0 by soname for host clipboard reads,
       # and Bun extracts its copy at runtime where autoPatchelfHook never sees it.
       wrapProgram $out/bin/opencode2 \
@@ -40,7 +40,7 @@ let
     '';
 
     meta = {
-      description = "OpenCode v2 next-channel preview";
+      description = "OpenCode v2";
       homepage = "https://github.com/anomalyco/opencode/tree/v2";
       license = pkgs.lib.licenses.mit;
       mainProgram = "opencode2";
@@ -103,9 +103,9 @@ in
       text = builtins.toJSON {
         "$schema" = "https://opencode.ai/v2/cli.json";
         animations = true;
-        attention.enabled = true;
+        attention.sound = true;
         attention.notifications = !machine.hasGui;
-        plugins = [ "file://${plugins}/vim" ]
+        plugins = [ "file://${plugins}/vim" "file://${plugins}/auto-tabs" ]
           ++ lib.optional machine.hasGui "file://${plugins}/notifications";
         diffs.wrap = "word";
         session = {

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 import { syncBuiltinESMExports } from "node:module"
-import { Service } from "@opencode-ai/client/service"
-import type { Plugin } from "@opencode-ai/plugin"
+import { Service } from "@opencode/client/service"
+import type { Plugin } from "@opencode/plugin"
 
 import usage from "./index.ts"
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 import { setTimeout as sleep } from "node:timers/promises"
-import type { OpenCodeClient } from "@opencode-ai/client"
+import type { OpenCodeClient } from "@opencode/client"
 
 import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
@@ -92,10 +92,10 @@ test("every snapshot re-reads all pages and pending requests in loaded locations
       assert.deepEqual(input.location, location)
       return { data: asked ? [{ sessionID: "ses_second" }] : [] }
     } } },
-    form: { request: { list: async (input: { location: unknown }) => {
+    form: { list: async (input: { location: unknown }) => {
       assert.deepEqual(input.location, location)
       return { data: [] }
-    } } },
+    } },
   } as unknown as OpenCodeClient
   const signal = new AbortController().signal
   assert.match(notification(await snapshot(client, signal)).body, /— approval needed/)

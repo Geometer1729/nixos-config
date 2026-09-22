@@ -4,7 +4,7 @@ import { readFile, readdir } from "node:fs/promises"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 
-import { Plugin } from "@opencode-ai/plugin"
+import { Plugin } from "@opencode/plugin"
 
 interface ServerConfig {
   command: readonly [string, ...string[]]

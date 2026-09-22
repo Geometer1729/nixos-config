@@ -1,4 +1,4 @@
-import { Plugin } from "@opencode-ai/plugin/tui"
+import { Plugin } from "@opencode/plugin/tui"
 import type { EditBufferRenderable, EditorTraits } from "@opentui/core"
 import { jsx } from "@opentui/solid/jsx-runtime"
 import { onCleanup, onMount } from "solid-js"

@@ -1,4 +1,4 @@
-import type { OpenCodeClient } from "@opencode-ai/client"
+import type { OpenCodeClient } from "@opencode/client"
 import { basename } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
@@ -37,7 +37,7 @@ export async function snapshot(client: OpenCodeClient, signal: AbortSignal): Pro
   const requests = await Promise.all(locations.map(async (location) => {
     const [permissions, forms] = await Promise.all([
       client.permission.request.list({ location }, options),
-      client.form.request.list({ location }, options),
+      client.form.list({ location }, options),
     ])
     return { permissions: permissions.data, forms: forms.data }
   }))

@@ -2,9 +2,9 @@ import { execFile } from "node:child_process"
 import { setTimeout as sleep } from "node:timers/promises"
 import { promisify } from "node:util"
 
-import { OpenCode } from "@opencode-ai/client"
-import { Service } from "@opencode-ai/client/service"
-import { Plugin } from "@opencode-ai/plugin"
+import { OpenCode } from "@opencode/client"
+import { Service } from "@opencode/client/service"
+import { Plugin } from "@opencode/plugin"
 
 import { refreshQueue } from "./refresh.ts"
 import { confirmedSnapshot, notification, relevantEvent, snapshot } from "./snapshot.ts"
@@ -29,7 +29,7 @@ async function run(command: string, shared: Shared): Promise<void> {
         if (!endpoint) throw new Error("Local OpenCode service is not ready")
         const headers = Service.headers({ url: endpoint.url, ...(endpoint.auth ? { auth: endpoint.auth } : {}) })
         const client = OpenCode.make({ baseUrl: endpoint.url, headers: headers ?? {} })
-        const health = await client.health.get({ signal: connected })
+        const health = await client.server.info({ signal: connected })
         // A standalone server must never render another server's waiting sessions.
         if (health.pid !== process.pid) return
 

@@ -1,5 +1,7 @@
 { pkgs, config, ... }:
 {
+  scripts.opencode-task.extra = [ config.programs.opencode.package ];
+
   home.packages = [
     pkgs.vit
     pkgs.taskopen
@@ -10,6 +12,7 @@
       ''
         [keybinding]
         o = :!wr taskopen {TASK_UUID}<Enter>
+        O = :! ${config.scripts.opencode-task.package}/bin/opencode-task {TASK_UUID}<Enter>
         i = :!wr task {TASK_UUID} info<Enter>
         ri = :inbox<Enter>
         rs = :someday<Enter>

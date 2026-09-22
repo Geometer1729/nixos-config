@@ -2,9 +2,9 @@ import { rename, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
-import { OpenCode } from "@opencode-ai/client"
-import { Service } from "@opencode-ai/client/service"
-import { Plugin } from "@opencode-ai/plugin"
+import { OpenCode } from "@opencode/client"
+import { Service } from "@opencode/client/service"
+import { Plugin } from "@opencode/plugin"
 
 import { claudeUsage, codexUsage, fetchJSON, interval, render, Source } from "./usage.ts"
 
@@ -31,7 +31,7 @@ async function run(shared: Shared, file: string, timezone: string) {
     if (!endpoint) return
     const headers = Service.headers({ url: endpoint.url, ...(endpoint.auth ? { auth: endpoint.auth } : {}) })
     const client = OpenCode.make({ baseUrl: endpoint.url, headers: headers ?? {} })
-    if ((await client.health.get({ signal: timeout })).pid !== process.pid) return
+    if ((await client.server.info({ signal: timeout })).pid !== process.pid) return
     // One request covers both Claude profiles, including token renewal handled
     // by Meridian. No raw credentials or upstream responses go into the cache.
     let meridian: Promise<unknown> | undefined
