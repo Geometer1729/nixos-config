@@ -28,18 +28,25 @@ function messages(socket: Socket, receive: (message: unknown) => void) {
   })
 }
 
-// Arrays report a TUI's full tab inventory; a session ID requests focus.
+interface Presence {
+  sessions: readonly string[]
+  pane: string
+}
+
+// Objects report a TUI's tab inventory and tmux pane; a session ID requests focus.
 // EOF (including a killed TUI) removes its inventory.
 export async function presenceServer(path: string, changed: () => void) {
-  const clients = new Map<Socket, readonly string[]>()
+  const clients = new Map<Socket, Presence>()
   const server = createServer((socket) => {
     messages(socket, (message) => {
       if (typeof message === "string" && message.startsWith("ses_")) {
-        const owner = [...clients].find(([, ids]) => ids.includes(message))?.[0]
+        const owner = [...clients].find(([, { sessions }]) => sessions.includes(message))?.[0]
         owner?.write(JSON.stringify(message) + "\n")
         socket.end()
-      } else if (Array.isArray(message) && message.every((id) => typeof id === "string" && id.startsWith("ses_"))) {
-        clients.set(socket, message)
+      } else if (message && typeof message === "object" && "sessions" in message && "pane" in message
+        && Array.isArray(message.sessions) && message.sessions.every((id) => typeof id === "string" && id.startsWith("ses_"))
+        && typeof message.pane === "string") {
+        clients.set(socket, { sessions: message.sessions, pane: message.pane })
       } else {
         socket.destroy()
         return
@@ -57,7 +64,14 @@ export async function presenceServer(path: string, changed: () => void) {
     server.listen(path, () => { server.off("error", reject); resolve() })
   })
   return {
-    sessions: () => new Set([...clients.values()].flat()),
+    sessions: () => {
+      const panes = new Map<string, string>()
+      // Match click routing: the first attached TUI owns the displayed workspace.
+      for (const { sessions, pane } of clients.values()) {
+        for (const id of sessions) if (!panes.has(id)) panes.set(id, pane)
+      }
+      return panes
+    },
     close: () => new Promise<void>((resolve, reject) => {
       for (const socket of clients.keys()) socket.destroy()
       server.close((error) => error ? reject(error) : resolve())
@@ -67,7 +81,7 @@ export async function presenceServer(path: string, changed: () => void) {
 
 export function presenceClient(path: () => Promise<string>, focus: (sessionID: string) => void = () => undefined) {
   const controller = new AbortController()
-  let payload = "[]\n"
+  let payload = '{"sessions":[],"pane":""}\n'
   let socket: Socket | undefined
   let connected = false
   const task = (async () => {
@@ -78,7 +92,7 @@ export function presenceClient(path: () => Promise<string>, focus: (sessionID: s
         await new Promise<void>((resolve) => {
           socket = createConnection(address)
           messages(socket, (message) => {
-            if (typeof message === "string" && JSON.parse(payload).includes(message)) focus(message)
+            if (typeof message === "string" && JSON.parse(payload).sessions.includes(message)) focus(message)
           })
           socket.once("connect", () => { connected = true; socket!.write(payload) })
           socket.on("error", () => socket?.destroy())
@@ -91,8 +105,8 @@ export function presenceClient(path: () => Promise<string>, focus: (sessionID: s
     }
   })()
   return {
-    update(ids: readonly string[]) {
-      const next = JSON.stringify([...new Set(ids)].sort()) + "\n"
+    update(ids: readonly string[], pane = "") {
+      const next = JSON.stringify({ sessions: [...new Set(ids)].sort(), pane }) + "\n"
       if (next === payload) return
       payload = next
       if (connected) socket!.write(payload)

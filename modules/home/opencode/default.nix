@@ -217,6 +217,7 @@ in
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";
+        options.focusCommand = "${focus}/bin/opencode-focus";
       }
         {
           package = "file://${plugins}/usage";

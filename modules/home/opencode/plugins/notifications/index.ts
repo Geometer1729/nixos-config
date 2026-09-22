@@ -14,7 +14,7 @@ const exec = promisify(execFile)
 const report = (error: unknown) => console.error("OpenCode waiting notification:", error)
 const moduleID = Symbol("notification plugin generation")
 
-async function run(command: string, shared: Shared): Promise<void> {
+async function run(command: string, focusCommand: string, shared: Shared): Promise<void> {
   const signal = shared.controller.signal
   if (signal.aborted) return
   const presence = await presenceServer(socketPath(process.pid), () => shared.request())
@@ -36,7 +36,14 @@ async function run(command: string, shared: Shared): Promise<void> {
         const queue = refreshQueue(async () => {
           const timeout = AbortSignal.any([connected, AbortSignal.timeout(15_000)])
           const state = await confirmedSnapshot(() => snapshot(client, timeout), timeout, shared.request)
-          const content = notification(state, presence.sessions())
+          const attached = presence.sessions()
+          const workspaces = new Map(await Promise.all([...new Set(attached.values())].filter(Boolean).map(async (pane) => {
+            const workspace = await exec(focusCommand, ["--workspace", pane], { signal: timeout })
+              .then(({ stdout }) => stdout.trim()).catch(() => "")
+            return [pane, workspace] as const
+          })))
+          const locations = new Map([...attached].map(([id, pane]) => [id, workspaces.get(pane) ?? ""]))
+          const content = notification(state, new Set(attached.keys()), locations)
           await exec(command, [content.summary, content.body, content.key, content.sessionID, socketPath(process.pid)], { signal: timeout })
         }, connected, report)
         shared.request = queue.request
@@ -79,7 +86,8 @@ export default Plugin.define({
   id: "local.notifications",
   setup(context) {
     const command = context.options.command
-    if (typeof command !== "string" || !process.env.DBUS_SESSION_BUS_ADDRESS || !process.env.XDG_RUNTIME_DIR) return
+    const focusCommand = context.options.focusCommand
+    if (typeof command !== "string" || typeof focusCommand !== "string" || !process.env.DBUS_SESSION_BUS_ADDRESS || !process.env.XDG_RUNTIME_DIR) return
 
     // Global plugins are instantiated once per location. They share one reader
     // and renderer; a code reload replaces that reader. No session state is cached.
@@ -96,7 +104,7 @@ export default Plugin.define({
       const state: Shared = {
         moduleID, owners, controller: new AbortController(), task: Promise.resolve(), request: () => undefined,
       }
-      state.task = previous.then(() => run(command, state)).catch(report)
+      state.task = previous.then(() => run(command, focusCommand, state)).catch(report)
       return state
     })()
     const owner = Symbol()

@@ -17,7 +17,7 @@ test("locations share a reader, setup refreshes it, and code reload cannot be st
   const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
   process.env.XDG_RUNTIME_DIR = directory
   process.env.DBUS_SESSION_BUS_ADDRESS = "notification-lifecycle-test"
-  const context = { options: { command: "unused-test-notifier" } } as unknown as Plugin.Context
+  const context = { options: { command: "unused-test-notifier", focusCommand: "unused-test-focus" } } as unknown as Plugin.Context
   const host = globalThis as typeof globalThis & {
     __confOpenCodeWaiting?: { controller: AbortController; request(): void; owners: Set<symbol> }
   }

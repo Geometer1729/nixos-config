@@ -87,7 +87,7 @@ function escape(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
 }
 
-export function notification(state: Snapshot, attached: ReadonlySet<string>): Notification {
+export function notification(state: Snapshot, attached: ReadonlySet<string>, workspaces: ReadonlyMap<string, string> = new Map()): Notification {
   const sessions = new Map(state.sessions.map((session) => [session.id, session]))
   const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string> }>()
   const root = (id: string): Session | undefined => {
@@ -136,7 +136,9 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>): No
     body: rows.map((row) => {
       const status = statuses[row.kind]
       const suffix = labels.get(row.label)! > 1 ? ` (${row.id.slice(-6)})` : ""
-      return `${status.icon} ${escape(row.label + suffix)} — ${status.label}`
+      const workspace = workspaces.get(row.id)
+      const prefix = workspace ? `ws ${text(workspace)} · ` : ""
+      return `${status.icon} ${escape(prefix + row.label + suffix)} — ${status.label}`
     }).join("\n"),
   }
 }

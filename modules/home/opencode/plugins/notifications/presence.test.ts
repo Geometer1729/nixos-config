@@ -25,14 +25,15 @@ test("full tab snapshots merge across clients; closing the last owner removes at
   const first = presenceClient(async () => path)
   const second = presenceClient(async () => path)
   try {
-    first.update(["ses_a", "ses_background"])
-    second.update(["ses_a"])
+    first.update(["ses_a", "ses_background"], "%1")
+    second.update(["ses_a"], "%2")
     await until(() => server.sessions().size === 2)
+    assert.equal(server.sessions().get("ses_a"), "%1")
     first.update(["ses_background"])
-    await until(() => server.sessions().has("ses_a"))
+    await until(() => server.sessions().get("ses_a") === "%2")
     await second.close()
     await until(() => !server.sessions().has("ses_a"))
-    assert.deepEqual([...server.sessions()], ["ses_background"])
+    assert.deepEqual([...server.sessions().keys()], ["ses_background"])
     first.update([])
     await until(() => server.sessions().size === 0)
   } finally {
@@ -50,7 +51,7 @@ test("a killed client leaves no stale attached session", async () => {
   const child = spawn(process.execPath, ["--input-type=module", "-e", `
     import {createConnection} from 'node:net'
     const socket = createConnection(${JSON.stringify(path)})
-    socket.on('connect', () => socket.write('["ses_crash"]\\n'))
+    socket.on('connect', () => socket.write('{"sessions":["ses_crash"],"pane":"%1"}\\n'))
   `], { stdio: "ignore" })
   try {
     await until(() => server.sessions().has("ses_crash"))
@@ -108,13 +109,13 @@ test("reconnecting after a server restart reports the complete current tab list"
     client.update(["ses_after"])
     server = await presenceServer(path, () => undefined)
     await until(() => server.sessions().has("ses_after"))
-    assert.deepEqual([...server.sessions()], ["ses_after"])
+    assert.deepEqual([...server.sessions().keys()], ["ses_after"])
     const invalid = createConnection(path)
     await once(invalid, "connect")
     const closed = once(invalid, "close")
     invalid.write('{"invalid":"inventory"}\n')
     await closed
-    assert.deepEqual([...server.sessions()], ["ses_after"])
+    assert.deepEqual([...server.sessions().keys()], ["ses_after"])
   } finally {
     await client.close()
     await server.close()

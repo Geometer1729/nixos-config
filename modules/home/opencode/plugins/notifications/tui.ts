@@ -39,7 +39,7 @@ export default Plugin.define({
           if (route.type === "session" && route.sessionID !== "dummy") {
             ids.push(context.data.session.root(route.sessionID))
           }
-          client.update(ids)
+          client.update(ids, process.env.TMUX_PANE)
         })
         onCleanup(() => { void client.close() })
         return null
