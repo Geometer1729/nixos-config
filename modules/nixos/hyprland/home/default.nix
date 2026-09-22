@@ -1,6 +1,7 @@
 # Per-user Hyprland session.
 {
   imports = [
+    ../../../home/cliphist.nix
     ./hyprland.nix
     ./waybar.nix
     ./hyprpaper.nix

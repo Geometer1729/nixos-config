@@ -228,6 +228,7 @@ in
           "$mod SHIFT, n, exec, start-ticket"
           "$mod SHIFT, Return, exec, brave-workspace-window"
           "$mod, u, exec, clean-url"
+          "$mod SHIFT, v, exec, clipboard-history"
 
           # Window management
           "$mod, q, killactive"
