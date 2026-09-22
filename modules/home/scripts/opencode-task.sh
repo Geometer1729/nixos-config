@@ -11,13 +11,15 @@ fail() {
   fail "Select a task in VIT first."
 uuid=$1
 directory=$(realpath "$HOME/conf")
+title=$(task "$uuid" export | jq -er '.[0].description | select(length > 0)') ||
+  fail "Could not read the selected task's title."
 
-body=$(jq -nc --arg directory "$directory" '{location: {directory: $directory}}')
+body=$(jq -nc --arg directory "$directory" '{location: {directory: $directory}, agent: "plan"}')
 session=$(opencode api post /api/session --data "$body" | jq -er '.data.id') ||
   fail "Could not create the OpenCode session."
 
 # Attach the skill explicitly: API text does not pass through TUI @ completion.
-body=$(jq -nc --arg text "@taskwarrior $uuid" \
+body=$(jq -nc --arg text "@taskwarrior $uuid: $title" \
   '{text: $text, skills: [{id: "taskwarrior"}]}')
 opencode api post "/api/session/$session/prompt" --data "$body" >/dev/null ||
   fail "Session $session was created, but its task prompt could not be sent."

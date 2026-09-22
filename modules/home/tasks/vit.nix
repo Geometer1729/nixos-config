@@ -1,6 +1,9 @@
 { pkgs, config, ... }:
 {
-  scripts.opencode-task.extra = [ config.programs.opencode.package ];
+  scripts.opencode-task.extra = [
+    config.programs.opencode.package
+    config.programs.taskwarrior.package
+  ];
 
   home.packages = [
     pkgs.vit
