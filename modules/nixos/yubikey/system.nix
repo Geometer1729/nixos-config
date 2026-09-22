@@ -1,5 +1,12 @@
 { pkgs, config, ... }:
 {
+  imports = [ ../password/scripts.nix ];
+
+  scripts.yubikey = {
+    directory = ./.;
+    extras = with pkgs; [ gnupg usbutils ];
+  };
+
   # Enable smartcard daemon for YubiKey GPG support
   services = {
     pcscd.enable = true;
@@ -20,7 +27,7 @@
   # GPG support for YubiKey
   programs.gnupg.agent = {
     enable = true;
-    pinentryPackage = config.home-manager.users.${config.mainUser}.scripts.pinentry.package;
+    pinentryPackage = config.scripts.pinentry.packages.pinentry;
   };
 
   # Add udev rules for YubiKey

@@ -1,4 +1,4 @@
-{ flake, pkgs, ... }:
+{ flake, config, pkgs, ... }:
 let
   linearisSource = flake.inputs.linearis;
   linearisPackage = builtins.fromJSON (builtins.readFile "${linearisSource}/package.json");
@@ -42,6 +42,19 @@ let
     };
 in
 {
+  scripts.work = {
+    directory = ./.;
+    extras = with pkgs; [
+      linearis
+      config.programs.opencode.package
+      config.programs.rofi.package
+      direnv
+      gh
+      ghostty
+      tmux
+    ];
+  };
+
   home.packages =
     with pkgs;
     [

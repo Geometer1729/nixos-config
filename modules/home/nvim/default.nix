@@ -1,5 +1,11 @@
-{ flake, pkgs, lib, ... }:
+{ flake, config, machine, pkgs, lib, ... }:
 {
+  scripts.nvim = {
+    directory = ./.;
+    extras = [ pkgs.libnotify config.programs.nixvim.build.package ]
+      ++ lib.optional machine.hasGui pkgs.ghostty;
+  };
+
   stylix.targets.nixvim = {
     enable = true;
     #plugin = "base16-nvim";

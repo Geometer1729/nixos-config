@@ -1,8 +1,7 @@
 { pkgs, config, ... }:
 {
-  scripts.opencode-task.extra = [
+  scripts.tasks.overrides.opencode-task.extras = [
     config.programs.opencode.package
-    config.programs.taskwarrior.package
   ];
 
   home.packages = [
@@ -15,7 +14,7 @@
       ''
         [keybinding]
         o = :!wr taskopen {TASK_UUID}<Enter>
-        O = :! ${config.scripts.opencode-task.package}/bin/opencode-task {TASK_UUID}<Enter>
+        O = :! ${config.scripts.tasks.packages.opencode-task}/bin/opencode-task {TASK_UUID}<Enter>
         i = :!wr task {TASK_UUID} info<Enter>
         r = {ACTION_REFRESH}
         gi = :inbox<Enter>

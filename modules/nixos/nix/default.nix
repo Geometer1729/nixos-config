@@ -1,5 +1,14 @@
 { flake, config, lib, pkgs, ... }:
 {
+  scripts.nix = {
+    directory = ./.;
+    extras = [ config.nix.package pkgs.gh pkgs.python3 ];
+    overrides.flake-update.extras = [
+      config.scripts.nix.packages.flake-changelog
+      config.scripts.nix.packages.nixpkgs-changelog
+    ];
+  };
+
   nix = {
     nixPath = [ "nixpkgs=${flake.inputs.nixpkgs}" ];
 

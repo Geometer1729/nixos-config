@@ -14,6 +14,7 @@
     packages.default = self'.packages.activate;
 
     checks = lib.optionalAttrs (system == "x86_64-linux") {
+      script-modules = pkgs.callPackage ../nixos/scripts/tests.nix { };
       nixos-am = self.nixosConfigurations.am.config.system.build.toplevel;
       nixos-balrog = self.nixosConfigurations.balrog.config.system.build.toplevel;
       nixos-torag = self.nixosConfigurations.torag.config.system.build.toplevel;

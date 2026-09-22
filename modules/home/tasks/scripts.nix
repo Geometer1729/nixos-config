@@ -1,6 +1,15 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
-  # Task management helper scripts moved to modules/home/scripts/
+  scripts.tasks = {
+    directory = ./.;
+    extras = with pkgs; [
+      config.programs.taskwarrior.package
+      config.programs.nixvim.build.package
+      taskopen
+      fzf
+      libnotify
+    ] ++ lib.optional (config.scripts ? hyprland) config.scripts.hyprland.packages.scratchPad;
+  };
 
   home.packages = with pkgs;
     [

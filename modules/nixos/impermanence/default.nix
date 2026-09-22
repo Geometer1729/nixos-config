@@ -1,5 +1,9 @@
 { config, lib, ... }:
 {
+  scripts.impermanence = {
+    directory = ./.;
+  };
+
   programs.fuse.userAllowOther = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;

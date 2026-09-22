@@ -16,6 +16,7 @@ in
     machine
     nix
     password
+    scripts
     secrets
     ssh
     storage-health

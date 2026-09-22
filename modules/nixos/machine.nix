@@ -13,5 +13,6 @@
     };
   };
 
+  config._module.args.machine = config.machine;
   config.home-manager.extraSpecialArgs.machine = config.machine;
 }

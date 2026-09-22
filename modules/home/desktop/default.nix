@@ -1,5 +1,10 @@
 { pkgs, ... }:
 {
+  scripts.desktop = {
+    directory = ./.;
+    extras = [ pkgs.xinput ];
+  };
+
   home.packages = with pkgs; [
     # Fonts
     font-awesome

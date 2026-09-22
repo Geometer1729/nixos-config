@@ -13,6 +13,18 @@ let
   '';
 in
 {
+  scripts.system = {
+    directory = ./.;
+    extras = with pkgs; [
+      expect
+      zsh
+      nhWithSleepInhibit
+      tailscale
+      iproute2
+      nixos-rebuild
+    ] ++ lib.optional (config.scripts ? hyprland) config.scripts.hyprland.packages.scratchPad;
+  };
+
   home.packages = with pkgs; [
     # System utilities
     home-manager
@@ -28,7 +40,18 @@ in
     fastfetch
     lsof # list open files
 
-    # Custom utilities moved to modules/home/scripts/
+    # Interactive tools, independent of individual scripts' runtime dependencies.
+    coreutils
+    curl
+    fzf
+    gh
+    git
+    jq
+    libnotify
+    pipewire
+    pulseaudioFull
+    python3
+    systemd
   ] ++ lib.optionals machine.hasGui (with pkgs; [
     wl-clipboard
     radeontop

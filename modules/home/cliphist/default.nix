@@ -1,19 +1,13 @@
 { config, lib, pkgs, ... }:
 let
-  cliphist = config.scripts.cliphist.package;
+  cliphist = config.scripts.cliphist.packages.cliphist;
 in
 {
-  imports = [ ./scripts ];
-
-  scripts = {
-    cliphist = {
-      enable = true;
-      extra = [ pkgs.cliphist ];
-    };
-    clipboard-history = {
-      enable = true;
-      extra = [ cliphist config.programs.rofi.package pkgs.wl-clipboard ];
-    };
+  scripts.cliphist = {
+    directory = ./.;
+    extras = with pkgs; [ pkgs.cliphist config.programs.rofi.package wl-clipboard python3 ];
+    # The picker must use our runtime-only database wrapper before upstream cliphist.
+    overrides.clipboard-history.extras = [ cliphist ];
   };
 
   services.cliphist = {

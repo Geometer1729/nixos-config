@@ -9,6 +9,12 @@ let
 
 in
 {
+  scripts.claude = {
+    directory = ./.;
+    extras = with pkgs; [ libnotify tmux ]
+      ++ lib.optionals machine.hasGui [ hyprland xdotool ];
+  };
+
   # Use home-manager's official Claude Code module
   programs.claude-code = {
     enable = true;

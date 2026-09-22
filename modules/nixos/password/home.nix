@@ -33,7 +33,7 @@ let
   };
 in
 {
-  imports = [ ../../home/scripts ];
+  imports = [ ./scripts.nix ];
 
   home.packages = with pkgs; [
     # Password management
@@ -44,7 +44,7 @@ in
   # GPG agent configuration for YubiKey support
   services.gpg-agent = {
     enable = true;
-    pinentry.package = config.scripts.pinentry.package;
+    pinentry.package = config.scripts.pinentry.packages.pinentry;
 
     # Cache settings for YubiKey
     defaultCacheTtl = 600;

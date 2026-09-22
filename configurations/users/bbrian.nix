@@ -11,6 +11,7 @@ in
 
   imports = (with self.homeModules; [
     ./bbrian/git.nix
+    ./bbrian/scripts.nix
     inputs.nixvim.homeModules.nixvim
 
     ranger

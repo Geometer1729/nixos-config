@@ -152,7 +152,7 @@ let
       };
 
       "custom/ai-usage" = {
-        exec = lib.getExe config.scripts.ai-usage.package;
+        exec = lib.getExe config.scripts.hyprland.packages.ai-usage;
         return-type = "json";
         interval = 30;
         format = " {} ";

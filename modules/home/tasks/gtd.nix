@@ -103,7 +103,7 @@ let
   };
 in
 {
-  # GTD helper scripts moved to modules/home/scripts/
+  # GTD helper scripts are packaged in scripts.nix alongside the task helpers.
 
   programs.taskwarrior.config = {
     # GTD User Defined Attributes
