@@ -121,6 +121,7 @@ let
       temperature = {
         hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input"; # k10temp CPU sensor
         format = "{icon} {temperatureC}°C ";
+        tooltip-format = "CPU temperature: {temperatureC}°C\nClick: open btop";
         critical-threshold = 85;
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
         #format-icons = [ "" "" "" ];
@@ -129,13 +130,14 @@ let
       # CPU usage
       cpu = {
         format = "{usage}% ";
-        tooltip = false;
+        tooltip = true;
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
 
       # Memory usage
       memory = {
         format = "{}% ";
+        tooltip-format = "Memory usage: {percentage}%\nClick: open btop";
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
 
