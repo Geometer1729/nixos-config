@@ -8,7 +8,7 @@ baseline for unchecked hosts or commands.
 This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
 
 Verified 2026-09-21 with full `nix flake check /home/bbrian/conf`
-(SOPS user-key simplification, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
+(Hyprlock service lifetime fix, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
@@ -17,7 +17,7 @@ Verified 2026-09-21 with full `nix flake check /home/bbrian/conf`
 
 ## Flake checks
 
-- **Passed, 2026-09-21**: full `nix flake check /home/bbrian/conf` after the SOPS user-key simplification, including lint, Neovim, OpenCode plugin type/load checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
+- **Passed, 2026-09-21**: all 39 checks in full `nix flake check /home/bbrian/conf` with the Hyprlock service lifetime fix, including all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
 - **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Build/tests pass; follow the npm hook and dependency updates rather than suppressing the warnings.
 
 ## installer
@@ -82,18 +82,22 @@ Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands ov
 ## torag (secondary machine)
 
 ### Build and activation
-- **Passed, 2026-09-21**: `nixos-rebuild test --flake .#torag --target-host bbrian@torag --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `fdka1cn…` verified, with 279 MiB free in `/boot`.
+- **Passed, 2026-09-21**: Hyprlock fix, `nixos-rebuild test --flake .#torag --target-host bbrian@torag --sudo --use-substitutes`, active system `4xbk1mj…`. Boot default remains `fdka1cn…`.
 
 ### Post-deployment boot checks
 - **Passed for storage/system services, 2026-09-21 at 16:59 EDT**: `ssh torag sudo -n systemctl reboot`; expected active/default `fdka1cn…`, new boot ID, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. The user terminal-restoration failure below remains.
 
 ### Desktop runtime
-- **Lock screen lost during activation, newly recorded 2026-09-21**: Home Manager restarted `hypridle` at 16:44:35 EDT during `nixos-rebuild test`, after it had launched `hyprlock` at 16:40:17. Hyprland remained locked with no `hyprlock` process and displayed its “Oopsie daisy” recovery screen; there was no new boot or coredump. `hypridle` uses `KillMode=control-group`, strongly implicating termination of its child locker. Recovered by temporarily enabling `misc:allow_session_lock_restore`, launching `hyprlock`, and restoring the option to false. Follow up by giving the locker an independent service lifetime; the underlying configuration is unchanged.
+Hyprlock restart/activation survival, idle locking, password unlock, suspend/resume, and fresh login verified 2026-09-21–22 on `4xbk1mj…`. am live verification deferred by Brian; task 35 accepted on Torag evidence.
+
+- **Logout crashes, newly recorded 2026-09-22**: the approved locked-session `hyprctl -i 0 dispatch exit` test at 22:28 EDT September 21 produced a Hyprland 0.55.4 SIGSEGV and Hyprlock 0.9.5 / Hyprpaper SIGABRTs. Hyprlock reported `ASSERTION FAILED! [core] Disconnected from pollfd id 0`. DrKonqi's coredump launcher then repeatedly aborted. Logout reached the greeter, graphical targets eventually stopped, and the next login worked with no orphan locker. Inspect compositor teardown and the crash-launcher cascade; a clean locked logout remains unverified.
 - **Terminal restore timeout, newly recorded 2026-09-21**: `restore-terminals.service` failed at 16:44:59 EDT during Home Manager activation and again at 17:00:05 after reboot with `Timed out waiting for tmux-resurrect to restore terminal sessions`. Inspect its saved-session/readiness checks; this is a user-service failure even when the system-level `systemctl --failed` is clean.
 
 ### `just health`
-Checked 2026-09-21 with `ssh torag just --justfile /home/bbrian/conf/justfile health`, system `fdka1cn…`: no failed system units, root 37% used / 600 GiB available, two Syncthing peers, the existing D-Bus/menu journal warnings, and the user terminal-restoration failure above. Earlier intermittent hardware conditions were not re-exercised.
+Checked 2026-09-22 with `ssh torag just --justfile /home/bbrian/conf/justfile health`, system `4xbk1mj…`: four failed crash-processor units, root 37% used / 599 GiB available, two Syncthing peers, existing D-Bus/menu warnings, and the startup notification failure below. Current user failed-unit list is empty; earlier intermittent conditions remain unverified.
 
+- **Crash processors failed, newly recorded 2026-09-22**: four `drkonqi-coredump-processor@*.service` units remain failed after the logout crash cascade above. Inspect their processing/launcher errors before resetting the states; `just health` exits zero despite reporting these failures.
+- **Startup failure notification unavailable, newly recorded 2026-09-22**: at 09:51 EDT, `check-failed-services.service` exited 1 with `Failed to show notification: …NoReply: Remote peer disconnected`, alongside failed D-Bus notification-service activations. The later user failed-unit list is empty. Check notification-daemon readiness and the checker's startup ordering; initial failure alerts can be missed.
 - **ucsi_acpi**: `PPM init failed` — USB Type-C firmware issue, hardware
 - **spd5118**: `Failed to write` / `failed to resume async: error -6` — RAM SPD sensor resume error after sleep, hardware
 - **D-Bus/menu activation noise, newly recorded on torag**: duplicate accessibility, Blueman, dconf, and portal service names, plus `plasma-apply-lookandfeel` reporting `"applications.menu" not found`. These match am's existing findings; activation succeeds with zero failed units. Review duplicate service exports and the one-shot menu lookup if eliminating the noise.

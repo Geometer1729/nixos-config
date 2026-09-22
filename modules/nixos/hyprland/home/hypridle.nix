@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 {
   options.fast_lock = with lib; mkOption
     {
@@ -16,7 +16,8 @@
         ignore_dbus_inhibit = false;
         # Wait for the compositor to confirm the session is locked before sleeping.
         inhibit_sleep = 3;
-        lock_cmd = "pgrep -x hyprlock || hyprlock";
+        # Keep manually started lockers; systemd owns new ones independently.
+        lock_cmd = "pgrep -x hyprlock || ${pkgs.systemd}/bin/systemctl --user start hyprlock.service";
       };
 
       listener =
