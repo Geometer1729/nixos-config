@@ -8,7 +8,7 @@ baseline for unchecked hosts or commands.
 This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
 
 Verified 2026-09-21 with full `nix flake check /home/bbrian/conf`
-(storage-health changes, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
+(SOPS user-key simplification, nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
@@ -17,7 +17,7 @@ Verified 2026-09-21 with full `nix flake check /home/bbrian/conf`
 
 ## Flake checks
 
-- **Passed, 2026-09-21**: full `nix flake check /home/bbrian/conf`, including lint, Neovim, OpenCode plugin type/load checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
+- **Passed, 2026-09-21**: full `nix flake check /home/bbrian/conf` after the SOPS user-key simplification, including lint, Neovim, OpenCode plugin type/load checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
 - **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Build/tests pass; follow the npm hook and dependency updates rather than suppressing the warnings.
 
 ## installer
@@ -65,17 +65,16 @@ Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following exi
 ## balrog
 
 ### Build and activation
-- **Passed, 2026-09-21**: `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `r7v1p7f…` verified.
+- **Passed, 2026-09-21**: SOPS user-key simplification, `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `xhsxkk6…` verified.
 
 ### `just health`
 Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands over SSH (Balrog has no `/home/bbrian/conf/justfile`): no failed system units, root 26% used / 168 GiB available, and two Syncthing peers.
 
 - **D-Bus duplicate service names, newly recorded on Balrog**: boot journal reports duplicate dconf and systemd service names, matching the desktop hosts' existing warning class. Review duplicate service exports if eliminating the noise.
-- **Taskwarrior sync fails after reboot, newly recorded 2026-09-21**: user `taskwarrior-sync.service` exits 2 with `sync.server.client_id and sync.encryption_secret are required`. The configured client ID exists, but the encryption secret is absent because `/run/secrets` was not created. Sync succeeded immediately before reboot; fix the SOPS boot failure below and rerun the sync service.
 
 ### Post-deployment boot checks
 - **Storage checks passed, 2026-09-21 at 16:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, expected active/default `r7v1p7f…`, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. Alert delivery to am also passed after reboot.
-- **SOPS decryption fails in initrd, newly recorded 2026-09-21**: `setupSecretsForUsers` and `setupSecrets` fail with `Error getting data key: 0 successful groups required, got 0`; the `hosts` activation snippet then cannot read `/run/secrets/hosts`. The initrd logs only the persisted user's SSH age key, whereas successful live activation also imported the host SSH keys. Check host-key availability/order in the ephemeral-root initrd and boot-ready key paths. Overall system state still reports `running`, so unit-state checks alone miss this failure.
+- **Secrets/sync boot checks passed, 2026-09-21 at 20:52 EDT**: rebooted into expected active/booted/default `xhsxkk6…`, Linux 6.18.52. Both SOPS steps imported only the persisted user SSH key, expected secrets were readable, automatic Taskwarrior sync succeeded at 20:48 EDT without corrective activation, and system/user failed-unit lists were empty.
 
 ### Storage health
 - **Unsupported SMART attributes, 2026-09-21**: smartd reports no attributes 197 (`Current_Pending_Sector`) or 198 (`Offline_Uncorrectable`) on the Samsung 860 EVO. `smartctl -a` confirms these are absent from the device's attribute table; supported attributes and overall health are monitored. No suppression or configuration change is needed.

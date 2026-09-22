@@ -6,14 +6,9 @@ in
   sops = {
     defaultSopsFile = ./secrets.yaml;
     defaultSopsFormat = "yaml";
-    age = {
-      keyFile = "/persist/system/home/${config.mainUser}/.config/sops/age/keys.txt";
-      sshKeyPaths = [
-        "/persist/system/home/${config.mainUser}/.ssh/id_ed25519"
-        "/etc/ssh/ssh_host_ed25519_key"
-      ];
-      generateKey = true;
-    };
+    # User SSH keys are persisted and available before activation restores /etc.
+    age.sshKeyPaths = [ "/persist/system/home/${config.mainUser}/.ssh/id_ed25519" ];
+    gnupg.sshKeyPaths = [ ];
 
     secrets = {
       wifi = lib.mkIf (config.wifi.enable or false) { owner = "wpa_supplicant"; };
