@@ -91,6 +91,8 @@ in
   services.meridian = {
     enable = true;
     environment.CLAUDE_CONFIG_DIR = "${config.home.homeDirectory}/.claude-work";
+    # Override Meridian's bundled Nixpkgs Claude with the one used by the CLI.
+    environment.MERIDIAN_CLAUDE_PATH = lib.getExe config.programs.claude-code.package;
     # The quota API requires explicit paths (it ignores CLAUDE_CONFIG_DIR).
     # Keep the existing default profile ID so SDK sessions retain their owner.
     environment.MERIDIAN_DEFAULT_PROFILE = "default";
