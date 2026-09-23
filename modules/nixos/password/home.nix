@@ -10,7 +10,9 @@ let
     text = ''
       shopt -s nullglob globstar
 
-      prefix="''${PASSWORD_STORE_DIR:-$HOME/.password-store}"
+      # Desktop launchers may not inherit Home Manager's session variables.
+      export PASSWORD_STORE_DIR="''${PASSWORD_STORE_DIR:-${config.home.sessionVariables.PASSWORD_STORE_DIR}}"
+      prefix="$PASSWORD_STORE_DIR"
       password_files=("$prefix"/**/*.gpg)
 
       if (( ''${#password_files[@]} == 0 )); then
