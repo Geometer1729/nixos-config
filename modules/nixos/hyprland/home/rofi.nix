@@ -1,10 +1,11 @@
+{ config, lib, ... }:
 {
   # rofi launcher configuration
   programs.rofi = {
     enable = true;
 
     extraConfig = {
-      modi = "drun,ssh,run";
+      modi = "drun,ssh,run,keybinds:${lib.getExe config.scripts.hyprland.packages.rofi-keybinds}";
       show-icons = true;
       terminal = "ghostty";
       drun-display-format = "{icon} {name}";
@@ -14,6 +15,7 @@
       display-drun = "   Apps ";
       display-run = "   Run ";
       display-ssh = "   SSH ";
+      display-keybinds = "   Keybinds ";
       sidebar-mode = true;
     };
   };

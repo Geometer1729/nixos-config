@@ -4,7 +4,7 @@ let
   scratchpads = import ./scratchpads.nix;
   scratchpadPattern = lib.concatMapStringsSep "|" (scratchpad: scratchpad.name) scratchpads;
   scratchpadBindings = map
-    (scratchpad: "$mod, ${scratchpad.key}, exec, scratchPad ${scratchpad.name}")
+    (scratchpad: "$mod, ${scratchpad.key}, Toggle ${scratchpad.name} scratchpad, exec, scratchPad ${scratchpad.name}")
     scratchpads;
 in
 {
@@ -218,115 +218,116 @@ in
         # Keybindings - translating your XMonad bindings
         "$mod" = "ALT"; # Using Alt like your XMonad setup
 
-        bind = [
+        # Descriptions also appear in Rofi's Keybinds mode via hyprctl binds.
+        bindd = [
           # Application launchers
-          "$mod, Return, exec, ghostty"
-          "$mod, d, exec, rofi -show drun"
-          "$mod SHIFT, d, exec, passmenu"
-          "$mod, s, exec, rofi -show ssh"
-          "$mod, r, exec, rofi -show run"
-          "$mod SHIFT, n, exec, start-ticket"
-          "$mod SHIFT, Return, exec, brave-workspace-window"
-          "$mod, u, exec, clean-url"
-          "$mod SHIFT, v, exec, clipboard-history"
+          "$mod, Return, Open terminal, exec, ghostty"
+          "$mod, d, Open app launcher, exec, rofi -show drun"
+          "$mod SHIFT, d, Open password picker, exec, passmenu"
+          "$mod, s, Open SSH launcher, exec, rofi -show ssh"
+          "$mod, r, Run a command, exec, rofi -show run"
+          "$mod SHIFT, n, Start a ticket, exec, start-ticket"
+          "$mod SHIFT, Return, Open Brave window for this workspace, exec, brave-workspace-window"
+          "$mod, u, Clean URL in clipboard, exec, clean-url"
+          "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
 
           # Window management
-          "$mod, q, killactive"
-          "$mod SHIFT, q, exit"
-          "$mod, space, togglefloating"
-          "$mod, w, fullscreen,1"
+          "$mod, q, Close active window, killactive"
+          "$mod SHIFT, q, Exit Hyprland, exit"
+          "$mod, space, Toggle floating window, togglefloating"
+          "$mod, w, Toggle maximized window, fullscreen,1"
           # TODO this works pretty badly tbh and I really wish it was automatic
-          "$mod, f, fullscreenstate, -1 2"
+          "$mod, f, Tell application it is fullscreen, fullscreenstate, -1 2"
 
           # Cycle to next window and maximize (xmonad Full layout style)
-          "$mod, Tab, exec, hyprctl --batch 'dispatch cyclenext; dispatch fullscreen 1'"
+          "$mod, Tab, Cycle to next window and maximize, exec, hyprctl --batch 'dispatch cyclenext; dispatch fullscreen 1'"
 
           # Focus movement (vim-style like your XMonad)
-          "$mod, h, movefocus, l"
-          "$mod, l, movefocus, r"
-          "$mod, k, movefocus, u"
-          "$mod, j, movefocus, d"
+          "$mod, h, Focus window to the left, movefocus, l"
+          "$mod, l, Focus window to the right, movefocus, r"
+          "$mod, k, Focus window above, movefocus, u"
+          "$mod, j, Focus window below, movefocus, d"
 
           # Window movement
-          "$mod SHIFT, h, movewindow, l"
-          "$mod SHIFT, l, movewindow, r"
-          "$mod SHIFT, k, movewindow, u"
-          "$mod SHIFT, j, movewindow, d"
+          "$mod SHIFT, h, Move window left, movewindow, l"
+          "$mod SHIFT, l, Move window right, movewindow, r"
+          "$mod SHIFT, k, Move window up, movewindow, u"
+          "$mod SHIFT, j, Move window down, movewindow, d"
 
           # Workspace switching (1-9, 0, F1-F12 like your XMonad)
-          "$mod, 1, workspace, 1"
-          "$mod, 2, workspace, 2"
-          "$mod, 3, workspace, 3"
-          "$mod, 4, workspace, 4"
-          "$mod, 5, workspace, 5"
-          "$mod, 6, workspace, 6"
-          "$mod, 7, workspace, 7"
-          "$mod, 8, workspace, 8"
-          "$mod, 9, workspace, 9"
-          "$mod, 0, workspace, 10"
-          "$mod, F1, workspace, 11"
-          "$mod, F2, workspace, 12"
-          "$mod, F3, workspace, 13"
-          "$mod, F4, workspace, 14"
-          "$mod, F5, workspace, 15"
-          "$mod, F6, workspace, 16"
-          "$mod, F7, workspace, 17"
-          "$mod, F8, workspace, 18"
-          "$mod, F9, workspace, 19"
-          "$mod, F10, workspace, 20"
-          "$mod, F11, workspace, 21"
-          "$mod, F12, workspace, 22"
+          "$mod, 1, Switch to workspace 1, workspace, 1"
+          "$mod, 2, Switch to workspace 2, workspace, 2"
+          "$mod, 3, Switch to workspace 3, workspace, 3"
+          "$mod, 4, Switch to workspace 4, workspace, 4"
+          "$mod, 5, Switch to workspace 5, workspace, 5"
+          "$mod, 6, Switch to workspace 6, workspace, 6"
+          "$mod, 7, Switch to workspace 7, workspace, 7"
+          "$mod, 8, Switch to workspace 8, workspace, 8"
+          "$mod, 9, Switch to workspace 9, workspace, 9"
+          "$mod, 0, Switch to workspace 10, workspace, 10"
+          "$mod, F1, Switch to workspace 11, workspace, 11"
+          "$mod, F2, Switch to workspace 12, workspace, 12"
+          "$mod, F3, Switch to workspace 13, workspace, 13"
+          "$mod, F4, Switch to workspace 14, workspace, 14"
+          "$mod, F5, Switch to workspace 15, workspace, 15"
+          "$mod, F6, Switch to workspace 16, workspace, 16"
+          "$mod, F7, Switch to workspace 17, workspace, 17"
+          "$mod, F8, Switch to workspace 18, workspace, 18"
+          "$mod, F9, Switch to workspace 19, workspace, 19"
+          "$mod, F10, Switch to workspace 20, workspace, 20"
+          "$mod, F11, Switch to workspace 21, workspace, 21"
+          "$mod, F12, Switch to workspace 22, workspace, 22"
 
           # Move windows to workspaces
-          "$mod SHIFT, 1  , movetoworkspacesilent, 1"
-          "$mod SHIFT, 2  , movetoworkspacesilent, 2"
-          "$mod SHIFT, 3  , movetoworkspacesilent, 3"
-          "$mod SHIFT, 4  , movetoworkspacesilent, 4"
-          "$mod SHIFT, 5  , movetoworkspacesilent, 5"
-          "$mod SHIFT, 6  , movetoworkspacesilent, 6"
-          "$mod SHIFT, 7  , movetoworkspacesilent, 7"
-          "$mod SHIFT, 8  , movetoworkspacesilent, 8"
-          "$mod SHIFT, 9  , movetoworkspacesilent, 9"
-          "$mod SHIFT, 0  , movetoworkspacesilent, 10"
-          "$mod SHIFT, F1 , movetoworkspacesilent, 11"
-          "$mod SHIFT, F2 , movetoworkspacesilent, 12"
-          "$mod SHIFT, F3 , movetoworkspacesilent, 13"
-          "$mod SHIFT, F4 , movetoworkspacesilent, 14"
-          "$mod SHIFT, F5 , movetoworkspacesilent, 15"
-          "$mod SHIFT, F6 , movetoworkspacesilent, 16"
-          "$mod SHIFT, F7 , movetoworkspacesilent, 17"
-          "$mod SHIFT, F8 , movetoworkspacesilent, 18"
-          "$mod SHIFT, F9 , movetoworkspacesilent, 19"
-          "$mod SHIFT, F10, movetoworkspacesilent, 20"
-          "$mod SHIFT, F11, movetoworkspacesilent, 21"
-          "$mod SHIFT, F12, movetoworkspacesilent, 22"
+          "$mod SHIFT, 1  , Move window to workspace 1 silently, movetoworkspacesilent, 1"
+          "$mod SHIFT, 2  , Move window to workspace 2 silently, movetoworkspacesilent, 2"
+          "$mod SHIFT, 3  , Move window to workspace 3 silently, movetoworkspacesilent, 3"
+          "$mod SHIFT, 4  , Move window to workspace 4 silently, movetoworkspacesilent, 4"
+          "$mod SHIFT, 5  , Move window to workspace 5 silently, movetoworkspacesilent, 5"
+          "$mod SHIFT, 6  , Move window to workspace 6 silently, movetoworkspacesilent, 6"
+          "$mod SHIFT, 7  , Move window to workspace 7 silently, movetoworkspacesilent, 7"
+          "$mod SHIFT, 8  , Move window to workspace 8 silently, movetoworkspacesilent, 8"
+          "$mod SHIFT, 9  , Move window to workspace 9 silently, movetoworkspacesilent, 9"
+          "$mod SHIFT, 0  , Move window to workspace 10 silently, movetoworkspacesilent, 10"
+          "$mod SHIFT, F1 , Move window to workspace 11 silently, movetoworkspacesilent, 11"
+          "$mod SHIFT, F2 , Move window to workspace 12 silently, movetoworkspacesilent, 12"
+          "$mod SHIFT, F3 , Move window to workspace 13 silently, movetoworkspacesilent, 13"
+          "$mod SHIFT, F4 , Move window to workspace 14 silently, movetoworkspacesilent, 14"
+          "$mod SHIFT, F5 , Move window to workspace 15 silently, movetoworkspacesilent, 15"
+          "$mod SHIFT, F6 , Move window to workspace 16 silently, movetoworkspacesilent, 16"
+          "$mod SHIFT, F7 , Move window to workspace 17 silently, movetoworkspacesilent, 17"
+          "$mod SHIFT, F8 , Move window to workspace 18 silently, movetoworkspacesilent, 18"
+          "$mod SHIFT, F9 , Move window to workspace 19 silently, movetoworkspacesilent, 19"
+          "$mod SHIFT, F10, Move window to workspace 20 silently, movetoworkspacesilent, 20"
+          "$mod SHIFT, F11, Move window to workspace 21 silently, movetoworkspacesilent, 21"
+          "$mod SHIFT, F12, Move window to workspace 22 silently, movetoworkspacesilent, 22"
 
           # Workspace navigation (bracket keys like XMonad)
-          "$mod, bracketleft, focusmonitor, -1"
-          "$mod, bracketright, focusmonitor, +1"
-          #"$mod SHIFT, bracketleft, movewindow, mon:+1"
-          #"$mod SHIFT, bracketright, movewindow, mon:-1"
-          "$mod SHIFT, bracketleft, movecurrentworkspacetomonitor,+1"
-          "$mod SHIFT, bracketright, movecurrentworkspacetomonitor, -1"
+          "$mod, bracketleft, Focus previous monitor, focusmonitor, -1"
+          "$mod, bracketright, Focus next monitor, focusmonitor, +1"
+          #"$mod SHIFT, bracketleft, Move window to next monitor, movewindow, mon:+1"
+          #"$mod SHIFT, bracketright, Move window to previous monitor, movewindow, mon:-1"
+          "$mod SHIFT, bracketleft, Move workspace to next monitor, movecurrentworkspacetomonitor,+1"
+          "$mod SHIFT, bracketright, Move workspace to previous monitor, movecurrentworkspacetomonitor, -1"
 
           # Scratchpads (using special workspaces)
         ] ++ scratchpadBindings ++ [
-          "$mod, t, exec, onScratchPad --hide-after vit quickadd quick-add-task"
-          "$mod SHIFT, t, exec, onScratchPad --hide-after vim quicknote quick-note"
-          "$mod, p, exec, onScratchPad --hide-after vit process process"
+          "$mod, t, Quick-add a task, exec, onScratchPad --hide-after vit quickadd quick-add-task"
+          "$mod SHIFT, t, Write a quick note, exec, onScratchPad --hide-after vim quicknote quick-note"
+          "$mod, p, Process tasks, exec, onScratchPad --hide-after vit process process"
 
           # System controls
-          "$mod SHIFT, s, exec, suspend-with-dpms-fix"
-          "$mod SHIFT, r, exec, onScratchPad --hide-after sp rebuild rebuild"
-          "$mod SHIFT, w, exec, systemctl --user start rotate-wallpaper.service"
-          "$mod SHIFT, m, exec, toggle-mono-output"
+          "$mod SHIFT, s, Suspend computer, exec, suspend-with-dpms-fix"
+          "$mod SHIFT, r, Rebuild NixOS, exec, onScratchPad --hide-after sp rebuild rebuild"
+          "$mod SHIFT, w, Change wallpaper, exec, systemctl --user start rotate-wallpaper.service"
+          "$mod SHIFT, m, Toggle mono audio output, exec, toggle-mono-output"
 
           # Screenshots
-          ", Print, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
-          "$mod, Print, exec, grim ~/Pictures/screenshot-$(date +'%Y%m%d-%H%M%S').png"
+          ", Print, Screenshot selected region and annotate, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
+          "$mod, Print, Save full screenshot to Pictures, exec, grim ~/Pictures/screenshot-$(date +'%Y%m%d-%H%M%S').png"
 
           # Bluetooth
-          "$mod SHIFT, b, exec, bluetooth-autoconnect"
+          "$mod SHIFT, b, Connect Bluetooth headphones, exec, bluetooth-autoconnect"
         ];
 
         # Mouse bindings
@@ -336,17 +337,17 @@ in
         ];
 
         # Media keys
-        bindle = [
-          ", XF86AudioRaiseVolume, exec, pulsemixer --change-volume +1"
-          ", XF86AudioLowerVolume, exec, pulsemixer --change-volume -1"
+        bindled = [
+          ", XF86AudioRaiseVolume, Raise volume, exec, pulsemixer --change-volume +1"
+          ", XF86AudioLowerVolume, Lower volume, exec, pulsemixer --change-volume -1"
         ];
-        bindl = [
-          ", XF86AudioMute, exec, pulsemixer --toggle-mute"
-          ", XF86AudioPlay, exec, playPause"
-          ", XF86AudioNext, exec, playerctl next"
-          ", XF86AudioPrev, exec, playerctl previous"
-          "$mod SHIFT, p, exec, playPause"
-          "$mod, o, exec, playerctl next -a"
+        bindld = [
+          ", XF86AudioMute, Toggle mute, exec, pulsemixer --toggle-mute"
+          ", XF86AudioPlay, Play or pause media, exec, playPause"
+          ", XF86AudioNext, Next media track, exec, playerctl next"
+          ", XF86AudioPrev, Previous media track, exec, playerctl previous"
+          "$mod SHIFT, p, Play or pause media, exec, playPause"
+          "$mod, o, Next track on all players, exec, playerctl next -a"
         ];
 
         # Startup applications (matching your XMonad startup)
