@@ -191,14 +191,15 @@ in
           };
         };
       };
-      model = "openai/gpt-6-astra";
+      #model = "openai/gpt-6-astra";
+      model = "anthropic/claude-opus-5-5#xhigh";
       agents = {
-        build.model = "openai/gpt-6-astra#xhigh";
+        build.model = "anthropic/claude-opus-5-5#xhigh";
         explore.model = "openai/gpt-6-sol#xhigh";
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review";
           mode = "subagent";
-          model = "anthropic/claude-fable-5#xhigh";
+          model = "anthropic/claude-fable-5-1#xhigh";
           permissions = [
             {
               action = "edit";
