@@ -222,7 +222,7 @@ in
         bindd = [
           # Application launchers
           "$mod, Return, Open terminal, exec, ghostty"
-          "$mod, d, Open app launcher, exec, rofi -show drun"
+          "$mod, d, Open command palette, exec, rofi -show combi"
           "$mod SHIFT, d, Open password picker, exec, passmenu"
           "$mod, s, Open SSH launcher, exec, rofi -show ssh"
           "$mod, r, Run a command, exec, rofi -show run"

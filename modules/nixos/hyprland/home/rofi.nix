@@ -5,13 +5,16 @@
     enable = true;
 
     extraConfig = {
-      modi = "drun,ssh,run,keybinds:${lib.getExe config.scripts.hyprland.packages.rofi-keybinds}";
+      modi = "combi,drun,ssh,run,keybinds:${lib.getExe config.scripts.hyprland.packages.rofi-keybinds}";
+      combi-modes = "drun,ssh,run,keybinds";
+      combi-display-format = "{mode}: {text}";
       show-icons = true;
       terminal = "ghostty";
       drun-display-format = "{icon} {name}";
       location = 0;
       disable-history = false;
       hide-scrollbar = true;
+      display-combi = "   ALL ";
       display-drun = "   Apps ";
       display-run = "   Run ";
       display-ssh = "   SSH ";
