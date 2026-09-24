@@ -19,7 +19,7 @@ export default {
       const plugin = (await import(pathToFileURL(file).href)).default
       assert.equal(typeof plugin.id, "string", file)
       assert.ok(typeof plugin.setup === "function" || typeof plugin.effect === "function", file)
-      expected.push({ id: plugin.id, server: entry.server })
+      expected.push({ id: plugin.id, server: entry.server, path: entry.path })
     }
     writeFileSync(process.env.OPENCODE_CHECK_EXPECTED, JSON.stringify(expected))
   },

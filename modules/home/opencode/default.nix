@@ -3,7 +3,8 @@
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
-  plugins = (import ./plugins/package.nix { inherit lib pkgs; }).package;
+  pluginBuild = import ./plugins/package.nix { inherit lib pkgs; };
+  plugins = pluginBuild.package;
   notify = pkgs.writeShellApplication {
     name = "opencode-notify";
     runtimeInputs = with pkgs; [ coreutils jq libnotify mako socat util-linux ];
@@ -62,6 +63,12 @@ let
 in
 {
   imports = [ inputs.meridian.homeModules.default ];
+
+  # Plugin typecheck/tests, then load the real plugins under the deployed config.
+  home.checks = [
+    pluginBuild.check
+    (import ./checks/load.nix { inherit lib pkgs; home = config; })
+  ];
 
   home.packages = with pkgs; [
     config.services.meridian.package

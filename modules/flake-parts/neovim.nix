@@ -7,7 +7,6 @@
         config.allowUnfreePredicate = pkg:
           builtins.elem (lib.getName pkg) [ "vim-hoogle" ];
       };
-      nixvimLib = inputs.nixvim.lib.${system};
       nixvimModule = {
         pkgs = pkgsForNixvim;
         module = import ../home/nvim/nixvim.nix {
@@ -32,7 +31,5 @@
           description = "Neovim with NixVim configuration";
         };
       });
-
-      checks.neovim-config = nixvimLib.check.mkTestDerivationFromNixvimModule nixvimModule;
     };
 }

@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, osConfig, ... }:
 let
   cfg = config.programs.hyprland-custom;
   scratchpads = import ./scratchpads.nix;
@@ -368,5 +368,16 @@ in
         ];
       };
     };
+
+    # Parse the generated config with the Hyprland the session launches, so
+    # option renames/removals in updates fail the build before activation.
+    home.checks = [
+      (pkgs.runCommand "hyprland-config-check" { nativeBuildInputs = [ osConfig.programs.hyprland.package ]; } ''
+        export HOME=$TMPDIR XDG_RUNTIME_DIR=$TMPDIR/run
+        mkdir -p "$XDG_RUNTIME_DIR"
+        Hyprland --verify-config -c ${config.xdg.configFile."hypr/hyprland.conf".source}
+        touch $out
+      '')
+    ];
   };
 }

@@ -45,14 +45,19 @@ pkgs.runCommand "opencode-plugin-load"
     trap 'opencode2 service stop >/dev/null 2>&1 || true' EXIT
     # V2 loads plugins asynchronously; wait for the probe and the complete
     # active inventory rather than treating an empty initial list as ready.
+    # Only server plugins this host registers are expected in the inventory.
     ready=false
     for attempt in $(seq 1 100); do
       opencode2 api get /api/plugin > "$TMPDIR/plugins.json"
       if test -f "$OPENCODE_CHECK_EXPECTED" &&
-        jq -e --slurpfile expected "$OPENCODE_CHECK_EXPECTED" '
+        jq -e --slurpfile expected "$OPENCODE_CHECK_EXPECTED" \
+          --slurpfile config "$XDG_CONFIG_HOME/opencode/opencode.json" \
+          --arg package "file://$OPENCODE_CHECK_PACKAGE/" '
           [.data[] | select(.source.type != "builtin")] as $plugins |
+          [$config[0].plugins[] | (.package? // .) | ltrimstr($package)] as $registered |
           all($plugins[]; .state.status == "active") and
-          (($expected[0] | map(select(.server) | .id)) - ($plugins | map(.id)) | length == 0)
+          (($expected[0] | map(select(.server and ((.path | split("/")[0]) as $dir | any($registered[]; . == $dir))) | .id))
+            - ($plugins | map(.id)) | length == 0)
         ' "$TMPDIR/plugins.json" > /dev/null; then
         ready=true
         break
