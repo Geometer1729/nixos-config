@@ -1,7 +1,7 @@
 zathura_(){
 	\zathura $@ &
 }
-compdef zathura_=zathura
+(( $+commands[zathura] )) && compdef zathura_=zathura
 
 rm_(){
 	\rm -v $@ || \rm -riv $@

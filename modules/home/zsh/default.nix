@@ -1,9 +1,12 @@
-{ flake, config, ... }:
+{ flake, config, osConfig, lib, pkgs, ... }:
 let
   persistedHome =
     if config.home.username == "root"
     then "/persist/system/root"
     else "/persist/system/home/${config.home.username}";
+  zshFiles = lib.mapAttrs (_: file: file // { target = lib.removePrefix "./" file.target; })
+    (lib.filterAttrs (_: file: builtins.match "(\\./)?\\.z.*" file.target != null) config.home.file);
+  profiles = [ config.home.path osConfig.system.path ];
 in
 {
   imports = [ ./starship.nix ./direnv.nix ];
@@ -115,6 +118,32 @@ in
             (builtins.tail (builtins.genList (n: n + 1) 10))
         );
     };
+  # Start an interactive login shell on the generated dotfiles, with the real
+  # profiles for PATH/completions; any startup output fails the build.
+  # Home and history paths are redirected into the sandbox.
+  home.checks = [
+    (pkgs.runCommand "zsh-config-check" { nativeBuildInputs = [ config.programs.zsh.package ]; } ''
+      export HOME=$TMPDIR/home
+      export NIX_PROFILES=${lib.escapeShellArg (toString profiles)}
+      export PATH=${lib.makeBinPath profiles}:$PATH
+      ${lib.concatStrings (lib.mapAttrsToList (_: file: ''
+        mkdir -p "$(dirname "$HOME/${file.target}")"
+        if [[ -d ${file.source} ]]; then
+          ln -s ${file.source} "$HOME/${file.target}"
+        else
+          sed -e 's|${dirOf config.programs.zsh.history.path}|'"$TMPDIR/history"'|g' \
+            -e 's|${config.home.homeDirectory}|'"$HOME"'|g' \
+            ${file.source} > "$HOME/${file.target}"
+        fi
+      '') zshFiles)}
+      if ! output=$(zsh -i -l -c exit 2>&1 >/dev/null) || [[ -n $output ]]; then
+        echo "$output" >&2
+        exit 1
+      fi
+      touch $out
+    '')
+  ];
+
   home.sessionVariables = {
     EDITOR = "vim";
     NIX_AUTO_RUN = 1;

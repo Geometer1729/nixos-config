@@ -40,8 +40,7 @@
         mkdir -p "$(dirname "$XDG_CONFIG_HOME/${name}")"
         ln -s ${file.source} "$XDG_CONFIG_HOME/${name}"
       '') (lib.filterAttrs (name: _: lib.hasPrefix "nvim/" name) config.xdg.configFile))}
-      output=$(nvim -mn --headless +q 2>&1 >/dev/null)
-      if [[ -n $output ]]; then
+      if ! output=$(nvim -mn --headless +q 2>&1 >/dev/null) || [[ -n $output ]]; then
         echo "$output" >&2
         exit 1
       fi

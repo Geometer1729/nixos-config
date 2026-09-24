@@ -130,6 +130,21 @@ in
       '';
   };
 
+  # Load the generated config into a throwaway server; `source-file` fails on
+  # unknown options/commands (including inside bindings) and failing plugins.
+  home.checks = [
+    (pkgs.runCommand "tmux-config-check" { nativeBuildInputs = [ config.programs.tmux.package ]; } ''
+      export HOME=$TMPDIR TMUX_TMPDIR=$TMPDIR XDG_RUNTIME_DIR=$TMPDIR
+      # Plugin scripts use `#!/usr/bin/env bash`, which the sandbox lacks.
+      sed -E 's|^run-shell (/nix/store/[^ ]+\.tmux)$|run-shell "bash \1"|' \
+        ${config.xdg.configFile."tmux/tmux.conf".source} > tmux.conf
+      tmux -f /dev/null new-session -d
+      trap 'tmux kill-server' EXIT
+      tmux source-file tmux.conf
+      touch $out
+    '')
+  ];
+
   systemd.user.services.restore-terminals = lib.mkIf machine.hasGui {
     Unit = {
       Description = "Restore terminal windows and tmux attachments";
