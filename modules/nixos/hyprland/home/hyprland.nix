@@ -325,6 +325,7 @@ in
 
           # Screenshots
           ", Print, Screenshot selected region and annotate, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
+          "SHIFT, Print, OCR selected region to clipboard, exec, ocr-region"
           "$mod, Print, Save full screenshot to Pictures, exec, grim ~/Pictures/screenshot-$(date +'%Y%m%d-%H%M%S').png"
 
           # Bluetooth
