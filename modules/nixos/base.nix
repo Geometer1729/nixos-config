@@ -13,6 +13,7 @@ in
     boot
     disko
     impermanence
+    keep-awake
     machine
     nix
     password

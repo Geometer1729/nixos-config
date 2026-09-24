@@ -22,6 +22,7 @@ let
       modules-right = [
         "custom/ai-usage"
         "custom/inbox"
+        "custom/keep-awake"
         "pulseaudio#source"
         "pulseaudio"
       ] ++ lib.optionals (osConfig.wifi.enable or false) [ "network" ]
@@ -120,23 +121,22 @@ let
 
       temperature = {
         hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input"; # k10temp CPU sensor
-        format = "{icon} {temperatureC}°C ";
+        format = "🌡️ {temperatureC}°C ";
         tooltip-format = "CPU temperature: {temperatureC}°C\nClick: open btop";
         critical-threshold = 85;
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
-        #format-icons = [ "" "" "" ];
       };
 
       # CPU usage
       cpu = {
-        format = "{usage}% ";
+        format = "🤖 {usage}% ";
         tooltip = true;
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
 
       # Memory usage
       memory = {
-        format = "{}% ";
+        format = "🐏 {}% ";
         tooltip-format = "Memory usage: {percentage}%\nClick: open btop";
         on-click = "hyprctl dispatch exec 'ghostty -e btop'";
       };
@@ -156,6 +156,15 @@ let
         return-type = "json";
         interval = 30;
         format = " {} ";
+        tooltip = true;
+      };
+
+      "custom/keep-awake" = {
+        exec = "${lib.getExe osConfig.scripts.keep-awake.packages.keep-awake} waybar";
+        return-type = "json";
+        interval = 2;
+        format = " {} ";
+        on-click = "${lib.getExe osConfig.scripts.keep-awake.packages.keep-awake} toggle";
         tooltip = true;
       };
 
@@ -237,6 +246,23 @@ in
 
       #custom-ai-usage.incomplete {
         font-style: italic;
+      }
+
+      #custom-keep-awake.automatic,
+      #custom-keep-awake.other {
+        background-color: @base0D;
+        color: @base00;
+      }
+
+      #custom-keep-awake.manual,
+      #custom-keep-awake.both {
+        background-color: @base0A;
+        color: @base00;
+      }
+
+      #custom-keep-awake.error {
+        background-color: @base08;
+        color: @base00;
       }
 
       /* inbox theme */

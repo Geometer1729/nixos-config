@@ -15,6 +15,9 @@
 
     checks = lib.optionalAttrs (system == "x86_64-linux") {
       script-modules = pkgs.callPackage ../nixos/scripts/tests.nix { };
+      keep-awake = pkgs.callPackage ../nixos/keep-awake/tests.nix {
+        inherit (self.nixosConfigurations.am.config.scripts.keep-awake.packages) keep-awake;
+      };
       nixos-am = self.nixosConfigurations.am.config.system.build.toplevel;
       nixos-balrog = self.nixosConfigurations.balrog.config.system.build.toplevel;
       nixos-torag = self.nixosConfigurations.torag.config.system.build.toplevel;

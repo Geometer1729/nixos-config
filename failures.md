@@ -7,17 +7,19 @@ baseline for unchecked hosts or commands.
 
 This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
 
-Verified 2026-09-22 with full `nix flake check -L` (script groups and shared toolbox,
-nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two warnings remain:
+Verified 2026-09-23 with full `nix flake check -L` (workload-aware keep-awake,
+nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the following findings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
 
 - **Nix database contention during concurrent evaluations**: the 2026-09-20 flake check warned `SQLite database '/nix/var/nix/db/db.sqlite' is busy`; the September 14 plugin checks reported the analogous warning for `…/.cache/nix/eval-cache-v6/….sqlite`. Both runs ultimately passed; the final update checks emitted only the two warnings above. Recheck if contention recurs without concurrent evaluations; no database repair or deletion was needed.
 
+- **Cold eval-only source-store failure, newly recorded 2026-09-23**: Nix 2.35.2 `nix flake check --no-build` failed before output evaluation with `path '/nix/store/<hash>-<hash>-source' is not valid`; `--refresh` also failed. Direct builds and flake metadata passed. Full `nix flake check -L` materialized the missing path, after which eval-only checking passed too. Investigate read-only flake source materialization; no Nix fix was applied. Evidence: `/tmp/opencode/waybar-modes-eval{,-final,-after-full-check}.log` and `waybar-modes-checks.log`.
+
 ## Flake checks
 
-- **Passed, 2026-09-22**: full `nix flake check -L`, including script-group integration checks and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
+- **Passed, 2026-09-23**: full `nix flake check -L`, including workload recognition/lifetime tests, script-group checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
 - **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Build/tests pass; follow the npm hook and dependency updates rather than suppressing the warnings.
 
 ## installer
@@ -28,7 +30,7 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two 
 ## am (primary desktop)
 
 ### Build and activation
-- **Passed, 2026-09-22**: shared script toolbox, `nixos-rebuild test --flake .#am --sudo`; active system `zh86vnd…` verified with no failed system or user units. This was test activation, not a boot-default update.
+- **Passed, 2026-09-23**: workload-aware keep-awake and Waybar modes, `nixos-rebuild test --flake .#am --sudo`; active system `wy8c360…`, live inhibitor/toggle/restart tests, and no failed system or user units. This was test activation, not a boot-default update.
 - **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 - **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete. The September 20 build also reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY` and Qt AutoUic renaming duplicate `verticalLayout` to `verticalLayout1`. Build/tests pass; track upstream compiler/UI packaging rather than removing legacy support.
 - **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
@@ -38,6 +40,7 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; these two 
 
 ### Desktop runtime
 - **Waybar minimum height, newly recorded 2026-09-14**: restarting `waybar.service` reports `Requested height: 24 is less than the minimum height: 34 required by the modules` on both monitors; both bars run at 34 px. The same warning appears in September 11–12 logs before the AI usage module. Align the requested height with the existing font/padding, or revisit sizing if a 24 px bar is desired.
+- **Hypridle ScreenSaver cookie accounting, newly recorded 2026-09-23**: `No cookie in uninhibit` / `BUG THIS: inhibit locks < 0: -1` appeared after the idle-daemon restart. The same warnings occur on September 20 and 22, before the workload observer. Subsequent Brave Video Wake Lock acquire/release messages return the count to 1/0. Inspect Hypridle's cookie handling across client/daemon restarts; locking behavior during an unmatched release remains unverified.
 
 ### `just health`
 Checked 2026-09-22 on system `xs1fzdq…`: no failed system or user units, root 80% used / 181 GiB available, one connected Syncthing peer (Torag asleep, expected), and existing duplicate D-Bus/menu journal warnings. Earlier intermittent boot/hardware conditions were not re-exercised.

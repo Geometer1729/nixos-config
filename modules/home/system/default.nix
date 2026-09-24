@@ -1,24 +1,11 @@
 { config, machine, pkgs, lib, ... }:
-let
-  nhWithSleepInhibit = pkgs.writeShellScriptBin "nh" ''
-    if [[ "''${1-}" == os ]] && ${lib.boolToString machine.hasGui}; then
-      exec ${pkgs.systemd}/bin/systemd-inhibit \
-        --what=sleep \
-        --who=nh \
-        --why="NixOS operation in progress" \
-        ${pkgs.nh}/bin/nh "$@"
-    fi
-
-    exec ${pkgs.nh}/bin/nh "$@"
-  '';
-in
 {
   scripts.system = {
     directory = ./.;
     extras = with pkgs; [
       expect
       zsh
-      nhWithSleepInhibit
+      nh
       tailscale
       iproute2
       nixos-rebuild
@@ -32,7 +19,7 @@ in
     dust # disk usage tool
     nix-du # makes a graph of the nix store dependencies
     graphviz # renders graphs (like the nix-du ones)
-    nhWithSleepInhibit # nix helper
+    nh # nix helper
     sops # needed to edit sops-nix secrets
 
     # Monitoring and status tools

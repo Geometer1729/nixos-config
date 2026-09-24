@@ -321,6 +321,7 @@ in
           "$mod SHIFT, r, Rebuild NixOS, exec, onScratchPad --hide-after sp rebuild rebuild"
           "$mod SHIFT, w, Change wallpaper, exec, systemctl --user start rotate-wallpaper.service"
           "$mod SHIFT, m, Toggle mono audio output, exec, toggle-mono-output"
+          "$mod SHIFT, a, Toggle manual keep-awake (locking stays enabled), exec, keep-awake toggle"
 
           # Screenshots
           ", Print, Screenshot selected region and annotate, exec, sh -c 'wayfreeze & sleep 0.1; SELECTION=$(slurp); grim -g \"$SELECTION\" - | (sleep 0.1;pkill wayfreeze; swappy -f -)'"
