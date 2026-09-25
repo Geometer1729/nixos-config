@@ -23,6 +23,7 @@ let
         "custom/ai-usage"
         "custom/inbox"
         "custom/keep-awake"
+        "custom/notifications"
         "pulseaudio#source"
         "pulseaudio"
       ] ++ lib.optionals (osConfig.wifi.enable or false) [ "network" ]
@@ -168,6 +169,17 @@ let
         tooltip = true;
       };
 
+      "custom/notifications" = {
+        exec = "${lib.getExe config.scripts.hyprland.packages.notification-center} waybar";
+        return-type = "json";
+        interval = 5;
+        signal = 8; # Sent by notification-center dnd for an immediate refresh.
+        format = " {} ";
+        on-click = "${lib.getExe config.scripts.hyprland.packages.notification-center} dnd";
+        on-click-right = "${lib.getExe config.scripts.hyprland.packages.notification-center} history";
+        tooltip = true;
+      };
+
       # Custom inbox counter
       "custom/inbox" =
         let
@@ -261,6 +273,21 @@ in
       }
 
       #custom-keep-awake.error {
+        background-color: @base08;
+        color: @base00;
+      }
+
+      #custom-notifications.pending {
+        background-color: @base0D;
+        color: @base00;
+      }
+
+      #custom-notifications.dnd {
+        background-color: @base0A;
+        color: @base00;
+      }
+
+      #custom-notifications.error {
         background-color: @base08;
         color: @base00;
       }

@@ -83,7 +83,10 @@ in
         ignore-timeout = false;
         layer = "overlay";
         max-visible = 5;
+        max-history = 50;
         sort = "-time";
+        # Toggled by notification-center dnd; hidden notifications still reach history.
+        "mode=do-not-disturb".invisible = true;
       };
     };
 
@@ -230,6 +233,12 @@ in
           "$mod SHIFT, Return, Open Brave window for this workspace, exec, brave-workspace-window"
           "$mod, u, Clean URL in clipboard, exec, clean-url"
           "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
+
+          # Notifications
+          "$mod, i, Open notification history, exec, notification-center history"
+          "$mod SHIFT, i, Restore last dismissed notification, exec, makoctl restore"
+          "$mod, x, Dismiss all notifications, exec, makoctl dismiss -a"
+          "$mod, z, Toggle Do Not Disturb, exec, notification-center dnd"
 
           # Window management
           "$mod, q, Close active window, killactive"

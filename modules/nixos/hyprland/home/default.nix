@@ -15,5 +15,6 @@
     directory = ./.;
     extras = with pkgs; [ hyprland tmux ];
     overrides.onScratchPad.extras = [ config.scripts.hyprland.packages.scratchPad ];
+    overrides.notification-center.extras = with pkgs; [ mako wl-clipboard ];
   };
 }
