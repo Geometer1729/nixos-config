@@ -5,7 +5,7 @@
     enable = true;
 
     extraConfig = {
-      modi = "combi,drun,ssh,run,keybinds:${lib.getExe config.scripts.hyprland.packages.rofi-keybinds}";
+      modi = "combi,drun,ssh,run,keybinds:${lib.getExe config.scripts.hyprland.packages.rofi-keybinds} ${config.programs.waybar.clickActions}";
       combi-modes = "drun,ssh,run,keybinds";
       combi-display-format = "{mode}: {text}";
       show-icons = true;

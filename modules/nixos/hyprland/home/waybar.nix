@@ -205,13 +205,41 @@ let
           on-click = "hyprctl dispatch exec 'onScratchPad vit process process'";
         };
     };
+
+  # Click actions of the enabled modules, listed alongside keybinds in rofi.
+  clickButtons = {
+    on-click = "Left";
+    on-click-middle = "Middle";
+    on-click-right = "Right";
+  };
+  enabledModules = settings.modules-left ++ settings.modules-center ++ settings.modules-right;
+  clickActions = lib.concatMap
+    (module:
+      let moduleSettings = settings.${module} or { };
+      in lib.concatLists (lib.mapAttrsToList
+        (key: button: lib.optional (moduleSettings ? ${key}) {
+          inherit module button;
+          command = moduleSettings.${key};
+        })
+        clickButtons))
+    # Workspace clicks are a built-in waybar action, not a shell command.
+    (lib.remove "hyprland/workspaces" enabledModules);
 in
 {
-  home.packages = with pkgs; [
+  options.programs.waybar.clickActions = lib.mkOption {
+    type = lib.types.package;
+    readOnly = true;
+    internal = true;
+    description = "JSON file listing waybar click actions, read by rofi-keybinds.";
+  };
+
+  config.programs.waybar.clickActions = pkgs.writeText "waybar-click-actions.json" (builtins.toJSON clickActions);
+
+  config.home.packages = with pkgs; [
     pulseaudioFull
     pavucontrol
   ];
-  stylix.targets.waybar = {
+  config.stylix.targets.waybar = {
     enable = true;
     addCss = true;
     enableLeftBackColors = true;
@@ -219,7 +247,7 @@ in
     enableRightBackColors = true;
   };
 
-  programs.waybar = {
+  config.programs.waybar = {
     enable = true;
     systemd = {
       enable = true;

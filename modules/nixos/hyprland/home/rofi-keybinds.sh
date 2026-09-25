@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Optional JSON list of waybar click actions: [{module, button, command}].
+click_actions=${1:-}
+
 case "${ROFI_RETV:-0}" in
   0)
     printf '\0prompt\x1fKeybinds\n\0no-custom\x1ftrue\n'
@@ -34,13 +37,24 @@ case "${ROFI_RETV:-0}" in
        else [.dispatcher, .arg] | join(" ") end | one_line) as $description |
       $shortcut + (" " * ([2, 32 - ($shortcut | length)] | max)) + $description +
       (if .submap != "" then " [\(.submap)]" else "" end) +
-      "\u0000info\u001f" + ({dispatcher, arg} | tojson) +
+      "\u0000info\u001f" + ({kind: "bind", dispatcher, arg} | tojson) +
       "\u001fmeta\u001f" + ([.dispatcher, .arg] | join(" ") | one_line)
     ' <<< "$binds"
+
+    if [[ -r $click_actions ]]; then
+      jq -r '
+        def one_line: gsub("[\u0000-\u001f]"; " ");
+        .[] |
+        "Bar:\(.module | sub("^custom/"; "")) \(.button)" as $shortcut |
+        (.command | gsub("/nix/store/[^/ ]+/bin/"; "") | one_line) as $description |
+        $shortcut + (" " * ([2, 32 - ($shortcut | length)] | max)) + $description +
+        "\u0000info\u001f" + ({kind: "waybar", command} | tojson) +
+        "\u001fmeta\u001f" + (.command | one_line)
+      ' "$click_actions"
+    fi
     ;;
   1)
-    dispatcher=$(jq -er '.dispatcher' <<< "$ROFI_INFO")
-    arg=$(jq -r '.arg' <<< "$ROFI_INFO")
+    kind=$(jq -er '.kind' <<< "$ROFI_INFO")
     # Rofi detaches scripts, so PPID is not Rofi. ROFI_OUTSIDE carries its PID.
     rofi_pid=$ROFI_OUTSIDE
 
@@ -48,9 +62,22 @@ case "${ROFI_RETV:-0}" in
     # Rofi to exit so window actions and screenshots run after it releases focus.
     (
       tail --pid="$rofi_pid" --sleep-interval=0.05 -f /dev/null
-      if ! result=$(hyprctl dispatch "$dispatcher" "$arg" 2>&1); then
-        notify-send "Hyprland keybind failed" "$result"
-      fi
+      case "$kind" in
+        bind)
+          dispatcher=$(jq -er '.dispatcher' <<< "$ROFI_INFO")
+          arg=$(jq -r '.arg' <<< "$ROFI_INFO")
+          if ! result=$(hyprctl dispatch "$dispatcher" "$arg" 2>&1); then
+            notify-send "Hyprland keybind failed" "$result"
+          fi
+          ;;
+        waybar)
+          command=$(jq -er '.command' <<< "$ROFI_INFO")
+          # Waybar runs click actions through sh -c as well.
+          if ! result=$(sh -c "$command" 2>&1); then
+            notify-send "Waybar action failed" "$result"
+          fi
+          ;;
+      esac
     ) </dev/null >/dev/null 2>&1 &
     ;;
 esac
