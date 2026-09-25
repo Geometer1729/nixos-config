@@ -234,6 +234,7 @@ in
           "$mod, u, Clean URL in clipboard, exec, clean-url"
           "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
           "$mod CTRL, v, Force paste clipboard by typing it, exec, force-paste"
+          "$mod, e, Hold to dictate, exec, dictate start"
 
           # Notifications
           "$mod, i, Open notification history, exec, notification-center history"
@@ -340,6 +341,11 @@ in
 
           # Bluetooth
           "$mod SHIFT, b, Connect Bluetooth headphones, exec, bluetooth-autoconnect"
+        ];
+
+        # Release half of push-to-talk dictation.
+        bindrd = [
+          "$mod, e, Stop dictation and type text, exec, dictate stop"
         ];
 
         # Mouse bindings

@@ -3,6 +3,7 @@
 {
   imports = [
     ../../../home/cliphist
+    ../../../home/dictation
     ./hyprland.nix
     ./waybar.nix
     ./hyprpaper.nix
