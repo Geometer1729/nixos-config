@@ -91,6 +91,9 @@ in
         # Checkpoint terminals, Neovim, and tmux together.
         bind C-s run-shell '${saveTmux}/bin/save-tmux'
 
+        # Kill detached, numbered sessions that are a single idle shell pane in $HOME.
+        bind X run-shell '${config.scripts.tmux.packages.prune-orphans}/bin/prune-orphans'
+
         # better splits
         unbind %
         bind h split-window -v
