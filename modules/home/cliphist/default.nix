@@ -5,7 +5,7 @@ in
 {
   scripts.cliphist = {
     directory = ./.;
-    extras = with pkgs; [ pkgs.cliphist config.programs.rofi.package wl-clipboard python3 ];
+    extras = with pkgs; [ pkgs.cliphist config.programs.rofi.package wl-clipboard wtype python3 ];
     # The picker must use our runtime-only database wrapper before upstream cliphist.
     overrides.clipboard-history.extras = [ cliphist ];
   };

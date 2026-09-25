@@ -233,6 +233,7 @@ in
           "$mod SHIFT, Return, Open Brave window for this workspace, exec, brave-workspace-window"
           "$mod, u, Clean URL in clipboard, exec, clean-url"
           "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
+          "$mod CTRL, v, Force paste clipboard by typing it, exec, force-paste"
 
           # Notifications
           "$mod, i, Open notification history, exec, notification-center history"
