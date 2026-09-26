@@ -5,6 +5,7 @@ let
     name = "wifi-picker";
     runtimeInputs = with pkgs; [
       coreutils
+      curl
       fzf
       gawk
       gnugrep

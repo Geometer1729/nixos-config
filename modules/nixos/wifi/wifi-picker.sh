@@ -4,11 +4,25 @@ wpa() {
   wpa_cli -i "$interface" "$@"
 }
 
+list_networks() {
+  wpa scan_results \
+    | tail -n +2 \
+    | sort -t $'\t' -k3,3nr \
+    | awk -F '\t' '$5 != "" && !seen[$5]++'
+}
+
+if [[ ${1:-} == --list ]]; then
+  list_networks
+  exit 0
+fi
+
 fail() {
   printf '%s\n' "$1" >&2
   notify-send -u critical "Wi-Fi" "$1"
   exit 1
 }
+
+trap 'notify-send -u critical "Wi-Fi" "wifi-picker failed at line $LINENO: $BASH_COMMAND"' ERR
 
 if ! wpa status >/dev/null; then
   fail "Cannot reach wpa_supplicant on $interface"
@@ -17,34 +31,50 @@ fi
 printf 'Scanning on %s...\n' "$interface"
 wpa scan >/dev/null || fail "Could not start a Wi-Fi scan"
 
-scan_results=
 for _ in {1..15}; do
   sleep 0.4
-  scan_results=$(wpa scan_results)
-  if [[ $(printf '%s\n' "$scan_results" | wc -l) -gt 1 ]]; then
+  if [[ $(wpa scan_results | wc -l) -gt 1 ]]; then
     break
   fi
 done
 
-if ! selection=$(
-  printf '%s\n' "$scan_results" \
-    | tail -n +2 \
-    | sort -t $'\t' -k3,3nr \
-    | awk -F '\t' '$5 != "" && !seen[$5]++' \
+# --track blocks input while a reload runs, so scan outside fzf and only reload cached results.
+fzf_dir=$(mktemp -d)
+socket=$fzf_dir/fzf.sock
+(
+  while sleep 1; do
+    wpa scan >/dev/null || true
+    sleep 4
+    curl -s --unix-socket "$socket" -X POST http://localhost \
+      -d "reload-sync(${0@Q} --list)" >/dev/null || true
+  done
+) &
+refresher=$!
+
+selection=$(
+  list_networks \
     | fzf \
         --delimiter=$'\t' \
         --with-nth=5,3,4 \
-        --header='SSID | signal | security' \
+        --id-nth=5 \
+        --track \
+        --with-shell="$BASH -c" \
+        --listen-unsafe="$socket" \
+        --header='SSID | signal | security (rescans every 5s)' \
         --prompt='Wi-Fi> '
-); then
-  exit 0
-fi
+) || selection=
+kill "$refresher" 2>/dev/null || true
+rm -rf "$fzf_dir"
+[[ -n "$selection" ]] || exit 0
 
-ssid=$(cut -f5- <<<"$selection")
+# wpa_cli prints SSIDs escaped (\xNN, \", \\, \e, \n, \r, \t); printf %b decodes all but \".
+ssid_txt=$(cut -f5- <<<"$selection")
+ssid=$(printf '%b' "${ssid_txt//\\\"/\"}")
+ssid_hex=$(printf '%b' "${ssid_txt//\\\"/\"}" | od -An -v -tx1 | tr -d ' \n')
 flags=$(cut -f4 <<<"$selection")
 network_id=$(
   wpa list_networks \
-    | awk -F '\t' -v ssid="$ssid" 'NR > 1 && $2 == ssid { print $1; exit }'
+    | SSID_TXT=$ssid_txt awk -F '\t' 'NR > 1 && $2 == ENVIRON["SSID_TXT"] { print $1; exit }'
 )
 new_network=
 
@@ -61,9 +91,7 @@ if [[ -z "$network_id" ]]; then
   [[ "$network_id" =~ ^[0-9]+$ ]] || fail "Could not add $ssid"
   new_network=$network_id
 
-  escaped_ssid=${ssid//\\/\\\\}
-  escaped_ssid=${escaped_ssid//\"/\\\"}
-  [[ $(wpa set_network "$network_id" ssid "\"$escaped_ssid\"") == OK ]] \
+  [[ $(wpa set_network "$network_id" ssid "$ssid_hex") == OK ]] \
     || fail "Could not configure $ssid"
 
   if [[ "$flags" == *EAP* ]]; then
@@ -72,14 +100,13 @@ if [[ -z "$network_id" ]]; then
     [[ $(wpa set_network "$network_id" key_mgmt OWE) == OK ]] \
       || fail "Could not configure OWE for $ssid"
   elif [[ "$flags" == *PSK* ]]; then
-    IFS= read -r -s -p "Passphrase for $ssid: " passphrase </dev/tty
-    printf '\n'
+    printf 'Passphrase for %s: ' "$ssid"
+    # wpa_passphrase requires a terminal on stdin; it disables echo itself.
     psk=$(
-      printf '%s\n' "$passphrase" \
-        | wpa_passphrase "$ssid" \
+      wpa_passphrase "$ssid" </dev/tty 2>/dev/null \
         | awk '/^[[:space:]]*psk=[[:xdigit:]]+$/ { sub(/^[[:space:]]*psk=/, ""); print; exit }'
-    )
-    unset passphrase
+    ) || psk=
+    printf '\n'
     [[ ${#psk} -eq 64 ]] || fail "The passphrase must be between 8 and 63 characters"
     [[ $(wpa set_network "$network_id" psk "$psk") == OK ]] \
       || fail "Could not configure the passphrase for $ssid"
