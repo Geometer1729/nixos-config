@@ -78,6 +78,5 @@ in
   ] ++ (with self.nixosModules; [
     workstation
     builder
-    foundryvtt
   ]);
 }

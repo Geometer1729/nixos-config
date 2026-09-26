@@ -30,8 +30,7 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the follow
 ## am (primary desktop)
 
 ### Build and activation
-- **Passed, 2026-09-23**: workload-aware keep-awake and Waybar modes, `nixos-rebuild test --flake .#am --sudo`; active system `wy8c360…`, live inhibitor/toggle/restart tests, and no failed system or user units. This was test activation, not a boot-default update.
-- **Foundry startup-health race, newly recorded**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Observed on update activations and a concurrent old-input activation. The container becomes healthy and the failed state clears on later probes without intervention; final steady-state activation passed. Follow up on startup/readiness handling rather than disabling the health check.
+- **Passed, 2026-09-26**: Foundry migration, `nixos-rebuild test` and `boot --store-path … --sudo --no-reexec`; active/default system `kqndpfz…`, Foundry removed, no failed system or user units.
 - **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete. The September 20 build also reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY` and Qt AutoUic renaming duplicate `verticalLayout` to `verticalLayout1`. Build/tests pass; track upstream compiler/UI packaging rather than removing legacy support.
 - **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
 - **Initrd alternate-library warnings, newly recorded 2026-09-20**: `Couldn't satisfy dependency libcrypt.so.1` / `.so.1.1` for systemd 260.2. The initrd builder checks each dlopen SONAME alternative separately. The actual old am and all three new host initrds contain byte-identical `libcrypt.so.2`; no missing password-hashing implementation was found. No workaround needed; follow upstream warning handling. Balrog's updated initrd also passed its reboot check below.
@@ -51,7 +50,6 @@ Checked 2026-09-22 on system `xs1fzdq…`: no failed system or user units, root 
 - **ACPI USB _PLD**: `AE_AML_UNINITIALIZED_ELEMENT` for `PTXH.RHUB.POT7._PLD` — firmware ACPI table issue surfaced in the boot journal
 - **dbus-broker duplicate service names**: duplicate names for Blueman, dconf, accessibility, and xdg-desktop-portal service files after boot/activation — noisy but services are still running
 - **plasma-apply-lookandfeel**: `"applications.menu" not found` during Home Manager activation — one-shot menu lookup noise; activation still succeeds
-- **FoundryVTT auth DNS**: `getaddrinfo EAI_AGAIN foundryvtt.com` during boot/authentication — transient DNS/network timing unless it persists
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
 
 ### `just vim-health`
@@ -68,7 +66,12 @@ Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following exi
 ## balrog
 
 ### Build and activation
-- **Passed, 2026-09-21**: SOPS user-key simplification, `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and remote `sudo nixos-rebuild boot --store-path … --no-reexec`; active/default system `xhsxkk6…` verified.
+- **Passed, 2026-09-26**: Foundry migration, `nixos-rebuild test` and `boot --store-path … --target-host bbrian@balrog --sudo --use-substitutes --no-reexec`; active/default system `c42xf9x…` verified.
+- **Foundry startup-health race, moved from am**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Reproduced during Balrog's September 26 activation and reboot; later timer probes cleared the failed state without a reset, and steady-state test activation passed. Follow up on startup/readiness handling rather than disabling the health check.
+
+### FoundryVTT runtime
+- **Auth DNS, moved from am**: `getaddrinfo EAI_AGAIN foundryvtt.com` recurred during Balrog's September 26 boot/authentication. Later container DNS lookup passed and Foundry was healthy; investigate startup network readiness if this continues.
+- **License-verification startup message, newly recorded 2026-09-26**: `Software license verification failed` appeared on am before migration and Balrog after reboot. The browser initially reached `/license`, then reached `/auth`; the container is healthy. The message's cause is unverified; check licensing if it recurs or blocks world access. This predates the migration.
 
 ### `just health`
 Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands over SSH (Balrog has no `/home/bbrian/conf/justfile`): no failed system units, root 26% used / 168 GiB available, and two Syncthing peers.
@@ -76,6 +79,7 @@ Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands ov
 - **D-Bus duplicate service names, newly recorded on Balrog**: boot journal reports duplicate dconf and systemd service names, matching the desktop hosts' existing warning class. Review duplicate service exports if eliminating the noise.
 
 ### Post-deployment boot checks
+- **Foundry checks passed, 2026-09-26**: rebooted into expected active/booted/default `c42xf9x…`; original image/version 13.351.0, persistent data/image mounts, data-content checksum comparison, LAN HTTP, and no failed system or user units verified after the startup-health transient cleared.
 - **Storage checks passed, 2026-09-21 at 16:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, expected active/default `r7v1p7f…`, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. Alert delivery to am also passed after reboot.
 - **Secrets/sync boot checks passed, 2026-09-21 at 20:52 EDT**: rebooted into expected active/booted/default `xhsxkk6…`, Linux 6.18.52. Both SOPS steps imported only the persisted user SSH key, expected secrets were readable, automatic Taskwarrior sync succeeded at 20:48 EDT without corrective activation, and system/user failed-unit lists were empty.
 

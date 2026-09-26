@@ -28,11 +28,12 @@ let
   '';
 in
 {
-  imports = [
-    inputs.self.nixosModules.base
-    inputs.self.nixosModules.cache
-    inputs.self.nixosModules.taskchampion
-    inputs.self.nixosModules.useBuilders
+  imports = with inputs.self.nixosModules; [
+    base
+    cache
+    foundryvtt
+    taskchampion
+    useBuilders
     ./hardware.nix
   ];
 
