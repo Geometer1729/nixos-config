@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Balrog</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+        background: #18181b;
+        color: #fafafa;
+        font: 1.125rem/1.6 system-ui, sans-serif;
+      }
+      main { width: 100%; max-width: 32rem; }
+      h1 { margin: 0; font-size: clamp(3rem, 12vw, 5rem); line-height: 1.2; }
+      p { color: #a1a1aa; }
+      a {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        background: #fbbf24;
+        color: #18181b;
+        font-weight: 650;
+        text-decoration: none;
+      }
+      a:hover { background: #fcd34d; }
+      a:focus-visible { outline: 3px solid #fafafa; outline-offset: 5px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Balrog</h1>
+      <p>A small home on the web.</p>
+      <a href="/foundry">Open Foundry &rarr;</a>
+    </main>
+  </body>
+</html>

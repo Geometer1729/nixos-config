@@ -66,7 +66,7 @@ Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following exi
 ## balrog
 
 ### Build and activation
-- **Passed, 2026-09-26**: Foundry migration, `nixos-rebuild test` and `boot --store-path … --target-host bbrian@balrog --sudo --use-substitutes --no-reexec`; active/default system `c42xf9x…` verified.
+- **Passed, 2026-09-26**: landing page and Foundry reverse proxy, `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and `boot --store-path … --target-host bbrian@balrog --sudo --use-substitutes --no-reexec`; active/default system `75wl6k1…`. Nginx syntax, LAN/name-based HTTP, prefixed assets/API/WebSocket handshake, and no failed system or user units verified; this configuration was not reboot-tested.
 - **Foundry startup-health race, moved from am**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Reproduced during Balrog's September 26 activation and reboot; later timer probes cleared the failed state without a reset, and steady-state test activation passed. Follow up on startup/readiness handling rather than disabling the health check.
 
 ### FoundryVTT runtime

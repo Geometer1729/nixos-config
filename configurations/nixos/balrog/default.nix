@@ -32,6 +32,7 @@ in
     base
     cache
     foundryvtt
+    nginx
     taskchampion
     useBuilders
     ./hardware.nix
@@ -41,6 +42,11 @@ in
   networking.useDHCP = true;
   machine.hasGui = false;
   storageHealth.notificationHost = "am";
+
+  services.nginx.virtualHosts.default = {
+    root = ./www;
+    locations."/".tryFiles = "$uri $uri/ =404";
+  };
 
   home-manager.users.${config.mainUser} = {
     # Keep management tools without enabling workstation hardware authentication.
