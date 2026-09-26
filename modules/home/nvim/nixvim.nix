@@ -42,7 +42,13 @@
         auto_restore.__raw = ''vim.env.NVIM_AUTO_RESTORE == "1"'';
       };
     };
-    telescope.enable = true;
+    telescope = {
+      enable = true;
+      extensions = {
+        fzf-native.enable = true; # fzf query syntax: 'exact ^prefix suffix$ !negate
+        live-grep-args.enable = true; # pass rg flags in live_grep: "foo" -t nix
+      };
+    };
     which-key.enable = true;
     web-devicons.enable = true;
     vim-surround.enable = true;

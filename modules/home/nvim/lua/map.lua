@@ -63,7 +63,7 @@ end, { desc = 'Clear search and close floats' })
 map('n','<C-s>','<cmd>mksession! .session.vim<cr><cmd>qa!<cr>', { desc = 'Save session and quit all' })
 
 -- Telescope
-map('n','<Leader>ff',telescope.live_grep, { desc = 'Search project text' })
+map('n','<Leader>ff',t.extensions.live_grep_args.live_grep_args, { desc = 'Search project text' })
 map('n','<Leader>fw',t.extensions.vw.live_grep, { desc = 'Search Vimwiki text' })
 map('n','<Leader>fg',telescope.git_files, { desc = 'Search git files' })
 map('n','<Leader>fa',telescope.find_files, { desc = 'Search all files' })
