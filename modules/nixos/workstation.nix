@@ -34,6 +34,7 @@ in
       brave
       bt
       docker
+      fwupd
       gaming
       gh-noto
       hyprland
