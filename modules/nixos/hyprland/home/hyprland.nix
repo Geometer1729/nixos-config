@@ -171,6 +171,8 @@ in
         # Misc settings - most managed by Stylix
         misc = {
           force_default_wallpaper = -1;
+          # Clicked notifications (Slack, Signal, Discord) ask to be focused this way.
+          focus_on_activate = true;
           #enable_swallow = true;
           #swallow_regex = ".*prismlauncher.*";
         };
