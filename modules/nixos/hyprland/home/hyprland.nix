@@ -93,6 +93,8 @@ in
     # Hyprland configuration
     wayland.windowManager.hyprland = {
       enable = true;
+      # NixOS manages both portal backends; Home Manager would hide KDE's backend.
+      portalPackage = null;
       configType = "hyprlang";
       plugins = [
         #REEE I can't get plugins to build
