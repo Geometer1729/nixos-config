@@ -19,23 +19,51 @@ waybar_status() {
                   "Right click: history"] | join("\n"))}'
 }
 
+# Selecting mimics a left click, so use the on-button-left of the last matching
+# section in mako's config, as mako does.
+click_binding() {
+  jq -Rnr --argjson n "$1" '
+    reduce (inputs | select(. != "")) as $line ({criteria: {}, binding: "invoke-default-action"};
+      if $line | startswith("[") then
+        .criteria = ($line | .[1:-1] | split(" ") | map(split("=")
+          | {key: (.[0] | gsub("-"; "_")), value: (.[1:] | join("="))}) | from_entries)
+      elif ($line | startswith("on-button-left=")) and all(.criteria | to_entries[]; $n[.key] == .value) then
+        .binding = ($line | ltrimstr("on-button-left="))
+      else . end) | .binding
+  ' "${XDG_CONFIG_HOME:-$HOME/.config}/mako/config"
+}
+
 case "${1:-history}" in
   history)
-    history=$(makoctl history -j)
-    if [[ $(jq length <<< "$history") -eq 0 ]]; then
+    notifications=$(jq -s '(.[0] | map(.live = true)) + .[1]' <(makoctl list -j) <(makoctl history -j))
+    if [[ $(jq length <<< "$notifications") -eq 0 ]]; then
       notify-send "Notification history" "History is empty"
       exit 0
     fi
 
     index=$(jq -r '
       def one_line: gsub("[\u0000-\u001f]"; " ");
-      .[] | "\(.app_name // "unknown" | one_line): \(.summary | one_line)"
+      .[] | (if .live then "● " else "" end)
+        + "\(.app_name // "unknown" | one_line): \(.summary | one_line)"
         + (if (.body // "") != "" then " — \(.body | one_line)" else "" end)
-    ' <<< "$history" | rofi -dmenu -i -p Notifications -format i -no-custom \
-      -disable-history -mesg 'Enter: focus the sender, or copy the text if it has no window') || exit 0
+    ' <<< "$notifications" | rofi -dmenu -i -p Notifications -format i -no-custom \
+      -disable-history -mesg 'Enter: same as clicking it (● = still showing)') || exit 0
     [[ "$index" =~ ^[0-9]+$ ]] || exit 0
 
-    entry=$(jq ".[$index]" <<< "$history")
+    entry=$(jq ".[$index]" <<< "$notifications")
+    id=$(jq -r .id <<< "$entry")
+    binding=$(click_binding "$entry")
+    if [[ $binding == exec\ * ]]; then
+      # mako runs exec bindings through sh with $id set.
+      id=$id exec sh -c "$binding"
+    fi
+    if jq -e '.live and .actions.default' <<< "$entry" > /dev/null; then
+      exec makoctl invoke -n "$id"
+    fi
+    if jq -e .live <<< "$entry" > /dev/null; then
+      makoctl dismiss -n "$id"
+    fi
+
     app=$(jq -r '.desktop_entry // .app_name // ""' <<< "$entry")
     # mako cannot invoke actions on expired notifications, so jump to the app instead.
     if [[ -n "$app" && $(hyprctl dispatch focuswindow "class:(?i)^${app//./\\.}$") == ok ]]; then
