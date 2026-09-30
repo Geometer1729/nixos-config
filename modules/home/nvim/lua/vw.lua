@@ -23,6 +23,25 @@ g.taskwiki_disable_concealcursor=1
 -- Default used by `task` command
 g.taskwiki_data_location="~/.local/share/task"
 
+-- <Leader>t is taken by the task heading mappings below
+g.taskwiki_maplocalleader=' T'
+
+-- Completing every child must not complete the parent task
+g.vimwiki_listsyms_propagate=0
+
+-- taskwiki reads g:taskwiki_disable when each buffer's ftplugin loads,
+-- so this keeps P1-wiki checklists out of taskwarrior
+vim.api.nvim_create_autocmd({'BufReadPre', 'BufNewFile'}, {
+  pattern = '*.md',
+  callback = function(args)
+    if args.file:find('Documents/P1-wiki/', 1, true) then
+      g.taskwiki_disable = 1
+    else
+      g.taskwiki_disable = nil
+    end
+  end
+})
+
 -- No folds
 g.taskwiki_dont_fold="yes"
 g.vimwiki_folding=''

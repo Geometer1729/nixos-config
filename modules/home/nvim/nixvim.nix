@@ -28,6 +28,8 @@
   # instead of runtimepath. Plugins that use require() across plugins need to
   # be declared here so their Lua modules are findable.
   extraLuaPackages = ps: with ps; [ plenary-nvim ];
+  # taskwiki runs on the python3 provider
+  extraPython3Packages = ps: with ps; [ tasklib six packaging ];
   extraConfigLua =
     lib.strings.concatStrings
       (map
@@ -93,6 +95,7 @@
     [
       vim-hoogle
       vimwiki
+      taskwiki
       render-markdown-nvim
       nerdtree
       purescript-vim

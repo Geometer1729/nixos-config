@@ -8,6 +8,7 @@
       taskopen
       fzf
       libnotify
+      ripgrep
     ] ++ lib.optional (config.scripts ? hyprland) config.scripts.hyprland.packages.scratchPad;
   };
 

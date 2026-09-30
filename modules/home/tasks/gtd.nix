@@ -43,7 +43,7 @@ let
     next = {
       description = "GTD Next Actions";
       columns = [ "id" "start.age" "priority" "project" "energy" "estimate" "description.count" "tags" "urgency" ];
-      filter = "+next status:pending -@work";
+      filter = "+next -BLOCKED status:pending -@work";
       sort = "urgency-";
     };
     waiting = {
@@ -67,37 +67,37 @@ let
     computer = {
       description = "Tasks at computer";
       columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
-      filter = "+next +@computer status:pending";
+      filter = "+next +@computer -BLOCKED status:pending";
       sort = "urgency-";
     };
     home = {
       description = "Tasks at home";
       columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
-      filter = "+next +@home status:pending";
+      filter = "+next +@home -BLOCKED status:pending";
       sort = "urgency-";
     };
     errands = {
       description = "Errands to run";
       columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
-      filter = "+next +@errands status:pending";
+      filter = "+next +@errands -BLOCKED status:pending";
       sort = "urgency-";
     };
     work = {
       description = "Tasks at work";
       columns = [ "id" "priority" "energy" "estimate" "project" "description.count" "urgency" ];
-      filter = "+next +@work status:pending";
+      filter = "+next +@work -BLOCKED status:pending";
       sort = "urgency-";
     };
     high = {
       description = "High energy tasks";
       columns = [ "id" "estimate" "project" "description.count" "urgency" "tags" ];
-      filter = "+next energy:H status:pending";
+      filter = "+next energy:H -BLOCKED status:pending";
       sort = "urgency-";
     };
     low = {
       description = "Low energy tasks";
       columns = [ "id" "estimate" "project" "description.count" "urgency" "tags" ];
-      filter = "+next energy:L status:pending";
+      filter = "+next energy:L -BLOCKED status:pending";
       sort = "urgency-";
     };
   };

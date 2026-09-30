@@ -2,10 +2,10 @@
 TASK_FILE="$1"
 TASK_DESCRIPTION="$2"
 
-# Create file if it doesn't exist
-if ! [ -e "$TASK_FILE" ]; then
-  echo "# $TASK_DESCRIPTION" > "$TASK_FILE"
-fi
+source "$SCRIPTS_LIB/task-notes.sh"
+
+# Create the note, or a redirect to the task's taskwiki line, if it doesn't exist
+ensure_task_note "$(basename "$TASK_FILE" .md)" "$TASK_DESCRIPTION"
 
 # Check if file has a redirect link
 if grep -q "^\[Redirect\]" "$TASK_FILE"; then
