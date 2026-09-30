@@ -109,6 +109,14 @@ in
       { id = "default"; claudeConfigDir = "${config.home.homeDirectory}/.claude-work"; }
       { id = "personal"; claudeConfigDir = "${config.home.homeDirectory}/.claude-personal"; }
     ]);
+    # OpenCode's prompt carries AGENTS.md, skills and the Code Mode catalog, but
+    # also harness fingerprints Anthropic has metered as Extra Usage.
+    settings.pluginConfig = [{
+      # TODO: drop the patch once upstream matches V2's identity line.
+      inherit (inputs.meridian.legacyPackages.${pkgs.stdenv.hostPlatform.system}.meridianPlugins.opencode-scrub.overrideAttrs {
+        patches = [ ./meridian/opencode-scrub-v2.patch ];
+      }) path;
+    }];
   };
 
   xdg.configFile = {
@@ -155,10 +163,7 @@ in
     "meridian/sdk-features.json" = {
       force = true;
       text = builtins.toJSON {
-        opencode = {
-          clientSystemPrompt = false;
-          codeSystemPrompt = true;
-        };
+        opencode.codeSystemPrompt = true;
       };
     };
 

@@ -1,0 +1,23 @@
+diff --git a/src/scrub.ts b/src/scrub.ts
+index 82a5bae..fe067f3 100644
+--- a/src/scrub.ts
++++ b/src/scrub.ts
+@@ -35,6 +35,10 @@
+ const OPENCODE_IDENTITY_LINE =
+   /You are OpenCode, the best coding agent on the planet\.[^\n]*\n+/
+ 
++/** OpenCode V2 identity line; "a coding agent harness" is also pi's metered tell */
++const OPENCODE_V2_IDENTITY_LINE =
++  /You are an AI agent running in OpenCode, a coding agent harness\.[^\n]*\n+/
++
+ /** Vanilla feedback block (lines 7-10 of anthropic.txt) */
+ const OPENCODE_FEEDBACK_BLOCK =
+   /If the user asks for help or wants to give feedback[\s\S]*?github\.com\/anomalyco\/opencode[^\n]*\n+/
+@@ -103,6 +107,7 @@ export function scrubOpencodeFingerprints(systemPrompt: string): string {
+   if (!systemPrompt) return systemPrompt
+   return systemPrompt
+     .replace(OPENCODE_IDENTITY_LINE, GENERIC_IDENTITY)
++    .replace(OPENCODE_V2_IDENTITY_LINE, GENERIC_IDENTITY)
+     .replace(OPENCODE_FEEDBACK_BLOCK, "")
+     .replace(OPENCODE_DOCS_PARAGRAPH, "")
+     .replace(OPENCODE_OBJECTIVITY_BRAND, GENERIC_OBJECTIVITY)
