@@ -242,7 +242,7 @@ in
 
           # Notifications
           "$mod, i, Open notification history, exec, notification-center history"
-          "$mod SHIFT, i, Click top notification, exec, makoctl invoke"
+          "$mod SHIFT, i, Click top notification, exec, notification-center click"
           "$mod, x, Dismiss all notifications, exec, makoctl dismiss -a"
           "$mod SHIFT, x, Restore last dismissed notification, exec, makoctl restore"
           "$mod, z, Toggle Do Not Disturb, exec, notification-center dnd"

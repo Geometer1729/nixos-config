@@ -33,6 +33,29 @@ click_binding() {
   ' "${XDG_CONFIG_HOME:-$HOME/.config}/mako/config"
 }
 
+activate() {
+  local entry=$1 id binding app
+  id=$(jq -r .id <<< "$entry")
+  binding=$(click_binding "$entry")
+  if [[ $binding == exec\ * ]]; then
+    # mako runs exec bindings through sh with $id set.
+    id=$id exec sh -c "$binding"
+  fi
+  if jq -e '.live and .actions.default' <<< "$entry" > /dev/null; then
+    exec makoctl invoke -n "$id"
+  fi
+  if jq -e .live <<< "$entry" > /dev/null; then
+    makoctl dismiss -n "$id"
+  fi
+
+  app=$(jq -r '.desktop_entry // .app_name // ""' <<< "$entry")
+  # mako cannot invoke actions on expired notifications, so jump to the app instead.
+  if [[ -n "$app" && $(hyprctl dispatch focuswindow "class:(?i)^${app//./\\.}$") == ok ]]; then
+    exit 0
+  fi
+  jq -r '[.summary, .body // ""] | map(select(. != "")) | join("\n")' <<< "$entry" | wl-copy
+}
+
 case "${1:-history}" in
   history)
     notifications=$(jq -s '(.[0] | map(.live = true)) + .[1]' <(makoctl list -j) <(makoctl history -j))
@@ -50,26 +73,13 @@ case "${1:-history}" in
       -disable-history -mesg 'Enter: same as clicking it (● = still showing)') || exit 0
     [[ "$index" =~ ^[0-9]+$ ]] || exit 0
 
-    entry=$(jq ".[$index]" <<< "$notifications")
-    id=$(jq -r .id <<< "$entry")
-    binding=$(click_binding "$entry")
-    if [[ $binding == exec\ * ]]; then
-      # mako runs exec bindings through sh with $id set.
-      id=$id exec sh -c "$binding"
-    fi
-    if jq -e '.live and .actions.default' <<< "$entry" > /dev/null; then
-      exec makoctl invoke -n "$id"
-    fi
-    if jq -e .live <<< "$entry" > /dev/null; then
-      makoctl dismiss -n "$id"
-    fi
-
-    app=$(jq -r '.desktop_entry // .app_name // ""' <<< "$entry")
-    # mako cannot invoke actions on expired notifications, so jump to the app instead.
-    if [[ -n "$app" && $(hyprctl dispatch focuswindow "class:(?i)^${app//./\\.}$") == ok ]]; then
-      exit 0
-    fi
-    jq -r '[.summary, .body // ""] | map(select(. != "")) | join("\n")' <<< "$entry" | wl-copy
+    activate "$(jq ".[$index]" <<< "$notifications")"
+    ;;
+  click)
+    # Mako lists the topmost notification first.
+    entry=$(makoctl list -j | jq '.[0] // empty | .live = true')
+    [[ -n "$entry" ]] || exit 0
+    activate "$entry"
     ;;
   dnd)
     makoctl mode -t do-not-disturb > /dev/null
@@ -80,7 +90,7 @@ case "${1:-history}" in
       echo '{"text": "🔔 !", "class": "error", "tooltip": "Notification state unavailable"}'
     ;;
   *)
-    echo 'Usage: notification-center [history | dnd | waybar]' >&2
+    echo 'Usage: notification-center [history | click | dnd | waybar]' >&2
     exit 2
     ;;
 esac
