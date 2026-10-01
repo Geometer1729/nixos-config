@@ -15,6 +15,7 @@
         [keybinding]
         o = :!wr taskopen {TASK_UUID}<Enter>
         s = :!wr task-steps {TASK_UUID}<Enter>
+        x = :!r task-promote {TASK_UUID}<Enter>
         O = :! ${config.scripts.tasks.packages.opencode-task}/bin/opencode-task {TASK_UUID}<Enter>
         i = :!wr task {TASK_UUID} info<Enter>
         r = {ACTION_REFRESH}
