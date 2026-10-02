@@ -1,5 +1,10 @@
 { pkgs, ... }:
 {
+  programs.gh = {
+    enable = true;
+    extensions = [ pkgs.gh-stack ];
+  };
+
   programs.git = {
     enable = true;
     settings = {
@@ -8,8 +13,6 @@
       advice.forceDeleteBranch = false;
       merge.conflictstyle = "diff3";
       branch.autoSetupMerge = true;
-      credential."https://github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
-      credential."https://gitst.github.com".helper = "${pkgs.gh}/bin/gh auth git-credential";
       credential.helper = "store --file ~/.local/share/git/credentials";
       alias = {
         co = "checkout";
