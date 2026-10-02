@@ -17,6 +17,7 @@ in
     machine
     nix
     password
+    resume-timers
     scripts
     secrets
     ssh
