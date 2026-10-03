@@ -4,6 +4,13 @@ TASK_DESCRIPTION="$2"
 
 source "$SCRIPTS_LIB/task-notes.sh"
 
+# Tasks with a page open that wiki page instead
+PAGE=$(task _get "$(basename "$TASK_FILE" .md)".page)
+if [ -n "$PAGE" ]; then
+  vim "$WIKI_DIR/$PAGE"
+  exit
+fi
+
 # Create the note, or a redirect to the task's taskwiki line, if it doesn't exist
 ensure_task_note "$(basename "$TASK_FILE" .md)" "$TASK_DESCRIPTION"
 

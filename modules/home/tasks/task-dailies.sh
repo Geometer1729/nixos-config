@@ -1,7 +1,8 @@
 # Usage: task-dailies
 # Adds today's dailies from the wiki's recur.md; `until` expires them at midnight.
-# Each bullet under "## Daily" is passed to `task add`, so it may carry
-# attributes. The bullet is kept in the `routine` UDA to identify it across days.
+# Each bullet under "## Daily" has strftime codes expanded and is passed to
+# `task add`, so it may carry attributes. The raw bullet is kept in the
+# `routine` UDA to identify it across days.
 
 source "$SCRIPTS_LIB/task-notes.sh"
 
@@ -16,7 +17,7 @@ for LINE in "${DAILIES[@]}"; do
   for SEEN in "${EXISTING[@]}"; do
     [ "$SEEN" = "$LINE" ] && continue 2
   done
-  read -ra ARGS <<<"$LINE"
+  read -ra ARGS <<<"$(date +"$LINE")"
   task add "${ARGS[@]}" +daily +next due:eod until:tomorrow routine:"$LINE"
 done
 

@@ -7,6 +7,10 @@
       urgency."inherit" = "on";
       "news.version" = "3.4.1"; # I don't love this but it beats everything else I've tried
       search.case.sensitive = "no";
+      uda.page = {
+        type = "string";
+        label = "Page";
+      };
     };
   };
 
