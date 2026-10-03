@@ -205,6 +205,8 @@ in
           "tile on, match:class prismlauncher"
           # Maximize messaging apps on workspace 21 (xmonad Full layout style)
           "fullscreen_state 1 0, match:class (discord|signal|slack)"
+          # Page fullscreen requests (YouTube f) only tell Brave it is fullscreen.
+          "sync_fullscreen off, match:class brave-origin"
 
           "float on, match:class .blueman-manager-wrapped"
           "size monitor_w*0.5 monitor_h*0.5, match:class .blueman-manager-wrapped"
@@ -257,7 +259,8 @@ in
           "$mod, space, Toggle floating window, togglefloating"
           "$mod, w, Toggle maximized window, fullscreen,1"
           # TODO this works pretty badly tbh and I really wish it was automatic
-          "$mod, f, Tell application it is fullscreen, fullscreenstate, -1 2"
+          # fullscreenstate pins sync_fullscreen on the window; unset it so window rules apply again.
+          "$mod, f, Tell application it is fullscreen, exec, hyprctl --batch 'dispatch fullscreenstate -1 2; dispatch setprop active sync_fullscreen unset'"
 
           # Cycle to next window and maximize (xmonad Full layout style)
           "$mod, Tab, Cycle to next window and maximize, exec, hyprctl --batch 'dispatch cyclenext; dispatch fullscreen 1'"
