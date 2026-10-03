@@ -18,6 +18,10 @@
     Service = {
       Type = "exec";
       ExecStart = lib.getExe config.programs.hyprlock.package;
+      # hyprlock aborts on wl_display "invalid object" when outputs are
+      # recreated on resume (hyprwm/hyprlock#1064); relaunch to restore the lock.
+      Restart = "on-failure";
+      RestartSec = 1;
     };
   };
 }

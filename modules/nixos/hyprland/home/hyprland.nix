@@ -175,6 +175,8 @@ in
           force_default_wallpaper = -1;
           # Clicked notifications (Slack, Signal, Discord) ask to be focused this way.
           focus_on_activate = true;
+          # Lets a restarted hyprlock take over the lock after it crashes.
+          allow_session_lock_restore = true;
           #enable_swallow = true;
           #swallow_regex = ".*prismlauncher.*";
         };
