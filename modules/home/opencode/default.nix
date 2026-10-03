@@ -211,6 +211,12 @@ in
             ];
           };
         };
+        # Desktop-only browser tools can't reach the TUI; this is the TUI's browser.
+        playwright = {
+          type = "local";
+          # Snapshots and screenshots otherwise land in the session's working directory.
+          command = [ (lib.getExe pkgs.playwright-mcp) "--isolated" "--output-dir" "/tmp/playwright-mcp" ];
+        };
       };
       #model = "openai/gpt-6-astra";
       model = "anthropic/claude-opus-5-5#xhigh";
