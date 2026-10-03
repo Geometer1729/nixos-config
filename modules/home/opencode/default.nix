@@ -84,6 +84,15 @@ in
   };
   stylix.targets.opencode.enable = true;
 
+  keyHelp.opencode = {
+    match.process = "(^|/)opencode2( |$)";
+    binds = [{
+      key = "ctrl+p";
+      description = "Command palette (lists binds)";
+      keys = [ "C-p" ];
+    }];
+  };
+
   services.mako.settings = lib.mkIf machine.hasGui {
     "app-name=OpenCode category=opencode.waiting" = {
       width = 500;

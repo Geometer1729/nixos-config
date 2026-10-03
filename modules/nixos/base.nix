@@ -14,6 +14,7 @@ in
     disko
     impermanence
     keep-awake
+    key-help
     machine
     nix
     password

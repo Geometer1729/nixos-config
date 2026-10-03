@@ -1,5 +1,35 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
+let
+  # vit's :help only lists its defaults, so key help shows these too.
+  binds = {
+    o = { action = ":!wr taskopen {TASK_UUID}<Enter>"; description = "Open task note"; };
+    s = { action = ":!wr task-steps {TASK_UUID}<Enter>"; description = "Edit task steps"; };
+    x = { action = ":!r task-promote {TASK_UUID}<Enter>"; description = "Promote task"; };
+    O = { action = ":! ${config.scripts.tasks.packages.opencode-task}/bin/opencode-task {TASK_UUID}<Enter>"; description = "Work on task with opencode"; };
+    i = { action = ":!wr task {TASK_UUID} info<Enter>"; description = "Show task info"; };
+    r = { action = "{ACTION_REFRESH}"; description = "Refresh"; };
+    gi = { action = ":inbox<Enter>"; description = "Inbox report"; };
+    gs = { action = ":someday<Enter>"; description = "Someday report"; };
+    gn = { action = ":next<Enter>"; description = "Next report"; };
+  };
+in
 {
+  keyHelp.vit = {
+    match.process = "(^|/)\\.?vit(-wrapped)?( |$)";
+    binds = [{
+      key = ":help";
+      description = "Built-in help (defaults only)";
+      # No leading Escape: vit reads Escape plus the next key as Alt+key.
+      keys = [ ":help" "Enter" ];
+    }] ++ lib.mapAttrsToList
+      (key: bind: {
+        inherit key;
+        inherit (bind) description;
+        keys = [ key ];
+      })
+      binds;
+  };
+
   scripts.tasks.overrides.opencode-task.extras = [
     config.programs.opencode.package
   ];
@@ -13,15 +43,7 @@
     ".vit/config.ini".text =
       ''
         [keybinding]
-        o = :!wr taskopen {TASK_UUID}<Enter>
-        s = :!wr task-steps {TASK_UUID}<Enter>
-        x = :!r task-promote {TASK_UUID}<Enter>
-        O = :! ${config.scripts.tasks.packages.opencode-task}/bin/opencode-task {TASK_UUID}<Enter>
-        i = :!wr task {TASK_UUID} info<Enter>
-        r = {ACTION_REFRESH}
-        gi = :inbox<Enter>
-        gs = :someday<Enter>
-        gn = :next<Enter>
+        ${lib.concatStrings (lib.mapAttrsToList (key: bind: "${key} = ${bind.action}\n") binds)}
         [vit]
         theme = stylix
       '';

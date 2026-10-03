@@ -6,6 +6,21 @@
       ++ lib.optional machine.hasGui pkgs.ghostty;
   };
 
+  keyHelp.nvim = {
+    match.process = "(^|/)nvim( |$)";
+    binds = [
+      {
+        key = "Space f k";
+        description = "Search keymaps";
+        keys = [ "Escape" "Space" "f" "k" ];
+      }
+      {
+        key = "Space";
+        description = "Pause after a prefix to list next keys";
+      }
+    ];
+  };
+
   stylix.targets.nixvim = {
     enable = true;
     #plugin = "base16-nvim";

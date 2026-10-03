@@ -29,6 +29,15 @@
     enable = true;
     enableGitIntegration = true;
   };
+  keyHelp.lazygit = {
+    match.process = "(^|/)lazygit( |$)";
+    binds = [{
+      key = "?";
+      description = "Search and run binds";
+      keys = [ "?" ];
+    }];
+  };
+
   programs.lazygit = {
     enable = true;
     settings = {

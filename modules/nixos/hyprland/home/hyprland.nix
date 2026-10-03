@@ -235,6 +235,8 @@ in
           "$mod SHIFT, d, Open password picker, exec, passmenu"
           "$mod, s, Open SSH launcher, exec, rofi -show ssh"
           "$mod, r, Run a command, exec, rofi -show run"
+          "$mod, slash, Show key help for the focused app, exec, key-help"
+          "$mod SHIFT, slash, Search Hyprland keybinds, exec, rofi -show keybinds"
           "$mod SHIFT, n, Start a ticket, exec, start-ticket"
           "$mod SHIFT, Return, Open Brave window for this workspace, exec, brave-workspace-window"
           "$mod, u, Clean URL in clipboard, exec, clean-url"

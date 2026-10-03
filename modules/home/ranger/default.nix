@@ -9,6 +9,15 @@ in
 {
   home.packages = [ ranger-patched ];
 
+  keyHelp.ranger = {
+    match.process = "(^|/)\\.?ranger(-wrapped)?( |$)";
+    binds = [{
+      key = "?";
+      description = "Help: m man page, k keys, c commands";
+      keys = [ "Escape" "?" ];
+    }];
+  };
+
   xdg.configFile."ranger/rc.conf".text = ''
     set preview_images true
     set preview_images_method kitty

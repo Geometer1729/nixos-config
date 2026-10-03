@@ -12,6 +12,7 @@ let
       "$1"
   '';
   restoreTerminals = config.scripts.tmux.packages.restore-terminals;
+  tmuxKeys = config.scripts.tmux.packages.tmux-keys;
   saveTmux = pkgs.writeShellApplication {
     name = "save-tmux";
     runtimeInputs = with pkgs; [
@@ -46,6 +47,17 @@ in
     enable = machine.hasGui;
     extras = with pkgs; [ tmux ]
       ++ lib.optionals machine.hasGui [ ghostty hyprland ];
+    overrides.tmux-keys.extras = [ pkgs.fzf ];
+  };
+
+  keyHelp.tmux = {
+    order = 10;
+    match.process = "";
+    binds = [{
+      key = "C-b ?";
+      description = "Search tmux binds";
+      command = ''${lib.getExe tmuxKeys} "$KEY_HELP_CLIENT"'';
+    }];
   };
 
   programs.tmux = {
@@ -85,23 +97,23 @@ in
     keyMode = "vi";
     extraConfig =
       ''
-        # Send prefix to nested tmux with double press
-        bind C-b send-prefix
+        bind -N "Search key bindings" ? run-shell -b "${lib.getExe tmuxKeys} '#{client_name}'"
 
-        # Checkpoint terminals, Neovim, and tmux together.
-        bind C-s run-shell '${saveTmux}/bin/save-tmux'
+        bind -N "Send prefix to nested tmux" C-b send-prefix
+
+        bind -N "Save terminals, Neovim, and tmux" C-s run-shell '${saveTmux}/bin/save-tmux'
 
         # Kill detached, numbered sessions that are a single idle shell pane in $HOME.
-        bind X run-shell '${config.scripts.tmux.packages.prune-orphans}/bin/prune-orphans'
+        bind -N "Kill idle orphan sessions" X run-shell '${config.scripts.tmux.packages.prune-orphans}/bin/prune-orphans'
 
         # better splits
         unbind %
-        bind h split-window -v
+        bind -N "Split pane below" h split-window -v
         unbind '"'
-        bind v split-window -h
+        bind -N "Split pane right" v split-window -h
 
-        bind g popup -h 90% -w 90% 'EDITOR=nvim lazygit'
-        bind a rename-session "#{b:pane_current_path}"
+        bind -N "Open lazygit" g popup -h 90% -w 90% 'EDITOR=nvim lazygit'
+        bind -N "Name session after current directory" a rename-session "#{b:pane_current_path}"
         set-hook -g session-renamed 'attach-session -c "#{pane_current_path}"'
 
         set-option -g @tmux-autoreload-configs '${config.home.homeDirectory}/.config/tmux/tmux.conf'
@@ -129,7 +141,7 @@ in
         # Fixes escape being slow in vim (when in tmux)
         set -sg escape-time 0
 
-        bind u send-keys C-l \; run-shell "sleep .5s" \; clear-history
+        bind -N "Clear screen and scrollback" u send-keys C-l \; run-shell "sleep .5s" \; clear-history
       '';
   };
 

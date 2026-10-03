@@ -37,7 +37,7 @@ case "${ROFI_RETV:-0}" in
        else [.dispatcher, .arg] | join(" ") end | one_line) as $description |
       $shortcut + (" " * ([2, 32 - ($shortcut | length)] | max)) + $description +
       (if .submap != "" then " [\(.submap)]" else "" end) +
-      "\u0000info\u001f" + ({kind: "bind", dispatcher, arg} | tojson) +
+      "\u0000info\u001f" + ({kind: "bind", dispatcher, arg, $shortcut, $description} | tojson) +
       "\u001fmeta\u001f" + ([.dispatcher, .arg] | join(" ") | one_line)
     ' <<< "$binds"
 
@@ -48,7 +48,7 @@ case "${ROFI_RETV:-0}" in
         "Bar:\(.module | sub("^custom/"; "")) \(.button)" as $shortcut |
         (.command | gsub("/nix/store/[^/ ]+/bin/"; "") | one_line) as $description |
         $shortcut + (" " * ([2, 32 - ($shortcut | length)] | max)) + $description +
-        "\u0000info\u001f" + ({kind: "waybar", command} | tojson) +
+        "\u0000info\u001f" + ({kind: "waybar", command, $shortcut, $description} | tojson) +
         "\u001fmeta\u001f" + (.command | one_line)
       ' "$click_actions"
     fi
@@ -62,6 +62,8 @@ case "${ROFI_RETV:-0}" in
     # Rofi to exit so window actions and screenshots run after it releases focus.
     (
       tail --pid="$rofi_pid" --sleep-interval=0.05 -f /dev/null
+      notify-send "Next time: $(jq -r '.shortcut' <<< "$ROFI_INFO")" \
+        "$(jq -r '.description' <<< "$ROFI_INFO")"
       case "$kind" in
         bind)
           dispatcher=$(jq -er '.dispatcher' <<< "$ROFI_INFO")

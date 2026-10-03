@@ -243,6 +243,17 @@ in
   };
 
   home.packages = [ pkgs.browserpass restoreSession workspaceWindow xdgOpen placeWorkspaceWindows ];
+
+  keyHelp.brave = {
+    label = "Vimium";
+    order = 10;
+    match.class = "^brave";
+    binds = [{
+      key = "?";
+      description = "List binds (on web pages)";
+      command = ''hyprctl dispatch sendshortcut "SHIFT, slash, address:$KEY_HELP_WINDOW"'';
+    }];
+  };
   home.sessionVariables.BROWSER = "${xdgOpen}/bin/brave-xdg-open";
 
   # Home Manager assumes every programs.brave package uses Brave-Browser.
