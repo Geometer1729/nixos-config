@@ -11,7 +11,7 @@
     enable = true;
     settings = {
       general = {
-        after_sleep_cmd = "hyprctl dispatch dpms on; bluetooth-autoconnect.sh";
+        after_sleep_cmd = "hyprctl dispatch dpms on; bluetooth-autoconnect";
         before_sleep_cmd = "loginctl lock-session";
         ignore_dbus_inhibit = false;
         # Wait for the compositor to confirm the session is locked before sleeping.
