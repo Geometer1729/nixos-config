@@ -61,6 +61,10 @@ secrets:
 test-remote-builds:
   test-remote-builds
 
+# Check that tmux scopes survive the logout save (uses a disposable tmux server).
+test-tmux-shutdown:
+  python3 "{{flake}}/modules/home/scripts/test-tmux-shutdown.py"
+
 # Build once and retain the config devshell on both development machines
 deploy-devshell:
   #!/usr/bin/env bash
