@@ -180,6 +180,16 @@ in
       "$schema" = "https://opencode.ai/config.json";
       autoupdate = false;
       lsp = lspServers;
+      references.conf = {
+        path = "${config.home.homeDirectory}/conf";
+        description = builtins.concatStringsSep " " [
+          "Declarative NixOS/home-manager configuration for this machine, including OpenCode itself"
+          "(MCP servers, plugins, permissions, skills, AGENTS.md) and the dev tools agents rely on."
+          "Read it when the environment behaves unexpectedly."
+          "When OpenCode, an MCP server, or a dev tool is broken or misconfigured, fixing it here is wanted:"
+          "follow its AGENTS.md and propose the change rather than working around the breakage."
+        ];
+      };
       mcp = lib.optionalAttrs machine.hasGui {
         slack = {
           type = "remote";

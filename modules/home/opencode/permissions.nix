@@ -371,6 +371,7 @@ in
   external_directory = {
     "/nix/store/**" = "allow";
     "/tmp/**" = "allow";
+    "${config.home.homeDirectory}/conf/**" = "allow";
     "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
     "${config.home.homeDirectory}/Code/nixpkgs/**" = "allow";
   };
