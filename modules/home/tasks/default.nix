@@ -25,5 +25,6 @@
     ./vit.nix
     ./taskchampion-client.nix
     ./gtd.nix
+    ./dailies.nix
   ];
 }
