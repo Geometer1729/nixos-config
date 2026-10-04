@@ -43,7 +43,16 @@ let
     config.allowUnfree = true;
   };
   brave = unstable.brave-origin.override {
-    commandLineArgs = "--ozone-platform=wayland --profile-directory=Default --load-extension=${braveTheme}";
+    # Sites with high media engagement (YouTube, Loom) bypass the autoplay
+    # gesture requirement, so every restored tab played on boot. The
+    # AutoplayAllowed=false policy only declines to force autoplay on.
+    commandLineArgs = builtins.concatStringsSep " " [
+      "--ozone-platform=wayland"
+      "--profile-directory=Default"
+      "--load-extension=${braveTheme}"
+      "--autoplay-policy=document-user-activation-required"
+      "--disable-features=MediaEngagementBypassAutoplayPolicies,PreloadMediaEngagementData"
+    ];
   };
 
   restoreSession = pkgs.writeShellApplication {
