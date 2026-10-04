@@ -14,8 +14,8 @@
 
     package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
-      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
-      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000" ];
+      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000?priority=60" ];
+      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000?priority=60" ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="

@@ -4,9 +4,9 @@
   nix = {
     settings = {
       builders-use-substitutes = true;
-      # Add am as a substitute server
-      substituters = [ "ssh-ng://bbrian@am" ];
-      trusted-substituters = [ "ssh-ng://bbrian@am" ];
+      # Add am as a substitute server, after cache.nixos.org (priority 40)
+      substituters = [ "http://am:5000?priority=50" ];
+      trusted-substituters = [ "http://am:5000?priority=50" ];
       trusted-public-keys = [ "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s=" ];
     };
     distributedBuilds = true;
