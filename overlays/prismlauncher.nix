@@ -17,7 +17,6 @@ final: prev: {
     additionalLibs = [
       final.libvlc # Required for watermedia mod
       final.nss # Required for some mods
-      final.wayland # Required for Minecraft 26.1+ native Wayland
     ];
   };
 }

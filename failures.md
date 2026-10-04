@@ -7,8 +7,8 @@ baseline for unchecked hosts or commands.
 
 This section is only for evaluation warnings in `nix flake check` or `nix build *` for this repo.
 
-Verified 2026-09-23 with full `nix flake check -L` (workload-aware keep-awake,
-nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the following findings remain:
+Verified 2026-10-03 with full `nix flake check -L` (update worktree,
+nixpkgs 774debe). Evaluation and check builds passed on x86_64-linux; the following findings remain:
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
@@ -19,8 +19,8 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the follow
 
 ## Flake checks
 
-- **Passed, 2026-09-23**: full `nix flake check -L`, including workload recognition/lifetime tests, script-group checks, and all three host builds. Installer evaluated; ISO build/boot and other advertised platforms remain unverified.
-- **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Build/tests pass; follow the npm hook and dependency updates rather than suppressing the warnings.
+- **Passed, 2026-10-03**: full `nix flake check -L` (nixpkgs 774debe), including all three host builds and the OpenCode plugin load/reload check. ISO build/boot and other advertised platforms remain unverified.
+- **Plugin-check npm warnings, newly recorded 2026-09-21**: `opencode-plugins-check` reports unknown environment config `nodedir` and deprecated transitive `node-domexception@1.0.0`, `glob@9.3.5`, and `glob@10.5.0`. Since 2026-10-03 (plugins on `@opencode/plugin` 2.0.22) it also reports `EBADENGINE`: `@opentui/core@0.5.14` requires `node >=26.4.0` / `bun >=1.3.0`, but the check runs Node 24.21.0. Typecheck and all 46 tests pass; OpenCode loads plugins under its bundled Bun at runtime. Move the check to a satisfying runtime if Node-specific failures appear; otherwise follow the npm hook and dependency updates rather than suppressing the warnings.
 
 ## installer
 
@@ -30,12 +30,13 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the follow
 ## am (primary desktop)
 
 ### Build and activation
-- **Passed, 2026-09-29**: portal ownership fix, `nixos-rebuild test --flake .#am --sudo --no-reexec`; active system `7l8hzcv…`, no failed system or user units.
-- **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete. The September 20 build also reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY` and Qt AutoUic renaming duplicate `verticalLayout` to `verticalLayout1`. Build/tests pass; track upstream compiler/UI packaging rather than removing legacy support.
-- **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
-- **Initrd alternate-library warnings, newly recorded 2026-09-20**: `Couldn't satisfy dependency libcrypt.so.1` / `.so.1.1` for systemd 260.2. The initrd builder checks each dlopen SONAME alternative separately. The actual old am and all three new host initrds contain byte-identical `libcrypt.so.2`; no missing password-hashing implementation was found. No workaround needed; follow upstream warning handling. Balrog's updated initrd also passed its reboot check below.
+- **Passed, 2026-10-03**: update worktree `nh os build`, `nh os test`, and the am leg of `just deploy` (no change); active system `g344m3k…` (nixpkgs 774debe), no failed system or user units. The first `nh os test` was interrupted; see "Activation killed with its calling session" under Update tooling.
+- **PrismLauncher build warnings**: Java source/target 7 and Applet APIs are obsolete, and CMake reports unused `CMAKE_EXPORT_NO_PACKAGE_REGISTRY`; both remain in the 2026-10-03 12.0-develop build. The Qt AutoUic duplicate-`verticalLayout` warning is resolved upstream (`c2ef89ec`) and absent from that build. Build/tests pass; track upstream compiler packaging rather than removing legacy support.
+- **PrismLauncher intermittent check timeout, newly recorded 2026-09-20**: `ResourceFolderModelTest::test_removeResource()` line 161 expires its 10-second timer during the initial fixture installation, causing checkPhase exit 8. The test and affected path are unchanged; upstream PR #5912 documents prior timing failures. The same derivation passed all 22 tests on retry, and the 2026-10-03 build passed 23/23 on its first attempt; the intermittent condition was not re-exercised. Exact delay cause is unknown; retain a disposable build tree for isolated/full-class reproduction before proposing a fix. No tests were disabled.
+- **Initrd alternate-library warnings, newly recorded 2026-09-20**: `Couldn't satisfy dependency libcrypt.so.1` / `.so.1.1`, unchanged with systemd 260.4 (2026-10-03). The initrd builder checks each dlopen SONAME alternative separately. The actual old am and all three new host initrds contain byte-identical `libcrypt.so.2`; no missing password-hashing implementation was found. No workaround needed; follow upstream warning handling. Balrog's 6.18.54 initrd also passed its 2026-10-03 reboot check below.
 - **System-path collisions, newly recorded**: `pkgs.buildEnv` ignores duplicate PostgreSQL 18.6 `bin/postgres` and Xwayland/Xorg `protocol.txt` / `Xserver.1.gz`. The PostgreSQL service explicitly uses `postgresql-and-plugins` and is active; the global CLI selects the base package. X-server collisions concern documentation. Review duplicate package exposure if these warnings are to be eliminated.
 - **Info-index warning, newly recorded**: `install-info` reports no directory entry in `gawknotes.info`. Build succeeds; the supplemental document lacks index metadata. Follow upstream packaging if an index entry is needed.
+- **Upstream derivation build-log noise, newly recorded 2026-10-03**: derivations built locally rather than substituted print their own deprecation warnings. Examples: setuptools license-classifier/`setup.py install` deprecations (vit, tasklib, ranger, nixos-render-docs); ImageMagick 7 `convert` deprecation (nixos-icons, stylix-grub); `Fontconfig error: No writable cache directories` (nerd-fonts); GSettings `/system/` schema-path deprecations (steam FHS rootfs); Discord's declared `autoPatchelfIgnoreMissingDeps` for `libcrypto.so.1.1`; and C++/libxml2 deprecations in Inkscape/gtksourceview during flake check. All builds succeed. These come from upstream package builds, not from this configuration; no action unless one becomes an error.
 
 ### Desktop runtime
 - **KDE portal host-registration warning, newly recorded 2026-09-29**: after restoring discovery of the KDE backend, its startup reports `Failed to register with host portal` / `Connection already associated with an application ID`. The portal starts, `OpenDirectory` accepts the previously failing request, and Brian confirmed Brave's folder button works. The duplicate association's cause is unverified; inspect the KDE/host-portal registration sequence before changing registration behavior.
@@ -45,10 +46,11 @@ nixpkgs cf9d2fb). Evaluation and check builds passed on x86_64-linux; the follow
 - **Hypridle ScreenSaver cookie accounting, newly recorded 2026-09-23**: `No cookie in uninhibit` / `BUG THIS: inhibit locks < 0: -1` appeared after the idle-daemon restart. The same warnings occur on September 20 and 22, before the workload observer. Subsequent Brave Video Wake Lock acquire/release messages return the count to 1/0. Inspect Hypridle's cookie handling across client/daemon restarts; locking behavior during an unmatched release remains unverified.
 
 ### `just health`
-Checked 2026-09-22 on system `xs1fzdq…`: no failed system or user units, root 80% used / 181 GiB available, one connected Syncthing peer (Torag asleep, expected), and existing duplicate D-Bus/menu journal warnings. Earlier intermittent boot/hardware conditions were not re-exercised.
+Checked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe): no failed system or user units, root 81% used / 174 GiB available, two Syncthing peers, and existing duplicate D-Bus/menu journal warnings. Earlier intermittent boot/hardware conditions were not re-exercised.
 
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
-- **kvm_amd**: `SVM not supported by CPU 23` — hardware doesn't support nested virtualization
+- **kvm_amd**: `SVM not supported by CPU <n>` — hardware doesn't support nested virtualization. When activation restarts `systemd-modules-load`, the same cause also logs `Failed to insert module 'kvm_amd': Operation not supported` (2026-10-03).
+- **Keep-awake helper restart, newly recorded 2026-10-03**: `systemd-inhibit[…]: 'sleep' terminated by signal TERM` when activation restarts `workload-inhibit.service`. The service came back active; this is the expected stop of its placeholder inhibitor process.
 - **Bluetooth RTL**: `hci1: RTL: RTL: Read reg16 failed (-110)` — hardware/firmware issue, harmless
 - **ACPI USB _PLD**: `AE_AML_UNINITIALIZED_ELEMENT` for `PTXH.RHUB.POT7._PLD` — firmware ACPI table issue surfaced in the boot journal
 - **dbus-broker duplicate service names**: duplicate names for Blueman, dconf, accessibility, and xdg-desktop-portal service files after boot/activation — noisy but services are still running
@@ -56,7 +58,7 @@ Checked 2026-09-22 on system `xs1fzdq…`: no failed system or user units, root 
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
 
 ### `just vim-health`
-Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following existing warnings remain.
+Rechecked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe); the following existing warnings remain.
 
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
 - **WARNING**: Neovim 0.12.5 is available while the configured nixpkgs package is 0.12.4
@@ -64,13 +66,13 @@ Rechecked 2026-09-20 on system `iqccw0c…` (nixpkgs cf9d2fb); the following exi
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
 ### `just gnome-check`
-- Clean on 2026-09-20: `just gnome-check`, system `iqccw0c…` (nixpkgs cf9d2fb).
+- Clean on 2026-10-03: `just gnome-check`, system `g344m3k…` (nixpkgs 774debe).
 
 ## balrog
 
 ### Build and activation
-- **Passed, 2026-09-26**: landing page and Foundry reverse proxy, `nixos-rebuild test --flake .#balrog --target-host bbrian@balrog --sudo --use-substitutes` and `boot --store-path … --target-host bbrian@balrog --sudo --use-substitutes --no-reexec`; active/default system `75wl6k1…`. Nginx syntax, LAN/name-based HTTP, prefixed assets/API/WebSocket handshake, and no failed system or user units verified; this configuration was not reboot-tested.
-- **Foundry startup-health race, moved from am**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Reproduced during Balrog's September 26 activation and reboot; later timer probes cleared the failed state without a reset, and steady-state test activation passed. Follow up on startup/readiness handling rather than disabling the health check.
+- **Deployed with manual completion, 2026-10-03**: the `just deploy` leg (`nh os switch … --target-host bbrian@balrog`) lost its session when the switch restarted `tailscaled`. See "Activation killed with its calling session" under Update tooling. Podman/Foundry, nix-serve, smartd, taskchampion-sync-server, systemd-oomd and nscd were left stopped, and the profile still pointed at the old system. Completed with `sudo systemd-run --collect <system>/bin/switch-to-configuration switch`, which exited 4 only from the Foundry race below. Then `nix-env -p /nix/var/nix/profiles/system --set` and a detached `switch-to-configuration boot` were run. Active/default system `fjr0asf…` (nixpkgs 774debe).
+- **Foundry startup-health race, moved from am**: Podman's transient `<container-id>-<suffix>.service` runs `healthcheck run` immediately after starting Foundry, returns 1 while health is `starting`, and can make NixOS activation exit 4. Reproduced during Balrog's September 26 activation and reboot and the 2026-10-03 completion switch. Later timer probes cleared the failed state without a reset. Upstream tracks the same failure for all transient units as [nixpkgs #558533](https://github.com/NixOS/nixpkgs/issues/558533). Follow up on startup/readiness handling, or on that fix, rather than disabling the health check.
 
 ### FoundryVTT runtime
 - **Auth DNS, moved from am**: `getaddrinfo EAI_AGAIN foundryvtt.com` recurred during Balrog's September 26 boot/authentication. Later container DNS lookup passed and Foundry was healthy; investigate startup network readiness if this continues.
@@ -82,6 +84,7 @@ Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands ov
 - **D-Bus duplicate service names, newly recorded on Balrog**: boot journal reports duplicate dconf and systemd service names, matching the desktop hosts' existing warning class. Review duplicate service exports if eliminating the noise.
 
 ### Post-deployment boot checks
+- **Update reboot passed, 2026-10-03 at 13:55:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, Linux 6.18.54, booted/active/default `fjr0asf…`, `running`, zero failed system and user units; Foundry, nginx, nix-serve, smartd and taskchampion-sync-server active.
 - **Foundry checks passed, 2026-09-26**: rebooted into expected active/booted/default `c42xf9x…`; original image/version 13.351.0, persistent data/image mounts, data-content checksum comparison, LAN HTTP, and no failed system or user units verified after the startup-health transient cleared.
 - **Storage checks passed, 2026-09-21 at 16:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, expected active/default `r7v1p7f…`, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. Alert delivery to am also passed after reboot.
 - **Secrets/sync boot checks passed, 2026-09-21 at 20:52 EDT**: rebooted into expected active/booted/default `xhsxkk6…`, Linux 6.18.52. Both SOPS steps imported only the persisted user SSH key, expected secrets were readable, automatic Taskwarrior sync succeeded at 20:48 EDT without corrective activation, and system/user failed-unit lists were empty.
@@ -93,6 +96,10 @@ Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands ov
 
 ### Build and activation
 - **Passed, 2026-09-21**: Hyprlock fix, `nixos-rebuild test --flake .#torag --target-host bbrian@torag --sudo --use-substitutes`, active system `4xbk1mj…`. Boot default remains `fdka1cn…`.
+- **2026-10-03 update deploy skipped (Brian's decision)**: two `nixos-rebuild switch --flake …#torag --target-host bbrian@torag --sudo --use-substitutes` attempts (19:49 and 21:18 EDT) were killed during closure copy. No activation started. Torag remains on `38wya3x…` (nixpkgs cf9d2fb), `running`, with no failed units. The cause is the Wi-Fi link entry below. The new closure (`plp74b7…`) was built on am and evaluated in `nix flake check`; Torag activation, reboot, and its four health recipes remain unverified for nixpkgs 774debe.
+
+### Network
+- **Wi-Fi throughput on 2.4 GHz, newly recorded 2026-10-03**: Torag joins `moria` on 2412 MHz / 20 MHz when the router doesn't offer 5 GHz under that SSID. In that state, LAN RTT is 13–510 ms (0.5–1.6 s under load) and SSH throughput ~2 MiB/s, versus ~50 MiB/s after a reboot onto 5785 MHz / 80 MHz. The 5 GHz BSS later disappeared from scans again, and Torag fell back. This makes `--use-substitutes` deploys from am's `ssh-ng` substituter (priority 0, one connection) take more than an hour for a mass rebuild. Fix the router's 5 GHz advertisement or use Ethernet; substituter/deploy tuning is taskwarrior task 31.
 
 ### Post-deployment boot checks
 - **Passed for storage/system services, 2026-09-21 at 16:59 EDT**: `ssh torag sudo -n systemctl reboot`; expected active/default `fdka1cn…`, new boot ID, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. The user terminal-restoration failure below remains.
@@ -125,7 +132,7 @@ Rechecked 2026-09-20 with `ssh torag just --justfile /home/bbrian/conf/justfile 
 - Clean on 2026-09-20: `ssh torag just --justfile /home/bbrian/conf/justfile gnome-check`, system `w2i1207…` (nixpkgs cf9d2fb).
 
 ## Remote builds (`just test-remote-builds`)
-- Passed 2026-09-20 from am (`just test-remote-builds`, system `iqccw0c…`) and Torag (`ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds`, system `w2i1207…`): all 16 SSH, fresh remote-build, HTTP-cache, and signature-verified transfer assertions passed on each invocation.
+- Passed 2026-10-03 from am (`just test-remote-builds`, system `g344m3k…`), before and again after Balrog's update and reboot (21:45 EDT, Balrog `fjr0asf…`, Torag still `38wya3x…`): all 16 SSH, fresh remote-build, HTTP-cache, and signature-verified transfer assertions passed. The Torag-initiated run was not repeated because Torag was not deployed. Its last pass was 2026-09-20 (`ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds`, system `w2i1207…`).
 
 ## Update tooling
 
@@ -133,7 +140,9 @@ Newly recorded 2026-09-12 during the update; recovered coverage and raw evidence
 
 - **Suppressed package-extraction errors**: `nixpkgs-changelog` silently continued after the Linearis version assertion prevented Home Manager evaluation (231 rather than 408 package names). Fix individual evaluation error reporting and inventory coverage; the current extractor omits some profiles and option-injected dependencies. The update repaired the pin and reviewed the complete commit range independently.
 - **Regex package false positives**: `[26.05]` was passed unescaped to `grep`, producing an unrelated `jwx` match. Use literal package matching; this false positive was rejected by configuration/source review.
-- **Missing non-Git inputs**: `flake-changelog` compares only `.rev`, omitting changed `linearis-npm` registry metadata. Compare locked content for file inputs and report their non-Git identity. The final artifact has an explicitly labeled manual entry and complete direct-input accounting.
+- **Missing non-Git inputs**: `flake-changelog` compares only `.rev`, omitting changed `linearis-npm` registry metadata; recurred 2026-10-03 for `opencode2-npm` (2.0.12 → 2.0.22), which was resolved manually. Compare locked content for file inputs and report their non-Git identity.
+- **Activation killed with its calling session, newly recorded 2026-10-03**: `nh` runs `switch-to-configuration` as a direct child (locally via `sudo`, remotely inside the SSH session) instead of in a transient unit. On am, Home Manager activation restarted the OpenCode server that owned the shell, killing the switch after its stop phase. PostgreSQL, systemd-oomd, Docker and accounts-daemon stayed stopped until `nh os test` was rerun. On Balrog, the switch restarted `tailscaled` (new tailscale build), which terminated the Tailscale SSH session and the switch with it. `nixos-rebuild switch --target-host … --sudo` wraps the switch in `systemd-run` and was chosen for Torag, but that deploy was skipped (see torag), so this path is unverified here. Make `just deploy` (and agent-run activations) survive session loss, e.g. switch the recipe to `nixos-rebuild`, or have activation run via `systemd-run`.
+- **keep-awake over SSH, newly recorded 2026-10-03**: `ssh torag keep-awake toggle` fails with `XDG_RUNTIME_DIR: parameter null or not set` (line 131); it works after exporting `XDG_RUNTIME_DIR=/run/user/$(id -u)`. The earlier `keep-awake 24h` form used by update workflows no longer exists (`toggle | status | matches`). Default `XDG_RUNTIME_DIR` in the script and update the update workflow's keep-awake commands.
 
 ## KDE Connect runtime
 
@@ -154,5 +163,5 @@ passing notification tests and Nix activation above.
 - **OpenAI override normalization**: loading a location logs `configuration normalization diagnostic`, `path=$.provider.openai`, `kind=invalid`, `skipped malformed recognized value`. The exact rejected field is not identified by this warning. Inspect normalization/resolved provider configuration before relying on these custom overrides.
 - **Slack resource-template discovery**: location activation logs `failed to list MCP resource templates`, `MCP error -32601: Method not found: resources/templates/list`. Template discovery is unavailable on that integration; investigate capability-aware probing upstream.
 - **Auto-tabs passed, 2026-09-21, OpenCode 2.0.12**: a disposable live TUI retained its selected tab and opened an API-created same-directory session in the background; other-directory sessions were excluded. Plugin type checks, all 45 tests, and packaged load/reload checks passed. Existing beta clients need restarting to use the corrected tab API.
-- **Restart cancellation status, newly recorded 2026-09-20**: after a server restart, three background shell tools reported cancellation while their underlying commands continued and later wrote exit records. The original shell-output path also disappeared. Inspect durable command logs/exit records before retrying; investigate the harness's subprocess lifecycle and cancellation reporting. Update evidence was recovered without rerunning the input update.
+- **Restart cancellation status, newly recorded 2026-09-20**: after a server restart, three background shell tools reported cancellation while their underlying commands continued and later wrote exit records. The original shell-output path also disappeared. On 2026-10-03, a foreground `nh os test` reported `Command cancelled` when its own activation restarted the server, and this time the command really was killed: there was no exit record and no `finished switching`. Inspect durable command logs/exit records before retrying; investigate the harness's subprocess lifecycle and cancellation reporting.
 - **YAML language server unavailable, newly recorded 2026-09-20**: automatic diagnostics for an upstream Brave YAML rewrite reported `Executable not found in $PATH: "yaml-language-server"`. Plain source inspection succeeded; YAML LSP validation was unavailable. Check the configured server command and its executable environment before relying on these diagnostics.
