@@ -149,8 +149,8 @@ else
 fi
 
 if [ -n "$am_path" ]; then
-  test_cache_copy am balrog "ssh-ng://bbrian@am" "$am_path" "$am_token"
-  test_cache_copy am torag "ssh-ng://bbrian@am" "$am_path" "$am_token"
+  test_cache_copy am balrog "http://am:5000" "$am_path" "$am_token"
+  test_cache_copy am torag "http://am:5000" "$am_path" "$am_token"
 fi
 
 if [ -n "$balrog_path" ]; then
