@@ -12,6 +12,7 @@ let
       "$1"
   '';
   restoreTerminals = config.scripts.tmux.packages.restore-terminals;
+  restoreCommands = config.scripts.tmux.packages.restore-commands;
   tmuxKeys = config.scripts.tmux.packages.tmux-keys;
   saveTmux = pkgs.writeShellApplication {
     name = "save-tmux";
@@ -72,15 +73,20 @@ in
           plugin = resurrect;
           extraConfig = ''
             # Set before continuum starts its background restore.
-            set -g @resurrect-processes '\
+            # restore-commands replaces resurrect's typed-ahead process restore;
+            # same list syntax, plus resurrect's default programs.
+            set -g @resurrect-processes 'false'
+            set -g @restore-processes '\
               "~opencode2->opencode2 --continue" \
               "~lazygit->lazygit" \
               "~nvim->env NVIM_AUTO_RESTORE=1 nvim" \
               "~ghc.*--interactive->ghci" \
               "~calcurse->calcurse" \
-              "~vit->vit"'
+              "~vit->vit" \
+              vi vim view emacs man less more tail top htop irssi weechat mutt'
             set -g @resurrect-hook-post-save-layout '${filterScratchpads}'
-            set -g @resurrect-hook-post-restore-all '${pkgs.coreutils}/bin/touch "$XDG_RUNTIME_DIR/tmux-resurrected"'
+            set -g @resurrect-hook-pre-restore-all '${restoreCommands}/bin/restore-commands pre'
+            set -g @resurrect-hook-post-restore-all '${restoreCommands}/bin/restore-commands post'
           '';
         }
         {
@@ -166,6 +172,8 @@ in
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
       Before = [ "save-tmux-on-exit.service" ];
+      # Restoring belongs to login; re-running it on activation reopens windows.
+      X-RestartIfChanged = false;
     };
     Service = {
       Type = "oneshot";

@@ -57,6 +57,7 @@ in
         source ${./helpers.zsh}
         source ${./viCursor.zsh}
         source ${./notify.zsh}
+        source ${./tmuxRestore.zsh}
         bindkey  clear-screen
       ''; #If this gets any more substantial it may be time for a file
       localVariables =

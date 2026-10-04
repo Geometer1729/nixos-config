@@ -10,7 +10,10 @@
       ''
         # Tmux session management is only for terminal-driven direnv loads.
         # Direnv rollback can remove the opt-out inherited by background tools.
-        if [ -t 0 ] && [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ]; then
+        # Panes tmux-resurrect is restoring keep their saved session; prompting
+        # there could also swallow keys and kill the restored session.
+        if [ -t 0 ] && [ -n "$TMUX" ] && [ -z "$DIRENV_NO_TMUX_RENAME" ] \
+          && [ -z "$(tmux show-options -gqv @restoring)$(tmux show-options -pqv -t "$TMUX_PANE" @restored)" ]; then
           git_root=$(git rev-parse --show-toplevel 2>/dev/null)
           session_name=$(basename "''${git_root:-$PWD}")
           current_session=$(tmux display-message -p '#S')

@@ -57,7 +57,7 @@ save() {
 }
 
 restore() {
-  local all_sessions_ready=false session workspace command
+  local all_sessions_ready=false session workspace command attempt result failed=false
 
   [ -s "$manifest" ] || return 0
 
@@ -79,7 +79,11 @@ restore() {
   if ! $all_sessions_ready; then
     if ! tmux has-session 2>/dev/null; then
       rm -f "$restore_marker"
-      tmux new-session -d -s 0 2>/dev/null || tmux has-session -t '=0'
+      # Start the server in its own scope: left in this unit's cgroup, it would
+      # be killed whenever the unit stops or restarts. The tmux-spawn- prefix
+      # applies the drop-in that keeps it alive for the logout save.
+      systemd-run --user --scope --collect --quiet --unit="tmux-spawn-server-$$" \
+        tmux new-session -d -s 0 2>/dev/null || tmux has-session -t '=0'
     fi
 
     for _ in $(seq 1 200); do
@@ -114,13 +118,33 @@ restore() {
   while IFS=$'\t' read -r session workspace; do
     [[ "$session" =~ [[:space:]] ]] && continue
     tmux has-session -t "=$session" 2>/dev/null || continue
-    if tmux list-clients -F '#{client_session}' 2>/dev/null | grep -Fxq "$session"; then
-      continue
-    fi
+    attached "$session" && continue
 
     command="$(command -v ghostty) --title=tmux:$session -e $(command -v tmux) attach-session -t =$session"
-    hyprctl dispatch exec "[workspace $workspace silent] $command" >/dev/null
+    # A dispatch can succeed without a terminal ever attaching (seen at boot),
+    # so confirm the client and retry rather than trusting hyprctl's reply.
+    for attempt in 1 2 3; do
+      result=$(hyprctl dispatch exec "[workspace $workspace silent] $command" 2>&1) || true
+      for _ in $(seq 1 100); do
+        attached "$session" && break
+        sleep 0.1
+      done
+      if attached "$session"; then
+        echo "Attached $session on workspace $workspace (attempt $attempt)"
+        break
+      fi
+      echo "No terminal attached to $session after attempt $attempt; hyprctl: $result" >&2
+    done
+    attached "$session" || failed=true
   done < <(jq -r '.[] | [.session, .workspace] | @tsv' "$manifest")
+
+  if $failed; then
+    return 1
+  fi
+}
+
+attached() {
+  tmux list-clients -F '#{client_session}' 2>/dev/null | grep -Fxq "$1"
 }
 
 case "${1:-restore}" in
