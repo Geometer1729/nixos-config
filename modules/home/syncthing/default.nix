@@ -35,10 +35,6 @@ let
   };
 in
 {
-  scripts.syncthing = {
-    directory = ./.;
-  };
-
   services.syncthing = {
     enable = true;
 

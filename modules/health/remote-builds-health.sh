@@ -9,9 +9,11 @@ CLIENTS=(balrog torag)
 HOSTS=(am balrog torag)
 FAILURES=0
 
-if [ "$(hostname)" != "$BUILDER" ]; then
+if [ "$(uname -n)" != "$BUILDER" ]; then
   echo "Not on $BUILDER, bouncing via ssh..."
-  exec ssh "bbrian@$BUILDER" test-remote-builds
+  source "$SCRIPTS_LIB/remote.sh"
+  run_remote "$BUILDER" "${BASH_SOURCE[0]}"
+  exit
 fi
 
 pass() { echo "  PASS: $1"; }

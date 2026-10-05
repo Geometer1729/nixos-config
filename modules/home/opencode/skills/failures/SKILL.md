@@ -66,11 +66,11 @@ Use this structure, retaining applicable sections even when clean or unverified:
 | `## Evaluation warnings` — mandatory | Warnings from flake evaluation, builds, and activation commands. Deduplicate by cause and identify affected configurations/profiles, including installer-only findings. |
 | `## Flake checks` | `nix flake check`: failing check derivations, covered systems, and whether checks were built. `--no-build` verifies evaluation only. Keep its evaluation warnings in the mandatory section above. |
 | `## <host>` → `### Build and activation` | `nh os build` / `just build`, and `nh os test` / `nixos-rebuild test`; include deployment activation results when available. Distinguish a successful build from successful activation. |
-| `## <host>` → `### just health` | Results from every component of the current recipe: failed systemd units, boot-journal errors, filesystem usage, and Syncthing checks. |
-| `## <host>` → `### just vim-health` | Neovim health warnings and errors, including diagnostics printed by a command that exits successfully. |
-| `## <host>` → `### just gnome-check` | Findings from `got-gnomed`, as invoked by the recipe. |
+| `## <host>` → `### health` | Results from `systemd-health` (failed system and user units, boot-journal errors), `disk-health`, and `syncthing-health`. |
+| `## <host>` → `### vim-health` | Neovim health warnings and errors, including diagnostics printed by a check that passes. |
+| `## <host>` → `### gnome-health` | GNOME packages found in the system closure and what pulls them in. |
 | `## <host>` → `### Post-deployment boot checks` | When the workflow requires a reboot: expected configuration, running kernel, and `systemctl --failed` after boot. |
-| `## Remote builds (just test-remote-builds)` | Results of the remote-build checks, identifying the initiating host and affected build direction. |
+| `## Remote builds (remote-builds-health)` | Results of the remote-build checks, identifying the initiating host and affected build direction. |
 
 Use the health-command subsections on each host where those checks apply.
 Place wrapper commands such as `just test` and `just deploy` under their

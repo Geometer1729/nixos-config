@@ -29,6 +29,13 @@ let
     "nixfmt*"
     "ruff format --check*"
     "command -v *"
+    "health*"
+    "systemd-health*"
+    "disk-health*"
+    "syncthing-health*"
+    "vim-health*"
+    "gnome-health*"
+    "remote-builds-health*"
   ];
 
   wrappedDevelopmentBashCommands = builtins.concatMap
@@ -316,12 +323,7 @@ let
     "just build*"
     "just fmt*"
     "just test*"
-    "just health*"
-    "just vim-health*"
-    "just gnome-check*"
-    "just test-remote-builds*"
     "nvd diff*"
-    "got-gnomed*"
     "systemctl --failed*"
     "systemctl status*"
     "systemctl show*"
@@ -349,15 +351,10 @@ let
     "sudo podman healthcheck run foundryvtt"
     "curl -sS http://127.0.0.1:3456/health"
     "meridian --version*"
-    "check-syncthing*"
     "ssh -o ConnectTimeout=5 torag echo*"
     "ssh -o BatchMode=yes -o ConnectTimeout=15 torag 'hostname; uptime -p'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 torag 'hostname; readlink /run/current-system'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 am 'hostname; readlink /run/current-system'"
-    "ssh torag just --justfile /home/bbrian/conf/justfile health"
-    "ssh torag just --justfile /home/bbrian/conf/justfile vim-health"
-    "ssh torag just --justfile /home/bbrian/conf/justfile gnome-check"
-    "ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds"
   ]
   ++ developmentBashCommands
   ++ wrappedDevelopmentBashCommands

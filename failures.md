@@ -47,7 +47,7 @@ nixpkgs 774debe). Evaluation and check builds passed on x86_64-linux; the follow
 - **Waybar minimum height, newly recorded 2026-09-14**: restarting `waybar.service` reports `Requested height: 24 is less than the minimum height: 34 required by the modules` on both monitors; both bars run at 34 px. The same warning appears in September 11–12 logs before the AI usage module. Align the requested height with the existing font/padding, or revisit sizing if a 24 px bar is desired.
 - **Hypridle ScreenSaver cookie accounting, newly recorded 2026-09-23**: `No cookie in uninhibit` / `BUG THIS: inhibit locks < 0: -1` appeared after the idle-daemon restart. The same warnings occur on September 20 and 22, before the workload observer. Subsequent Brave Video Wake Lock acquire/release messages return the count to 1/0. Inspect Hypridle's cookie handling across client/daemon restarts; locking behavior during an unmatched release remains unverified.
 
-### `just health`
+### `health`
 Checked 2026-10-03 at 23:19 EDT after reboot (Linux 6.18.54, `p13nsrb…`): no failed system or user units, root 81% used / 172 GiB available, two Syncthing peers, existing duplicate D-Bus/menu journal warnings, and the Bluetooth signature below. Earlier intermittent boot/hardware conditions were not re-exercised.
 
 - **obexd**: `stat(/home/bbrian/phonebook/): No such file or directory` — bluetooth phonebook directory doesn't exist, cosmetic
@@ -59,7 +59,7 @@ Checked 2026-10-03 at 23:19 EDT after reboot (Linux 6.18.54, `p13nsrb…`): no f
 - **plasma-apply-lookandfeel**: `"applications.menu" not found` during Home Manager activation — one-shot menu lookup noise; activation still succeeds
 - **Bluetooth HFP SDP**: `Unable to get Hands-Free Voice gateway SDP record: Host is down` — Bluetooth device/service availability noise
 
-### `just vim-health`
+### `vim-health`
 Rechecked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe); the following existing warnings remain.
 
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
@@ -67,7 +67,7 @@ Rechecked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe); the following exi
 - **WARNING**: `yaml.docker-compose`, `yaml.gitlab`, and `yaml.helm-values` unknown filetypes — upstream LSP config advertises filetypes not known to this Neovim runtime
 - **WARNING**: `biber is not executable!` — LaTeX bibliography tool, not installed globally (vimtex plugin check)
 
-### `just gnome-check`
+### `gnome-health`
 - Clean on 2026-10-03: `just gnome-check`, system `g344m3k…` (nixpkgs 774debe).
 
 ## balrog
@@ -80,7 +80,7 @@ Rechecked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe); the following exi
 - **Auth DNS, moved from am**: `getaddrinfo EAI_AGAIN foundryvtt.com` recurred during Balrog's September 26 boot/authentication, and again at the 2026-10-03 23:04 boot (`Unable to authenticate: request to https://foundryvtt.com/ failed`). Later container DNS lookup passed and Foundry was healthy; investigate startup network readiness if this continues.
 - **License-verification startup message, newly recorded 2026-09-26**: `Software license verification failed` appeared on am before migration and Balrog after reboot. The browser initially reached `/license`, then reached `/auth`; the container is healthy. The message's cause is unverified; check licensing if it recurs or blocks world access. This predates the migration.
 
-### `just health`
+### `health`
 Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands over SSH (Balrog has no `/home/bbrian/conf/justfile`): no failed system units, root 26% used / 168 GiB available, and two Syncthing peers.
 
 - **D-Bus duplicate service names, newly recorded on Balrog**: boot journal reports duplicate dconf and systemd service names, matching the desktop hosts' existing warning class. Review duplicate service exports if eliminating the noise.
@@ -113,7 +113,7 @@ Hyprlock restart/activation survival, idle locking, password unlock, suspend/res
 - **Logout crashes, newly recorded 2026-09-22**: the approved locked-session `hyprctl -i 0 dispatch exit` test at 22:28 EDT September 21 produced a Hyprland 0.55.4 SIGSEGV and Hyprlock 0.9.5 / Hyprpaper SIGABRTs. Hyprlock reported `ASSERTION FAILED! [core] Disconnected from pollfd id 0`. DrKonqi's coredump launcher then repeatedly aborted. Logout reached the greeter, graphical targets eventually stopped, and the next login worked with no orphan locker. Inspect compositor teardown and the crash-launcher cascade; a clean locked logout remains unverified.
 - **Terminal restore timeout, newly recorded 2026-09-21**: `restore-terminals.service` failed at 16:44:59 EDT during Home Manager activation and again at 17:00:05 after reboot with `Timed out waiting for tmux-resurrect to restore terminal sessions`. Inspect its saved-session/readiness checks; this is a user-service failure even when the system-level `systemctl --failed` is clean.
 
-### `just health`
+### `health`
 Checked 2026-10-03 at 22:59 EDT and again after the 23:04 reboot with `ssh torag just --justfile /home/bbrian/conf/justfile health`, system `zhhf445…` (nixpkgs 774debe): zero failed system/user units, root 37% used / 598 GiB available, `/boot` 45% / 280 MiB free, two Syncthing peers, existing D-Bus duplicate-name warnings, and (before the reboot) the waybar abort recorded under am's Desktop runtime. vim-health, gnome-check and `test-remote-builds` (16/16) also passed after the reboot. Earlier intermittent conditions remain unverified.
 
 - **Crash processors failed, newly recorded 2026-09-22**: four `drkonqi-coredump-processor@*.service` units remained failed after the logout crash cascade above. Their failed states were gone by 2026-10-03 after Torag's reboots; the triggering logout crash was not re-exercised. Inspect the processing/launcher errors if they recur; `just health` exits zero despite reporting these failures.
@@ -122,7 +122,7 @@ Checked 2026-10-03 at 22:59 EDT and again after the 23:04 reboot with `ssh torag
 - **spd5118**: `Failed to write` / `failed to resume async: error -6` — RAM SPD sensor resume error after sleep, hardware
 - **D-Bus/menu activation noise, newly recorded on torag**: duplicate accessibility, Blueman, dconf, and portal service names, plus `plasma-apply-lookandfeel` reporting `"applications.menu" not found`. These match am's existing findings; activation succeeds with zero failed units. Review duplicate service exports and the one-shot menu lookup if eliminating the noise.
 
-### `just vim-health`
+### `vim-health`
 Rechecked 2026-10-03 with `ssh torag just --justfile /home/bbrian/conf/justfile vim-health`, system `zhhf445…` (nixpkgs 774debe). The existing warnings remain.
 
 - **WARNING**: render-markdown LaTeX helpers `utftex` and `latex2text` are absent
@@ -131,10 +131,10 @@ Rechecked 2026-10-03 with `ssh torag just --justfile /home/bbrian/conf/justfile 
 - **WARNING**: `No clipboard tool found` — observed in the SSH-launched headless check; GUI-session clipboard behavior was not exercised
 - **WARNING**: `biber is not executable!` — same as am
 
-### `just gnome-check`
+### `gnome-health`
 - Clean on 2026-10-03: `ssh torag just --justfile /home/bbrian/conf/justfile gnome-check`, system `zhhf445…` (nixpkgs 774debe).
 
-## Remote builds (`just test-remote-builds`)
+## Remote builds (`remote-builds-health`)
 - Passed 2026-10-03 at 22:59 EDT from am (`just test-remote-builds`, `p13nsrb…`) and Torag (`ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds`, `zhhf445…`), with Balrog on `sjk916z…`: all 16 SSH, fresh remote-build, HTTP-cache and signature-verified transfer assertions passed on each, including the new `http://am:5000` cache paths to Balrog and Torag.
 
 ## Update tooling

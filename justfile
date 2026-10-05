@@ -7,13 +7,13 @@ default:
 # Update system configuration and commit changes
 update:
   nh os switch -u "{{flake}}" && nix develop --command "git add . && git commit -m update"
-  just health
+  nix develop "{{flake}}" --command health --local
 
 # Test configuration without switching
 test:
   nh os test "{{flake}}"
   nix flake check "{{flake}}"
-  just health
+  nix develop "{{flake}}" --command health --local
 
 # Build configuration
 build:
@@ -33,37 +33,16 @@ clean:
 gc:
   nix-collect-garbage -d
 
-# Check system health
-health:
-  systemctl --failed
-  journalctl -p 3 -xb --no-pager -n 10 || echo "No recent critical errors"
-  df -h /
-  check-syncthing
-
 # Clear failed systemd states to stop repeated notifications
 clear-notos:
   systemctl --user reset-failed
   systemctl reset-failed
-
-# Check neovim health (shows errors only)
-vim-health:
-  @if [ "${OPENCODE_TERMINAL:-}" = 1 ] && [ -n "${TMUX:-}" ]; then export TERM="$(tmux show-options -gv default-terminal)"; fi; nvim --headless -c "checkhealth" -c "w! /tmp/nvim-health.txt" -c "qa" 2>/dev/null || true
-  @echo "=== Neovim Checkhealth Summary ==="
-  @grep -E '^- (❌|⚠)' /tmp/nvim-health.txt | grep -v 'is not executable. Configuration will not be used' || echo "No errors or warnings found"
 
 # edit the secrets file
 secrets:
   mkdir -p ~/.config/sops/age
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets/secrets.yaml
-
-# Test remote build infrastructure (am <-> torag)
-test-remote-builds:
-  test-remote-builds
-
-# Check that tmux scopes survive the logout save (uses a disposable tmux server).
-test-tmux-shutdown:
-  python3 "{{flake}}/modules/home/scripts/test-tmux-shutdown.py"
 
 deploy:
   #!/usr/bin/env bash
@@ -77,7 +56,3 @@ deploy:
     fi
     nh os switch "{{flake}}" -H "$host" --target-host "bbrian@$host" --elevation-strategy passwordless "${extra_args[@]}"
   done
-
-
-gnome-check:
-  got-gnomed

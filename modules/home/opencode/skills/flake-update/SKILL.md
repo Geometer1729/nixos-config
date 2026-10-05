@@ -183,11 +183,13 @@ required fixes. Then run all mandatory validation:
 ```bash
 nh os test /home/bbrian/Code/conf-update-MM-DD-YY
 nix flake check /home/bbrian/Code/conf-update-MM-DD-YY
-just health
-just vim-health
-just gnome-check
-just test-remote-builds
+nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health
 ```
+
+`health` runs every local check (`systemd-health`, `disk-health`,
+`syncthing-health`, `vim-health`, `gnome-health`) and then
+`remote-builds-health`, and exits nonzero if any failed. Its output still
+needs reconciling, since passing checks can print known warnings.
 
 `nh os test` must activate the update worktree even when no configuration fix
 was needed. Load the `failures` skill to reconcile the build, evaluation,
@@ -202,15 +204,12 @@ After local checks pass, run `just deploy` from the update worktree. This must
 deploy the update worktree directly to `am`, `balrog`, and `torag`. Confirm
 that Balrog activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
-Run these checks on torag with an explicit justfile: SSH starts in the remote
-home directory, where `just` cannot discover `~/conf/justfile`. These recipes
-check the activated system; deployment still uses the local update worktree.
+Then check the deployed hosts. `health HOST` copies the worktree's checks to
+each host and runs them against its activated system, then reruns
+`remote-builds-health` once:
 
 ```bash
-ssh torag just --justfile /home/bbrian/conf/justfile health
-ssh torag just --justfile /home/bbrian/conf/justfile vim-health
-ssh torag just --justfile /home/bbrian/conf/justfile gnome-check
-ssh torag just --justfile /home/bbrian/conf/justfile test-remote-builds
+nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health torag balrog
 ```
 
 Do not run `just deploy` again on torag. If Balrog or torag is unavailable, ask
