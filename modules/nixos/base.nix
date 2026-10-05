@@ -33,6 +33,9 @@ in
   };
   hardware.enableRedistributableFirmware = true;
 
+  # Every deploy builds the config devshell and keeps it alive with the generation.
+  system.extraDependencies = [ self.devShells.${pkgs.stdenv.hostPlatform.system}.default ];
+
   home-manager = {
     backupFileExtension = "bkp";
     useGlobalPkgs = true;

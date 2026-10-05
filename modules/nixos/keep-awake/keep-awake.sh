@@ -26,7 +26,7 @@ workload() {
     nix-build) reason="Nix build" ;;
     nix-copy-closure) reason="Nix closure transfer" ;;
     nh) has os && reason="NixOS operation" ;;
-    just) has deploy || has deploy-devshell && reason="Deployment" ;;
+    just) has deploy && reason="Deployment" ;;
     nix)
       has build && reason="Nix build"
       has copy && reason="Nix copy"

@@ -4,7 +4,7 @@
 `keep-awake monitor`, which scans `/proc` every two seconds for important work,
 regardless of launcher, shell, user, or session. The recognized commands are the
 `case` in `workload` in `keep-awake.sh`: NixOS rebuilds/activation, `nh os`,
-`local-deploy`, `just deploy[-devshell]`, Nix builds/checks/copies, remote Nix
+`local-deploy`, `just deploy`, Nix builds/checks/copies, remote Nix
 serving, and anything run by a Nix build user. Matching is deliberately loose, so
 a false positive only delays sleep. Code passed to `sh -c` and similar is ignored.
 

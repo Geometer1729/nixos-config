@@ -65,23 +65,11 @@ test-remote-builds:
 test-tmux-shutdown:
   python3 "{{flake}}/modules/home/scripts/test-tmux-shutdown.py"
 
-# Build once and retain the config devshell on both development machines
-deploy-devshell:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  # Keep the root outside .direnv and avoid result* names, which nh clean removes.
-  shell=$(nix build "{{flake}}#devShells.x86_64-linux.default" --out-link "{{flake}}/.deploy-devshell" --print-out-paths)
-  for host in am torag; do
-    nix copy --substitute-on-destination --to "ssh://bbrian@$host" "$shell"
-    ssh "bbrian@$host" nix-store --realise "$shell" --add-root /home/bbrian/conf/.deploy-devshell
-  done
-
 deploy:
   #!/usr/bin/env bash
   set -euo pipefail
   nixpkgs-fmt "{{flake}}"
   nix flake check "{{flake}}"
-  just deploy-devshell
   for host in am balrog torag; do
     extra_args=()
     if [[ "$host" != am ]]; then
