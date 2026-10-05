@@ -44,15 +44,6 @@ secrets:
   ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
   sops edit ./modules/nixos/secrets/secrets.yaml
 
-deploy:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  nixpkgs-fmt "{{flake}}"
-  nix flake check "{{flake}}"
-  for host in am balrog torag; do
-    extra_args=()
-    if [[ "$host" != am ]]; then
-      extra_args+=(--use-substitutes)
-    fi
-    nh os switch "{{flake}}" -H "$host" --target-host "bbrian@$host" --elevation-strategy passwordless "${extra_args[@]}"
-  done
+# Deploy this checkout (default: switch on every host)
+deploy action="switch" *hosts:
+  NH_FLAKE="{{flake}}" deploy {{action}} {{hosts}}

@@ -22,7 +22,7 @@ workload() {
   case $name in
     nixos-rebuild) reason="NixOS rebuild" ;;
     switch-to-configuration) reason="NixOS activation" ;;
-    local-deploy) reason="NixOS deployment" ;;
+    local-deploy | deploy) reason="NixOS deployment" ;;
     nix-build) reason="Nix build" ;;
     nix-copy-closure) reason="Nix closure transfer" ;;
     nh) has os && reason="NixOS operation" ;;
