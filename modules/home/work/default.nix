@@ -59,7 +59,12 @@ in
     with pkgs;
     [
       linearis
-      slack
+      # brave-xdg-open inherits Slack's environment, so links land in Work.
+      (slack.overrideAttrs (old: {
+        postFixup = (old.postFixup or "") + ''
+          wrapProgram $out/bin/slack --set BRAVE_CONTAINER Work
+        '';
+      }))
       google-chrome
     ];
 

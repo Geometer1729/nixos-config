@@ -151,6 +151,15 @@ let
         exec ${brave}/bin/brave-origin
       fi
 
+      # Apps wrapped with BRAVE_CONTAINER (e.g. Slack) open every link there.
+      if [[ -n "''${BRAVE_CONTAINER:-}" ]]; then
+        for url in "$@"; do
+          ${brave}/bin/brave-origin --container="$BRAVE_CONTAINER" "$url" &
+        done
+        wait
+        exit
+      fi
+
       for url in "$@"; do
         case "$url" in
           http://linear.app/*|https://linear.app/*|http://*.linear.app/*|https://*.linear.app/*)
