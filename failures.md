@@ -148,14 +148,6 @@ Newly recorded 2026-09-12 during the update; recovered coverage and raw evidence
 - **Update artifacts lost on reboot, newly recorded 2026-10-03**: the flake-update skill writes evidence to `/tmp/flake-update/…`, which the ephemeral root wipes at reboot; the 2026-10-03 report's artifact paths no longer exist. Write artifacts somewhere persisted (or into the update worktree, uncommitted) before any reboot step; see taskwarrior task 32.
 - **keep-awake over SSH, newly recorded 2026-10-03**: `ssh torag keep-awake toggle` fails with `XDG_RUNTIME_DIR: parameter null or not set` (line 131); it works after exporting `XDG_RUNTIME_DIR=/run/user/$(id -u)`. The earlier `keep-awake 24h` form used by update workflows no longer exists (`toggle | status | matches`). Default `XDG_RUNTIME_DIR` in the script and update the update workflow's keep-awake commands.
 
-## KDE Connect runtime
-
-Verified 2026-09-14 with KDE Connect 26.04.3 on am and torag: `nixos-rebuild test`/`switch`, bidirectional notification forwarding, and Slack/Discord exclusions passed. New upstream runtime warnings remain:
-
-- **Notification resync unsupported, both hosts**: `SendNotificationsPlugin received a packet of type "kdeconnect.notification.request" but doesn't implement receivePacket`. The Linux sender cannot replay existing notifications on reconnect; new notifications pass. Follow upstream resync support; this limitation was accepted when choosing KDE Connect.
-- **Structured notification hints unsupported, both hosts**: `Unimplemented conversation of type 'r' 114`. The Linux D-Bus listener cannot decode struct-valued hints such as image data. Text forwarding passes; icon fidelity is unverified. Follow upstream hint parsing support.
-- **Desktop/discovery logging**: KDE Connect also reports `"applications.menu" not found` on both hosts, extending the existing desktop-menu lookup finding; torag reports `No uuids found` while probing nearby Bluetooth devices. Tailscale pairing and forwarding pass. Investigate upstream menu lookup and Bluetooth discovery if these messages become disruptive.
-
 ## OpenCode runtime
 
 Newly recorded while verifying notifications on am, 2026-09-13, using
