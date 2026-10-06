@@ -1,9 +1,11 @@
 # Resolve the supplied pane, or the calling TUI's pane, to its terminal window.
 pane="${2:-${TMUX_PANE:?OpenCode notification focus requires tmux}}"
-session=$(tmux display-message -p -t "$pane" '#{session_id}')
-client=$(tmux list-clients -t "$session" -F '#{client_pid}' | head -n 1)
-terminal=$(ps -o ppid= -p "$client" | tr -d ' ')
-window=$(hyprctl clients -j | jq -ec --argjson pid "$terminal" 'first(.[] | select(.pid == $pid))')
+session=$(tmux display-message -p -t "$pane" '#{session_name}')
+# Ghostty serves several windows from one process; match tmux's set-titles string
+# instead, or the bare name scratchpads are launched with.
+window=$(hyprctl clients -j | jq -ec --arg session "$session" '
+  [.[] | select((.title == "tmux:" + $session or .title == $session) and (.class | ascii_downcase | contains("ghostty")))]
+  | min_by(.focusHistoryID)')
 
 if [[ "${1-}" == "--workspace" ]]; then
   jq -r '.workspace.name' <<<"$window"
