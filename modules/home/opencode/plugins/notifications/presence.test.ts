@@ -97,6 +97,23 @@ test("clicks focus only an attached owner and stop routing after its tab closes"
   }
 })
 
+test("a connection that has not reported yet cannot stall close", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
+  const path = join(directory, "server.sock")
+  const server = await presenceServer(path, () => undefined)
+  const silent = createConnection(path)
+  try {
+    await once(silent, "connect")
+    await Promise.race([
+      server.close(),
+      sleep(1000).then(() => assert.fail("close waited on a silent connection")),
+    ])
+  } finally {
+    silent.destroy()
+    await rm(directory, { recursive: true })
+  }
+})
+
 test("reconnecting after a server restart reports the complete current tab list", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
   const path = join(directory, "server.sock")

@@ -37,7 +37,11 @@ interface Presence {
 // EOF (including a killed TUI) removes its inventory.
 export async function presenceServer(path: string, changed: () => void) {
   const clients = new Map<Socket, Presence>()
+  // server.close() waits for every open connection, including ones that have
+  // not reported yet. A connection missed here would stall the next generation.
+  const sockets = new Set<Socket>()
   const server = createServer((socket) => {
+    sockets.add(socket)
     messages(socket, (message) => {
       if (typeof message === "string" && message.startsWith("ses_")) {
         const owner = [...clients].find(([, { sessions }]) => sessions.includes(message))?.[0]
@@ -55,6 +59,7 @@ export async function presenceServer(path: string, changed: () => void) {
     })
     socket.on("error", () => socket.destroy())
     socket.on("close", () => {
+      sockets.delete(socket)
       clients.delete(socket)
       changed()
     })
@@ -73,8 +78,8 @@ export async function presenceServer(path: string, changed: () => void) {
       return panes
     },
     close: () => new Promise<void>((resolve, reject) => {
-      for (const socket of clients.keys()) socket.destroy()
       server.close((error) => error ? reject(error) : resolve())
+      for (const socket of sockets) socket.destroy()
     }),
   }
 }
