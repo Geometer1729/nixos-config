@@ -34,6 +34,7 @@ in
     opencode
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
+    notify-sync
     systemd-failure-notifications
     desktop
     media
