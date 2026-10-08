@@ -158,6 +158,7 @@ Never post the result automatically.
 - Technical is fine flowery jargon is not
 - Do not overstate importance or scale of what was done
 - Blunt short expressive pragmatic not overly professional
+- Focus on outcomes not work done
 
 Terrible: Made topical voting recover from transient upstream failures and invalid candidate selections.
 Good: Fixed topic generation crashes (we now retry).
