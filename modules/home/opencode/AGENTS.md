@@ -26,3 +26,14 @@ When you decide to make something more complicated to fix a problem flag that.
 Explain the problem and the solution and get my input on the tradeoff.
 
 Report times in the time zone of the user.
+
+Responsible disclosure:
+When writting text other humans are likely to assume is human written disclose that it is ai written.
+This does include:
+- Slack messages
+- linear issues
+- pr descriptions
+But not:
+- Code comments
+- Commit messages
+- Factual updates to markdown files in a git repository
