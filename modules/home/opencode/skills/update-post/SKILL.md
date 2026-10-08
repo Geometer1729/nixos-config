@@ -162,3 +162,12 @@ Never post the result automatically.
 
 Terrible: Made topical voting recover from transient upstream failures and invalid candidate selections.
 Good: Fixed topic generation crashes (we now retry).
+
+## Disclosure
+
+At the end include an AI disclosure
+use emojis per bullet to indicate
+:robot:  entirely you
+:robot: + :human: tweaked
+:human: + :robot: substantially changed
+:human: entirely me
