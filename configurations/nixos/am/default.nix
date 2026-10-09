@@ -17,6 +17,10 @@ in
   nix.settings.extra-platforms = [ "i686-linux" "aarch64-linux" ];
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
+  # Log RCU Tasks holdout tasks and stacks after 15s (jiffies at CONFIG_HZ=1000).
+  # This is a diagnostic threshold, not a limit on the shutdown wait.
+  boot.kernelParams = [ "rcupdate.rcu_task_stall_timeout=15000" ];
+
   services.pipewire.wireplumber = {
     extraScripts."default-nodes/prefer-blue-snowball.lua" = ''
       SimpleEventHook {
