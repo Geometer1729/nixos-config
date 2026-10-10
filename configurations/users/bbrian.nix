@@ -28,6 +28,7 @@ in
     ssh
     syncthing
     tasks
+    tea
     tmux
     zsh
     claude
