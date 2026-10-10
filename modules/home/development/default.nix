@@ -9,6 +9,7 @@
     neovim-remote
     nixd # nix lsp
     bash-language-server # shell lsp
+    yaml-language-server # yaml lsp, also used by the assistant's LSP config
 
     # Command line utilities
     arp-scan # network scanner
