@@ -22,16 +22,17 @@ test("Meridian scopes headers to Anthropic and classifies V2 auxiliary requests"
   await meridian.setup(context as unknown as Plugin.Context)
   assert.ok(hook)
   const requests = new Set<string>()
-  for (const [agent, kind, mode, name] of [
-    ["build", "primary", "primary", "build"],
-    ["expert", "primary", "subagent", "expert"],
-    ["build", "title", "subagent", "build"],
-    ["build", "compaction", "subagent", "build"],
-    ["custom\u200b", "primary", "primary", "custom"],
+  for (const [agent, kind, mode, name, session] of [
+    ["build", "primary", "primary", "build", "ses_test"],
+    ["expert", "primary", "subagent", "expert", "ses_test"],
+    ["build", "title", "subagent", "build", "ses_test:title"],
+    ["build", "generate", "subagent", "build", "ses_test:generate"],
+    ["build", "compaction", "subagent", "build", "ses_test"],
+    ["custom\u200b", "primary", "primary", "custom", "ses_test"],
   ] as const) {
     const request = new Request("http://localhost/v1/messages", { headers: { "x-existing": "preserved" } })
     await hook({ agent, kind, request, sessionID: "ses_test" })
-    assert.equal(request.headers.get("x-opencode-session"), "ses_test")
+    assert.equal(request.headers.get("x-opencode-session"), session)
     assert.equal(request.headers.get("x-opencode-agent-mode"), mode)
     assert.equal(request.headers.get("x-opencode-agent-name"), name)
     assert.equal(request.headers.get("x-existing"), "preserved")

@@ -59,6 +59,13 @@ let
       exec ${opencode2}/bin/opencode2 "$@"
     '';
   };
+  serve = pkgs.writeShellApplication {
+    name = "opencode-serve";
+    runtimeInputs = [ opencode2 pkgs.jq pkgs.systemd config.programs.zsh.package ];
+    text = builtins.readFile ./serve.sh;
+  };
+  # Plugins call Hyprland, so wait for the session environment where there is one.
+  serveTarget = if machine.hasGui then "graphical-session.target" else "default.target";
   lspServers = import ./lsp-servers.nix;
 in
 {
@@ -91,6 +98,18 @@ in
       description = "Command palette (lists binds)";
       keys = [ "C-p" ];
     }];
+  };
+
+  systemd.user.services.opencode-serve = {
+    Unit = {
+      Description = "Start the OpenCode server for paired apps";
+      After = [ serveTarget ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${serve}/bin/opencode-serve";
+    };
+    Install.WantedBy = [ serveTarget ];
   };
 
   services.mako.settings = lib.mkIf machine.hasGui {

@@ -10,10 +10,13 @@ export default Plugin.define({
     await context.session.hook("http.request", async (event) => {
       const { data: agent } = await context.agent.get({ agentID: event.agent })
       // Auxiliary requests can carry the primary agent's ID in V2.
-      const kind = (event as typeof event & { kind?: string }).kind
-      const auxiliary = kind === "title" || kind === "compaction"
+      const auxiliary = event.kind !== "primary"
+      // Meridian resumes whichever request last stored a session ID, so a title
+      // finishing after the first turn would replace the conversation. Compaction
+      // continues the conversation and keeps its ID.
+      const detached = event.kind === "title" || event.kind === "generate"
       const headers = event.request.headers
-      headers.set("x-opencode-session", event.sessionID)
+      headers.set("x-opencode-session", detached ? `${event.sessionID}:${event.kind}` : event.sessionID)
       // The V2 HTTP hook has no message ID; identify each physical request.
       headers.set("x-opencode-request", randomUUID())
       headers.set("x-opencode-agent-mode", auxiliary || agent.mode === "subagent" ? "subagent" : "primary")
