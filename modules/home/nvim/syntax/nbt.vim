@@ -1,4 +1,7 @@
-syntax clear
+if exists("b:current_syntax")
+  finish
+endif
+
 syntax region nbtString start=/"/ skip=/\\./ end=/"/ oneline
 syntax region nbtString start=/'/ skip=/\\./ end=/'/ oneline
 syntax match nbtKey /[A-Za-z_][A-Za-z0-9_+.-]*\ze\s*:/

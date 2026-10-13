@@ -1,1 +1,1 @@
-vim.filetype.add({ extension = { nbt = "nbt", snbt = "nbt" } })
+vim.filetype.add({ extension = { snbt = "nbt" } })

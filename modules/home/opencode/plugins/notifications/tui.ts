@@ -8,6 +8,14 @@ import { presenceClient, socketPath } from "./presence.ts"
 
 const exec = promisify(execFile)
 
+// A wildcard-bound service is discovered at 0.0.0.0 but reports its interface addresses.
+function sameService(serverURL: string, localURL: string): boolean {
+  const local = new URL(localURL)
+  if (local.hostname !== "0.0.0.0" && local.hostname !== "[::]") return serverURL === localURL
+  const server = new URL(serverURL)
+  return server.protocol === local.protocol && server.port === local.port
+}
+
 export default Plugin.define({
   id: "local.notifications.presence",
   setup(context) {
@@ -24,7 +32,7 @@ export default Plugin.define({
           ])
           // Presence is for this desktop's managed service, including after its
           // port/PID changes. A TUI connected to a remote server is excluded.
-          if (!local || !server.urls.includes(local.url)) throw new Error("Not the local service")
+          if (!local || !server.urls.some((url) => sameService(url, local.url))) throw new Error("Not the local service")
           return socketPath(server.pid)
         }, (sessionID) => {
           if (typeof focusCommand !== "string") return
