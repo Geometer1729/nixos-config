@@ -75,6 +75,10 @@ in
     fi
   '';
 
+  # grim-monolith dev shells decrypt agenix secrets with ~/.ssh/id_agenix.
+  home.file.".ssh/id_agenix".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/bbrian/.ssh/id_ed25519";
+
   programs.ssh.settings =
     let
       me = {
