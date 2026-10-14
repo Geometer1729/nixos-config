@@ -58,14 +58,14 @@ PACKAGES_FILE="$FLAKE_UPDATE_DIR/config-packages.txt"
 : > "$PACKAGES_FILE"  # Truncate file
 
 # Get system packages
-nix eval "$FLAKE_PATH#nixosConfigurations.am.config.environment.systemPackages" --json 2>/dev/null | \
+nix eval "$FLAKE_PATH#nixosConfigurations.durin.config.environment.systemPackages" --json 2>/dev/null | \
    jq -r '.[]' 2>/dev/null | sed 's|/nix/store/[a-z0-9]*-||' | sed 's|-[0-9].*||' >> "$PACKAGES_FILE" || true
 
 # Get home-manager packages
-nix eval "$FLAKE_PATH#nixosConfigurations.am.config.home-manager.users.bbrian.home.packages" --json 2>/dev/null | \
+nix eval "$FLAKE_PATH#nixosConfigurations.durin.config.home-manager.users.bbrian.home.packages" --json 2>/dev/null | \
    jq -r '.[]' 2>/dev/null | sed 's|/nix/store/[a-z0-9]*-||' | sed 's|-[0-9].*||' >> "$PACKAGES_FILE" || true
 
-# Also try gimli configuration if am doesn't exist
+# Also try gimli configuration if durin doesn't exist
 nix eval "$FLAKE_PATH#nixosConfigurations.gimli.config.environment.systemPackages" --json 2>/dev/null | \
    jq -r '.[]' 2>/dev/null | sed 's|/nix/store/[a-z0-9]*-||' | sed 's|-[0-9].*||' >> "$PACKAGES_FILE" || true
 

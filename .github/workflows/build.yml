@@ -37,16 +37,16 @@ jobs:
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-    - name: Wake am
+    - name: Wake durin
       run: |
         wakeonlan 24:4b:fe:57:0b:55
         for _ in {1..120}; do
-          if nc -z -w 1 am 22; then
+          if nc -z -w 1 durin 22; then
             exit 0
           fi
           sleep 1
         done
-        echo "Timed out waiting for am" >&2
+        echo "Timed out waiting for durin" >&2
         exit 1
 
     - name: Check flake
@@ -54,8 +54,8 @@ jobs:
 
     - name: Warm system closures
       run: |
-        nix build --out-link /var/lib/cache-warmer/am \
-          .#nixosConfigurations.am.config.system.build.toplevel
+        nix build --out-link /var/lib/cache-warmer/durin \
+          .#nixosConfigurations.durin.config.system.build.toplevel
         nix build --out-link /var/lib/cache-warmer/gimli \
           .#nixosConfigurations.gimli.config.system.build.toplevel
         nix build --out-link /var/lib/cache-warmer/narvi \

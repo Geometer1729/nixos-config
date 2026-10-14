@@ -40,7 +40,7 @@ in
   options.storageHealth.notificationHost = lib.mkOption {
     type = lib.types.nullOr lib.types.str;
     default = null;
-    example = "am";
+    example = "durin";
     description = "Desktop to receive SMART alerts over SSH as mainUser; null delivers locally.";
   };
 

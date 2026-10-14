@@ -41,7 +41,7 @@ in
   networking.hostName = "narvi";
   networking.useDHCP = true;
   machine.hasGui = false;
-  storageHealth.notificationHost = "am";
+  storageHealth.notificationHost = "durin";
 
   services.nginx.virtualHosts.default = {
     root = ./www;
@@ -156,8 +156,8 @@ in
     settings = {
       max-jobs = 2;
       # Preserve this cache server's upstreams rather than substituting from itself.
-      substituters = lib.mkForce [ "https://cache.nixos.org/" "http://am:5000?priority=50&retry-attempts=1" ];
-      trusted-substituters = lib.mkForce [ "http://am:5000?priority=50&retry-attempts=1" ];
+      substituters = lib.mkForce [ "https://cache.nixos.org/" "http://durin:5000?priority=50&retry-attempts=1" ];
+      trusted-substituters = lib.mkForce [ "http://durin:5000?priority=50&retry-attempts=1" ];
       trusted-public-keys = lib.mkForce [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s="

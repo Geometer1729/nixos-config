@@ -5,7 +5,7 @@ let
 in
 {
 
-  networking.hostName = "am";
+  networking.hostName = "durin";
   machine.hasGui = true;
   networking.interfaces.enp4s0.wakeOnLan.enable = true;
   amd = true;

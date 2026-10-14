@@ -201,7 +201,7 @@ raw store-path lists as artifacts when needed; do not read complete closure
 listings into the parent context.
 
 After local checks pass, run `just deploy` from the update worktree. This must
-deploy the update worktree directly to `am`, `narvi`, and `gimli`. Confirm
+deploy the update worktree directly to `durin`, `narvi`, and `gimli`. Confirm
 that Narvi activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
 Then check the deployed hosts. `health HOST` copies the worktree's checks to

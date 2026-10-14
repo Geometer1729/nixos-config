@@ -15,7 +15,7 @@
 
     # Config validation lives in each module's `home.checks`, which these builds include.
     checks = lib.optionalAttrs (system == "x86_64-linux") {
-      nixos-am = self.nixosConfigurations.am.config.system.build.toplevel;
+      nixos-durin = self.nixosConfigurations.durin.config.system.build.toplevel;
       nixos-narvi = self.nixosConfigurations.narvi.config.system.build.toplevel;
       nixos-gimli = self.nixosConfigurations.gimli.config.system.build.toplevel;
     };

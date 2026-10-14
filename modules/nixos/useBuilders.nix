@@ -1,18 +1,18 @@
 {
-  programs.ssh.knownHosts.am.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKpLa0qnwzKS2Au6VkrfD8Yo7U9udsRJMhzDBxEv6fx0";
+  programs.ssh.knownHosts.durin.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKpLa0qnwzKS2Au6VkrfD8Yo7U9udsRJMhzDBxEv6fx0";
 
   nix = {
     settings = {
       builders-use-substitutes = true;
-      # Add am as a substitute server, after cache.nixos.org (priority 40)
-      substituters = [ "http://am:5000?priority=50&retry-attempts=1" ];
-      trusted-substituters = [ "http://am:5000?priority=50&retry-attempts=1" ];
+      # Add durin as a substitute server, after cache.nixos.org (priority 40)
+      substituters = [ "http://durin:5000?priority=50&retry-attempts=1" ];
+      trusted-substituters = [ "http://durin:5000?priority=50&retry-attempts=1" ];
       trusted-public-keys = [ "am:Z8PSUn37U1JU2UXWxnfHPpMQDrCcXa3oLMvNCVPUz5s=" ];
     };
     distributedBuilds = true;
     buildMachines = [
       {
-        hostName = "am";
+        hostName = "durin";
         publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUtwTGEwcW53ektTMkF1NlZrcmZEOFlvN1U5dWRzUkpNaHpEQnhFdjZmeDAgcm9vdEBhbQo=";
         sshKey = "/home/bbrian/.ssh/id_ed25519";
         sshUser = "bbrian";

@@ -29,7 +29,7 @@ nixpkgs 774debe). Evaluation and check builds passed on x86_64-linux; the follow
 ### Build and activation
 - **ISO build passed, 2026-09-12 (nixpkgs 6713828)**; never boot-tested. On 2026-09-20, updated nixpkgs cf9d2fb passed configuration evaluation only; the updated ISO build/boot remains unverified.
 
-## am (primary desktop)
+## durin (primary desktop, formerly am)
 
 ### Build and activation
 - **Passed, 2026-10-09**: `nixos-rebuild test --flake .#am --sudo` and `nixos-rebuild boot --flake .#am --sudo`; active/default `k5nm6hk…`, no failed system or user units. RCU reporting threshold verified live and in GRUB; not reboot-tested.

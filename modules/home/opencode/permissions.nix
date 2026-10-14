@@ -354,7 +354,7 @@ let
     "ssh -o ConnectTimeout=5 gimli echo*"
     "ssh -o BatchMode=yes -o ConnectTimeout=15 gimli 'hostname; uptime -p'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 gimli 'hostname; readlink /run/current-system'"
-    "ssh -o BatchMode=yes -o ConnectTimeout=10 am 'hostname; readlink /run/current-system'"
+    "ssh -o BatchMode=yes -o ConnectTimeout=10 durin 'hostname; readlink /run/current-system'"
   ]
   ++ developmentBashCommands
   ++ wrappedDevelopmentBashCommands

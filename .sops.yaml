@@ -2,13 +2,13 @@
 
 # Recipients are derived from each machine's persisted bbrian SSH key.
 keys:
-  - &am age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
+  - &durin age197eh2yndc3wtpag20dns7t4zh5mqypqt6ayfl97fydslsq3p74nshh8p9n
   - &gimli age14hrt2y2xr4jejp4p6jcms62m2f5sy6w6sr3g6yw8lvl6wtpy9f0s0r7df0
   - &narvi age18yx5vvavy0cnrcgmtg0gapt6plnl3rduhszyetwlw64dep7ye3nqsnlrpz
 creation_rules:
   - path_regex: modules/nixos/secrets/secrets.yaml
     key_groups:
     - age:
-      - *am
+      - *durin
       - *gimli
       - *narvi

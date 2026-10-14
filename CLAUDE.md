@@ -38,7 +38,7 @@ Update `CLAUDE.md` when you notice something in this file is wrong or about to b
 
 - `just` contains common project commands.
 - `nix develop` enters the development shell.
-- `am` is the primary desktop.
+- `durin` is the primary desktop (formerly `am`).
 - `gimli` is the laptop (formerly `torag`).
 - `narvi` is the always-on server (formerly `balrog`).
 

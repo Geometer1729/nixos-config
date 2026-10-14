@@ -1,12 +1,12 @@
-# Test the distributed builders and binary caches shared by am, narvi, and gimli.
-# The test is orchestrated from am because it is the remote builder and one cache source.
+# Test the distributed builders and binary caches shared by durin, narvi, and gimli.
+# The test is orchestrated from durin because it is the remote builder and one cache source.
 # shellcheck shell=bash
 
 set -euo pipefail
 
-BUILDER="am"
+BUILDER="durin"
 CLIENTS=(narvi gimli)
-HOSTS=(am narvi gimli)
+HOSTS=(durin narvi gimli)
 FAILURES=0
 
 if [ "$(uname -n)" != "$BUILDER" ]; then
@@ -122,7 +122,7 @@ echo
 
 echo "HTTP cache endpoints"
 for client in "${HOSTS[@]}"; do
-  for cache in am narvi; do
+  for cache in durin narvi; do
     if run_on "$client" curl -fsS --retry 2 --connect-timeout 5 "http://$cache:5000/nix-cache-info" >/dev/null 2>&1; then
       pass "$client can reach $cache cache"
     else
@@ -133,31 +133,31 @@ done
 echo
 
 echo "Signed cache transfers"
-am_token="am-cache-test-$(date +%s)-$$"
-balrog_token="narvi-cache-test-$(date +%s)-$$"
-am_path=""
-balrog_path=""
+durin_token="durin-cache-test-$(date +%s)-$$"
+narvi_token="narvi-cache-test-$(date +%s)-$$"
+durin_path=""
+narvi_path=""
 
-if am_path=$(build_local_path "$am_token"); then
-  pass "created a fresh signed path on am"
+if durin_path=$(build_local_path "$durin_token"); then
+  pass "created a fresh signed path on durin"
 else
-  fail "could not create a cache test path on am"
+  fail "could not create a cache test path on durin"
 fi
 
-if balrog_path=$(build_remote_local_path narvi "$balrog_token"); then
+if narvi_path=$(build_remote_local_path narvi "$narvi_token"); then
   pass "created a fresh signed path locally on narvi"
 else
   fail "could not create a cache test path locally on narvi"
 fi
 
-if [ -n "$am_path" ]; then
-  test_cache_copy am narvi "http://am:5000" "$am_path" "$am_token"
-  test_cache_copy am gimli "http://am:5000" "$am_path" "$am_token"
+if [ -n "$durin_path" ]; then
+  test_cache_copy durin narvi "http://durin:5000" "$durin_path" "$durin_token"
+  test_cache_copy durin gimli "http://durin:5000" "$durin_path" "$durin_token"
 fi
 
-if [ -n "$balrog_path" ]; then
-  test_cache_copy narvi am "http://narvi:5000" "$balrog_path" "$balrog_token"
-  test_cache_copy narvi gimli "http://narvi:5000" "$balrog_path" "$balrog_token"
+if [ -n "$narvi_path" ]; then
+  test_cache_copy narvi durin "http://narvi:5000" "$narvi_path" "$narvi_token"
+  test_cache_copy narvi gimli "http://narvi:5000" "$narvi_path" "$narvi_token"
 fi
 
 echo

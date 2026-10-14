@@ -3,9 +3,9 @@ let
   # Device configuration - add your device IDs here
   # Get device ID by running: syncthing device-id
   devices = {
-    am = {
+    durin = {
       id = "YFC525D-GUV3HTC-EPRRNPY-CRYYQCG-ANDWVZY-TXQAP36-GXQSB2J-YPJYEAF";
-      addresses = [ "tcp://am:22000" ];
+      addresses = [ "tcp://durin:22000" ];
     };
     gimli = {
       id = "3MB5CXC-4FO3G2D-YH4PF6X-DY2IGTN-R4YB5RI-GZPTKAK-K6IKHOQ-QBBWNQG";

@@ -36,7 +36,7 @@ persistent configuration not controled by this config.
 
 - `just` contains common project commands.
 - `nix develop` enters the development shell.
-- `am` is the primary desktop.
+- `durin` is the primary desktop (formerly `am`).
 - `gimli` is the laptop (formerly `torag`).
 - `narvi` is the always-on server (formerly `balrog`).
 

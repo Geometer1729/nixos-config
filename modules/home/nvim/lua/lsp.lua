@@ -42,10 +42,10 @@ vim.lsp.config.nixd = {
       },
       options = {
         nixos = {
-            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.am.options',
+            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.durin.options',
         },
         home_manager = {
-            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.am.options.home-manager.users.type.getSubOptions []',
+            expr = '(builtins.getFlake "/home/bbrian/conf").nixosConfigurations.durin.options.home-manager.users.type.getSubOptions []',
         },
       },
     },

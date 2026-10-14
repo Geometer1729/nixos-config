@@ -25,7 +25,7 @@ fmt:
 
 # Clean old generations (keep 3)
 clean:
-  ssh am nh clean all --keep 3 --optimise
+  ssh durin nh clean all --keep 3 --optimise
   ssh gimli nh clean all --keep 3 --optimise
   ssh narvi nh clean all --keep 3 --optimise
 
