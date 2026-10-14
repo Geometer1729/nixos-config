@@ -351,9 +351,9 @@ let
     "sudo podman healthcheck run foundryvtt"
     "curl -sS http://127.0.0.1:3456/health"
     "meridian --version*"
-    "ssh -o ConnectTimeout=5 torag echo*"
-    "ssh -o BatchMode=yes -o ConnectTimeout=15 torag 'hostname; uptime -p'"
-    "ssh -o BatchMode=yes -o ConnectTimeout=10 torag 'hostname; readlink /run/current-system'"
+    "ssh -o ConnectTimeout=5 gimli echo*"
+    "ssh -o BatchMode=yes -o ConnectTimeout=15 gimli 'hostname; uptime -p'"
+    "ssh -o BatchMode=yes -o ConnectTimeout=10 gimli 'hostname; readlink /run/current-system'"
     "ssh -o BatchMode=yes -o ConnectTimeout=10 am 'hostname; readlink /run/current-system'"
   ]
   ++ developmentBashCommands

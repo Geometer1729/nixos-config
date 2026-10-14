@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   echo "Usage: deploy (switch|boot|test|build) [HOST...]" >&2
-  echo "Deploys \$NH_FLAKE to each HOST (default: am balrog torag)." >&2
+  echo "Deploys \$NH_FLAKE to each HOST (default: am balrog gimli)." >&2
   exit 2
 }
 
@@ -16,7 +16,7 @@ case $action in
 esac
 
 hosts=("$@")
-[ "${#hosts[@]}" -gt 0 ] || hosts=(am balrog torag)
+[ "${#hosts[@]}" -gt 0 ] || hosts=(am balrog gimli)
 
 for host in "${hosts[@]}"; do
   nh os "$action" "${NH_FLAKE:-$HOME/conf}" -H "$host" --target-host "bbrian@$host" --elevation-strategy passwordless

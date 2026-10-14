@@ -98,7 +98,7 @@ Checked 2026-09-21 on `r7v1p7f…` by running the recipe's component commands ov
 ### Storage health
 - **Unsupported SMART attributes, 2026-09-21**: smartd reports no attributes 197 (`Current_Pending_Sector`) or 198 (`Offline_Uncorrectable`) on the Samsung 860 EVO. `smartctl -a` confirms these are absent from the device's attribute table; supported attributes and overall health are monitored. No suppression or configuration change is needed.
 
-## torag (secondary machine)
+## gimli (laptop, formerly torag)
 
 ### Build and activation
 - **Passed, 2026-09-21**: Hyprlock fix, `nixos-rebuild test --flake .#torag --target-host bbrian@torag --sudo --use-substitutes`, active system `4xbk1mj…`. Boot default remains `fdka1cn…`.

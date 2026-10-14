@@ -7,9 +7,9 @@ let
       id = "YFC525D-GUV3HTC-EPRRNPY-CRYYQCG-ANDWVZY-TXQAP36-GXQSB2J-YPJYEAF";
       addresses = [ "tcp://am:22000" ];
     };
-    torag = {
+    gimli = {
       id = "3MB5CXC-4FO3G2D-YH4PF6X-DY2IGTN-R4YB5RI-GZPTKAK-K6IKHOQ-QBBWNQG";
-      addresses = [ "tcp://torag:22000" ];
+      addresses = [ "tcp://gimli:22000" ];
     };
     balrog = {
       id = "DDE5AJ4-F7PSE7K-2Z7ZDQG-IBYGAMD-K2YIQ6X-POQJQZF-46SQ5MN-KZPHTAZ";

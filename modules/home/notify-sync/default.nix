@@ -2,7 +2,7 @@
 # notifications that originate on it, over an SSH-forwarded peer session bus.
 { lib, osConfig, pkgs, ... }:
 let
-  desktops = [ "am" "torag" ];
+  desktops = [ "am" "gimli" ];
   peers = lib.remove osConfig.networking.hostName desktops;
 
   notify-sync = pkgs.writers.writePython3Bin "notify-sync"

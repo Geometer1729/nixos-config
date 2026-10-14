@@ -5,7 +5,7 @@ let
 in
 {
 
-  networking.hostName = "torag";
+  networking.hostName = "gimli";
   machine.hasGui = true;
   drive = "/dev/nvme0n1";
   nix.settings.max-jobs = 12;

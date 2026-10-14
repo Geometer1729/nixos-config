@@ -1,12 +1,12 @@
-# Test the distributed builders and binary caches shared by am, balrog, and torag.
+# Test the distributed builders and binary caches shared by am, balrog, and gimli.
 # The test is orchestrated from am because it is the remote builder and one cache source.
 # shellcheck shell=bash
 
 set -euo pipefail
 
 BUILDER="am"
-CLIENTS=(balrog torag)
-HOSTS=(am balrog torag)
+CLIENTS=(balrog gimli)
+HOSTS=(am balrog gimli)
 FAILURES=0
 
 if [ "$(uname -n)" != "$BUILDER" ]; then
@@ -152,12 +152,12 @@ fi
 
 if [ -n "$am_path" ]; then
   test_cache_copy am balrog "http://am:5000" "$am_path" "$am_token"
-  test_cache_copy am torag "http://am:5000" "$am_path" "$am_token"
+  test_cache_copy am gimli "http://am:5000" "$am_path" "$am_token"
 fi
 
 if [ -n "$balrog_path" ]; then
   test_cache_copy balrog am "http://balrog:5000" "$balrog_path" "$balrog_token"
-  test_cache_copy balrog torag "http://balrog:5000" "$balrog_path" "$balrog_token"
+  test_cache_copy balrog gimli "http://balrog:5000" "$balrog_path" "$balrog_token"
 fi
 
 echo

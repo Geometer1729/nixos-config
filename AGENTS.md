@@ -37,7 +37,7 @@ persistent configuration not controled by this config.
 - `just` contains common project commands.
 - `nix develop` enters the development shell.
 - `am` is the primary desktop.
-- `torag` is the secondary machine.
+- `gimli` is the laptop (formerly `torag`).
 
 ## Update Reports
 

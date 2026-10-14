@@ -56,8 +56,8 @@ jobs:
       run: |
         nix build --out-link /var/lib/cache-warmer/am \
           .#nixosConfigurations.am.config.system.build.toplevel
-        nix build --out-link /var/lib/cache-warmer/torag \
-          .#nixosConfigurations.torag.config.system.build.toplevel
+        nix build --out-link /var/lib/cache-warmer/gimli \
+          .#nixosConfigurations.gimli.config.system.build.toplevel
         nix build --out-link /var/lib/cache-warmer/balrog \
           .#nixosConfigurations.balrog.config.system.build.toplevel
 

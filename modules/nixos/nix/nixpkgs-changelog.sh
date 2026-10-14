@@ -65,8 +65,8 @@ nix eval "$FLAKE_PATH#nixosConfigurations.am.config.environment.systemPackages" 
 nix eval "$FLAKE_PATH#nixosConfigurations.am.config.home-manager.users.bbrian.home.packages" --json 2>/dev/null | \
    jq -r '.[]' 2>/dev/null | sed 's|/nix/store/[a-z0-9]*-||' | sed 's|-[0-9].*||' >> "$PACKAGES_FILE" || true
 
-# Also try torag configuration if am doesn't exist
-nix eval "$FLAKE_PATH#nixosConfigurations.torag.config.environment.systemPackages" --json 2>/dev/null | \
+# Also try gimli configuration if am doesn't exist
+nix eval "$FLAKE_PATH#nixosConfigurations.gimli.config.environment.systemPackages" --json 2>/dev/null | \
    jq -r '.[]' 2>/dev/null | sed 's|/nix/store/[a-z0-9]*-||' | sed 's|-[0-9].*||' >> "$PACKAGES_FILE" || true
 
 # Deduplicate and clean

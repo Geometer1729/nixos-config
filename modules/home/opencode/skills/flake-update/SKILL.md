@@ -201,7 +201,7 @@ raw store-path lists as artifacts when needed; do not read complete closure
 listings into the parent context.
 
 After local checks pass, run `just deploy` from the update worktree. This must
-deploy the update worktree directly to `am`, `balrog`, and `torag`. Confirm
+deploy the update worktree directly to `am`, `balrog`, and `gimli`. Confirm
 that Balrog activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
 Then check the deployed hosts. `health HOST` copies the worktree's checks to
@@ -209,10 +209,10 @@ each host and runs them against its activated system, then reruns
 `remote-builds-health` once:
 
 ```bash
-nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health torag balrog
+nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health gimli balrog
 ```
 
-Do not run `just deploy` again on torag. If Balrog or torag is unavailable, ask
+Do not run `just deploy` again on gimli. If Balrog or gimli is unavailable, ask
 the user whether to wait or skip that host's deployment and checks. An explicit
 skip counts as completion but must be recorded in the report.
 

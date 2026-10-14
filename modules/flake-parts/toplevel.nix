@@ -17,7 +17,7 @@
     checks = lib.optionalAttrs (system == "x86_64-linux") {
       nixos-am = self.nixosConfigurations.am.config.system.build.toplevel;
       nixos-balrog = self.nixosConfigurations.balrog.config.system.build.toplevel;
-      nixos-torag = self.nixosConfigurations.torag.config.system.build.toplevel;
+      nixos-gimli = self.nixosConfigurations.gimli.config.system.build.toplevel;
     };
   };
 }

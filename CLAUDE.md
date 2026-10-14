@@ -39,6 +39,6 @@ Update `CLAUDE.md` when you notice something in this file is wrong or about to b
 - `just` contains common project commands.
 - `nix develop` enters the development shell.
 - `am` is the primary desktop.
-- `torag` is the secondary machine.
+- `gimli` is the laptop (formerly `torag`).
 
 The main goal here is to preserve a few durable truths about the repo, not to accumulate workflow trivia.
