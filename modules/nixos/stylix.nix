@@ -6,6 +6,12 @@
   home-manager.sharedModules = [
     {
       stylix.targets.gnome.enable = false;
+      # adw-gtk3 is the light variant; nothing advertises prefer-dark to GTK without the gnome portal/target
+      gtk.theme.name = lib.mkForce "adw-gtk3-dark";
+      # adw-gtk3 6.x hard-codes --accent-bg-color to blue instead of following @accent_bg_color
+      stylix.targets.gtk.extraCss = ''
+        :root { --accent-bg-color: @accent_bg_color; --accent-fg-color: @accent_fg_color; }
+      '';
     }
   ];
 

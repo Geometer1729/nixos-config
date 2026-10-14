@@ -115,5 +115,8 @@ in
     WLR_NO_HARDWARE_CURSORS = "1";
     # Hint electron apps to use wayland
     NIXOS_OZONE_WL = "1";
+    # The KDE settings portal provides no org.gnome.desktop.interface, so GTK
+    # falls back to light Adwaita instead of reading the stylix settings.ini
+    GDK_DEBUG = "no-portals";
   };
 }
