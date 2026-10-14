@@ -1,7 +1,7 @@
 { flake, config, lib, pkgs, ... }:
 let
   inherit (flake) inputs;
-  scheduleReboot = pkgs.writeShellScriptBin "schedule-balrog-reboot" ''
+  scheduleReboot = pkgs.writeShellScriptBin "schedule-narvi-reboot" ''
     set -euo pipefail
     export TZ=America/New_York
 
@@ -11,7 +11,7 @@ let
       next=$(${pkgs.coreutils}/bin/date -d "tomorrow 02:00" +%s)
     fi
 
-    unit="balrog-reboot-$next"
+    unit="narvi-reboot-$next"
     if ${pkgs.systemd}/bin/systemctl is-active --quiet "$unit.timer"; then
       echo "Reboot already scheduled for $(${pkgs.coreutils}/bin/date -d "@$next")"
       exit 0
@@ -19,7 +19,7 @@ let
 
     ${pkgs.systemd}/bin/systemd-run \
       --unit="$unit" \
-      --description="Reboot balrog after cache update" \
+      --description="Reboot narvi after cache update" \
       --on-calendar="*-*-* 02:00:00 America/New_York" \
       --timer-property=AccuracySec=1s \
       --collect \
@@ -38,7 +38,7 @@ in
     ./hardware.nix
   ];
 
-  networking.hostName = "balrog";
+  networking.hostName = "narvi";
   networking.useDHCP = true;
   machine.hasGui = false;
   storageHealth.notificationHost = "am";
@@ -114,7 +114,7 @@ in
     tokenFile = "/persist/system/secrets/github-runner-token";
     user = "github-runner";
     group = "github-runner";
-    extraLabels = [ "balrog" "cache-warmer" ];
+    extraLabels = [ "narvi" "cache-warmer" ];
     extraPackages = with pkgs; [ netcat-openbsd wakeonlan ];
     serviceOverrides.ReadWritePaths = [ "/var/lib/cache-warmer" ];
   };
@@ -128,7 +128,7 @@ in
     };
   };
   systemd.services.cache-warmer-activate = {
-    description = "Activate balrog and schedule its reboot";
+    description = "Activate narvi and schedule its reboot";
     restartIfChanged = false;
     serviceConfig.Type = "oneshot";
     script = ''
@@ -137,16 +137,16 @@ in
       rm -f "$status_dir/activate" "$status_dir/activation-success" "$status_dir/activation-failed"
       trap 'printf "Activation failed with exit code %s\n" "$?" > "$status_dir/activation-failed"' ERR
 
-      target=$(${pkgs.coreutils}/bin/readlink -e /var/lib/cache-warmer/balrog)
+      target=$(${pkgs.coreutils}/bin/readlink -e /var/lib/cache-warmer/narvi)
       case "$target" in
-        /nix/store/*-nixos-system-balrog-*) ;;
+        /nix/store/*-nixos-system-narvi-*) ;;
         *)
           echo "Refusing to activate unexpected path: $target" >&2
           exit 1
           ;;
       esac
       "$target/bin/switch-to-configuration" switch
-      ${scheduleReboot}/bin/schedule-balrog-reboot
+      ${scheduleReboot}/bin/schedule-narvi-reboot
       printf 'Activated %s\n' "$target" > "$status_dir/activation-success"
     '';
   };

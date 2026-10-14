@@ -27,7 +27,7 @@ fmt:
 clean:
   ssh am nh clean all --keep 3 --optimise
   ssh gimli nh clean all --keep 3 --optimise
-  ssh balrog nh clean all --keep 3 --optimise
+  ssh narvi nh clean all --keep 3 --optimise
 
 # Garbage collect Nix store
 gc:

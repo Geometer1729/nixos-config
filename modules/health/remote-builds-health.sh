@@ -1,12 +1,12 @@
-# Test the distributed builders and binary caches shared by am, balrog, and gimli.
+# Test the distributed builders and binary caches shared by am, narvi, and gimli.
 # The test is orchestrated from am because it is the remote builder and one cache source.
 # shellcheck shell=bash
 
 set -euo pipefail
 
 BUILDER="am"
-CLIENTS=(balrog gimli)
-HOSTS=(am balrog gimli)
+CLIENTS=(narvi gimli)
+HOSTS=(am narvi gimli)
 FAILURES=0
 
 if [ "$(uname -n)" != "$BUILDER" ]; then
@@ -122,7 +122,7 @@ echo
 
 echo "HTTP cache endpoints"
 for client in "${HOSTS[@]}"; do
-  for cache in am balrog; do
+  for cache in am narvi; do
     if run_on "$client" curl -fsS --retry 2 --connect-timeout 5 "http://$cache:5000/nix-cache-info" >/dev/null 2>&1; then
       pass "$client can reach $cache cache"
     else
@@ -134,7 +134,7 @@ echo
 
 echo "Signed cache transfers"
 am_token="am-cache-test-$(date +%s)-$$"
-balrog_token="balrog-cache-test-$(date +%s)-$$"
+balrog_token="narvi-cache-test-$(date +%s)-$$"
 am_path=""
 balrog_path=""
 
@@ -144,20 +144,20 @@ else
   fail "could not create a cache test path on am"
 fi
 
-if balrog_path=$(build_remote_local_path balrog "$balrog_token"); then
-  pass "created a fresh signed path locally on balrog"
+if balrog_path=$(build_remote_local_path narvi "$balrog_token"); then
+  pass "created a fresh signed path locally on narvi"
 else
-  fail "could not create a cache test path locally on balrog"
+  fail "could not create a cache test path locally on narvi"
 fi
 
 if [ -n "$am_path" ]; then
-  test_cache_copy am balrog "http://am:5000" "$am_path" "$am_token"
+  test_cache_copy am narvi "http://am:5000" "$am_path" "$am_token"
   test_cache_copy am gimli "http://am:5000" "$am_path" "$am_token"
 fi
 
 if [ -n "$balrog_path" ]; then
-  test_cache_copy balrog am "http://balrog:5000" "$balrog_path" "$balrog_token"
-  test_cache_copy balrog gimli "http://balrog:5000" "$balrog_path" "$balrog_token"
+  test_cache_copy narvi am "http://narvi:5000" "$balrog_path" "$balrog_token"
+  test_cache_copy narvi gimli "http://narvi:5000" "$balrog_path" "$balrog_token"
 fi
 
 echo

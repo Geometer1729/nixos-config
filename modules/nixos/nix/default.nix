@@ -14,8 +14,8 @@
 
     package = lib.mkDefault pkgs.nixVersions.latest;
     settings = {
-      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000?priority=60&retry-attempts=1" ];
-      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://balrog:5000?priority=60&retry-attempts=1" ];
+      substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://narvi:5000?priority=60&retry-attempts=1" ];
+      trusted-substituters = [ "https://cache.nixos.org" "https://prismlauncher.cachix.org" "http://narvi:5000?priority=60&retry-attempts=1" ];
       # Fail fast when a LAN cache is offline instead of stalling every nix command
       connect-timeout = 3;
       trusted-public-keys = [

@@ -74,7 +74,7 @@ Rechecked 2026-10-03 on system `g344m3k…` (nixpkgs 774debe); the following exi
 ### `gnome-health`
 - Clean on 2026-10-03: `just gnome-check`, system `g344m3k…` (nixpkgs 774debe).
 
-## balrog
+## narvi (server, formerly balrog)
 
 ### Build and activation
 - **Deployed with manual completion, 2026-10-03 (twice)**: both `nh os switch … --target-host bbrian@balrog` runs (13:53 from `just deploy`, and 22:51 after a cf9d2fb master deploy had downgraded tailscale again) lost their session when the switch restarted `tailscaled`. See "Activation killed with its calling session" under Update tooling. Podman/Foundry, nix-serve, smartd, taskchampion-sync-server, systemd-oomd and nscd were left stopped, and the profile still pointed at the old system. Each was completed with `sudo systemd-run --collect <system>/bin/switch-to-configuration switch` (the Foundry race below can make it exit 4), then `nix-env -p /nix/var/nix/profiles/system --set` and a detached `switch-to-configuration boot`. Final active/default system `sjk916z…` (nixpkgs 774debe plus the substituter fix).

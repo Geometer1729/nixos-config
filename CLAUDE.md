@@ -40,5 +40,6 @@ Update `CLAUDE.md` when you notice something in this file is wrong or about to b
 - `nix develop` enters the development shell.
 - `am` is the primary desktop.
 - `gimli` is the laptop (formerly `torag`).
+- `narvi` is the always-on server (formerly `balrog`).
 
 The main goal here is to preserve a few durable truths about the repo, not to accumulate workflow trivia.

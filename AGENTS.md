@@ -38,6 +38,7 @@ persistent configuration not controled by this config.
 - `nix develop` enters the development shell.
 - `am` is the primary desktop.
 - `gimli` is the laptop (formerly `torag`).
+- `narvi` is the always-on server (formerly `balrog`).
 
 ## Update Reports
 

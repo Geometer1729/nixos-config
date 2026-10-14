@@ -11,9 +11,9 @@ let
       id = "3MB5CXC-4FO3G2D-YH4PF6X-DY2IGTN-R4YB5RI-GZPTKAK-K6IKHOQ-QBBWNQG";
       addresses = [ "tcp://gimli:22000" ];
     };
-    balrog = {
+    narvi = {
       id = "DDE5AJ4-F7PSE7K-2Z7ZDQG-IBYGAMD-K2YIQ6X-POQJQZF-46SQ5MN-KZPHTAZ";
-      addresses = [ "tcp://balrog:22000" ];
+      addresses = [ "tcp://narvi:22000" ];
     };
   };
 
