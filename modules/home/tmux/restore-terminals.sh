@@ -4,6 +4,7 @@ set -euo pipefail
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
 manifest="$state_dir/terminals.json"
 restore_marker="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/tmux-resurrected"
+resurrect_last="$HOME/.tmux/resurrect/last"
 
 save() {
   local clients windows entries client_pid session pid workspace
@@ -57,7 +58,8 @@ save() {
 }
 
 restore() {
-  local all_sessions_ready=false session workspace command attempt result failed=false
+  local session workspace command attempt result failed=false
+  local -a sessions=()
 
   [ -s "$manifest" ] || return 0
 
@@ -67,16 +69,18 @@ restore() {
   done
   hyprctl monitors -j >/dev/null 2>&1 || return 0
 
-  all_sessions_ready=true
+  # Only wait for sessions tmux-resurrect will recreate: the manifest can list
+  # a session that ended before the final snapshot.
   while IFS= read -r session; do
     [[ "$session" =~ [[:space:]] ]] && continue
-    if ! tmux has-session -t "=$session" 2>/dev/null; then
-      all_sessions_ready=false
-      break
+    if tmux has-session -t "=$session" 2>/dev/null || in_snapshot "$session"; then
+      sessions+=("$session")
+    else
+      echo "Skipping $session: not in the tmux-resurrect snapshot" >&2
     fi
   done < <(jq -r '.[].session' "$manifest")
 
-  if ! $all_sessions_ready; then
+  if ! sessions_ready "${sessions[@]}"; then
     if ! tmux has-session 2>/dev/null; then
       rm -f "$restore_marker"
       # Start the server in its own scope: left in this unit's cgroup, it would
@@ -98,21 +102,14 @@ restore() {
   fi
 
   for _ in $(seq 1 200); do
-    all_sessions_ready=true
-    while IFS= read -r session; do
-      [[ "$session" =~ [[:space:]] ]] && continue
-      if ! tmux has-session -t "=$session" 2>/dev/null; then
-        all_sessions_ready=false
-        break
-      fi
-    done < <(jq -r '.[].session' "$manifest")
-    $all_sessions_ready && break
+    sessions_ready "${sessions[@]}" && break
     sleep 0.1
   done
 
-  if ! $all_sessions_ready; then
+  # Attach whatever was restored rather than leaving every window closed.
+  if ! sessions_ready "${sessions[@]}"; then
     echo "Timed out waiting for tmux-resurrect to restore terminal sessions" >&2
-    return 1
+    failed=true
   fi
 
   while IFS=$'\t' read -r session workspace; do
@@ -141,6 +138,20 @@ restore() {
   if $failed; then
     return 1
   fi
+}
+
+sessions_ready() {
+  local session
+  for session in "$@"; do
+    tmux has-session -t "=$session" 2>/dev/null || return 1
+  done
+}
+
+in_snapshot() {
+  awk -F'\t' -v session="$1" '
+    $1 == "pane" && $2 == session { found = 1; exit }
+    END { exit !found }
+  ' "$resurrect_last" 2>/dev/null
 }
 
 attached() {
