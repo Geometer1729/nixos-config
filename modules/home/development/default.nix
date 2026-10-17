@@ -1,7 +1,6 @@
 { machine, lib, pkgs, ... }:
 {
   home.packages = with pkgs; [
-    tmate
     tmux
     nix-output-monitor
     nixpkgs-fmt
