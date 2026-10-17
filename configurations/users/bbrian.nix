@@ -37,6 +37,7 @@ in
     ghostty
     notify-sync
     systemd-failure-notifications
+    dependabot-notifications
     desktop
     media
     communication
