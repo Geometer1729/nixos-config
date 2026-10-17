@@ -97,7 +97,7 @@ First checked 2026-10-17 with `health narvi` (headless server):
 - Clean on 2026-10-17: `health narvi`, system `m73il1w…`.
 
 ### Post-deployment boot checks
-- **Update reboot passed, 2026-10-17 at 11:24 EDT**: `ssh narvi sudo -n systemctl reboot`; new boot ID `9aa96940…`, Linux 6.18.56, booted/active/default `m73il1w…`; briefly `degraded` from the Foundry healthcheck transient, then `running` with zero failed system and user units; Foundry, nginx, nix-serve, smartd, taskchampion-sync-server and the GitHub runner active.
+- **Update reboots passed, 2026-10-17 at 11:24 and 11:44 EDT**: the second reboot (into `6aadmsm…`, boot ID `bf104a42…`) was `running` with zero failed units, and a scratch 3.7b tmux server parsed the config. First reboot: `ssh narvi sudo -n systemctl reboot`; new boot ID `9aa96940…`, Linux 6.18.56, booted/active/default `m73il1w…`; briefly `degraded` from the Foundry healthcheck transient, then `running` with zero failed system and user units; Foundry, nginx, nix-serve, smartd, taskchampion-sync-server and the GitHub runner active.
 - **Foundry checks passed, 2026-09-26**: rebooted into expected active/booted/default `c42xf9x…`; original image/version 13.351.0, persistent data/image mounts, data-content checksum comparison, LAN HTTP, and no failed system or user units verified after the startup-health transient cleared.
 - **Storage checks passed, 2026-09-21 at 16:59 EDT**: `ssh balrog sudo -n systemctl reboot`; new boot ID, expected active/default `r7v1p7f…`, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. Alert delivery to am also passed after reboot.
 - **Secrets/sync boot checks passed, 2026-09-21 at 20:52 EDT**: rebooted into expected active/booted/default `xhsxkk6…`, Linux 6.18.52. Both SOPS steps imported only the persisted user SSH key, expected secrets were readable, automatic Taskwarrior sync succeeded at 20:48 EDT without corrective activation, and system/user failed-unit lists were empty.
@@ -108,13 +108,13 @@ First checked 2026-10-17 with `health narvi` (headless server):
 ## gimli (laptop, formerly torag)
 
 ### Build and activation
-- **Passed, 2026-10-17**: `just deploy boot`, then a detached `ssh gimli sudo -n systemd-run --collect <system>/bin/switch-to-configuration switch` (`finished switching`, exit 0); active/default `3wirlf8…` (nixpkgs 26f4107). Not rebooted: still running Linux 6.18.54.
+- **Passed, 2026-10-17**: `just deploy boot`, then a detached `ssh gimli sudo -n systemd-run --collect <system>/bin/switch-to-configuration switch` (`finished switching`, exit 0); active/default `3wirlf8…` (nixpkgs 26f4107).
 
 ### Network
 - **Wi-Fi throughput on 2.4 GHz, newly recorded 2026-10-03**: Torag joins `moria` on 2412 MHz / 20 MHz when the router doesn't offer 5 GHz under that SSID. In that state, LAN RTT is 13–510 ms (0.5–1.6 s under load) and SSH throughput ~2 MiB/s. On 5 GHz / 80 MHz it gets ~50 MiB/s. The 5 GHz BSS came and went during the evening; at 22:42 Torag was on 5220 MHz (816 Mbit/s PHY rate) and the deploy copy was fast. The `ssh-ng` substituter that made slow links unbearable was replaced by `http://am:5000?priority=50` (`7bbd75f`). Recheck the band if deploys slow down again.
 
 ### Post-deployment boot checks
-- **Update reboot passed, 2026-10-03 at 23:04 EDT**: `ssh torag sudo -n systemctl reboot`; new boot ID, Linux 6.18.54, booted/active `zhhf445…`, `running`, zero failed system and user units, still on 5 GHz.
+- **Update reboot passed, 2026-10-17 at 11:44 EDT**: `ssh gimli sudo -n systemctl reboot`; new boot ID `028fb879…`, Linux 6.18.56, booted `3wirlf8…`, `running`, zero failed system and user units. The tmux server came up as 3.7b. All six sessions were restored with an unchanged layout, and `restore-terminals` attached its three windows on attempt 1. Re-sourcing the config and `save-tmux` both succeeded.
 - **Passed for storage/system services, 2026-09-21 at 16:59 EDT**: `ssh torag sudo -n systemctl reboot`; expected active/default `fdka1cn…`, new boot ID, Linux 6.18.52, zero failed system units, persisted SMART state, unchanged scrub-result hash/timer timestamp, and active monitoring verified. The user terminal-restoration failure below remains.
 
 ### Desktop runtime
