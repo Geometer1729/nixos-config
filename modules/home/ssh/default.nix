@@ -14,7 +14,7 @@ in
 {
   scripts.ssh = {
     directory = ./.;
-    extras = with pkgs; [ getent tmux ];
+    extras = with pkgs; [ getent iproute2 tmux ];
   };
 
   # Send browser launches from SSH sessions back to the connecting machine.

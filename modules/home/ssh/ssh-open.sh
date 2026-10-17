@@ -20,6 +20,22 @@ client_ip=${connection%% *}
 client=$(getent hosts "$client_ip" | awk '{ print $2; exit }') || client=
 client=${client%%.*}
 
+# OAuth logins (claude, gcloud, …) redirect the browser to a callback server
+# on localhost here. Forward each such port that is actually listening from
+# the client's localhost for long enough to finish the login.
+decoded=$(printf '%b' "${url//%/\\x}")
+forwards=()
+while read -r port; do
+  if [[ -n $(ss -Hltn "sport = :$port") ]]; then
+    forwards+=(-R "$port:localhost:$port")
+  fi
+done < <(grep -oE '(localhost|127\.0\.0\.1|\[::1\]):[0-9]+' <<<"$decoded" | sed 's/.*://' | sort -u)
+if [[ -n $client && ${#forwards[@]} -gt 0 ]] &&
+  ! ssh -f -o BatchMode=yes -o ConnectTimeout=5 -o ExitOnForwardFailure=yes \
+    "${forwards[@]}" "$client" sleep 600 </dev/null >/dev/null 2>&1; then
+  echo "ssh-open: could not forward ${forwards[*]} to $client; the login redirect may fail" >&2
+fi
+
 # Tailscale SSH leaves XDG_RUNTIME_DIR unset. The real xdg-open is called by
 # path because the client's own shell also sees an SSH session.
 remote="export XDG_RUNTIME_DIR=/run/user/\$(id -u)
