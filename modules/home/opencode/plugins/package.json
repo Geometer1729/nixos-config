@@ -17,5 +17,10 @@
     "@types/json-schema": "7.0.15",
     "@types/node": "24.10.1",
     "typescript": "5.9.3"
+  },
+  "//": "seroval override: solid-js 1.9.12 pins seroval ~1.5.0, which has GHSA advisories fixed in 1.6.3 (Dependabot #45, #46). @opentui/solid peers solid-js at exactly 1.9.12, so we can't bump solid-js. Solid only uses seroval for SSR, which the TUI plugins never do. Drop this once @opentui/solid allows solid-js >= 1.9.16.",
+  "overrides": {
+    "seroval": "^1.6.3",
+    "seroval-plugins": "^1.6.3"
   }
 }
