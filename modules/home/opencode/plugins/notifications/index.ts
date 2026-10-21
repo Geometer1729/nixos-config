@@ -1,4 +1,6 @@
 import { execFile } from "node:child_process"
+import { watch } from "node:fs"
+import { basename, dirname } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 import { promisify } from "node:util"
 
@@ -9,19 +11,24 @@ import { Plugin } from "@opencode/plugin"
 import { refreshQueue } from "./refresh.ts"
 import { confirmedSnapshot, notification, relevantEvent, snapshot } from "./snapshot.ts"
 import { presenceServer, socketPath } from "./presence.ts"
+import { inside, muteFile, mutedUntil } from "./mute.ts"
 
 const exec = promisify(execFile)
 const report = (error: unknown) => console.error("OpenCode waiting notification:", error)
 const moduleID = Symbol("notification plugin generation")
 
-async function run(command: string, focusCommand: string, shared: Shared): Promise<void> {
+async function run(command: string, focusCommand: string, workDirectory: string | undefined, shared: Shared): Promise<void> {
   const signal = shared.controller.signal
   if (signal.aborted) return
   const presence = await presenceServer(socketPath(process.pid), () => shared.request())
+  const mute = muteFile()
+  const muteWatcher = watch(dirname(mute), (_, name) => { if (name === basename(mute)) shared.request() })
+  muteWatcher.on("error", report)
   try {
     while (!signal.aborted) {
       const connection = new AbortController()
       const connected = AbortSignal.any([signal, connection.signal])
+      let unmuteScheduled: number | undefined
       try {
         // Server plugins expose events but not the complete session/form inventory.
         // Use the documented authenticated client for those snapshot reads.
@@ -43,7 +50,14 @@ async function run(command: string, focusCommand: string, shared: Shared): Promi
             return [pane, workspace] as const
           })))
           const locations = new Map([...attached].map(([id, pane]) => [id, workspaces.get(pane) ?? ""]))
-          const content = notification(state, new Set(attached.keys()), locations)
+          const until = workDirectory === undefined ? undefined : await mutedUntil(mute)
+          if (until !== undefined && until !== unmuteScheduled) {
+            unmuteScheduled = until
+            void sleep(until - Date.now(), undefined, { signal: connected }).then(() => shared.request(), () => undefined)
+          }
+          const muted = new Set(until === undefined ? [] : state.sessions
+            .filter((session) => inside(session.location.directory, workDirectory!)).map((session) => session.id))
+          const content = notification(state, new Set([...attached.keys()].filter((id) => !muted.has(id))), locations)
           await exec(command, [content.summary, content.body, content.key, content.sessionID, socketPath(process.pid)], { signal: timeout })
         }, connected, report)
         shared.request = queue.request
@@ -69,6 +83,7 @@ async function run(command: string, focusCommand: string, shared: Shared): Promi
       }
     }
   } finally {
+    muteWatcher.close()
     await presence.close()
   }
 }
@@ -87,6 +102,7 @@ export default Plugin.define({
   setup(context) {
     const command = context.options.command
     const focusCommand = context.options.focusCommand
+    const workDirectory = typeof context.options.workDirectory === "string" ? context.options.workDirectory : undefined
     if (typeof command !== "string" || typeof focusCommand !== "string" || !process.env.DBUS_SESSION_BUS_ADDRESS || !process.env.XDG_RUNTIME_DIR) return
 
     // Global plugins are instantiated once per location. They share one reader
@@ -104,7 +120,7 @@ export default Plugin.define({
       const state: Shared = {
         moduleID, owners, controller: new AbortController(), task: Promise.resolve(), request: () => undefined,
       }
-      state.task = previous.then(() => run(command, focusCommand, state)).catch(report)
+      state.task = previous.then(() => run(command, focusCommand, workDirectory, state)).catch(report)
       return state
     })()
     const owner = Symbol()

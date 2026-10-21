@@ -252,6 +252,7 @@ in
           "$mod, x, Dismiss all notifications, exec, makoctl dismiss -a"
           "$mod SHIFT, x, Restore last dismissed notification, exec, makoctl restore"
           "$mod, z, Toggle Do Not Disturb, exec, notification-center dnd"
+          "$mod SHIFT, z, Mute work sessions until morning, exec, notification-center work"
 
           # Window management
           "$mod, q, Close active window, killactive"

@@ -280,6 +280,8 @@ in
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";
         options.focusCommand = "${focus}/bin/opencode-focus";
+        # Sessions here are hidden while `notification-center work` mutes them.
+        options.workDirectory = "${config.home.homeDirectory}/Code/work";
       }
         {
           package = "file://${plugins}/usage";

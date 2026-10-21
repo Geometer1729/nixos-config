@@ -176,6 +176,7 @@ let
         signal = 8; # Sent by notification-center dnd for an immediate refresh.
         format = " {} ";
         on-click = "${lib.getExe config.scripts.hyprland.packages.notification-center} dnd";
+        on-click-middle = "${lib.getExe config.scripts.hyprland.packages.notification-center} work";
         on-click-right = "${lib.getExe config.scripts.hyprland.packages.notification-center} history";
         tooltip = true;
       };
