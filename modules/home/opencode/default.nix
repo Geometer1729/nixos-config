@@ -252,6 +252,9 @@ in
       agents = {
         build.model = "anthropic/claude-opus-5-5#xhigh";
         explore.model = "openai/gpt-6-sol#xhigh";
+        # Meridian wraps Anthropic requests in the Claude Code agent prompt, so
+        # titles generated through it answer the message or emit tool calls.
+        title.model = "openai/gpt-6-luna";
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review";
           mode = "subagent";
