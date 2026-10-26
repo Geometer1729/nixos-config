@@ -33,6 +33,7 @@ in
       base
       brave
       bt
+      chatgpt
       docker
       fwupd
       gaming
