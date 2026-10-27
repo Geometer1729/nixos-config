@@ -39,7 +39,7 @@ issues=$(
 )
 choice=$(rofi -dmenu -i -no-custom -p 'Linear issue' \
   -display-columns 1,2,3 -display-column-separator $'\t' <<<"$issues") || exit 0
-IFS=$'\t' read -r identifier _title _state branch <<<"$choice"
+IFS=$'\t' read -r identifier title _state branch <<<"$choice"
 
 repo=$(find "$work" -mindepth 1 -maxdepth 1 -type d ! -name wts -printf '%f\n' |
   sort | rofi -dmenu -i -no-custom -p 'Repository') || exit 0
@@ -100,8 +100,13 @@ fi
 if ! tmux list-panes -t "=$session" -F '#{pane_dead}:#{pane_current_command}' |
   grep -Eq '^0:opencode2?$'; then
   prompt="/start-ticket $identifier"
+  # An explicit title stops the title agent from naming every session after the
+  # /start-ticket template ("BRD-?? implementation status").
+  body=$(jq -nc --arg title "$identifier: $title" --arg directory "$worktree" \
+    '{title: $title, location: {directory: $directory}}')
+  opencode_session=$(opencode api post /api/session --data "$body" | jq -er '.data.id')
   tmux split-window -h -t "$session:0.0" -c "$worktree" \
-    "exec opencode --prompt $(printf %q "$prompt")"
+    "exec opencode --session $opencode_session --prompt $(printf %q "$prompt")"
   tmux select-layout -t "$session:0" even-horizontal
 fi
 
