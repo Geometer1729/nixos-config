@@ -275,7 +275,15 @@ in
           package = "file://${plugins}/lsp";
           options.servers = lspServers;
         }
-        { package = "file://${plugins}/meridian"; }
+        {
+          package = "file://${plugins}/meridian";
+          # Mirrors the CLAUDE_CONFIG_DIR split in zsh/direnv.nix.
+          options = {
+            workDirectory = "${config.home.homeDirectory}/Code/work";
+            workProfile = "default";
+            personalProfile = "personal";
+          };
+        }
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";

@@ -5,11 +5,18 @@ import { Plugin } from "@opencode/plugin"
 
 import meridian from "./index.ts"
 
-test("Meridian scopes headers to Anthropic and classifies V2 auxiliary requests", async () => {
-  type Event = { agent: string; sessionID: string; request: Request; kind: string }
+type Event = { agent: string; sessionID: string; request: Request; kind: string }
+
+async function setup(directory: string, canonical = directory, options: Record<string, unknown> = {
+  workDirectory: "/home/user/Code/work",
+  workProfile: "default",
+  personalProfile: "personal",
+}) {
   let hook: ((event: Event) => Promise<void>) | undefined
   const modes: Record<string, string> = { build: "primary", expert: "subagent", "custom\u200b": "all" }
   const context = {
+    options,
+    location: { directory, project: { canonical } },
     agent: { get: async ({ agentID }: { agentID: string }) => ({ data: { mode: modes[agentID] } }) },
     session: {
       hook: async (name: string, callback: typeof hook, options: { providerID: string }) => {
@@ -21,6 +28,11 @@ test("Meridian scopes headers to Anthropic and classifies V2 auxiliary requests"
   }
   await meridian.setup(context as unknown as Plugin.Context)
   assert.ok(hook)
+  return hook
+}
+
+test("Meridian scopes headers to Anthropic and classifies V2 auxiliary requests", async () => {
+  const hook = await setup("/home/user/conf")
   const requests = new Set<string>()
   for (const [agent, kind, mode, name, session] of [
     ["build", "primary", "primary", "build", "ses_test"],
@@ -41,4 +53,26 @@ test("Meridian scopes headers to Anthropic and classifies V2 auxiliary requests"
     assert.ok(!requests.has(id))
     requests.add(id)
   }
+})
+
+test("Meridian profile follows the location's work directory", async () => {
+  for (const [directory, canonical, profile] of [
+    ["/home/user/Code/work", "/home/user/Code/work", "default"],
+    ["/home/user/Code/work/grim/src", "/home/user/Code/work/grim", "default"],
+    ["/home/user/.local/share/opencode/worktree/abc/fix", "/home/user/Code/work/grim", "default"],
+    ["/home/user/Code/workshop", "/home/user/Code/workshop", "personal"],
+    ["/home/user/conf", "/home/user/conf", "personal"],
+  ] as const) {
+    const hook = await setup(directory, canonical)
+    const request = new Request("http://localhost/v1/messages")
+    await hook({ agent: "build", kind: "primary", request, sessionID: "ses_test" })
+    assert.equal(request.headers.get("x-meridian-profile"), profile, directory)
+  }
+})
+
+test("Meridian leaves profile selection to the proxy without options", async () => {
+  const hook = await setup("/home/user/conf", "/home/user/conf", {})
+  const request = new Request("http://localhost/v1/messages")
+  await hook({ agent: "build", kind: "primary", request, sessionID: "ses_test" })
+  assert.equal(request.headers.get("x-meridian-profile"), null)
 })
