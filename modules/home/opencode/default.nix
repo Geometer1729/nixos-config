@@ -34,12 +34,15 @@ let
       install -Dm755 bin/opencode $out/bin/opencode2
       # OpenTUI dlopens libwayland-client.so.0 by soname for host clipboard reads,
       # and Bun extracts its copy at runtime where autoPatchelfHook never sees it.
+      # OpenTUI disables OSC 8 links under tmux, so wrapped URLs only open their
+      # clicked row; tmux forwards them via the hyperlinks terminal feature.
       wrapProgram $out/bin/opencode2 \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
         --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland ]} \
         --set NPM_CONFIG_FORCE true \
         --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
+        --set FORCE_HYPERLINK 1 \
         --set PINENTRY_USER_DATA ${if machine.hasGui then "gui" else "curses"}
 
       runHook postInstall

@@ -133,6 +133,8 @@ in
         set-hook -g window-layout-changed 'if "[ #{session_windows} -lt 2 ]" "set status off"'
 
         set -g default-terminal tmux-256color
+        # Forward OSC 8 hyperlinks so wrapped links stay clickable as one URL.
+        set -as terminal-features 'xterm-ghostty:hyperlinks'
 
         # Give each terminal window a stable session identifier for workspace restore.
         set -g set-titles on
