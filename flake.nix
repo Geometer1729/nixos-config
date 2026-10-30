@@ -40,8 +40,6 @@
     shuck.flake = false;
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
-    # 1.62.x rejects OpenCode's concurrent title and primary requests.
-    meridian.url = "github:rynfar/meridian/8b789e4e491c31ec79737cb18dd9c79666496f20"; # 1.60.0
 
     # Custom source pins used by local modules.
     # These are flake inputs so `nix flake update` can move them intentionally.

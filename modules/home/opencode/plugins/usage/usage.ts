@@ -57,26 +57,6 @@ export function codexUsage(value: unknown, now: number): Usage {
   return { label: "Codex", windows, fetchedAt: now }
 }
 
-const claudeLabels: Record<string, string> = {
-  five_hour: "5-hour",
-  seven_day: "Weekly",
-}
-
-export function claudeUsage(value: unknown, id: string, label: string): Usage {
-  const raw = object(value)
-  const profile = (Array.isArray(raw.profiles) ? raw.profiles : []).map(object).find((item) => item.id === id)
-  // Meridian calls any upstream failure "no_token", including rate limiting.
-  if (!profile || profile.error || !number(profile.fetchedAt)) throw new Error("Quota unavailable in Meridian")
-  const windows = (Array.isArray(profile.windows) ? profile.windows : []).flatMap((value) => {
-    const item = object(value)
-    if (typeof item.type !== "string") return []
-    const name = claudeLabels[item.type] ?? item.type.replace(/^seven_day_/, "Weekly · ").replaceAll("_", " ")
-    return window(name, number(item.utilization) ? item.utilization * 100 : null, item.resetsAt)
-  })
-  if (!windows.length) throw new Error("No usage windows returned")
-  return { label, windows, fetchedAt: profile.fetchedAt }
-}
-
 export class FetchError extends Error {
   readonly retryAt: number
   constructor(message: string, retryAt = 0) {

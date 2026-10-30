@@ -61,14 +61,14 @@ try {
     do {
       plugins = (await client.plugin.list({ location: { directory } })).data
       const probe = plugins.find((plugin) => plugin.id === "test.reload")
-      if (probe?.state.status === "active" && probe.source.path === join(target, "index.js")) break
+      if (probe?.state.status === "active" && probe.source.path === target) break
       await sleep(100)
     } while (Date.now() < deadline)
     const local = plugins.filter((plugin) => plugin.source.type !== "builtin")
     assert.equal(local.length, 1, JSON.stringify(local))
     const probe = plugins.find((plugin) => plugin.id === "test.reload")
     assert.equal(probe?.state.status, "active", JSON.stringify(plugins.filter((plugin) => plugin.source.type !== "builtin")))
-    assert.equal(probe.source.path, join(target, "index.js"))
+    assert.equal(probe.source.path, target)
   }
   await check(env.HOME, first)
   const second = await generation(2)

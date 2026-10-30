@@ -43,6 +43,7 @@ let
         --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
         --set FORCE_HYPERLINK 1 \
+        --set OPENCODE_CLAUDE_PATH ${lib.getExe config.scripts.claude.packages.claude-agent} \
         --set PINENTRY_USER_DATA ${if machine.hasGui then "gui" else "curses"}
 
       runHook postInstall
@@ -72,17 +73,13 @@ let
   lspServers = import ./lsp-servers.nix;
 in
 {
-  imports = [ inputs.meridian.homeModules.default ];
-
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [
     pluginBuild.check
     (import ./checks/load.nix { inherit lib pkgs; home = config; })
   ];
 
-  home.packages = with pkgs; [
-    config.services.meridian.package
-  ] ++ lib.optionals machine.hasGui [ libnotify notify ] ++ [
+  home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify ] ++ [
     opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
@@ -126,30 +123,6 @@ in
     };
   };
 
-  services.meridian = {
-    enable = true;
-    environment.CLAUDE_CONFIG_DIR = "${config.home.homeDirectory}/.claude-work";
-    # Override Meridian's bundled Nixpkgs Claude with the one used by the CLI.
-    environment.MERIDIAN_CLAUDE_PATH = lib.getExe config.programs.claude-code.package;
-    # The quota API requires explicit paths (it ignores CLAUDE_CONFIG_DIR).
-    # Keep the existing default profile ID so SDK sessions retain their owner.
-    environment.MERIDIAN_DEFAULT_PROFILE = "default";
-    # Meridian's module emits Environment= literally; systemd must preserve the
-    # JSON quotes rather than interpreting them as unit-file quoting.
-    environment.MERIDIAN_PROFILES = lib.escapeShellArg (builtins.toJSON [
-      { id = "default"; claudeConfigDir = "${config.home.homeDirectory}/.claude-work"; }
-      { id = "personal"; claudeConfigDir = "${config.home.homeDirectory}/.claude-personal"; }
-    ]);
-    # OpenCode's prompt carries AGENTS.md, skills and the Code Mode catalog, but
-    # also harness fingerprints Anthropic has metered as Extra Usage.
-    settings.pluginConfig = [{
-      # TODO: drop the patch once upstream matches V2's identity line.
-      inherit (inputs.meridian.legacyPackages.${pkgs.stdenv.hostPlatform.system}.meridianPlugins.opencode-scrub.overrideAttrs {
-        patches = [ ./meridian/opencode-scrub-v2.patch ];
-      }) path;
-    }];
-  };
-
   xdg.configFile = {
     "opencode/AGENTS.md".source = ./AGENTS.md;
     "opencode/cli.json" = {
@@ -189,13 +162,6 @@ in
     "opencode/commands" = {
       source = ./commands;
       recursive = true;
-    };
-
-    "meridian/sdk-features.json" = {
-      force = true;
-      text = builtins.toJSON {
-        opencode.codeSystemPrompt = true;
-      };
     };
 
     "opencode/opencode.json".text = builtins.toJSON {
@@ -251,17 +217,15 @@ in
         };
       };
       #model = "openai/gpt-6-astra";
-      model = "anthropic/claude-opus-5-5#xhigh";
+      model = "claude-agent/opus#xhigh";
       agents = {
-        build.model = "anthropic/claude-opus-5-5#xhigh";
+        build.model = "claude-agent/opus#xhigh";
         explore.model = "openai/gpt-6-sol#xhigh";
-        # Meridian wraps Anthropic requests in the Claude Code agent prompt, so
-        # titles generated through it answer the message or emit tool calls.
         title.model = "openai/gpt-6-luna";
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review";
           mode = "subagent";
-          model = "anthropic/claude-fable-5-1#xhigh";
+          model = "claude-agent/fable#xhigh";
           permissions = [
             {
               action = "edit";
@@ -278,15 +242,6 @@ in
           package = "file://${plugins}/lsp";
           options.servers = lspServers;
         }
-        {
-          package = "file://${plugins}/meridian";
-          # Mirrors the CLAUDE_CONFIG_DIR split in zsh/direnv.nix.
-          options = {
-            workDirectory = "${config.home.homeDirectory}/Code/work";
-            workProfile = "default";
-            personalProfile = "personal";
-          };
-        }
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";
@@ -299,10 +254,6 @@ in
           options.timezone = "America/New_York";
         }];
       provider = {
-        anthropic.options = {
-          apiKey = "x";
-          baseURL = "http://127.0.0.1:3456";
-        };
         openai.models."gpt-6-astra" = {
           modelID = "gpt-6-astra";
           name = "GPT-6 Astra";

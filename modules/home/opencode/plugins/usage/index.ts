@@ -6,7 +6,7 @@ import { OpenCode } from "@opencode/client"
 import { Service } from "@opencode/client/service"
 import { Plugin } from "@opencode/plugin"
 
-import { claudeUsage, codexUsage, fetchJSON, interval, render, Source } from "./usage.ts"
+import { codexUsage, fetchJSON, interval, render, Source } from "./usage.ts"
 
 const generation = Symbol("AI usage plugin generation")
 interface Shared {
@@ -20,8 +20,6 @@ const host = globalThis as typeof globalThis & { __confAIUsage?: Shared }
 async function run(shared: Shared, file: string, timezone: string) {
   const signal = shared.controller.signal
   const codex = new Source("Codex")
-  const work = new Source("Claude work")
-  const personal = new Source("Claude personal")
   async function update() {
     const context = shared.contexts.values().next().value
     if (!context) return
@@ -32,10 +30,6 @@ async function run(shared: Shared, file: string, timezone: string) {
     const headers = Service.headers({ url: endpoint.url, ...(endpoint.auth ? { auth: endpoint.auth } : {}) })
     const client = OpenCode.make({ baseUrl: endpoint.url, headers: headers ?? {} })
     if ((await client.server.info({ signal: timeout })).pid !== process.pid) return
-    // One request covers both Claude profiles, including token renewal handled
-    // by Meridian. No raw credentials or upstream responses go into the cache.
-    let meridian: Promise<unknown> | undefined
-    const claude = () => meridian ??= fetchJSON("http://127.0.0.1:3456/v1/usage/quota/all", timeout)
     const readings = await Promise.all([
       (async () => {
         const connection = await context.integration.connection.active("openai")
@@ -54,8 +48,6 @@ async function run(shared: Shared, file: string, timezone: string) {
           return codexUsage(raw, Date.now())
         })
       })().catch(() => ({ label: "Codex", error: "OpenCode connection unavailable" })),
-      work.read("default", async () => claudeUsage(await claude(), "default", work.label)),
-      personal.read("personal", async () => claudeUsage(await claude(), "personal", personal.label)),
     ])
     if (signal.aborted) return
     const temporary = `${file}.${process.pid}.tmp`

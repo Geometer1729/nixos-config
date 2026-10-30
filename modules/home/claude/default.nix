@@ -13,6 +13,7 @@ in
     directory = ./.;
     extras = with pkgs; [ libnotify tmux ]
       ++ lib.optionals machine.hasGui [ hyprland xdotool ];
+    overrides.claude-agent.runtimeEnv.CLAUDE = lib.getExe config.programs.claude-code.package;
   };
 
   # Use home-manager's official Claude Code module

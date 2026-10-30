@@ -44,7 +44,6 @@
         ".tmux/resurrect"
         ".claude-work"
         ".claude-personal"
-        ".config/meridian"
         ".config/opencode"
         ".ssh"
         ".tldrc"
@@ -63,7 +62,6 @@
         ".config/chromium"
         ".config/google-chrome"
         ".hoogle"
-        ".cache/meridian"
       ];
       files = [
         # zsh_history is written directly to /persist so rename-based updates work.

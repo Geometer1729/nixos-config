@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
-import { claudeUsage, codexUsage, FetchError, interval, render, Source } from "./usage.ts"
+import { codexUsage, FetchError, interval, render, Source } from "./usage.ts"
 import type { Usage } from "./usage.ts"
 
 const now = Date.parse("2026-09-14T17:00:00Z")
@@ -40,16 +40,6 @@ test("model-specific and code-review limits are included; missing values are not
   assert.deepEqual(bar.class, ["critical"])
   assert.match(bar.tooltip, /Model &lt;large&gt;/)
   assert.throws(() => codexUsage({ rate_limit: null }, now), /No usage windows/)
-})
-
-test("Claude fractional utilization is converted and only the requested profile is read", () => {
-  const result = claudeUsage({ profiles: [
-    { id: "personal", windows: [{ type: "seven_day", utilization: 0.99 }], fetchedAt: now },
-    { id: "default", windows: [{ type: "five_hour", utilization: 0.42, resetsAt: reset }, { type: "seven_day_fable", utilization: 0.84 }], fetchedAt: now },
-  ] }, "default", "Claude work")
-  assert.deepEqual(result.windows.map((item) => item.used), [42, 84])
-  assert.equal(result.windows[1]?.label, "Weekly · fable")
-  assert.throws(() => claudeUsage({ profiles: [{ id: "default", error: "no_token" }] }, "default", "Work"), /Quota unavailable/)
 })
 
 test("a failed account cannot make a partial result look complete", () => {
