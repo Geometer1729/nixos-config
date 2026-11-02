@@ -40,6 +40,11 @@
     shuck.flake = false;
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
+    # Hex needs a newer rustc than stable has. Its glibc must not be older than
+    # the system's, or it finds no Vulkan adapter; unstable satisfies both.
+    hex.url = "github:anomalyco/hex/v3.0.0";
+    hex.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    hex.inputs.home-manager.follows = "home-manager";
 
     # Custom source pins used by local modules.
     # These are flake inputs so `nix flake update` can move them intentionally.

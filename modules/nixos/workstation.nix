@@ -38,6 +38,7 @@ in
       fwupd
       gaming
       gh-noto
+      hex
       hyprland
       kde
       main
