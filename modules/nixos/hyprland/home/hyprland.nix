@@ -244,8 +244,7 @@ in
           "$mod, u, Clean URL in clipboard, exec, clean-url"
           "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
           "$mod CTRL, v, Force paste clipboard by typing it, exec, force-paste"
-          # Global binds also fire on release, which ends Hex's hold-to-dictate.
-          "$mod, e, Hold to dictate, global, hex:dictation"
+          "$mod, e, Hold to dictate, exec, dictate start"
 
           # Notifications
           "$mod, i, Open notification history, exec, notification-center history"
@@ -355,6 +354,12 @@ in
 
           # Bluetooth
           "$mod SHIFT, b, Connect Bluetooth headphones, exec, bluetooth-autoconnect"
+        ];
+
+        # Release half of push-to-talk dictation. The script delivers the text
+        # to where the press was, so focus can move on before it arrives.
+        bindrd = [
+          "$mod, e, Stop dictation and deliver text, exec, dictate stop"
         ];
 
         # Mouse bindings

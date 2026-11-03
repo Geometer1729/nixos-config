@@ -133,10 +133,14 @@ in
         attention.sound = true;
         attention.notifications = !machine.hasGui;
         plugins = [ "file://${plugins}/vim" "file://${plugins}/auto-tabs" ]
-          ++ lib.optional machine.hasGui {
-          package = "file://${plugins}/notifications";
-          options.focusCommand = "${focus}/bin/opencode-focus";
-        };
+          ++ lib.optionals machine.hasGui [
+          {
+            package = "file://${plugins}/notifications";
+            options.focusCommand = "${focus}/bin/opencode-focus";
+          }
+          # Receives Hex dictation from the dictate script.
+          "file://${plugins}/dictation"
+        ];
         diffs.wrap = "word";
         session = {
           markdown = "rendered";
