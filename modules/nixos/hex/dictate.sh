@@ -98,7 +98,7 @@ stop() {
       0) exit 0 ;;
       1)
         printf '%s' "$text" | wl-copy
-        notify "Dictation copied" "OpenCode's prompt was not available: $text"
+        notify "Dictation copied" "OpenCode had no text field focused: $text"
         exit 0
         ;;
     esac

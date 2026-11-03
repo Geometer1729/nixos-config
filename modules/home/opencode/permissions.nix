@@ -370,6 +370,7 @@ in
     "${config.home.homeDirectory}/Code/nixpkgs/**" = "allow";
   };
   lsp = "allow";
+  speak = "allow";
   # Slack MCP: reads are allowed by default; anything that publishes asks first.
   # Drafts stay allowed — they are the review-first posting workflow.
   "slack_slack_send_message" = "ask";

@@ -73,6 +73,9 @@ let
   lspServers = import ./lsp-servers.nix;
 in
 {
+  # `speak` plays the speech plugin's messages.
+  imports = [ ../speech ];
+
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [
     pluginBuild.check
@@ -256,7 +259,9 @@ in
         {
           package = "file://${plugins}/usage";
           options.timezone = "America/New_York";
-        }];
+        }
+        # The speak tool; its TUI part plays the speech in the viewed session.
+        "file://${plugins}/speech"];
       provider = {
         openai.models."gpt-6-astra" = {
           modelID = "gpt-6-astra";

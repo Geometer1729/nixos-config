@@ -1,14 +1,12 @@
 import { Plugin } from "@opencode/plugin/tui"
-import type { EditBufferRenderable, EditorTraits } from "@opentui/core"
+import type { EditBufferRenderable } from "@opentui/core"
 import { rmSync } from "node:fs"
 import { createServer } from "node:net"
 
 import { insertion, insertionPoint, socketPath } from "./insert.ts"
 
-type HostEditorTraits = EditorTraits & { owner?: string; role?: string }
-
 // Hex's dictate script writes a transcript to this TUI's socket, then reads
-// "ok" once it is in the prompt. Keys are never sent, so it works while the
+// "ok" once it is inserted. Keys are never sent, so it works while the
 // terminal is unfocused and regardless of held modifiers or Vim mode.
 export default Plugin.define({
   id: "local.dictation",
@@ -18,13 +16,9 @@ export default Plugin.define({
     if (!pane || !runtimeDir) return
     const path = socketPath(runtimeDir, pane)
 
-    // The prompt is only reachable while it holds the TUI's focus, not a dialog.
-    const prompt = (): EditBufferRenderable | undefined => {
-      const current = context.renderer.currentFocusedEditor
-      const traits = current?.traits as HostEditorTraits | undefined
-      if (!current || traits?.owner !== "opencode" || traits.role !== "prompt") return
-      return current
-    }
+    // Whichever editor holds the TUI's focus: the prompt, or a dialog's input
+    // such as a question's custom answer. A dialog without one has none.
+    const editor = (): EditBufferRenderable | undefined => context.renderer.currentFocusedEditor ?? undefined
 
     const server = createServer((socket) => {
       const chunks: Buffer[] = []
@@ -36,10 +30,10 @@ export default Plugin.define({
       })
       socket.on("end", () => {
         const text = Buffer.concat(chunks).toString("utf8")
-        const input = prompt()
+        const input = editor()
         if (!input || !text) return socket.end("unavailable\n")
-        // The Vim plugin shows a status outside insert mode.
-        const normal = Boolean((input.traits as HostEditorTraits).status)
+        // The Vim plugin shows a status on the prompt outside insert mode.
+        const normal = Boolean(input.traits.status)
         input.cursorOffset = insertionPoint(input.plainText, input.cursorOffset, normal)
         input.insertText(insertion(input.plainText.slice(0, input.cursorOffset), text))
         context.renderer.requestRender()
