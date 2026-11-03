@@ -20,7 +20,9 @@ If the gcloud token is stale just run `gcloud auth login` and ask me to approve 
 When I say "let me know", notify me with `notify-send --expire-time=300000` when the requested work or wait is complete.
 
 Value your dev env!
-If a tool you are supposed to have does not work that's P1
+When a tool you are supposed to have does not work (a CLI, MCP server, LSP, or OpenCode itself), triage it:
+- Blocking: the current task can't be finished correctly without it. Fix it inline, in `~/conf`, then continue.
+- Non-blocking: a workaround leaves the task's result intact. Before continuing, file the breakage as a Taskwarrior task tagged `+agent +@computer` with a note (see the taskwarrior skill) written for a new agent that will fix it with none of your context: the exact symptom and errors, where and when it happened, how to reproduce it, what you ruled out, and where to look. Then work around it, finish the task, and give the task ID in your final reply.
 
 When you decide to make something more complicated to fix a problem flag that.
 Explain the problem and the solution and get my input on the tradeoff.

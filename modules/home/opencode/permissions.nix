@@ -242,6 +242,8 @@ let
     "echo*"
     "printf*"
     "notify-send *"
+    "task add *"
+    "task _get *"
     "true"
     "test*"
     "expr*"
@@ -368,6 +370,7 @@ in
     "${config.home.homeDirectory}/conf/**" = "allow";
     "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
     "${config.home.homeDirectory}/Code/nixpkgs/**" = "allow";
+    "${config.home.homeDirectory}/Documents/vw/tasks/**" = "allow";
   };
   lsp = "allow";
   speak = "allow";
@@ -402,5 +405,6 @@ in
     "/nix/store/**" = "deny";
     "/tmp/**" = "allow";
     "${config.home.homeDirectory}/Code/conf-update-*/**" = "allow";
+    "${config.home.homeDirectory}/Documents/vw/tasks/**" = "allow";
   };
 }

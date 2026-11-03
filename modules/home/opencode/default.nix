@@ -181,8 +181,8 @@ in
           "Declarative NixOS/home-manager configuration for this machine, including OpenCode itself"
           "(MCP servers, plugins, permissions, skills, AGENTS.md) and the dev tools agents rely on."
           "Read it when the environment behaves unexpectedly."
-          "When OpenCode, an MCP server, or a dev tool is broken or misconfigured, fixing it here is wanted:"
-          "follow its AGENTS.md and propose the change rather than working around the breakage."
+          "When OpenCode, an MCP server, or a dev tool is broken or misconfigured, this is where to fix it:"
+          "follow its AGENTS.md."
         ];
       };
       mcp = lib.optionalAttrs machine.hasGui {
