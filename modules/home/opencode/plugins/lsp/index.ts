@@ -26,7 +26,7 @@ interface Diagnostic {
 }
 
 interface RpcMessage {
-  error?: { message?: string }
+  error?: { code?: number; message?: string }
   id?: number
   jsonrpc?: "2.0"
   method?: string
@@ -43,6 +43,7 @@ interface Client {
   documents?: Map<string, { text: string; version: number }>
   notify(method: string, params?: unknown): void
   process: ChildProcessWithoutNullStreams
+  pullDiagnostics?: boolean
   request<Result = unknown>(method: string, params?: unknown, timeout?: number): Promise<Result>
   server?: Server
 }
@@ -185,8 +186,10 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
       const waiter = pending.get(message.id)
       if (!waiter) return
       pending.delete(message.id)
-      if (message.error) waiter.reject(new Error(message.error.message ?? JSON.stringify(message.error)))
-      else waiter.resolve(message.result)
+      if (message.error) {
+        const error = new Error(message.error.message ?? JSON.stringify(message.error))
+        waiter.reject(Object.assign(error, { code: message.error.code }))
+      } else waiter.resolve(message.result)
       return
     }
 
@@ -261,7 +264,7 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
     DIRENV_NO_TMUX_RENAME: "1",
   }
   const client = rpc(server, root, env, onStop)
-  await client.request(
+  const initialized = await client.request<{ capabilities?: { diagnosticProvider?: unknown } } | null>(
     "initialize",
     {
       processId: globalThis.process.pid,
@@ -273,6 +276,7 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
         textDocument: {
           synchronization: { didOpen: true, didChange: true },
           publishDiagnostics: { relatedInformation: true },
+          diagnostic: { dynamicRegistration: false },
         },
       },
       initializationOptions: server.initialization ?? {},
@@ -280,7 +284,7 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
     120_000,
   )
   client.notify("initialized", {})
-  return { ...client, server }
+  return { ...client, server, pullDiagnostics: Boolean(initialized?.capabilities?.diagnosticProvider) }
 }
 
 function waitForExit(process: ChildProcessWithoutNullStreams, timeout: number): Promise<boolean> {
@@ -348,6 +352,27 @@ function waitForDiagnostics(client: Client, uri: string, since: number, timeout 
     }
     client.diagnosticWaiters.set(uri, [...(client.diagnosticWaiters.get(uri) ?? []), done])
   })
+}
+
+// ContentModified and ServerCancelled: rust-analyzer cancels pulls when any document changes.
+const retriedPullErrors = new Set([-32801, -32802])
+
+// Pulls answer for the current text, and do not wait for a push that is skipped when nothing changed.
+async function pullDiagnostics(client: Client, uri: string, timeout: number): Promise<Diagnostic[]> {
+  const deadline = Date.now() + timeout
+  while (true) {
+    try {
+      const report = await client.request<{ items?: Diagnostic[] } | null>(
+        "textDocument/diagnostic",
+        { textDocument: { uri } },
+        Math.max(deadline - Date.now(), 1),
+      )
+      return report?.items ?? []
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown }).code
+      if (typeof code !== "number" || !retriedPullErrors.has(code) || Date.now() >= deadline) throw error
+    }
+  }
 }
 
 async function open(
@@ -454,8 +479,10 @@ export default Plugin.define({
       const root = await findRoot(server, file, directory)
       const client = await clientFor(server, root)
       const { uri, changed, diagnosticVersion } = await open(client, file)
-      const diagnostics =
-        changed || !client.diagnostics.has(uri)
+      // Pull servers may still push results that lag the text, such as rust-analyzer's cargo check.
+      const diagnostics = client.pullDiagnostics
+        ? await pullDiagnostics(client, uri, timeout)
+        : changed || !client.diagnostics.has(uri)
           ? await waitForDiagnostics(client, uri, diagnosticVersion, timeout)
           : (client.diagnostics.get(uri) ?? [])
       return diagnostics.length > 0 ? formatDiagnostics(value, diagnostics) : ""
@@ -518,7 +545,7 @@ export default Plugin.define({
           if (!server) throw new Error(`No configured language server for: ${file}`)
           const root = await findRoot(server, file, directory)
           const client = await clientFor(server, root)
-          const { uri, changed, diagnosticVersion } = await open(client, file)
+          const { uri } = await open(client, file)
           let result
 
           if (input.operation === "hover") {

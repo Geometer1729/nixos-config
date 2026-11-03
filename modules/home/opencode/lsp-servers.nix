@@ -14,6 +14,9 @@
   rust = {
     command = [ "rust-analyzer" ];
     extensions = [ ".rs" ];
+    # Its cargo check only reruns on save, which the plugin never sends, so
+    # its errors went stale. Agents run cargo themselves.
+    initialization.checkOnSave = false;
   };
   typescript = {
     command = [ "typescript-language-server" "--stdio" ];

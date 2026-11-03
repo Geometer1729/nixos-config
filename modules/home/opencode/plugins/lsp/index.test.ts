@@ -183,3 +183,102 @@ process.stdin.on("data", (chunk) => {
     }
   })
 })
+
+for (const mode of ["push", "pull"]) {
+  test(`${mode} diagnostics clear once a broken file is fixed`, async (t) => {
+    const directory = await mkdtemp(path.join(tmpdir(), "opencode-lsp-test-"))
+    const source = path.join(directory, "example.fake")
+    const server = path.join(directory, "server.mjs")
+    const originalPath = process.env.PATH
+    let cleanup: (() => Promise<void> | void) | undefined
+
+    t.after(async () => {
+      if (cleanup) await cleanup()
+      process.env.PATH = originalPath
+      await rm(directory, { recursive: true, force: true })
+    })
+
+    await writeFile(path.join(directory, "direnv"), "#!/bin/sh\nprintf '{}\\n'\n")
+    await chmod(path.join(directory, "direnv"), 0o755)
+    await writeFile(
+      server,
+      String.raw`const mode = process.argv[2]
+const texts = new Map()
+let buffer = Buffer.alloc(0)
+let cancelled = false
+
+function send(message) {
+  const body = JSON.stringify(message)
+  process.stdout.write("Content-Length: " + Buffer.byteLength(body) + "\r\n\r\n" + body)
+}
+
+function diagnostic(message) {
+  return { message, severity: 1, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } } }
+}
+
+function current(uri) {
+  return texts.get(uri).includes("broken") ? [diagnostic("broken")] : []
+}
+
+process.stdin.on("data", (chunk) => {
+  buffer = Buffer.concat([buffer, chunk])
+  while (true) {
+    const headerEnd = buffer.indexOf("\r\n\r\n")
+    if (headerEnd < 0) return
+    const length = Number(/content-length:\s*(\d+)/i.exec(buffer.subarray(0, headerEnd).toString())?.[1])
+    const bodyStart = headerEnd + 4
+    if (buffer.length < bodyStart + length) return
+    const { id, method, params } = JSON.parse(buffer.subarray(bodyStart, bodyStart + length).toString())
+    buffer = buffer.subarray(bodyStart + length)
+    if (method === "initialize") {
+      const capabilities =
+        mode === "pull" ? { diagnosticProvider: { interFileDependencies: false, workspaceDiagnostics: false } } : {}
+      send({ jsonrpc: "2.0", id, result: { capabilities } })
+    }
+    if (method === "textDocument/didOpen" || method === "textDocument/didChange") {
+      const uri = params.textDocument.uri
+      texts.set(uri, params.textDocument.text ?? params.contentChanges[0].text)
+      // Like rust-analyzer's cargo check, pushes from a pull server can describe older text.
+      const diagnostics = mode === "pull" ? [diagnostic("stale")] : current(uri)
+      send({ jsonrpc: "2.0", method: "textDocument/publishDiagnostics", params: { uri, diagnostics } })
+    }
+    if (method === "textDocument/diagnostic") {
+      if (cancelled) send({ jsonrpc: "2.0", id, result: { kind: "full", items: current(params.textDocument.uri) } })
+      else send({ jsonrpc: "2.0", id, error: { code: -32802, message: "server cancelled the request" } })
+      cancelled = true
+    }
+    if (method === "shutdown") send({ jsonrpc: "2.0", id, result: null })
+    if (method === "exit") process.exit(0)
+  }
+})
+`,
+    )
+    process.env.PATH = `${directory}:${originalPath}`
+
+    let lspTool: LspTool | undefined
+    const ctx = {
+      options: { servers: { fake: { command: [process.execPath, server, mode], extensions: [".fake"] } } },
+      session: { get: async () => ({ location: { directory } }) },
+      shell: { hook: async () => {} },
+      tool: {
+        hook: async () => {},
+        transform: async (transform: (tools: { add(tool: LspTool): void }) => void) =>
+          transform({
+            add: (tool) => {
+              lspTool = tool
+            },
+          }),
+      },
+    }
+    cleanup = (await lspPlugin.setup(ctx as unknown as Plugin.Context)) ?? undefined
+    const tool = lspTool
+    assert.ok(tool)
+
+    const diagnostics = async (text: string): Promise<unknown> => {
+      await writeFile(source, text)
+      return tool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" })
+    }
+    assert.deepEqual(await diagnostics("broken\n"), { content: `${source}:1:1: error: broken` })
+    assert.deepEqual(await diagnostics("fixed\n"), { content: "" })
+  })
+}
