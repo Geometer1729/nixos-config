@@ -22,6 +22,18 @@
     };
   };
 
+  # The backend only reads user config; its system config dir is in the store.
+  # Without a TTY Ghostty's single-instance detection hands the window to a
+  # running instance and returns at once, which the portal reads as a cancel.
+  xdg.configFile."xdg-desktop-portal-termfilechooser/config".text = ''
+    [filechooser]
+    cmd=ranger-wrapper.sh
+    default_dir=$HOME
+    env=TERMCMD=ghostty --gtk-single-instance=false --title=termfilechooser -e
+    open_mode=suggested
+    save_mode=suggested
+  '';
+
   keyHelp.hyprland = {
     label = "Hyprland";
     order = 0;

@@ -70,8 +70,13 @@ in
     extraPortals = lib.mkForce [
       pkgs.xdg-desktop-portal-hyprland
       pkgs.kdePackages.xdg-desktop-portal-kde
+      pkgs.xdg-desktop-portal-termfilechooser
     ];
-    config.common.default = [ "hyprland" "kde" ];
+    config.common = {
+      default = [ "hyprland" "kde" ];
+      # Pick files with ranger in a terminal instead of the KDE dialog.
+      "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
+    };
   };
 
   services = {
