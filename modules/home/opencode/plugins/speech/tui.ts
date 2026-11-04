@@ -1,44 +1,40 @@
 import { Plugin } from "@opencode/plugin/tui"
 import { jsx } from "@opentui/solid/jsx-runtime"
-import { execFile, spawn } from "node:child_process"
-import { createEffect } from "solid-js"
+import { execFile } from "node:child_process"
+import { randomUUID } from "node:crypto"
+import { createEffect, createSignal, untrack } from "solid-js"
 
-import { type Said, Speech } from "./rpc.ts"
-import { type Playback, Speaker } from "./speaker.ts"
+import { type Speaking, Speech } from "./rpc.ts"
 
-// `speak` synthesizes and plays; its process group is stopped as a whole.
-function play(text: string): Playback {
-  const child = spawn("speak", [], { detached: true, stdio: ["pipe", "ignore", "ignore"] })
-  const done = new Promise<void>((resolve) => {
-    child.once("exit", () => resolve())
-    child.once("error", (error) => {
-      console.error("OpenCode speech:", error)
-      resolve()
-    })
-  })
-  child.stdin.once("error", () => {})
-  child.stdin.end(text)
-  return {
-    done,
-    stop: () => {
-      if (child.pid === undefined || child.exitCode !== null || child.signalCode !== null) return
-      try {
-        process.kill(-child.pid, "SIGTERM")
-      } catch {}
-    },
-  }
-}
+const report = (error: unknown) => console.error("OpenCode speech:", error)
 
+// The server plays the speech; this tells it which session is on screen while
+// the terminal has focus, and stops the speech on Escape.
 export default Plugin.define({
   id: "local.speech.tui",
   setup(context) {
-    const speaker = new Speaker(play)
+    const client = randomUUID()
+    // The client changes when the server restarts.
+    const speech = () => context.client.rpc(Speech)
+
     // tmux reports focus changes but not the focus a TUI (or a reloaded plugin)
     // starts with, so until the first report, ask which pane the focused window shows.
     let reported: boolean | null = null
     let checked = false
-    let session: string | undefined
-    const update = () => speaker.view((reported ?? checked) ? session : undefined)
+    const [session, setSession] = createSignal<string>()
+    const [speaking, setSpeaking] = createSignal<string>()
+
+    // Reports go out in order, each only once the last has arrived.
+    let sent: string | undefined
+    let reports = Promise.resolve()
+    const update = (force = false) => {
+      const sessionID = (reported ?? checked) ? session() : undefined
+      if (!force && sessionID === sent) return
+      sent = sessionID
+      reports = reports
+        .then(() => speech().view(sessionID === undefined ? { client } : { client, sessionID }))
+        .then(() => {}, report)
+    }
     const check = () => {
       const pane = process.env.TMUX_PANE
       if (reported !== null || !pane) return
@@ -58,26 +54,35 @@ export default Plugin.define({
     context.renderer.on("focus", onFocus)
     context.renderer.on("blur", onBlur)
 
-    const unsubscribe = context.client.rpc(Speech).events.on("said", (event) => {
-      const { sessionID, text, mode } = event.data as unknown as Said
-      speaker.add(sessionID, text, mode)
+    const unsubscribeSaid = speech().events.on("said", () => {
       check()
+      update(true)
+    })
+    const unsubscribeSpeaking = speech().events.on("speaking", (event) => {
+      setSpeaking((event.data as unknown as Speaking).sessionID)
     })
     check()
 
     const Controller = () => {
       createEffect(() => {
         const route = context.ui.router.current()
-        session = route.type === "session" && route.sessionID !== "dummy"
+        setSession(route.type === "session" && route.sessionID !== "dummy"
           ? context.data.session.root(route.sessionID)
-          : undefined
-        update()
+          : undefined)
+        untrack(() => update())
       })
       context.keymap.layer(() => ({
         mode: "global",
         // Above the Vim plugin, so Escape only stops the speech.
         priority: 2000,
-        commands: [{ bind: "escape", enabled: () => speaker.speaking, run: () => speaker.stop() }],
+        commands: [{
+          bind: "escape",
+          enabled: () => speaking() !== undefined && speaking() === session(),
+          run: () => {
+            setSpeaking(undefined)
+            void speech().stop({}).catch(report)
+          },
+        }],
       }))
       return jsx("box", { height: 0 })
     }
@@ -85,10 +90,12 @@ export default Plugin.define({
 
     return () => {
       removeSlot()
-      unsubscribe()
+      unsubscribeSaid()
+      unsubscribeSpeaking()
       context.renderer.off("focus", onFocus)
       context.renderer.off("blur", onBlur)
-      speaker.view(undefined)
+      reported = false
+      update()
     }
   },
 })

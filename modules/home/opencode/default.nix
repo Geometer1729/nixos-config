@@ -73,7 +73,7 @@ let
   lspServers = import ./lsp-servers.nix;
 in
 {
-  # `speak` plays the speech plugin's messages.
+  # The speech plugin's server voices its messages with speak-synthesize and speak-play.
   imports = [ ../speech ];
 
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
@@ -260,8 +260,12 @@ in
           package = "file://${plugins}/usage";
           options.timezone = "America/New_York";
         }
-        # The speak tool; its TUI part plays the speech in the viewed session.
-        "file://${plugins}/speech"];
+        # The speak tool, played where a TUI reports its session is on screen.
+        {
+          package = "file://${plugins}/speech";
+          options.synthesize = lib.getExe config.scripts.speech.packages.speak-synthesize;
+          options.play = lib.getExe config.scripts.speech.packages.speak-play;
+        }];
       provider = {
         openai.models."gpt-6-astra" = {
           modelID = "gpt-6-astra";
