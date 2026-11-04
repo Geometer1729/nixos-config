@@ -19,6 +19,8 @@ If the gcloud token is stale just run `gcloud auth login` and ask me to approve 
 
 When I say "let me know", notify me with `notify-send --expire-time=300000` when the requested work or wait is complete.
 
+Use the speak tool whenever you hand control back to me with finished work, a question, or a blocker. Try to really condense the important points.
+
 Value your dev env!
 When a tool you are supposed to have does not work (a CLI, MCP server, LSP, or OpenCode itself), triage it:
 - Blocking: the current task can't be finished correctly without it. Fix it inline, in `~/conf`, then continue.
