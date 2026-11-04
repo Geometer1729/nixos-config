@@ -259,6 +259,11 @@ in
         {
           package = "file://${plugins}/usage";
           options.timezone = "America/New_York";
+          # The CLAUDE_CONFIG_DIRs from zsh/direnv.nix and claude-agent.sh.
+          options.claude = {
+            work = "${config.home.homeDirectory}/.claude-work";
+            personal = "${config.home.homeDirectory}/.claude-personal";
+          };
         }
         # The speak tool, played where a TUI reports its session is on screen.
         {

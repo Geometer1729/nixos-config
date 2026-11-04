@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
-import { codexUsage, FetchError, interval, render, Source } from "./usage.ts"
+import { claudeAccounts, claudeUsage, codexUsage, FetchError, interval, render, Source } from "./usage.ts"
 import type { Usage } from "./usage.ts"
 
 const now = Date.parse("2026-09-14T17:00:00Z")
@@ -40,6 +40,45 @@ test("model-specific and code-review limits are included; missing values are not
   assert.deepEqual(bar.class, ["critical"])
   assert.match(bar.tooltip, /Model &lt;large&gt;/)
   assert.throws(() => codexUsage({ rate_limit: null }, now), /No usage windows/)
+})
+
+test("Claude percentages and model-scoped weekly limits are read; unset windows are skipped", () => {
+  const resetsAt = new Date(reset).toISOString()
+  const result = claudeUsage({
+    five_hour: null,
+    seven_day: { utilization: 9, resets_at: resetsAt },
+    seven_day_opus: { utilization: 40, resets_at: null },
+    seven_day_breakdown: { rows: [] },
+    limits: [
+      { kind: "weekly_all", percent: 9, resets_at: resetsAt },
+      { kind: "weekly_scoped", percent: 2, resets_at: resetsAt, scope: { model: { display_name: "Fable" } } },
+      { kind: "weekly_scoped", percent: 41, scope: { model: { display_name: "Opus" } } },
+    ],
+  }, "Claude work", now)
+  assert.deepEqual(result.windows, [
+    { label: "Weekly", used: 9, resetsAt: reset },
+    { label: "Weekly · opus", used: 40, resetsAt: null },
+    { label: "Weekly · Fable", used: 2, resetsAt: reset },
+  ])
+  assert.throws(() => claudeUsage({ five_hour: null, limits: [] }, "Claude work", now), /No usage windows/)
+})
+
+test("Claude profiles on one account are read once with the freshest token", () => {
+  const profile = (name: string, account: string, token: string, expiresAt: number) => ({
+    name,
+    credentials: { claudeAiOauth: { accessToken: token, expiresAt } },
+    config: { oauthAccount: { accountUuid: account } },
+  })
+  assert.deepEqual(claudeAccounts([
+    profile("work", "a", "stale", now - 1),
+    profile("personal", "a", "fresh", now + 1),
+    profile("other", "b", "expired", now),
+    { name: "new", credentials: undefined, config: { oauthAccount: { accountUuid: "c" } } },
+  ], now), [
+    { label: "Claude work + personal", id: "a", token: "fresh" },
+    { label: "Claude other", id: "b", error: "Sign-in expired; using Claude renews it" },
+    { label: "Claude new", id: "signed-out:new", error: "Not signed in to Claude Code" },
+  ])
 })
 
 test("a failed account cannot make a partial result look complete", () => {

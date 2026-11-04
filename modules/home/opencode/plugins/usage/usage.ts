@@ -57,6 +57,65 @@ export function codexUsage(value: unknown, now: number): Usage {
   return { label: "Codex", windows, fetchedAt: now }
 }
 
+export function claudeUsage(value: unknown, label: string, now: number): Usage {
+  const raw = object(value)
+  const windows: Window[] = []
+  const add = (name: string, used: unknown, reset: unknown) => {
+    if (windows.some((item) => item.label.toLowerCase() === name.toLowerCase())) return
+    windows.push(...window(name, used, typeof reset === "string" ? Date.parse(reset) : null))
+  }
+  for (const [key, value] of Object.entries(raw)) {
+    const scope = /^seven_day_(.+)$/.exec(key)?.[1]
+    const name = key === "five_hour" ? "5-hour" : key === "seven_day" ? "Weekly" : scope ? `Weekly · ${scope.replaceAll("_", " ")}` : undefined
+    if (name) add(name, object(value).utilization, object(value).resets_at)
+  }
+  // Model-specific weekly limits are only reported in this list.
+  if (Array.isArray(raw.limits)) {
+    for (const value of raw.limits) {
+      const item = object(value)
+      const model = object(object(item.scope).model)
+      const name = typeof model.display_name === "string" ? model.display_name : model.id
+      if (item.kind === "weekly_scoped" && typeof name === "string") add(`Weekly · ${name}`, item.percent, item.resets_at)
+    }
+  }
+  if (!windows.length) throw new Error("No usage windows returned")
+  return { label, windows, fetchedAt: now }
+}
+
+export interface ClaudeProfile {
+  name: string
+  credentials: unknown
+  config: unknown
+}
+
+export type ClaudeAccount = { label: string; id: string } & ({ token: string } | { error: string })
+
+// Profiles signed into the same account share one quota, so they are read
+// once, with whichever token Claude Code renewed last. Renewal is left to
+// Claude Code: refreshing here could race its refresh-token rotation.
+export function claudeAccounts(profiles: ClaudeProfile[], now: number): ClaudeAccount[] {
+  const groups = new Map<string, { names: string[]; token?: string; expiresAt: number }>()
+  for (const profile of profiles) {
+    const oauth = object(object(profile.credentials).claudeAiOauth)
+    const account = object(object(profile.config).oauthAccount).accountUuid
+    const token = typeof oauth.accessToken === "string" ? oauth.accessToken : undefined
+    const id = token && typeof account === "string" ? account : `signed-out:${profile.name}`
+    const group = groups.get(id) ?? { names: [], expiresAt: 0 }
+    group.names.push(profile.name)
+    if (token && number(oauth.expiresAt) && oauth.expiresAt > group.expiresAt) {
+      group.token = token
+      group.expiresAt = oauth.expiresAt
+    }
+    groups.set(id, group)
+  }
+  return [...groups].map(([id, group]) => {
+    const label = `Claude ${group.names.join(" + ")}`
+    if (id.startsWith("signed-out:")) return { label, id, error: "Not signed in to Claude Code" }
+    if (!group.token || group.expiresAt <= now) return { label, id, error: "Sign-in expired; using Claude renews it" }
+    return { label, id, token: group.token }
+  })
+}
+
 export class FetchError extends Error {
   readonly retryAt: number
   constructor(message: string, retryAt = 0) {

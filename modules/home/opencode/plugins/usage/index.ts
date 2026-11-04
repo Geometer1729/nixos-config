@@ -1,4 +1,4 @@
-import { rename, writeFile } from "node:fs/promises"
+import { readFile, rename, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
@@ -6,7 +6,9 @@ import { OpenCode } from "@opencode/client"
 import { Service } from "@opencode/client/service"
 import { Plugin } from "@opencode/plugin"
 
-import { codexUsage, fetchJSON, interval, render, Source } from "./usage.ts"
+import { claudeAccounts, claudeUsage, codexUsage, FetchError, fetchJSON, interval, render, Source } from "./usage.ts"
+
+const readJSON = (file: string): Promise<unknown> => readFile(file, "utf8").then(JSON.parse).catch(() => undefined)
 
 const generation = Symbol("AI usage plugin generation")
 interface Shared {
@@ -17,9 +19,10 @@ interface Shared {
 }
 const host = globalThis as typeof globalThis & { __confAIUsage?: Shared }
 
-async function run(shared: Shared, file: string, timezone: string) {
+async function run(shared: Shared, file: string, timezone: string, profiles: Record<string, string>) {
   const signal = shared.controller.signal
   const codex = new Source("Codex")
+  const claude = new Map<string, Source>()
   async function update() {
     const context = shared.contexts.values().next().value
     if (!context) return
@@ -30,6 +33,13 @@ async function run(shared: Shared, file: string, timezone: string) {
     const headers = Service.headers({ url: endpoint.url, ...(endpoint.auth ? { auth: endpoint.auth } : {}) })
     const client = OpenCode.make({ baseUrl: endpoint.url, headers: headers ?? {} })
     if ((await client.server.info({ signal: timeout })).pid !== process.pid) return
+    // Tokens come from the files Claude Code keeps current. No raw credentials
+    // or upstream responses go into the cache.
+    const accounts = claudeAccounts(await Promise.all(Object.entries(profiles).map(async ([name, directory]) => ({
+      name,
+      credentials: await readJSON(join(directory, ".credentials.json")),
+      config: await readJSON(join(directory, ".claude.json")),
+    }))), Date.now())
     const readings = await Promise.all([
       (async () => {
         const connection = await context.integration.connection.active("openai")
@@ -48,6 +58,19 @@ async function run(shared: Shared, file: string, timezone: string) {
           return codexUsage(raw, Date.now())
         })
       })().catch(() => ({ label: "Codex", error: "OpenCode connection unavailable" })),
+      ...accounts.map((account) => {
+        const source = claude.get(account.label) ?? new Source(account.label)
+        claude.set(account.label, source)
+        return source.read(account.id, async () => {
+          if ("error" in account) throw new FetchError(account.error)
+          const raw = await fetchJSON("https://api.anthropic.com/api/oauth/usage", timeout, {
+            Authorization: `Bearer ${account.token}`,
+            "anthropic-beta": "oauth-2025-04-20",
+            Accept: "application/json",
+          })
+          return claudeUsage(raw, account.label, Date.now())
+        })
+      }),
     ])
     if (signal.aborted) return
     const temporary = `${file}.${process.pid}.tmp`
@@ -70,6 +93,10 @@ export default Plugin.define({
     const runtime = process.env.XDG_RUNTIME_DIR
     if (!runtime || !process.env.DBUS_SESSION_BUS_ADDRESS) return
     const timezone = typeof context.options.timezone === "string" ? context.options.timezone : "America/New_York"
+    const claude = context.options.claude
+    // Profile name -> CLAUDE_CONFIG_DIR.
+    const profiles = claude !== null && typeof claude === "object" && !Array.isArray(claude)
+      ? Object.fromEntries(Object.entries(claude).filter((entry): entry is [string, string] => typeof entry[1] === "string")) : {}
     // Ownership spans code generations: a short-lived location can load a new
     // copy while older projects remain open. Keep their contexts, and let their
     // cleanup release the current poller rather than the retired generation.
@@ -82,7 +109,7 @@ export default Plugin.define({
     }
     const shared = host.__confAIUsage ??= (() => {
       const state: Shared = { generation, contexts, controller: new AbortController(), task: Promise.resolve() }
-      state.task = previous.then(() => run(state, join(runtime, "opencode-ai-usage.json"), timezone))
+      state.task = previous.then(() => run(state, join(runtime, "opencode-ai-usage.json"), timezone, profiles))
         .catch(() => console.error("AI usage monitor stopped; Waybar will mark its last reading stale"))
       return state
     })()
