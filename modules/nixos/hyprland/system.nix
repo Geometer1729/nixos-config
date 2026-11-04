@@ -72,7 +72,8 @@ in
       pkgs.kdePackages.xdg-desktop-portal-kde
       pkgs.xdg-desktop-portal-termfilechooser
     ];
-    config.common = {
+    # Scoped to Hyprland so Plasma sessions keep Plasma's own kde-portals.conf.
+    config.hyprland = {
       default = [ "hyprland" "kde" ];
       # Pick files with ranger in a terminal instead of the KDE dialog.
       "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
