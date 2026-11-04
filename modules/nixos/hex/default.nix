@@ -10,7 +10,8 @@
 
     scripts.hex = {
       directory = ./.;
-      extras = [ config.programs.hex.package ] ++ (with pkgs; [ hyprland socat tmux wl-clipboard wtype ]);
+      extras = [ config.programs.hex.package config.programs.taskwarrior.package ]
+        ++ (with pkgs; [ hyprland socat tmux wl-clipboard wtype ]);
     };
   };
 

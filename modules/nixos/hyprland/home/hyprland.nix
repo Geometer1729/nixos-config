@@ -245,6 +245,7 @@ in
           "$mod SHIFT, v, Open clipboard history, exec, clipboard-history"
           "$mod CTRL, v, Force paste clipboard by typing it, exec, force-paste"
           "$mod, e, Hold to dictate, exec, dictate start"
+          "$mod SHIFT, e, Hold to dictate a new task, exec, dictate start task"
 
           # Notifications
           "$mod, i, Open notification history, exec, notification-center history"
@@ -360,6 +361,7 @@ in
         # to where the press was, so focus can move on before it arrives.
         bindrd = [
           "$mod, e, Stop dictation and deliver text, exec, dictate stop"
+          "$mod SHIFT, e, Stop dictation and deliver text, exec, dictate stop"
         ];
 
         # Mouse bindings

@@ -3,6 +3,7 @@
 # The transcript goes where the press was, so focus can move on before it arrives:
 # straight into the prompt of an OpenCode TUI in that tmux pane, otherwise pasted
 # only if that window still has focus, and left on the clipboard if not.
+# `dictate start task` instead adds the transcript as a Taskwarrior task.
 
 state="$XDG_RUNTIME_DIR/dictation"
 target="$state/target"
@@ -54,11 +55,27 @@ paste() {
   wtype "${keys[@]}"
 }
 
+add_task() {
+  # Hex ends sentences with a period, which a task description doesn't want.
+  local description=${1%.} errors
+  if ! errors=$(task add -- "$description" 2>&1); then
+    printf '%s' "$1" | wl-copy
+    notify --urgency=critical "Task not created, dictation copied" "$errors"
+    return 1
+  fi
+  # No ID: the next garbage collection can renumber it.
+  notify "Task created" "$description"
+}
+
 start() {
   mkdir -p "$state"
   rm -f "$target"
   local where errors
-  where=$(focused)
+  if [[ "${1:-}" == task ]]; then
+    where=task
+  else
+    where=$(focused)
+  fi
   if ! errors=$(hex dictation start 2>&1 > /dev/null); then
     notify --urgency=critical "Dictation failed" "$errors"
     exit 1
@@ -91,6 +108,11 @@ stop() {
       ;;
   esac
 
+  if [[ "$where" == task ]]; then
+    add_task "$text"
+    exit
+  fi
+
   if [[ -n "$pane" ]]; then
     status=0
     deliver "$pane" "$text" || status=$?
@@ -113,10 +135,10 @@ stop() {
 }
 
 case "${1:-}" in
-  start) start ;;
+  start) start "${2:-}" ;;
   stop) stop ;;
   *)
-    echo "usage: dictate start|stop" >&2
+    echo "usage: dictate start [task] | dictate stop" >&2
     exit 2
     ;;
 esac
