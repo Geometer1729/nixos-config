@@ -11,7 +11,7 @@
     scripts.hex = {
       directory = ./.;
       extras = [ config.programs.hex.package config.programs.taskwarrior.package ]
-        ++ (with pkgs; [ hyprland socat tmux wl-clipboard wtype ]);
+        ++ (with pkgs; [ hyprland playerctl socat tmux wl-clipboard wtype ]);
     };
   };
 

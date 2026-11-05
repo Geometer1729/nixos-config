@@ -7,9 +7,32 @@
 
 state="$XDG_RUNTIME_DIR/dictation"
 target="$state/target"
+# Media players that start paused, for stop to resume.
+paused="$state/paused"
 
 notify() {
   notify-send --app-name=Hex "$@"
+}
+
+# Pauses whatever plays so the microphone doesn't hear it.
+pause_media() {
+  local player
+  : > "$paused"
+  while read -r player; do
+    if [[ "$(playerctl --player="$player" status 2> /dev/null)" == Playing ]] \
+      && playerctl --player="$player" pause 2> /dev/null; then
+      printf '%s\n' "$player" >> "$paused"
+    fi
+  done < <(playerctl --list-all 2> /dev/null)
+}
+
+resume_media() {
+  [[ -f "$paused" ]] || return 0
+  local player
+  while read -r player; do
+    playerctl --player="$player" play 2> /dev/null || true
+  done < "$paused"
+  rm -f "$paused"
 }
 
 # The focused window's address and, for a Ghostty window titled after its tmux
@@ -76,7 +99,9 @@ start() {
   else
     where=$(focused)
   fi
+  pause_media
   if ! errors=$(hex dictation start 2>&1 > /dev/null); then
+    resume_media
     notify --urgency=critical "Dictation failed" "$errors"
     exit 1
   fi
@@ -98,6 +123,7 @@ stop() {
   errors=$(mktemp)
   trap 'rm -f "$errors"' EXIT
   text=$(hex dictation stop --print 2> "$errors") || status=$?
+  resume_media
   case "$status" in
     0) ;;
     # No speech was heard.
