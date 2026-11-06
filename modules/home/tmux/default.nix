@@ -136,7 +136,9 @@ in
         # Forward OSC 8 hyperlinks so wrapped links stay clickable as one URL.
         set -as terminal-features 'xterm-ghostty:hyperlinks'
 
-        # Give each terminal window a stable session identifier for workspace restore.
+        # Title each terminal window after its current session; dictation, focus,
+        # and workspace restore find sessions by it. Don't launch these windows
+        # with Ghostty's --title: it pins the title, which goes stale on a session switch.
         set -g set-titles on
         set -g set-titles-string 'tmux:#{session_name}'
 

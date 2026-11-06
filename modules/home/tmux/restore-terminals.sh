@@ -117,7 +117,7 @@ restore() {
     tmux has-session -t "=$session" 2>/dev/null || continue
     attached "$session" && continue
 
-    command="$(command -v ghostty) --title=tmux:$session -e $(command -v tmux) attach-session -t =$session"
+    command="$(command -v ghostty) -e $(command -v tmux) attach-session -t =$session"
     # A dispatch can succeed without a terminal ever attaching (seen at boot),
     # so confirm the client and retry rather than trusting hyprctl's reply.
     for attempt in 1 2 3; do

@@ -111,4 +111,4 @@ if ! tmux list-panes -t "=$session" -F '#{pane_dead}:#{pane_current_command}' |
 fi
 
 (trap - ERR; cleanup_merged_worktrees) >/dev/null 2>&1 &
-exec ghostty --title="tmux:$session" -e tmux attach-session -t "$session"
+exec ghostty -e tmux attach-session -t "$session"
