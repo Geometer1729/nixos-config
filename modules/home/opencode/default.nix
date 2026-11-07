@@ -63,6 +63,41 @@ let
       exec ${opencode2}/bin/opencode2 "$@"
     '';
   };
+  # browse lets agents drive Brave through its extension; the relay starts on demand.
+  browseNpm = builtins.fromJSON (builtins.readFile inputs.browse-npm);
+  browse = pkgs.stdenv.mkDerivation {
+    pname = "browse";
+    inherit (browseNpm) version;
+    src = pkgs.fetchurl {
+      url = browseNpm.dist.tarball;
+      hash = browseNpm.dist.integrity;
+    };
+    sourceRoot = "package";
+
+    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
+    dontBuild = true;
+    dontStrip = true; # Stripping removes Bun's embedded application payload.
+    installPhase = ''
+      runHook preInstall
+
+      install -Dm755 bin/browse $out/bin/browse
+      # The flake input updates browse; its own updater would reinstall into ~/.local/bin.
+      # Recordings shell out to ffmpeg.
+      wrapProgram $out/bin/browse \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ffmpeg ]} \
+        --set OPENCODE_BROWSER_AUTO_UPDATE off
+
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Let AI agents use your real browser";
+      homepage = "https://github.com/anomalyco/browse";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "browse";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
   serve = pkgs.writeShellApplication {
     name = "opencode-serve";
     runtimeInputs = [ opencode2 pkgs.jq pkgs.systemd config.programs.zsh.package ];
@@ -82,7 +117,7 @@ in
     (import ./checks/load.nix { inherit lib pkgs; home = config; })
   ];
 
-  home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify ] ++ [
+  home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify browse ] ++ [
     opencode2
   ];
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
@@ -221,6 +256,11 @@ in
           type = "local";
           # Snapshots and screenshots otherwise land in the session's working directory.
           command = [ (lib.getExe pkgs.playwright-mcp) "--isolated" "--output-dir" "/tmp/playwright-mcp" ];
+        };
+        # Brave Origin with its logins, once its extension is paired (`browse pair`).
+        browse = {
+          type = "local";
+          command = [ (lib.getExe browse) "mcp" ];
         };
       };
       #model = "openai/gpt-6-astra";

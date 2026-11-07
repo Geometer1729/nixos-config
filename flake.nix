@@ -60,6 +60,8 @@
     zsh-nix-shell.flake = false;
     opencode2-npm.url = "file+https://registry.npmjs.org/@opencode/cli-linux-x64/latest";
     opencode2-npm.flake = false;
+    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
+    browse-npm.flake = false;
 
     # Work
     linearis.url = "github:linearis-oss/linearis";

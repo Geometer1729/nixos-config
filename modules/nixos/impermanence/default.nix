@@ -61,6 +61,8 @@
         ".config/ncspot"
         ".config/chromium"
         ".config/google-chrome"
+        # browse's relay token and paired browser keys.
+        ".local/share/browse"
         ".hoogle"
       ];
       files = [

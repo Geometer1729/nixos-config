@@ -68,6 +68,18 @@
         "type": "github"
       }
     },
+    "browse-npm": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-LwWasryn7AmsGZ62gsXY+oCxKmVDk8+w96at1C0NO2s=",
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/latest"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/latest"
+      }
+    },
     "claude-code": {
       "inputs": {
         "nixpkgs": [
@@ -591,6 +603,7 @@
     },
     "root": {
       "inputs": {
+        "browse-npm": "browse-npm",
         "claude-code": "claude-code",
         "disko": "disko",
         "flake-parts": "flake-parts",

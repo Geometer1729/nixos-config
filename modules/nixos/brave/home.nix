@@ -283,6 +283,8 @@ in
       externalExtension; # Video Speed Controller
     "BraveSoftware/Brave-Origin/External Extensions/naepdomgkenhinolocfifgehidddafch.json" =
       externalExtension; # Browserpass
+    "BraveSoftware/Brave-Origin/External Extensions/mfnicocicmmlkpjnaffgihfjhdgjkdjg.json" =
+      externalExtension; # browse, for the agent MCP server in opencode
     "BraveSoftware/Brave-Origin/NativeMessagingHosts/com.github.browserpass.native.json".source =
       browserpassManifest;
   };
