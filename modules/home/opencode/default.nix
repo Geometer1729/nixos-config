@@ -251,12 +251,7 @@ in
             ];
           };
         };
-        # Desktop-only browser tools can't reach the TUI; this is the TUI's browser.
-        playwright = {
-          type = "local";
-          # Snapshots and screenshots otherwise land in the session's working directory.
-          command = [ (lib.getExe pkgs.playwright-mcp) "--isolated" "--output-dir" "/tmp/playwright-mcp" ];
-        };
+        # Desktop-only browser tools can't reach the TUI; this is the TUI's browser:
         # Brave Origin with its logins, once its extension is paired (`browse pair`).
         browse = {
           type = "local";
