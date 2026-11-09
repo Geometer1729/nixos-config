@@ -52,6 +52,8 @@ let
       "--load-extension=${braveTheme}"
       "--autoplay-policy=document-user-activation-required"
       "--disable-features=MediaEngagementBypassAutoplayPolicies,PreloadMediaEngagementData"
+      # Dismissing the "started debugging this browser" banner detaches browse from every tab.
+      "--silent-debugger-extension-api"
     ];
   };
 
