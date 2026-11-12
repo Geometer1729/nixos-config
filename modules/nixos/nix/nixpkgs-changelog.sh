@@ -103,7 +103,9 @@ for rev in "$OLD_REV" "$NEW_REV"; do
 done
 if (( ${#MISSING_REVS[@]} > 0 )); then
   log_info "Fetching ${#MISSING_REVS[@]} missing revision(s) into $NIXPKGS_REPO..."
-  git -C "$NIXPKGS_REPO" fetch --filter=blob:none --no-tags origin "${MISSING_REVS[@]}"
+  # Keep this a full clone. In a blob:none clone every reviewer's `git show`
+  # fetches a new pack, and the thousands of packs trigger full repacks.
+  git -C "$NIXPKGS_REPO" fetch --no-tags origin "${MISSING_REVS[@]}"
 fi
 
 for rev in "$OLD_REV" "$NEW_REV"; do
