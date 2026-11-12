@@ -58,8 +58,8 @@ save() {
 }
 
 restore() {
-  local session workspace command attempt result failed=false
-  local -a sessions=()
+  local session workspace job failed=false
+  local -a sessions=() jobs=()
 
   [ -s "$manifest" ] || return 0
 
@@ -112,40 +112,52 @@ restore() {
     failed=true
   fi
 
+  # Open every terminal at once, so one slow to start doesn't hold up the rest.
   while IFS=$'\t' read -r session workspace; do
     [[ "$session" =~ [[:space:]] ]] && continue
     tmux has-session -t "=$session" 2>/dev/null || continue
     attached "$session" && continue
-
-    command="$(command -v ghostty) -e $(command -v tmux) attach-session -t =$session"
-    # A dispatch can succeed without a terminal ever attaching (seen at boot),
-    # so confirm the client and retry rather than trusting hyprctl's reply.
-    # A terminal can also take over 10s to attach at boot, so only relaunch
-    # once the previous one has exited; relaunching early opened two.
-    for attempt in 1 2 3; do
-      result=$(hyprctl dispatch "hl.dsp.exec_cmd([==[$command]==], { workspace = \"$workspace silent\" })" 2>&1) || true
-      for tick in $(seq 1 300); do
-        attached "$session" && break
-        # Give Hyprland a moment to spawn it before treating it as gone.
-        ((tick > 20)) && ! launching "$session" && break
-        sleep 0.1
-      done
-      if attached "$session"; then
-        echo "Attached $session on workspace $workspace (attempt $attempt)"
-        break
-      fi
-      if launching "$session"; then
-        echo "Terminal for $session still had not attached after 30s; not relaunching" >&2
-        break
-      fi
-      echo "No terminal attached to $session after attempt $attempt; hyprctl: $result" >&2
-    done
-    attached "$session" || failed=true
+    open_terminal "$session" "$workspace" &
+    jobs+=("$!")
   done < <(jq -r '.[] | [.session, .workspace] | @tsv' "$manifest")
+
+  for job in "${jobs[@]}"; do
+    wait "$job" || failed=true
+  done
 
   if $failed; then
     return 1
   fi
+}
+
+# Opens a terminal attached to the session on the workspace, failing if none attaches.
+open_terminal() {
+  local session=$1 workspace=$2 command attempt result tick
+
+  command="$(command -v ghostty) -e $(command -v tmux) attach-session -t =$session"
+  # A dispatch can succeed without a terminal ever attaching (seen at boot),
+  # so confirm the client and retry rather than trusting hyprctl's reply.
+  # A terminal can also take over 10s to attach at boot, so only relaunch
+  # once the previous one has exited; relaunching early opened two.
+  for attempt in 1 2 3; do
+    result=$(hyprctl dispatch "hl.dsp.exec_cmd([==[$command]==], { workspace = \"$workspace silent\" })" 2>&1) || true
+    for tick in $(seq 1 300); do
+      attached "$session" && break
+      # Give Hyprland a moment to spawn it before treating it as gone.
+      ((tick > 20)) && ! launching "$session" && break
+      sleep 0.1
+    done
+    if attached "$session"; then
+      echo "Attached $session on workspace $workspace (attempt $attempt)"
+      return 0
+    fi
+    if launching "$session"; then
+      echo "Terminal for $session still had not attached after 30s; not relaunching" >&2
+      return 1
+    fi
+    echo "No terminal attached to $session after attempt $attempt; hyprctl: $result" >&2
+  done
+  return 1
 }
 
 sessions_ready() {
