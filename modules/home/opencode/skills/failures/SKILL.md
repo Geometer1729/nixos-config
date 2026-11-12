@@ -65,7 +65,7 @@ Use this structure, retaining applicable sections even when clean or unverified:
 | --- | --- |
 | `## Evaluation warnings` — mandatory | Warnings from flake evaluation, builds, and activation commands. Deduplicate by cause and identify affected configurations/profiles, including installer-only findings. |
 | `## Flake checks` | `nix flake check`: failing check derivations, covered systems, and whether checks were built. `--no-build` verifies evaluation only. Keep its evaluation warnings in the mandatory section above. |
-| `## <host>` → `### Build and activation` | `nh os build` / `just build`, and `nh os test` / `nixos-rebuild test`; include deployment activation results when available. Distinguish a successful build from successful activation. |
+| `## <host>` → `### Build and activation` | `nh os build` / `just build`, and `just switch` or older `nh os test` / `nixos-rebuild test` results; include deployment activation results when available. Distinguish a successful build from successful activation. |
 | `## <host>` → `### health` | Results from `systemd-health` (failed system and user units, boot-journal errors), `disk-health`, and `syncthing-health`. |
 | `## <host>` → `### vim-health` | Neovim health warnings and errors, including diagnostics printed by a check that passes. |
 | `## <host>` → `### gnome-health` | GNOME packages found in the system closure and what pulls them in. |

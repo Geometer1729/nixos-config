@@ -324,6 +324,8 @@ let
     "nh * --help*"
     "just build*"
     "just fmt*"
+    "just switch"
+    "just --justfile * switch"
     "just test*"
     "nvd diff*"
     "systemctl --failed*"

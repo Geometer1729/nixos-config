@@ -15,6 +15,21 @@ test:
   nix flake check "{{flake}}"
   nix develop "{{flake}}" --command health --local
 
+# Switch to this checkout in its own unit, safe from OpenCode/sshd restarts
+switch:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  tmp=$(mktemp -d)
+  trap 'rm -rf "$tmp"' EXIT
+  nh os build "{{flake}}" --out-link "$tmp/system"
+  system=$(readlink -f "$tmp/system")
+  sudo nix-env -p /nix/var/nix/profiles/system --set "$system"
+  unit="switch-$(date +%s)"
+  status=0
+  sudo systemd-run --collect --wait --quiet --unit="$unit" "$system/bin/switch-to-configuration" switch || status=$?
+  journalctl -u "$unit" -o cat --no-pager | grep -v '^sops-install-secrets: Imported'
+  exit "$status"
+
 # Build configuration
 build:
   nh os build "{{flake}}"

@@ -18,7 +18,8 @@ Nearly all configuration of this machine should come from this repo.
 
 - If you create a new file that must be visible to flakes, `git add` it before any build.
 - Verify meaningful config changes before calling the work done.
-- Default verification for NixOS changes is `nixos-rebuild test`.
+- Default verification for NixOS changes is `just switch`. Don't use `test`: its generation is lost on reboot.
+- Don't run `nh os switch` or `nixos-rebuild switch` yourself. They run activation under your shell, and restarting OpenCode or sshd kills it midway.
 
 ## Impermanence
 

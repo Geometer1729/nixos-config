@@ -181,7 +181,7 @@ If the build fails, diagnose it against relevant upstream commits and apply
 required fixes. Then run all mandatory validation:
 
 ```bash
-nh os test /home/bbrian/Code/conf-update-MM-DD-YY
+just --justfile /home/bbrian/Code/conf-update-MM-DD-YY/justfile switch
 nix flake check /home/bbrian/Code/conf-update-MM-DD-YY
 nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health
 ```
@@ -191,8 +191,10 @@ nix develop /home/bbrian/Code/conf-update-MM-DD-YY -c health
 `remote-builds-health`, and exits nonzero if any failed. Its output still
 needs reconciling, since passing checks can print known warnings.
 
-`nh os test` must activate the update worktree even when no configuration fix
-was needed. Load the `failures` skill to reconcile the build, evaluation,
+`just switch` must activate the update worktree on durin even when no
+configuration fix was needed. It runs activation in a separate systemd unit, so
+an OpenCode or sshd restart cannot kill it; never substitute `nh os switch` or
+`nh os test`. Load the `failures` skill to reconcile the build, evaluation,
 activation, and local check results with this worktree's `failures.md` before
 deciding whether checks pass.
 
@@ -200,8 +202,9 @@ Use `nix store diff-closures` and targeted queries for closure analysis. Record
 raw store-path lists as artifacts when needed; do not read complete closure
 listings into the parent context.
 
-After local checks pass, run `just deploy` from the update worktree. This must
-deploy the update worktree directly to `durin`, `narvi`, and `gimli`. Confirm
+After local checks pass, run `just deploy switch narvi gimli` from the update
+worktree. This deploys the update worktree directly to `narvi` and `gimli`;
+`durin` already runs it from `just switch`. Confirm
 that Narvi activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
 Then check the deployed hosts. `health HOST` copies the worktree's checks to
