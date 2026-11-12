@@ -60,18 +60,21 @@ in
                 type = "btrfs";
                 extraArgs = [ "-f" ];
 
+                # btrfs applies compress to the whole filesystem from whichever
+                # subvolume mounts first, so every subvolume carries it.
                 subvolumes = {
                   "/root" = {
+                    mountOptions = [ "compress=zstd:1" ];
                     mountpoint = "/";
                   };
 
                   "/persist" = {
-                    mountOptions = [ "subvol=persist" "noatime" ];
+                    mountOptions = [ "subvol=persist" "noatime" "compress=zstd:1" ];
                     mountpoint = "/persist";
                   };
 
                   "/nix" = {
-                    mountOptions = [ "subvol=nix" "noatime" ];
+                    mountOptions = [ "subvol=nix" "noatime" "compress=zstd:1" ];
                     mountpoint = "/nix";
                   };
                 };
