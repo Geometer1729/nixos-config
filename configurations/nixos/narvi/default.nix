@@ -145,6 +145,8 @@ in
           exit 1
           ;;
       esac
+      # Record it as a generation, so GRUB and rollbacks can reach it.
+      ${config.nix.package}/bin/nix-env -p /nix/var/nix/profiles/system --set "$target"
       "$target/bin/switch-to-configuration" switch
       ${scheduleReboot}/bin/schedule-narvi-reboot
       printf 'Activated %s\n' "$target" > "$status_dir/activation-success"
