@@ -275,9 +275,7 @@ in
           (bind "${mod} + SHIFT + e" "Hold to dictate a new task" (exec "dictate start task"))
           # Release half of push-to-talk dictation. The script delivers the text
           # to where the press was, so focus can move on before it arrives.
-          # TODO Hyprland 0.55 matches a release against the mods still held, so
-          # letting go of Alt before E leaves dictation recording. 0.57 (NixOS
-          # 26.11) matches the mods held at press instead, which fixes this.
+          # Hyprland 0.57 still releases it when Alt comes up before E.
           (bindWith { release = true; } "${mod} + e" "Stop dictation and deliver text" (exec "dictate stop"))
           (bindWith { release = true; } "${mod} + SHIFT + e" "Stop dictation and deliver text" (exec "dictate stop"))
 
