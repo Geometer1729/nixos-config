@@ -137,6 +137,9 @@ in
             enabled = true;
             size = 3;
             passes = 1;
+            # Floating windows show the wallpaper, not the windows behind them,
+            # like urxvt's fake transparency.
+            xray = true;
           };
 
           #drop_shadow = true;
