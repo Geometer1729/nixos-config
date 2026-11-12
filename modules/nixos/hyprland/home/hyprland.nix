@@ -275,9 +275,10 @@ in
           (bind "${mod} + SHIFT + e" "Hold to dictate a new task" (exec "dictate start task"))
           # Release half of push-to-talk dictation. The script delivers the text
           # to where the press was, so focus can move on before it arrives.
-          # Hyprland 0.57 still releases it when Alt comes up before E.
-          (bindWith { release = true; } "${mod} + e" "Stop dictation and deliver text" (exec "dictate stop"))
-          (bindWith { release = true; } "${mod} + SHIFT + e" "Stop dictation and deliver text" (exec "dictate stop"))
+          # Transparent: when Alt comes up before E, Hyprland 0.57 shadows binds
+          # matching the still-held E, which would swallow this release.
+          (bindWith { release = true; transparent = true; } "${mod} + e" "Stop dictation and deliver text" (exec "dictate stop"))
+          (bindWith { release = true; transparent = true; } "${mod} + SHIFT + e" "Stop dictation and deliver text" (exec "dictate stop"))
 
           # Notifications
           (bind "${mod} + i" "Open notification history" (exec "notification-center history"))
