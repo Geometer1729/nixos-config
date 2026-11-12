@@ -125,21 +125,21 @@ let
         format = "🌡️ {temperatureC}°C ";
         tooltip-format = "CPU temperature: {temperatureC}°C\nClick: open btop";
         critical-threshold = 85;
-        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
+        on-click = "hyprctl dispatch 'hl.dsp.exec_cmd(\"ghostty -e btop\")'";
       };
 
       # CPU usage
       cpu = {
         format = "🤖 {usage}% ";
         tooltip = true;
-        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
+        on-click = "hyprctl dispatch 'hl.dsp.exec_cmd(\"ghostty -e btop\")'";
       };
 
       # Memory usage
       memory = {
         format = "🐏 {}% ";
         tooltip-format = "Memory usage: {percentage}%\nClick: open btop";
-        on-click = "hyprctl dispatch exec 'ghostty -e btop'";
+        on-click = "hyprctl dispatch 'hl.dsp.exec_cmd(\"ghostty -e btop\")'";
       };
 
       # Clock
@@ -203,7 +203,7 @@ let
           return-type = "json";
           interval = 30;
           format = " 📥 {} ";
-          on-click = "hyprctl dispatch exec 'onScratchPad vit process process'";
+          on-click = "hyprctl dispatch 'hl.dsp.exec_cmd(\"onScratchPad vit process process\")'";
         };
     };
 

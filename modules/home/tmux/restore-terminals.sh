@@ -121,7 +121,7 @@ restore() {
     # A dispatch can succeed without a terminal ever attaching (seen at boot),
     # so confirm the client and retry rather than trusting hyprctl's reply.
     for attempt in 1 2 3; do
-      result=$(hyprctl dispatch exec "[workspace $workspace silent] $command" 2>&1) || true
+      result=$(hyprctl dispatch "hl.dsp.exec_cmd([==[$command]==], { workspace = \"$workspace silent\" })" 2>&1) || true
       for _ in $(seq 1 100); do
         attached "$session" && break
         sleep 0.1

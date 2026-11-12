@@ -16,4 +16,5 @@ fi
 
 tmux select-window -t "$pane"
 tmux select-pane -t "$pane"
-hyprctl -i 0 dispatch focuswindow "address:$(jq -r '.address' <<<"$window")"
+address=$(jq -r '.address' <<<"$window")
+hyprctl -i 0 dispatch "hl.dsp.focus({ window = \"address:$address\" })"

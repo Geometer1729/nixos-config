@@ -201,8 +201,7 @@ let
         local title="$2"
 
         if [[ "$title" =~ ^Brave\ WS\ ([1-9]|1[0-9]|2[0-2])$ ]]; then
-          hyprctl dispatch movetoworkspacesilent \
-            "''${BASH_REMATCH[1]},address:$address" >/dev/null
+          hyprctl dispatch "hl.dsp.window.move({ workspace = ''${BASH_REMATCH[1]}, follow = false, window = \"address:$address\" })" >/dev/null
         fi
       }
 
@@ -271,7 +270,7 @@ in
     binds = [{
       key = "?";
       description = "List binds (on web pages)";
-      command = ''hyprctl dispatch sendshortcut "SHIFT, slash, address:$KEY_HELP_WINDOW"'';
+      command = ''hyprctl dispatch "hl.dsp.send_shortcut({ mods = \"SHIFT\", key = \"slash\", window = \"address:$KEY_HELP_WINDOW\" })"'';
     }];
   };
   home.sessionVariables.BROWSER = "${xdgOpen}/bin/brave-xdg-open";

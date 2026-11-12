@@ -66,9 +66,12 @@ case "${ROFI_RETV:-0}" in
         "$(jq -r '.description' <<< "$ROFI_INFO")"
       case "$kind" in
         bind)
-          dispatcher=$(jq -er '.dispatcher' <<< "$ROFI_INFO")
-          arg=$(jq -r '.arg' <<< "$ROFI_INFO")
-          if ! result=$(hyprctl dispatch "$dispatcher" "$arg" 2>&1); then
+          # hyprctl binds lists Lua binds only by reference, so run the action
+          # the config recorded under this description. hyprctl exits 0 even
+          # when the dispatch fails, so check its reply.
+          description=$(jq -er '.description' <<< "$ROFI_INFO")
+          result=$(hyprctl dispatch "keybind_actions[ [==[$description]==] ]" 2>&1) || true
+          if [[ $result != ok ]]; then
             notify-send "Hyprland keybind failed" "$result"
           fi
           ;;

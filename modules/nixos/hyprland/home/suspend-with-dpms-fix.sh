@@ -5,4 +5,4 @@
 sudo systemctl suspend
 
 # When we wake up (suspend returns), re-enable all monitors
-hyprctl dispatch dpms on
+hyprctl dispatch 'hl.dsp.dpms({ action = "on" })'

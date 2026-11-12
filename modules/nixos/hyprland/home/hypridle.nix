@@ -11,7 +11,7 @@
     enable = true;
     settings = {
       general = {
-        after_sleep_cmd = "hyprctl dispatch dpms on; bluetooth-autoconnect";
+        after_sleep_cmd = "hyprctl dispatch 'hl.dsp.dpms({ action = \"on\" })'; bluetooth-autoconnect";
         before_sleep_cmd = "loginctl lock-session";
         ignore_dbus_inhibit = false;
         # Wait for the compositor to confirm the session is locked before sleeping.
@@ -31,8 +31,8 @@
             # DPMS disabled - testing if monitor's own power saving is causing blackouts
             # {
             #   timeout = 15 * 60;
-            #   on-timeout = "hyprctl dispatch dpms off";
-            #   on-resume = "hyprctl dispatch dpms on";
+            #   on-timeout = "hyprctl dispatch 'hl.dsp.dpms({ action = \"off\" })'";
+            #   on-resume = "hyprctl dispatch 'hl.dsp.dpms({ action = \"on\" })'";
             # }
             {
               timeout = 20 * 60;
@@ -48,8 +48,8 @@
             # DPMS disabled - testing if monitor's own power saving is causing blackouts
             # {
             #   timeout = 90 * 60;
-            #   on-timeout = "hyprctl dispatch dpms off";
-            #   on-resume = "hyprctl dispatch dpms on";
+            #   on-timeout = "hyprctl dispatch 'hl.dsp.dpms({ action = \"off\" })'";
+            #   on-resume = "hyprctl dispatch 'hl.dsp.dpms({ action = \"on\" })'";
             # }
             {
               timeout = 60 * 60;

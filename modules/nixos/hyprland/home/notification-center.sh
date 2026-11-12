@@ -77,7 +77,7 @@ activate() {
 
   app=$(jq -r '.desktop_entry // .app_name // ""' <<< "$entry")
   # mako cannot invoke actions on expired notifications, so jump to the app instead.
-  if [[ -n "$app" && $(hyprctl dispatch focuswindow "class:(?i)^${app//./\\.}$") == ok ]]; then
+  if [[ -n "$app" && $(hyprctl dispatch "hl.dsp.focus({ window = [==[class:(?i)^${app//./\\.}$]==] })") == ok ]]; then
     exit 0
   fi
   jq -r '[.summary, .body // ""] | map(select(. != "")) | join("\n")' <<< "$entry" | wl-copy
