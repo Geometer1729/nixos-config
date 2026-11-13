@@ -97,9 +97,17 @@ if [[ ! -d $worktree ]]; then
   else
     git -C "$repo" worktree add --no-track -b "$branch" "$worktree" origin/HEAD
   fi
-  if [[ -f $repo/.env ]]; then
-    cp "$repo/.env" "$worktree/.env"
-  fi
+  # Ignored .env files, at the root or in packages, don't come with a worktree.
+  # --directory lists ignored directories like node_modules without descending.
+  (
+    cd "$repo" || exit
+    git ls-files -z --others --ignored --exclude-standard --directory |
+      while IFS= read -r -d '' path; do
+        case $path in
+        .env | */.env) cp --parents "$path" "$worktree" ;;
+        esac
+      done
+  )
 fi
 
 if [[ -f $worktree/.envrc ]]; then
