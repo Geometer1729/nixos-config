@@ -181,6 +181,8 @@ into two emojis by `slack_send_message_draft`.
 
 When Brian asks for a draft, create it with `slack_send_message_draft` in
 `#fap` as a reply in the thread that holds his latest `#fap` post (the
-`thread_ts` in that post's permalink). The tool can't edit or delete
-drafts, so every retry leaves an extra draft Brian has to delete by hand.
-Get the text right before creating one.
+`thread_ts` in that post's permalink). Slack keeps one draft per thread,
+and the tool can't edit or delete it. If a draft already exists, the tool
+still answers "Draft created" but creates nothing; only a response with a
+`draft_id` means it worked. Before creating a replacement, ask Brian to
+delete the existing draft. Get the text right before creating one.
