@@ -101,6 +101,18 @@
         "type": "github"
       }
     },
+    "claude-icon": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-NaU3lBTdeEqnSoErPU6l+6HOK9QzVZIREEJOAVTpRmM=",
+        "type": "file",
+        "url": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -171,6 +183,18 @@
         "type": "github"
       }
     },
+    "foundryvtt-image": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-NL5Jp6rzNfkzvMmlhDT7pfoaZuxjzg+RfUVRk7a1FaE=",
+        "type": "file",
+        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release"
+      }
+    },
     "fromYaml": {
       "flake": false,
       "locked": {
@@ -235,16 +259,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1793405621,
-        "narHash": "sha256-T+3g39WBjcAnpLAyEuxozX0T2ZXFWezDQq81JX4k54I=",
+        "lastModified": 1794439746,
+        "narHash": "sha256-hHO0/EVT1nHT1ote506hv/GtfKXOmaLzfYH/u7wW73Q=",
         "owner": "anomalyco",
         "repo": "hex",
-        "rev": "7b05b5fd1fa0e3b9c333209cd1644d9603693d5c",
+        "rev": "911eec023a0ceb99c5a4a17ce5fc8840daa22882",
         "type": "github"
       },
       "original": {
         "owner": "anomalyco",
-        "ref": "v3.0.0",
+        "ref": "production",
         "repo": "hex",
         "type": "github"
       }
@@ -307,6 +331,19 @@
         "owner": "nix-community",
         "repo": "impermanence",
         "type": "github"
+      }
+    },
+    "kokoro": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793005659,
+        "narHash": "sha256-HKrjB25Dqlu7p000Js6S6+y32h/dDEjn7vQqWnCU74E=",
+        "type": "tarball",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2"
       }
     },
     "libnbtplusplus": {
@@ -605,13 +642,16 @@
       "inputs": {
         "browse-npm": "browse-npm",
         "claude-code": "claude-code",
+        "claude-icon": "claude-icon",
         "disko": "disko",
         "flake-parts": "flake-parts",
+        "foundryvtt-image": "foundryvtt-image",
         "git-hooks": "git-hooks",
         "hex": "hex",
         "home-manager": "home-manager",
         "homeassistant-smartrent": "homeassistant-smartrent",
         "impermanence": "impermanence",
+        "kokoro": "kokoro",
         "linearis": "linearis",
         "linearis-npm": "linearis-npm",
         "nix-darwin": "nix-darwin",
@@ -637,16 +677,15 @@
     "shuck": {
       "flake": false,
       "locked": {
-        "lastModified": 1778120822,
-        "narHash": "sha256-J0u53uabBu6q+Arjvijt8t9xp9TYWWRRITQm5MBTYq8=",
+        "lastModified": 1794222826,
+        "narHash": "sha256-bREqeKtLNRBuESlrhiM7XWDPLSMiGLAMsMJ/kaK7oUM=",
         "owner": "ewhauser",
         "repo": "shuck",
-        "rev": "faf74aaa1354d115fd4398163bfdd2d8ec2b1232",
+        "rev": "8611d2df10b457d864e040168dd53513cc92f57d",
         "type": "github"
       },
       "original": {
         "owner": "ewhauser",
-        "ref": "v0.0.38",
         "repo": "shuck",
         "type": "github"
       }

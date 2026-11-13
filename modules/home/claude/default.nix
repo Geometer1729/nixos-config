@@ -1,12 +1,6 @@
 { flake, pkgs, config, machine, lib, ... }:
 let
   inherit (flake) inputs;
-  # Fetch Claude icon as a derivation
-  claudeIcon = pkgs.fetchurl {
-    url = "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
-    sha256 = "sha256-86hX9EtbVC7nniAN1kpLjt485fm5lpOjm9ECTLK392o=";
-  };
-
 in
 {
   scripts.claude = {
@@ -192,6 +186,6 @@ in
       force = true;
     };
   } // lib.optionalAttrs machine.hasGui {
-    ".local/share/icons/claude-icon.svg".source = claudeIcon;
+    ".local/share/icons/claude-icon.svg".source = inputs.claude-icon;
   };
 }

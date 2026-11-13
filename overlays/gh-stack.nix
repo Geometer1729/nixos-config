@@ -1,21 +1,13 @@
-_:
-final: prev: {
-  # Stable nixpkgs lags far behind upstream gh-stack releases. Remove once
-  # stable nixpkgs reaches this version.
+{ flake, ... }:
+final: prev:
+let
+  unstable = flake.inputs.nixpkgs-unstable.legacyPackages.${final.stdenv.hostPlatform.system};
+in
+{
+  # Stable nixpkgs lags far behind upstream gh-stack releases; unstable tracks
+  # them and moves with `nix flake update`. Remove once stable catches up.
   gh-stack =
-    final.lib.warnIf (final.lib.versionAtLeast prev.gh-stack.version "0.2.0")
+    final.lib.warnIf (final.lib.versionAtLeast prev.gh-stack.version unstable.gh-stack.version)
       "nixpkgs gh-stack is ${prev.gh-stack.version}; drop overlays/gh-stack.nix"
-      (prev.gh-stack.overrideAttrs (oldAttrs: {
-        version = "0.2.0";
-        src = oldAttrs.src.override {
-          tag = "v0.2.0";
-          hash = "sha256-70H1kOdvklTeB8OVFg7g6xQ4rn0gqv+zU7yjDYPd3vo=";
-        };
-        vendorHash = "sha256-Otstml5TSTJeYsP9o94aUperP1MgT2axa/wqALEnXYk=";
-        nativeCheckInputs = (oldAttrs.nativeCheckInputs or [ ]) ++ [ final.git ];
-        # modifyview tests expect to run inside a git checkout.
-        preCheck = (oldAttrs.preCheck or "") + ''
-          git init -q
-        '';
-      }));
+      unstable.gh-stack;
 }

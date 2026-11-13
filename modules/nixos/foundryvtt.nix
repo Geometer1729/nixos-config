@@ -1,8 +1,12 @@
-{ config, lib, ... }:
+{ flake, config, lib, ... }:
+let
+  release = builtins.fromJSON (builtins.readFile flake.inputs.foundryvtt-image);
+in
 {
   # TODO why not "https://github.com/reckenrode/nix-foundryvtt"
   virtualisation.oci-containers.containers.foundryvtt = {
-    image = "felddy/foundryvtt:release";
+    # Pinned by digest so `nix flake update` moves it; a bare tag is pulled once and never again.
+    image = "docker.io/felddy/foundryvtt@${release.digest}";
     # Foundry binds its license signature to the hostname; podman otherwise randomizes it per start.
     hostname = "foundryvtt";
     ports = [ "127.0.0.1:30000:30000" ];

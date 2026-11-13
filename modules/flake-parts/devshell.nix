@@ -24,7 +24,7 @@
 
       shuck = pkgs.rustPlatform.buildRustPackage {
         pname = "shuck";
-        version = "0.0.38";
+        version = (fromTOML (builtins.readFile "${inputs.shuck}/Cargo.toml")).workspace.package.version;
         src = inputs.shuck;
         cargoLock.lockFile = "${inputs.shuck}/Cargo.lock";
         cargoBuildFlags = [ "-p" "shuck-cli" ];

@@ -153,6 +153,18 @@ when knowable, the condition for removal. Remove obsolete overlays and record
 the evidence in the report. The subagent returns one concise decision with
 evidence per overlay and no unrelated upstream details.
 
+Then do the stale-pin review: check every source the update cannot move (see
+"Pinning" in `AGENTS.md`) against its latest upstream release:
+
+- each in-repo npm project (`git ls-files '*package-lock.json'`), with
+  `npm outdated`;
+- each container `image` not pinned by a flake-input digest
+  (`rg 'image = ' -g '*.nix'`), comparing the deployed image with the registry;
+- any flake input or hardcoded version pinned to a fixed tag.
+
+Bump each stale pin, or record why it stays. The review is complete when every
+such pin has a current, bumped, or kept-because decision in the report.
+
 ## 5. Assess Relevance And Required Fixes
 
 Organize findings into:
@@ -239,6 +251,7 @@ format of existing reports and include:
 - relevant unmatched NixOS module, library, security, and infrastructure
   changes;
 - the result for every local overlay: kept, updated, or removed;
+- the stale-pin review decision for every pin;
 - every breaking marker and whether it applies here;
 - packages added to or removed from the closure;
 - deployment and local and remote health-check results;

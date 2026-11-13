@@ -36,13 +36,14 @@
     homeassistant-smartrent.flake = false;
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
-    shuck.url = "github:ewhauser/shuck/v0.0.38";
+    shuck.url = "github:ewhauser/shuck";
     shuck.flake = false;
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
     # Hex needs a newer rustc than stable has. Its glibc must not be older than
     # the system's, or it finds no Vulkan adapter; unstable satisfies both.
-    hex.url = "github:anomalyco/hex/v3.0.0";
+    # `production` carries every release; `dev` is ahead of it.
+    hex.url = "github:anomalyco/hex/production";
     hex.inputs.nixpkgs.follows = "nixpkgs-unstable";
     hex.inputs.home-manager.follows = "home-manager";
 
@@ -62,6 +63,13 @@
     opencode2-npm.flake = false;
     browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
     browse-npm.flake = false;
+    kokoro.url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2";
+    kokoro.flake = false;
+    claude-icon.url = "file+https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
+    claude-icon.flake = false;
+    # Docker Hub metadata for the image tag; its digest pins the container.
+    foundryvtt-image.url = "file+https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release";
+    foundryvtt-image.flake = false;
 
     # Work
     linearis.url = "github:linearis-oss/linearis";
