@@ -9,7 +9,7 @@ if [[ -r "$CACHE" ]] && jq -ce --argjson now "$(date +%s)" '
     .text = (.text | sub(" \\?$"; "") + " ?") |
     .tooltip = "Usage monitor has not updated for over 11 minutes. The values below are stale.\n\n" + .tooltip |
     .class += ["incomplete"]
-  else . end | del(.updatedAt)
+  else . end | del(.updatedAt, .signIn)
 ' "$CACHE" 2>/dev/null; then
   exit 0
 fi

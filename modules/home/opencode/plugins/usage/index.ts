@@ -1,12 +1,12 @@
+import { watch } from "node:fs"
 import { readFile, rename, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import { setTimeout as sleep } from "node:timers/promises"
 
 import { OpenCode } from "@opencode/client"
 import { Service } from "@opencode/client/service"
 import { Plugin } from "@opencode/plugin"
 
-import { claudeAccounts, claudeUsage, codexUsage, FetchError, fetchJSON, interval, render, Source } from "./usage.ts"
+import { claudeAccounts, claudeUsage, codexUsage, FetchError, fetchJSON, interval, render, Source, Unavailable } from "./usage.ts"
 
 const readJSON = (file: string): Promise<unknown> => readFile(file, "utf8").then(JSON.parse).catch(() => undefined)
 
@@ -19,11 +19,38 @@ interface Shared {
 }
 const host = globalThis as typeof globalThis & { __confAIUsage?: Shared }
 
-async function run(shared: Shared, file: string, timezone: string, profiles: Record<string, string>) {
+async function run(shared: Shared, runtime: string, timezone: string, profiles: Record<string, string>) {
   const signal = shared.controller.signal
+  const file = join(runtime, "opencode-ai-usage.json")
   const codex = new Source("Codex")
   const claude = new Map<string, Source>()
+
+  // Poll early, past backoff, when Claude Code renews a token or the Waybar
+  // click (ai-usage-renew) touches the refresh file. Debounced because one
+  // credential write produces several events.
+  let forced = false
+  let wake: (() => void) | undefined
+  let debounce: ReturnType<typeof setTimeout> | undefined
+  const trigger = () => {
+    clearTimeout(debounce)
+    debounce = setTimeout(() => { forced = true; wake?.() }, 1_000)
+  }
+  signal.addEventListener("abort", () => clearTimeout(debounce), { once: true })
+  const watchFor = (directory: string, name: string) => {
+    try {
+      const watcher = watch(directory, { persistent: false }, (_event, changed) => { if (changed === name) trigger() })
+      watcher.on("error", () => watcher.close())
+      signal.addEventListener("abort", () => watcher.close(), { once: true })
+    } catch {
+      // A missing profile directory just means no early refresh for it.
+    }
+  }
+  for (const directory of Object.values(profiles)) watchFor(directory, ".credentials.json")
+  watchFor(runtime, "opencode-ai-usage.refresh")
+
   async function update() {
+    const force = forced
+    forced = false
     const context = shared.contexts.values().next().value
     if (!context) return
     const timeout = AbortSignal.any([signal, AbortSignal.timeout(45_000)])
@@ -45,31 +72,39 @@ async function run(shared: Shared, file: string, timezone: string, profiles: Rec
         const connection = await context.integration.connection.active("openai")
         const key = connection?.type === "credential" ? connection.id : "disconnected"
         return codex.read(key, async () => {
-          if (!connection || connection.type !== "credential") throw new Error("Connect ChatGPT in OpenCode")
+          const signedOut = "Not signed in to ChatGPT in OpenCode; click the bar to sign in"
+          if (!connection || connection.type !== "credential") throw new Unavailable(signedOut, true)
           const credential = await context.integration.connection.resolve(connection)
-          if (credential?.type !== "oauth") throw new Error("Connect ChatGPT in OpenCode")
+          if (credential?.type !== "oauth") throw new Unavailable(signedOut, true)
           const accountID = credential.metadata?.accountID
-          if (typeof accountID !== "string") throw new Error("OpenCode account ID unavailable")
+          if (typeof accountID !== "string") throw new Unavailable("ChatGPT account ID missing; click the bar to sign in again", true)
           const raw = await fetchJSON("https://chatgpt.com/backend-api/wham/usage", timeout, {
             Authorization: `Bearer ${credential.access}`,
             "ChatGPT-Account-Id": accountID,
             Accept: "application/json",
+          }).catch((error: unknown) => {
+            // OpenCode renews this token, so a rejection means the sign-in
+            // itself is gone. Not 403: chatgpt.com also uses it for bot checks.
+            if (error instanceof FetchError && error.status === 401) {
+              throw new FetchError(401, error.retryAt, "ChatGPT rejected the sign-in; click the bar to sign in", true)
+            }
+            throw error
           })
           return codexUsage(raw, Date.now())
-        })
+        }, Date.now(), force)
       })().catch(() => ({ label: "Codex", error: "OpenCode connection unavailable" })),
       ...accounts.map((account) => {
         const source = claude.get(account.label) ?? new Source(account.label)
         claude.set(account.label, source)
         return source.read(account.id, async () => {
-          if ("error" in account) throw new FetchError(account.error)
+          if ("error" in account) throw new Unavailable(account.error)
           const raw = await fetchJSON("https://api.anthropic.com/api/oauth/usage", timeout, {
             Authorization: `Bearer ${account.token}`,
             "anthropic-beta": "oauth-2025-04-20",
             Accept: "application/json",
           })
           return claudeUsage(raw, account.label, Date.now())
-        })
+        }, Date.now(), force)
       }),
     ])
     if (signal.aborted) return
@@ -83,7 +118,19 @@ async function run(shared: Shared, file: string, timezone: string, profiles: Rec
     } catch {
       if (!signal.aborted) console.error("AI usage update failed; retrying after five minutes")
     }
-    await sleep(interval, undefined, { signal }).catch(() => undefined)
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        clearTimeout(timer)
+        signal.removeEventListener("abort", done)
+        wake = undefined
+        resolve()
+      }
+      const timer = setTimeout(done, interval)
+      wake = done
+      signal.addEventListener("abort", done, { once: true })
+      // A trigger that fired during the update must not wait a full interval.
+      if (forced || signal.aborted) done()
+    })
   }
 }
 
@@ -109,7 +156,7 @@ export default Plugin.define({
     }
     const shared = host.__confAIUsage ??= (() => {
       const state: Shared = { generation, contexts, controller: new AbortController(), task: Promise.resolve() }
-      state.task = previous.then(() => run(state, join(runtime, "opencode-ai-usage.json"), timezone, profiles))
+      state.task = previous.then(() => run(state, runtime, timezone, profiles))
         .catch(() => console.error("AI usage monitor stopped; Waybar will mark its last reading stale"))
       return state
     })()

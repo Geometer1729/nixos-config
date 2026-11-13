@@ -1,4 +1,7 @@
 import assert from "node:assert/strict"
+import { mkdtemp, rm, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import test from "node:test"
 import { syncBuiltinESMExports } from "node:module"
 import { Service } from "@opencode/client/service"
@@ -57,5 +60,41 @@ test("polling survives a newer generation unloading while older projects remain 
     else process.env.DBUS_SESSION_BUS_ADDRESS = bus
     if (runtime === undefined) delete process.env.XDG_RUNTIME_DIR
     else process.env.XDG_RUNTIME_DIR = runtime
+  }
+})
+
+test("renewed credentials and the Waybar click poll early instead of waiting for the interval", async (t) => {
+  let polls = 0
+  t.mock.method(Service, "discover", async () => { polls++; return undefined })
+  syncBuiltinESMExports()
+  t.after(() => syncBuiltinESMExports())
+  const runtime = await mkdtemp(join(tmpdir(), "usage-wake-"))
+  const profile = await mkdtemp(join(tmpdir(), "usage-profile-"))
+  const bus = process.env.DBUS_SESSION_BUS_ADDRESS
+  const previousRuntime = process.env.XDG_RUNTIME_DIR
+  process.env.DBUS_SESSION_BUS_ADDRESS = "usage-wake-test"
+  process.env.XDG_RUNTIME_DIR = runtime
+  const waitFor = async (count: number) => {
+    for (let i = 0; i < 50 && polls < count; i++) await new Promise((resolve) => setTimeout(resolve, 100))
+    assert.equal(polls, count)
+  }
+  const cleanup = await usage.setup({ options: { claude: { work: profile } } } as unknown as Plugin.Context)
+  try {
+    await waitFor(1)
+    await writeFile(join(runtime, "unrelated"), "")
+    await new Promise((resolve) => setTimeout(resolve, 1_500))
+    assert.equal(polls, 1, "Other runtime files must not wake the monitor")
+    await writeFile(join(runtime, "opencode-ai-usage.refresh"), "")
+    await waitFor(2)
+    await writeFile(join(profile, ".credentials.json"), "{}")
+    await waitFor(3)
+  } finally {
+    await cleanup?.()
+    await rm(runtime, { recursive: true, force: true })
+    await rm(profile, { recursive: true, force: true })
+    if (bus === undefined) delete process.env.DBUS_SESSION_BUS_ADDRESS
+    else process.env.DBUS_SESSION_BUS_ADDRESS = bus
+    if (previousRuntime === undefined) delete process.env.XDG_RUNTIME_DIR
+    else process.env.XDG_RUNTIME_DIR = previousRuntime
   }
 })

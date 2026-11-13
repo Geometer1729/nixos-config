@@ -1,5 +1,5 @@
 # Per-user Hyprland session.
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
     ../../../home/cliphist
@@ -16,6 +16,9 @@
     extras = with pkgs; [ hyprland tmux ];
     overrides.onScratchPad.extras = [ config.scripts.hyprland.packages.scratchPad ];
     overrides.notification-center.extras = with pkgs; [ mako wl-clipboard ];
+    overrides.ai-usage-renew.extras = [ pkgs.ghostty ]
+      ++ lib.optional config.programs.claude-code.enable config.programs.claude-code.package
+      ++ lib.optional config.programs.opencode.enable config.programs.opencode.package;
     overrides.key-help = {
       extras = [ config.programs.rofi.package ];
       runtimeEnv.KEY_HELP_PROGRAMS = "${pkgs.writeText "key-help.json" (builtins.toJSON config.keyHelp)}";

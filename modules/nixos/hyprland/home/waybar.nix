@@ -156,6 +156,8 @@ let
         exec = lib.getExe config.scripts.hyprland.packages.ai-usage;
         return-type = "json";
         interval = 30;
+        signal = 9; # Sent by ai-usage-renew once the plugin has polled.
+        on-click = lib.getExe config.scripts.hyprland.packages.ai-usage-renew;
         format = " {} ";
         tooltip = true;
       };
