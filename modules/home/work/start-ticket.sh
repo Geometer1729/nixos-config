@@ -7,24 +7,45 @@ trap 'notify-send -u critical start-ticket "failed: $BASH_COMMAND"' ERR
 
 work=$HOME/Code/work
 
-cleanup_merged_worktrees() {
-  local candidate branch state merged_at merged_epoch common_dir
-  local cutoff=$(( $(date +%s) - 48 * 60 * 60 ))
+# Removes worktrees whose PR was merged or closed 12h ago, and worktrees idle
+# for 48h with every commit pushed. Without --force, git still refuses any
+# worktree with uncommitted or untracked files. Whatever is left after a week
+# idle gets a notification whose click opens a review in OpenCode.
+cleanup_finished_worktrees() {
+  local candidate branch state closed_at closed_epoch last_active unpushed reason common_dir
+  local now
+  now=$(date +%s)
 
   for candidate in "$work/wts"/*; do
     [[ -d $candidate && $candidate != "$worktree" ]] || continue
-    branch=$(git -C "$candidate" symbolic-ref --quiet --short HEAD 2>/dev/null) || continue
-    IFS=$'\t' read -r state merged_at < <(
-      cd "$candidate" && gh pr view "$branch" --json state,mergedAt \
-        --jq '[.state, .mergedAt] | @tsv' 2>/dev/null
-    ) || continue
-    [[ $state == MERGED && -n $merged_at ]] || continue
-    merged_epoch=$(date --date="$merged_at" +%s) || continue
-    (( merged_epoch <= cutoff )) || continue
-    common_dir=$(git -C "$candidate" rev-parse --path-format=absolute --git-common-dir) || continue
+    # The HEAD reflog is per worktree and moves on every commit, checkout and reset.
+    last_active=$(stat -c %Y "$(git -C "$candidate" rev-parse --path-format=absolute --git-path logs/HEAD)") ||
+      last_active=$now
+    reason=
 
-    if git --git-dir="$common_dir" worktree remove "$candidate"; then
-      notify-send start-ticket "Removed merged worktree ${candidate##*/}"
+    if branch=$(git -C "$candidate" symbolic-ref --quiet --short HEAD 2>/dev/null) &&
+      IFS=$'\t' read -r state closed_at < <(
+        cd "$candidate" && gh pr view "$branch" --json state,closedAt \
+          --jq '[.state, .closedAt] | @tsv' 2>/dev/null
+      ) &&
+      [[ $state == MERGED || $state == CLOSED ]] &&
+      closed_epoch=$(date --date="$closed_at" +%s) &&
+      (( closed_epoch <= now - 12 * 60 * 60 )); then
+      reason=${state,,}
+    elif (( last_active <= now - 48 * 60 * 60 )) &&
+      unpushed=$(git -C "$candidate" rev-list HEAD --not --remotes) &&
+      [[ -z $unpushed ]]; then
+      reason=idle
+    fi
+
+    if [[ -n $reason ]] &&
+      common_dir=$(git -C "$candidate" rev-parse --path-format=absolute --git-common-dir) &&
+      git --git-dir="$common_dir" worktree remove "$candidate"; then
+      notify-send start-ticket "Removed $reason worktree ${candidate##*/}"
+    elif (( last_active <= now - 7 * 24 * 60 * 60 )); then
+      # review-worktree reads the path back from the body.
+      notify-send --app-name=stale-worktree \
+        "Consider pruning ${candidate##*/}" "$candidate"
     fi
   done
 }
@@ -110,5 +131,5 @@ if ! tmux list-panes -t "=$session" -F '#{pane_dead}:#{pane_current_command}' |
   tmux select-layout -t "$session:0" even-horizontal
 fi
 
-(trap - ERR; cleanup_merged_worktrees) >/dev/null 2>&1 &
+(trap - ERR; cleanup_finished_worktrees) >/dev/null 2>&1 &
 exec ghostty -e tmux attach-session -t "$session"

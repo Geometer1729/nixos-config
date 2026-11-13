@@ -1,11 +1,19 @@
-{ flake, config, pkgs, ... }:
+{ flake
+, config
+, pkgs
+, ...
+}:
 let
   linearisSource = flake.inputs.linearis;
   linearisPackage = builtins.fromJSON (builtins.readFile "${linearisSource}/package.json");
   linearisLock = builtins.fromJSON (builtins.readFile "${linearisSource}/package-lock.json");
   linearisNpm = builtins.fromJSON (builtins.readFile flake.inputs.linearis-npm);
   linearisRuntimePackage = removeAttrs linearisPackage [ "devDependencies" ];
-  linearisRuntimePackages = pkgs.lib.filterAttrs (_: dependency: !(dependency.dev or false)) linearisLock.packages;
+  linearisRuntimePackages = pkgs.lib.filterAttrs
+    (
+      _: dependency: !(dependency.dev or false)
+    )
+    linearisLock.packages;
   linearisRuntimeLock = linearisLock // {
     packages = linearisRuntimePackages // {
       "" = removeAttrs linearisRuntimePackages."" [ "devDependencies" ];
@@ -51,22 +59,25 @@ in
       direnv
       gh
       ghostty
+      mako
       tmux
     ];
   };
 
-  home.packages =
-    with pkgs;
-    [
-      linearis
-      # brave-xdg-open inherits Slack's environment, so links land in Work.
-      (slack.overrideAttrs (old: {
-        postFixup = (old.postFixup or "") + ''
-          wrapProgram $out/bin/slack --set BRAVE_CONTAINER Work
-        '';
-      }))
-      google-chrome
-    ];
+  # start-ticket nudges about worktrees idle for a week; clicking reviews them.
+  services.mako.settings."app-name=stale-worktree".on-button-left =
+    "exec ${config.scripts.work.packages.review-worktree}/bin/review-worktree \"$id\"";
+
+  home.packages = with pkgs; [
+    linearis
+    # brave-xdg-open inherits Slack's environment, so links land in Work.
+    (slack.overrideAttrs (old: {
+      postFixup = (old.postFixup or "") + ''
+        wrapProgram $out/bin/slack --set BRAVE_CONTAINER Work
+      '';
+    }))
+    google-chrome
+  ];
 
   programs.zsh.initContent = ''
     if [ -f /run/secrets/linear_api_key ]; then
@@ -86,8 +97,17 @@ in
       };
     in
     {
-      firefly = me // { HostName = "35.197.253.212"; User = "root"; };
-      vault = me // { HostName = "vault.geosurge.ai"; User = "doma"; };
-      geomancer = me // { HostName = "geomancer.geosurge.ai"; User = "operator"; };
+      firefly = me // {
+        HostName = "35.197.253.212";
+        User = "root";
+      };
+      vault = me // {
+        HostName = "vault.geosurge.ai";
+        User = "doma";
+      };
+      geomancer = me // {
+        HostName = "geomancer.geosurge.ai";
+        User = "operator";
+      };
     };
 }
