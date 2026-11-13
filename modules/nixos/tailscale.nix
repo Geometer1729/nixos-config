@@ -55,5 +55,13 @@
   # Auto-start tailscale daemon on boot
   systemd.services.tailscaled = {
     wantedBy = [ "multi-user.target" ];
+    # Deploys SSH in over Tailscale, and nh 4.4.2 runs switch-to-configuration
+    # inside that session, so restarting tailscaled mid-switch kills the switch
+    # halfway. A new tailscaled therefore only starts on reboot or a manual
+    # `systemctl restart --no-block tailscaled`.
+    # Remove once every host has nh >= 4.5.0 (or nixos-rebuild-ng that uses
+    # `systemd-run --wait --output=cat` instead of `--pipe`) and systemd >= 261,
+    # i.e. likely NixOS 26.11: those run activation in a detached unit.
+    restartIfChanged = false;
   };
 }

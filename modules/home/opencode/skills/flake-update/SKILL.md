@@ -207,6 +207,11 @@ worktree. This deploys the update worktree directly to `narvi` and `gimli`;
 `durin` already runs it from `just switch`. Confirm
 that Narvi activated the expected update-worktree system, then reboot it and
 verify the running kernel and that `systemctl --failed` reports no failed units.
+Activation never restarts `tailscaled` (see `modules/nixos/tailscale.nix`), so
+deploys over Tailscale survive. If the update changed `tailscaled`, start the new
+daemon on the hosts that were not rebooted: `sudo systemctl restart --no-block
+tailscaled` on durin and `ssh gimli sudo systemctl restart --no-block tailscaled`
+(the SSH session drops; the queued restart still runs).
 Then check the deployed hosts. `health HOST` copies the worktree's checks to
 each host and runs them against its activated system, then reruns
 `remote-builds-health` once:
