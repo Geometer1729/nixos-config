@@ -128,14 +128,17 @@ fi
 
 if ! tmux list-panes -t "=$session" -F '#{pane_dead}:#{pane_current_command}' |
   grep -Eq '^0:opencode2?$'; then
-  prompt="/start-ticket $identifier"
   # An explicit title stops the title agent from naming every session after the
   # /start-ticket template ("BRD-?? implementation status").
   body=$(jq -nc --arg title "$identifier: $title" --arg directory "$worktree" \
     '{title: $title, location: {directory: $directory}}')
   opencode_session=$(opencode api post /api/session --data "$body" | jq -er '.data.id')
+  # Not `opencode --prompt`: the TUI saves that prompt as the home draft and
+  # resubmits it in every new tab.
+  body=$(jq -nc --arg text "$identifier" '{name: "start-ticket", text: $text}')
+  opencode api post "/api/session/$opencode_session/command" --data "$body" >/dev/null
   tmux split-window -h -t "$session:0.0" -c "$worktree" \
-    "exec opencode --session $opencode_session --prompt $(printf %q "$prompt")"
+    "exec opencode --session $opencode_session"
   tmux select-layout -t "$session:0" even-horizontal
 fi
 
