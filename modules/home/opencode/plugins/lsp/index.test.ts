@@ -23,6 +23,72 @@ interface ToolInvocation {
   tool: string
 }
 
+// A temporary directory whose bin/ comes first on PATH, with a direnv that changes nothing.
+async function sandbox(t: test.TestContext): Promise<{ bin: string; directory: string }> {
+  const directory = await mkdtemp(path.join(tmpdir(), "opencode-lsp-test-"))
+  const bin = path.join(directory, "bin")
+  const originalPath = process.env.PATH
+  t.after(async () => {
+    process.env.PATH = originalPath
+    await rm(directory, { recursive: true, force: true })
+  })
+  await mkdir(bin)
+  await writeFile(path.join(bin, "direnv"), "#!/bin/sh\nprintf '{}\\n'\n")
+  await chmod(path.join(bin, "direnv"), 0o755)
+  process.env.PATH = `${bin}:${originalPath}`
+  return { bin, directory }
+}
+
+async function setupTool(t: test.TestContext, directory: string, options: Record<string, unknown>): Promise<LspTool> {
+  let lspTool: LspTool | undefined
+  const ctx = {
+    options,
+    session: { get: async () => ({ location: { directory } }) },
+    shell: { hook: async () => {} },
+    tool: {
+      hook: async () => {},
+      transform: async (transform: (tools: { add(tool: LspTool): void }) => void) =>
+        transform({
+          add: (tool) => {
+            lspTool = tool
+          },
+        }),
+    },
+  }
+  const cleanup = await lspPlugin.setup(ctx as unknown as Plugin.Context)
+  t.after(async () => {
+    if (cleanup) await cleanup()
+  })
+  assert.ok(lspTool)
+  return lspTool
+}
+
+const serverPrelude = String.raw`let buffer = Buffer.alloc(0)
+
+function send(message) {
+  const body = JSON.stringify(message)
+  process.stdout.write("Content-Length: " + Buffer.byteLength(body) + "\r\n\r\n" + body)
+}
+
+function listen(handle) {
+  process.stdin.on("data", (chunk) => {
+    buffer = Buffer.concat([buffer, chunk])
+    while (true) {
+      const headerEnd = buffer.indexOf("\r\n\r\n")
+      if (headerEnd < 0) return
+      const length = Number(/content-length:\s*(\d+)/i.exec(buffer.subarray(0, headerEnd).toString())?.[1])
+      const bodyStart = headerEnd + 4
+      if (buffer.length < bodyStart + length) return
+      const message = JSON.parse(buffer.subarray(bodyStart, bodyStart + length).toString())
+      buffer = buffer.subarray(bodyStart + length)
+      if (message.method === "shutdown") send({ jsonrpc: "2.0", id: message.id, result: null })
+      else if (message.method === "exit") process.exit(0)
+      else handle(message)
+    }
+  })
+}
+`
+
 async function eventually(check: () => boolean | Promise<boolean>, timeout = 3_000): Promise<void> {
   const deadline = Date.now() + timeout
   while (Date.now() < deadline) {
@@ -280,5 +346,92 @@ process.stdin.on("data", (chunk) => {
     }
     assert.deepEqual(await diagnostics("broken\n"), { content: `${source}:1:1: error: broken` })
     assert.deepEqual(await diagnostics("fixed\n"), { content: "" })
+  })
+}
+
+test("rust crates in one cargo workspace share a server", async (t) => {
+  const { bin, directory } = await sandbox(t)
+  const log = path.join(directory, "roots.log")
+  const server = path.join(directory, "server.mjs")
+  // Like `cargo locate-project --workspace`, which refuses a crate that isn't a member.
+  await writeFile(
+    path.join(bin, "cargo"),
+    `#!/bin/sh
+case "$PWD" in
+  "${directory}"/crates/*) printf '%s\\n' '${directory}/Cargo.toml' ;;
+  *) echo "error: current package believes it's in a workspace when it's not" >&2; exit 101 ;;
+esac
+`,
+  )
+  await chmod(path.join(bin, "cargo"), 0o755)
+  await writeFile(
+    server,
+    `${serverPrelude}
+import { appendFileSync } from "node:fs"
+appendFileSync(process.argv[2], process.cwd() + "\\n")
+listen(({ id, method, params }) => {
+  if (method === "initialize") send({ jsonrpc: "2.0", id, result: { capabilities: {} } })
+  if (method === "textDocument/didOpen") {
+    send({ jsonrpc: "2.0", method: "textDocument/publishDiagnostics", params: { uri: params.textDocument.uri, diagnostics: [] } })
+  }
+})
+`,
+  )
+  await writeFile(path.join(directory, "Cargo.toml"), "[workspace]\n")
+  const files = ["crates/a", "crates/b", "other"].map((crate) => path.join(directory, crate, "src/lib.rs"))
+  for (const file of files) {
+    await mkdir(path.dirname(file), { recursive: true })
+    await writeFile(path.join(path.dirname(file), "../Cargo.toml"), "[package]\n")
+    await writeFile(file, "\n")
+  }
+
+  const tool = await setupTool(t, directory, {
+    servers: { rust: { command: [process.execPath, server, log], extensions: [".rs"] } },
+  })
+  for (const file of files) await tool.execute({ operation: "diagnostics", file }, { sessionID: "test" })
+
+  const roots = (await readFile(log, "utf8")).trim().split("\n")
+  assert.deepEqual(roots.sort(), [directory, path.join(directory, "other")])
+})
+
+for (const mode of ["loads", "stuck"]) {
+  test(`rust-analyzer pulls wait for a workspace that ${mode === "loads" ? "loads" : "never loads"}`, async (t) => {
+    const { directory } = await sandbox(t)
+    const source = path.join(directory, "example.fake")
+    const server = path.join(directory, "server.mjs")
+    await writeFile(source, "broken\n")
+    // Like rust-analyzer, it answers with nothing before its workspace loads, and says so only later.
+    await writeFile(
+      server,
+      `${serverPrelude}
+let loaded = false
+listen(({ id, method }) => {
+  if (method === "initialize") {
+    const capabilities = { diagnosticProvider: { interFileDependencies: true, workspaceDiagnostics: false } }
+    send({ jsonrpc: "2.0", id, result: { capabilities, serverInfo: { name: "rust-analyzer" } } })
+  }
+  if (method === "initialized" && process.argv[2] === "loads") {
+    setTimeout(() => {
+      loaded = true
+      send({ jsonrpc: "2.0", method: "experimental/serverStatus", params: { health: "ok", quiescent: true } })
+    }, 200)
+  }
+  if (method === "textDocument/diagnostic") {
+    const items = loaded
+      ? [{ message: "broken", severity: 1, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } } }]
+      : []
+    send({ jsonrpc: "2.0", id, result: { kind: "full", items } })
+  }
+})
+`,
+    )
+    const tool = await setupTool(t, directory, {
+      diagnosticTimeoutMs: 1_000,
+      servers: { fake: { command: [process.execPath, server, mode], extensions: [".fake"] } },
+    })
+    const diagnostics = tool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" })
+
+    if (mode === "loads") assert.deepEqual(await diagnostics, { content: `${source}:1:1: error: broken` })
+    else await assert.rejects(diagnostics, /rust-analyzer was still loading the workspace/)
   })
 }

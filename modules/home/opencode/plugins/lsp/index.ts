@@ -36,17 +36,27 @@ interface RpcMessage {
 
 type DiagnosticWaiter = (items: Diagnostic[]) => void
 
+// From experimental/serverStatus, which only rust-analyzer sends.
+interface Readiness {
+  quiescent?: boolean
+  waiters: Array<() => void>
+}
+
 interface Client {
   diagnosticVersions: Map<string, number>
   diagnosticWaiters: Map<string, DiagnosticWaiter[]>
   diagnostics: Map<string, Diagnostic[]>
   documents?: Map<string, { text: string; version: number }>
+  name?: string
   notify(method: string, params?: unknown): void
   process: ChildProcessWithoutNullStreams
   pullDiagnostics?: boolean
+  readiness: Readiness
   request<Result = unknown>(method: string, params?: unknown, timeout?: number): Promise<Result>
   server?: Server
 }
+
+class TimeoutError extends Error {}
 
 interface ClientEntry {
   idleTimer?: NodeJS.Timeout
@@ -62,7 +72,10 @@ interface LspInput {
 }
 
 const clients = new Map<string, ClientEntry>()
+const cargoWorkspaces = new Map<string, Promise<string>>()
 const defaultIdleTimeoutMs = 30 * 60 * 1000
+// rust-analyzer takes about 8s to re-pull an 8,000-line file after an item-level edit, on an idle machine.
+const defaultDiagnosticTimeoutMs = 30_000
 
 const languageIDs: Record<string, string> = {
   ".bash": "shellscript",
@@ -90,33 +103,56 @@ function rootsFor(extensions: string[]): string[] {
   return [".git"]
 }
 
-function direnvChanges(
+function capture(
+  command: string,
+  args: string[],
   cwd: string,
   env: NodeJS.ProcessEnv,
-): Promise<{ changes: Record<string, unknown>; error?: string }> {
+): Promise<{ error?: string; stdout: string }> {
   return new Promise((resolve) => {
-    const child = spawn("direnv", ["export", "json"], {
-      cwd,
-      env: { ...env, DIRENV_NO_TMUX_RENAME: "1" },
-      stdio: ["ignore", "pipe", "pipe"],
-    })
+    const child = spawn(command, args, { cwd, env, stdio: ["ignore", "pipe", "pipe"] })
     const chunks: Buffer[] = []
     const errors: Buffer[] = []
     child.stdout.on("data", (chunk) => chunks.push(chunk))
     child.stderr.on("data", (chunk) => errors.push(chunk))
-    child.on("error", (error) => resolve({ changes: {}, error: error.message }))
-    child.on("exit", (code) => {
-      if (code !== 0) {
-        return resolve({ changes: {}, error: Buffer.concat(errors).toString().trim() || `direnv exited with ${code}` })
-      }
-      try {
-        const output = Buffer.concat(chunks).toString().trim()
-        resolve({ changes: output ? (JSON.parse(output) as Record<string, unknown>) : {} })
-      } catch {
-        resolve({ changes: {}, error: "direnv returned invalid JSON" })
-      }
+    child.on("error", (error) => resolve({ stdout: "", error: error.message }))
+    child.on("close", (code) => {
+      const stdout = Buffer.concat(chunks).toString().trim()
+      if (code === 0) resolve({ stdout })
+      else resolve({ stdout, error: Buffer.concat(errors).toString().trim() || `${command} exited with ${code}` })
     })
   })
+}
+
+async function direnvChanges(
+  cwd: string,
+  env: NodeJS.ProcessEnv,
+): Promise<{ changes: Record<string, unknown>; error?: string }> {
+  const result = await capture("direnv", ["export", "json"], cwd, { ...env, DIRENV_NO_TMUX_RENAME: "1" })
+  if (result.error !== undefined) return { changes: {}, error: result.error }
+  try {
+    return { changes: result.stdout ? (JSON.parse(result.stdout) as Record<string, unknown>) : {} }
+  } catch {
+    return { changes: {}, error: "direnv returned invalid JSON" }
+  }
+}
+
+// Every rust-analyzer loads its crate's whole workspace, so the workspace's crates share one.
+function cargoWorkspace(crate: string): Promise<string> {
+  const cached = cargoWorkspaces.get(crate)
+  if (cached) return cached
+  const located = (async () => {
+    const loaded = await direnvChanges(crate, globalThis.process.env)
+    // Retry next time: `direnv allow` doesn't restart OpenCode, and the server can't start until then anyway.
+    if (loaded.error !== undefined) cargoWorkspaces.delete(crate)
+    const env = applyEnvironment(globalThis.process.env, loaded.changes)
+    const args = ["locate-project", "--workspace", "--message-format", "plain"]
+    const result = await capture("cargo", args, crate, env)
+    // Cargo refuses a crate inside a workspace's directory that isn't a member; it is its own root.
+    return result.error === undefined && result.stdout ? path.dirname(result.stdout) : crate
+  })()
+  cargoWorkspaces.set(crate, located)
+  return located
 }
 
 function applyEnvironment(env: NodeJS.ProcessEnv, changes: Record<string, unknown>): NodeJS.ProcessEnv {
@@ -141,6 +177,7 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
   const diagnostics = new Map<string, Diagnostic[]>()
   const diagnosticVersions = new Map<string, number>()
   const diagnosticWaiters = new Map<string, DiagnosticWaiter[]>()
+  const readiness: Readiness = { waiters: [] }
   process.stderr.resume()
 
   const send = (message: RpcMessage): void => {
@@ -156,7 +193,7 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
       const id = nextID++
       const timer = setTimeout(() => {
         pending.delete(id)
-        reject(new Error(`${method} timed out`))
+        reject(new TimeoutError(`${method} timed out`))
       }, timeout)
       pending.set(id, {
         resolve: (value: unknown) => {
@@ -195,6 +232,17 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
 
     if (message.method === "textDocument/publishDiagnostics") {
       publishDiagnostics((message.params ?? {}) as { diagnostics?: Diagnostic[]; uri?: string })
+      return
+    }
+
+    if (message.method === "experimental/serverStatus") {
+      const quiescent = (message.params as { quiescent?: unknown } | undefined)?.quiescent
+      if (typeof quiescent !== "boolean") return
+      readiness.quiescent = quiescent
+      if (!quiescent) return
+      const waiters = readiness.waiters
+      readiness.waiters = []
+      for (const resolve of waiters) resolve()
       return
     }
 
@@ -250,6 +298,7 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
     diagnosticVersions,
     diagnosticWaiters,
     process,
+    readiness,
   }
 }
 
@@ -264,13 +313,17 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
     DIRENV_NO_TMUX_RENAME: "1",
   }
   const client = rpc(server, root, env, onStop)
-  const initialized = await client.request<{ capabilities?: { diagnosticProvider?: unknown } } | null>(
+  const initialized = await client.request<{
+    capabilities?: { diagnosticProvider?: unknown }
+    serverInfo?: { name?: unknown }
+  } | null>(
     "initialize",
     {
       processId: globalThis.process.pid,
       rootUri: pathToFileURL(root).href,
       workspaceFolders: [{ name: path.basename(root), uri: pathToFileURL(root).href }],
       capabilities: {
+        experimental: { serverStatusNotification: true },
         window: { workDoneProgress: true },
         workspace: { configuration: true, workspaceFolders: true },
         textDocument: {
@@ -283,8 +336,16 @@ async function start(server: Server, root: string, onStop: () => void): Promise<
     },
     120_000,
   )
+  const name = initialized?.serverInfo?.name
+  // Its first status can arrive after the answer to the first pull, which is empty.
+  if (name === "rust-analyzer") client.readiness.quiescent ??= false
   client.notify("initialized", {})
-  return { ...client, server, pullDiagnostics: Boolean(initialized?.capabilities?.diagnosticProvider) }
+  return {
+    ...client,
+    name: typeof name === "string" ? name : path.basename(server.command[0]),
+    server,
+    pullDiagnostics: Boolean(initialized?.capabilities?.diagnosticProvider),
+  }
 }
 
 function waitForExit(process: ChildProcessWithoutNullStreams, timeout: number): Promise<boolean> {
@@ -333,6 +394,34 @@ async function findRoot(server: Server, file: string, boundary: string): Promise
   }
 }
 
+async function rootFor(server: Server, file: string, boundary: string): Promise<string> {
+  const root = await findRoot(server, file, boundary)
+  if (!server.extensions.includes(".rs")) return root
+  const entries: string[] = await readdir(root).catch(() => [])
+  return entries.includes("Cargo.toml") ? cargoWorkspace(root) : root
+}
+
+// Until the workspace has loaded, rust-analyzer answers as if it were empty.
+async function ready(client: Client, deadline: number): Promise<void> {
+  const readiness = client.readiness
+  if (readiness.quiescent !== false) return
+  const loaded = await new Promise<boolean>((resolve) => {
+    const done = (): void => {
+      clearTimeout(timer)
+      resolve(true)
+    }
+    const timer = setTimeout(
+      () => {
+        readiness.waiters = readiness.waiters.filter((waiter) => waiter !== done)
+        resolve(false)
+      },
+      Math.max(deadline - Date.now(), 0),
+    )
+    readiness.waiters.push(done)
+  })
+  if (!loaded) throw new Error(`${client.name} was still loading the workspace, so there is no result yet`)
+}
+
 function waitForDiagnostics(client: Client, uri: string, since: number, timeout = 30_000): Promise<Diagnostic[]> {
   return new Promise<Diagnostic[]>((resolve) => {
     if ((client.diagnosticVersions.get(uri) ?? 0) > since) {
@@ -361,14 +450,20 @@ const retriedPullErrors = new Set([-32801, -32802])
 async function pullDiagnostics(client: Client, uri: string, timeout: number): Promise<Diagnostic[]> {
   const deadline = Date.now() + timeout
   while (true) {
+    await ready(client, deadline)
     try {
       const report = await client.request<{ items?: Diagnostic[] } | null>(
         "textDocument/diagnostic",
         { textDocument: { uri } },
         Math.max(deadline - Date.now(), 1),
       )
+      // A workspace reload that began during the pull leaves its answer as empty as one before the first load.
+      if (client.readiness.quiescent === false) continue
       return report?.items ?? []
     } catch (error: unknown) {
+      if (error instanceof TimeoutError) {
+        throw new Error(`${client.name} was still analysing after ${timeout / 1000}s, so this is not a clean result`)
+      }
       const code = (error as { code?: unknown }).code
       if (typeof code !== "number" || !retriedPullErrors.has(code) || Date.now() >= deadline) throw error
     }
@@ -427,11 +522,15 @@ function position(input: Pick<LspInput, "character" | "line">): { character: num
 export default Plugin.define({
   id: "bbrian.lsp",
   setup: async (ctx) => {
-    const options = ctx.options as { idleTimeoutMs?: unknown; servers?: Record<string, unknown> }
-    const idleTimeoutMs =
-      typeof options.idleTimeoutMs === "number" && Number.isFinite(options.idleTimeoutMs) && options.idleTimeoutMs > 0
-        ? options.idleTimeoutMs
-        : defaultIdleTimeoutMs
+    const options = ctx.options as {
+      diagnosticTimeoutMs?: unknown
+      idleTimeoutMs?: unknown
+      servers?: Record<string, unknown>
+    }
+    const duration = (value: unknown, fallback: number): number =>
+      typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback
+    const idleTimeoutMs = duration(options.idleTimeoutMs, defaultIdleTimeoutMs)
+    const diagnosticTimeoutMs = duration(options.diagnosticTimeoutMs, defaultDiagnosticTimeoutMs)
     const servers = Object.entries(options.servers ?? {}).flatMap(([id, value]): Server[] => {
       if (!value || typeof value !== "object") return []
       const configured = value as Partial<ServerConfig>
@@ -472,18 +571,18 @@ export default Plugin.define({
       return entry.promise
     }
 
-    const diagnosticsFor = async (directory: string, value: string, timeout = 30_000): Promise<string> => {
+    const diagnosticsFor = async (directory: string, value: string): Promise<string> => {
       const file = path.resolve(directory, value)
       const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
       if (!server) return ""
-      const root = await findRoot(server, file, directory)
+      const root = await rootFor(server, file, directory)
       const client = await clientFor(server, root)
       const { uri, changed, diagnosticVersion } = await open(client, file)
       // Pull servers may still push results that lag the text, such as rust-analyzer's cargo check.
       const diagnostics = client.pullDiagnostics
-        ? await pullDiagnostics(client, uri, timeout)
+        ? await pullDiagnostics(client, uri, diagnosticTimeoutMs)
         : changed || !client.diagnostics.has(uri)
-          ? await waitForDiagnostics(client, uri, diagnosticVersion, timeout)
+          ? await waitForDiagnostics(client, uri, diagnosticVersion, diagnosticTimeoutMs)
           : (client.diagnostics.get(uri) ?? [])
       return diagnostics.length > 0 ? formatDiagnostics(value, diagnostics) : ""
     }
@@ -543,9 +642,10 @@ export default Plugin.define({
           const file = path.resolve(directory, input.file)
           const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
           if (!server) throw new Error(`No configured language server for: ${file}`)
-          const root = await findRoot(server, file, directory)
+          const root = await rootFor(server, file, directory)
           const client = await clientFor(server, root)
           const { uri } = await open(client, file)
+          await ready(client, Date.now() + diagnosticTimeoutMs)
           let result
 
           if (input.operation === "hover") {
@@ -587,7 +687,7 @@ export default Plugin.define({
 
       for (const value of new Set(paths.filter((item): item is string => typeof item === "string"))) {
         try {
-          const message = await diagnosticsFor(session.location.directory, value, 10_000)
+          const message = await diagnosticsFor(session.location.directory, value)
           if (message) messages.push(message)
         } catch (error: unknown) {
           messages.push(

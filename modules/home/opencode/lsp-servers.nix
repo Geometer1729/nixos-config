@@ -14,9 +14,15 @@
   rust = {
     command = [ "rust-analyzer" ];
     extensions = [ ".rs" ];
-    # Its cargo check only reruns on save, which the plugin never sends, so
-    # its errors went stale. Agents run cargo themselves.
-    initialization.checkOnSave = false;
+    initialization = {
+      # Its cargo check only reruns on save, which the plugin never sends, so
+      # its errors went stale. Agents run cargo themselves.
+      checkOnSave = false;
+      # Missing match arms. rust-analyzer analyses each workspace crate once,
+      # with cfg(test) on, so its dependents see #[cfg(test)] enum variants
+      # and get false errors. cargo still reports real ones.
+      diagnostics.disabled = [ "E0004" ];
+    };
   };
   typescript = {
     command = [ "typescript-language-server" "--stdio" ];
