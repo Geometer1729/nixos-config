@@ -262,10 +262,10 @@ in
       model = "claude-agent/opus#xhigh";
       agents = {
         build.model = "claude-agent/opus#xhigh";
-        explore.model = "openai/gpt-6-sol#xhigh";
+        explore.model = "claude-agent/sonnet#xhigh";
         title.model = "openai/gpt-6-luna";
         expert = {
-          description = "Handles architecture, difficult diagnosis, and independent code review";
+          description = "Handles architecture, difficult diagnosis, and independent code review. Helps simplify overengineered plans.";
           mode = "subagent";
           model = "claude-agent/fable#xhigh";
           permissions = [
