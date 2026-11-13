@@ -44,6 +44,11 @@ in
   storageHealth.notificationHost = "durin";
 
   services.nginx.virtualHosts.default = {
+    serverName = "bbrian.xyz";
+    serverAliases = [ "www.bbrian.xyz" ];
+    enableACME = true;
+    # Serve HTTP too until the router forwards 443; then switch to forceSSL.
+    addSSL = true;
     root = ./www;
     locations."/".tryFiles = "$uri $uri/ =404";
   };
