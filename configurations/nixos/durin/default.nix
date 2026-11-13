@@ -19,7 +19,12 @@ in
 
   # Log RCU Tasks holdout tasks and stacks after 15s (jiffies at CONFIG_HZ=1000).
   # This is a diagnostic threshold, not a limit on the shutdown wait.
-  boot.kernelParams = [ "rcupdate.rcu_task_stall_timeout=15000" ];
+  boot.kernelParams = [
+    "rcupdate.rcu_task_stall_timeout=15000"
+    # The RTL8761B USB dongle (0bda:a729) hangs on the first HCI command after
+    # idling (tx timeout + USB reset); testing whether USB autosuspend is why.
+    "btusb.enable_autosuspend=0"
+  ];
 
   services.pipewire.wireplumber = {
     extraScripts."default-nodes/prefer-blue-snowball.lua" = ''
