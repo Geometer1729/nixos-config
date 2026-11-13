@@ -3,13 +3,15 @@
   # TODO why not "https://github.com/reckenrode/nix-foundryvtt"
   virtualisation.oci-containers.containers.foundryvtt = {
     image = "felddy/foundryvtt:release";
+    # Foundry binds its license signature to the hostname; podman otherwise randomizes it per start.
+    hostname = "foundryvtt";
     ports = [ "127.0.0.1:30000:30000" ];
     volumes = [ "/var/lib/foundryvtt:/data" ];
     environmentFiles = [ config.sops.secrets.foundryvtt-env.path ];
     environment = {
       FOUNDRY_ROUTE_PREFIX = "foundry";
-      FOUNDRY_PROXY_PORT = "80";
-      FOUNDRY_PROXY_SSL = "false";
+      FOUNDRY_PROXY_PORT = "443";
+      FOUNDRY_PROXY_SSL = "true";
     };
   };
 
