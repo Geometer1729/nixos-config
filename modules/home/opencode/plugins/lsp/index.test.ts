@@ -394,6 +394,46 @@ listen(({ id, method, params }) => {
   assert.deepEqual(roots.sort(), [directory, path.join(directory, "other")])
 })
 
+test("typescript files get a server per package", async (t) => {
+  const { directory } = await sandbox(t)
+  const log = path.join(directory, "roots.log")
+  const server = path.join(directory, "server.mjs")
+  await writeFile(
+    server,
+    `${serverPrelude}
+import { appendFileSync } from "node:fs"
+appendFileSync(process.argv[2], process.cwd() + "\\n")
+listen(({ id, method, params }) => {
+  if (method === "initialize") send({ jsonrpc: "2.0", id, result: { capabilities: {} } })
+  if (method === "textDocument/didOpen") {
+    send({ jsonrpc: "2.0", method: "textDocument/publishDiagnostics", params: { uri: params.textDocument.uri, diagnostics: [] } })
+  }
+})
+`,
+  )
+  await mkdir(path.join(directory, ".git"))
+  await writeFile(path.join(directory, "package.json"), "{}\n")
+  for (const name of ["a", "b"]) {
+    await mkdir(path.join(directory, "packages", name, "src"), { recursive: true })
+    await writeFile(path.join(directory, "packages", name, "package.json"), "{}\n")
+  }
+  const files = ["packages/a/src/index.ts", "packages/a/src/view.tsx", "packages/b/src/index.ts", "scripts/x.ts"].map(
+    (file) => path.join(directory, file),
+  )
+  for (const file of files) {
+    await mkdir(path.dirname(file), { recursive: true })
+    await writeFile(file, "\n")
+  }
+
+  const tool = await setupTool(t, directory, {
+    servers: { typescript: { command: [process.execPath, server, log], extensions: [".ts", ".tsx"] } },
+  })
+  for (const file of files) await tool.execute({ operation: "diagnostics", file }, { sessionID: "test" })
+
+  const roots = (await readFile(log, "utf8")).trim().split("\n")
+  assert.deepEqual(roots.sort(), [directory, path.join(directory, "packages/a"), path.join(directory, "packages/b")])
+})
+
 for (const mode of ["loads", "stuck"]) {
   test(`rust-analyzer pulls wait for a workspace that ${mode === "loads" ? "loads" : "never loads"}`, async (t) => {
     const { directory } = await sandbox(t)

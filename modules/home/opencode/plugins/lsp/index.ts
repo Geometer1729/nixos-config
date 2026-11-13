@@ -98,6 +98,9 @@ function rootsFor(extensions: string[]): string[] {
     return ["hie.yaml", "cabal.project", "stack.yaml", "*.cabal"]
   }
   if (extensions.includes(".rs")) return ["Cargo.toml", ".git"]
+  // typescript-language-server type-checks with the typescript under its root, so a monorepo whose packages pin
+  // different versions needs one server per package.
+  if (extensions.some((extension) => extension === ".ts" || extension === ".tsx")) return ["package.json", ".git"]
   if (extensions.includes(".nix")) return ["flake.nix", "default.nix", ".git"]
   if (extensions.includes(".lua")) return [".luarc.json", ".luarc.jsonc", ".git"]
   return [".git"]
