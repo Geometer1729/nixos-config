@@ -52,11 +52,9 @@ in
   security.sudo.wheelNeedsPassword = false;
 
   # eMudhra intermediate keys were trivially weak (Mozilla bug 2083449); AAA was the Sectigo cross-sign path.
+  # NSS 3.131.1 dropped the other emSign roots, and cacert fails on blocklisting absent roots.
   security.pki.caCertificateBlacklist = [
     "emSign Root CA - G1"
-    "emSign ECC Root CA - G3"
-    "emSign Root CA - C1"
-    "emSign ECC Root CA - C3"
     "Comodo AAA Services root"
   ];
 

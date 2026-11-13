@@ -1,7 +1,7 @@
 _:
 final: prev: {
-  # nixpkgs lags far behind upstream gh-stack releases. Remove once nixpkgs
-  # reaches this version.
+  # Stable nixpkgs lags far behind upstream gh-stack releases. Remove once
+  # stable nixpkgs reaches this version.
   gh-stack =
     final.lib.warnIf (final.lib.versionAtLeast prev.gh-stack.version "0.2.0")
       "nixpkgs gh-stack is ${prev.gh-stack.version}; drop overlays/gh-stack.nix"
