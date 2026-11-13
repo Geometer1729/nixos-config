@@ -1,3 +1,8 @@
+# Servers resolve from PATH, which the project's dev shell should provide so
+# their versions match the project's toolchain and dependencies. Only nixd,
+# bash and yaml are installed globally (modules/home/development): nixd for
+# this repo, the others because they barely vary between projects. A missing
+# server belongs in that project's dev shell, not home.packages.
 {
   nixd = {
     command = [ "nixd" ];
