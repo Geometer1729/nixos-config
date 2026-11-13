@@ -167,7 +167,20 @@ Good: Fixed topic generation crashes (we now retry).
 
 At the end include an AI disclosure
 use emojis per bullet to indicate
-:robot:  entirely you
-:robot: + :human: tweaked
-:human: + :robot: substantially changed
-:human: entirely me
+:robot_face:  entirely you
+:robot_face: + 👱🏻 tweaked
+👱🏻 + :robot_face: substantially changed
+👱🏻 entirely me
+
+Write these exactly: the `:robot_face:` shortcode and the raw Unicode 👱🏻
+(U+1F471 U+1F3FB). `:robot:` and `:human:` don't exist in this workspace and
+render as broken glyphs. `:person_with_blond_hair::skin-tone-2:` gets split
+into two emojis by `slack_send_message_draft`.
+
+## Slack Draft
+
+When Brian asks for a draft, create it with `slack_send_message_draft` in
+`#fap` as a reply in the thread that holds his latest `#fap` post (the
+`thread_ts` in that post's permalink). The tool can't edit or delete
+drafts, so every retry leaves an extra draft Brian has to delete by hand.
+Get the text right before creating one.
