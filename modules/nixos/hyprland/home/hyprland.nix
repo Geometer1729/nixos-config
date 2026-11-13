@@ -242,6 +242,8 @@ in
                 hl.exec_cmd("bluetooth-autoconnect")
                 -- Pester me about any swap files
                 hl.exec_cmd("check-swaps")
+                -- A tmux server that outlived a crashed Hyprland still names the dead instance.
+                hl.exec_cmd('tmux set-environment -g HYPRLAND_INSTANCE_SIGNATURE "$HYPRLAND_INSTANCE_SIGNATURE"')
               end'')
           ];
         };
