@@ -21,6 +21,8 @@ export interface Notification {
   body: string
   key: string
   sessionID: string
+  /** The browse session whose waiting tab a click shows, when the top row is a browser handoff. */
+  browser: string
 }
 
 async function runningTools(client: OpenCodeClient, sessionIDs: readonly string[], signal: AbortSignal) {
@@ -122,7 +124,7 @@ function escape(value: string): string {
 
 export function notification(state: Snapshot, attached: ReadonlySet<string>, workspaces: ReadonlyMap<string, string> = new Map()): Notification {
   const sessions = new Map(state.sessions.map((session) => [session.id, session]))
-  const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string>; detail?: string }>()
+  const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string>; handoff?: Handoff }>()
   const root = (id: string): Session | undefined => {
     let session = sessions.get(id)
     const visited = new Set<string>()
@@ -134,13 +136,13 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
     }
     return session
   }
-  const add = (session: Session | undefined, kind: Kind, reason: string, detail?: string) => {
+  const add = (session: Session | undefined, kind: Kind, reason: string, handoff?: Handoff) => {
     if (!session || !attached.has(session.id) || session.time.archived !== undefined) return
     const previous = waiting.get(session.id)
     const reasons = previous?.reasons ?? new Set<string>()
     reasons.add(reason)
     if (!previous || statuses[kind].order < statuses[previous.kind].order) {
-      waiting.set(session.id, { session, kind, reasons, ...(detail === undefined ? {} : { detail }) })
+      waiting.set(session.id, { session, kind, reasons, ...(handoff === undefined ? {} : { handoff }) })
     }
   }
 
@@ -155,20 +157,21 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
   // The earliest handoff names the row; each one is its own delivery.
   const handoffs = state.handoffs.toSorted((a, b) => a.startedAt.localeCompare(b.startedAt) || a.session.localeCompare(b.session))
   for (const handoff of handoffs) {
-    add(root(handoff.sessionID), "browser", `handoff:${handoff.session}:${handoff.startedAt}`, handoff.message)
+    add(root(handoff.sessionID), "browser", `handoff:${handoff.session}:${handoff.startedAt}`, handoff)
   }
   for (const permission of state.permissions) add(root(permission.sessionID), "permission", `permission:${permission.id}`)
 
-  const rows = [...waiting.values()].map(({ session, kind, reasons, detail }) => {
+  const rows = [...waiting.values()].map(({ session, kind, reasons, handoff }) => {
     const project = text(basename(session.location.directory) || session.location.directory)
     const title = text(session.title ?? session.id)
-    return { id: session.id, kind, reasons: [...reasons].sort(), label: `${project} · ${title}`, detail }
+    return { id: session.id, kind, reasons: [...reasons].sort(), label: `${project} · ${title}`, handoff }
   }).sort((a, b) => statuses[a.kind].order - statuses[b.kind].order || a.label.localeCompare(b.label) || a.id.localeCompare(b.id))
   const labels = new Map<string, number>()
   for (const row of rows) labels.set(row.label, (labels.get(row.label) ?? 0) + 1)
 
   return {
     sessionID: rows[0]?.id ?? "",
+    browser: rows[0]?.handoff?.session ?? "",
     key: JSON.stringify(rows.map(({ id, reasons }) => [id, reasons])),
     summary: rows.length ? `OpenCode · ${rows.length} session${rows.length === 1 ? "" : "s"} waiting` : "",
     body: rows.map((row) => {
@@ -176,7 +179,7 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
       const suffix = labels.get(row.label)! > 1 ? ` (${row.id.slice(-6)})` : ""
       const workspace = workspaces.get(row.id)
       const prefix = workspace ? `ws ${text(workspace)} · ` : ""
-      const detail = row.detail === undefined ? "" : `: ${truncate(text(row.detail))}`
+      const detail = row.handoff === undefined ? "" : `: ${truncate(text(row.handoff.message))}`
       return `${status.icon} ${escape(prefix + row.label + suffix)} — ${escape(status.label + detail)}`
     }).join("\n"),
   }

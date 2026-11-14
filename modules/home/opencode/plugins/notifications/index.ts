@@ -85,7 +85,9 @@ async function run({ command, focusCommand, browseCommand, workDirectory }: Opti
           const muted = new Set(until === undefined ? [] : state.sessions
             .filter((session) => inside(session.location.directory, workDirectory!)).map((session) => session.id))
           const content = notification(state, new Set([...attached.keys()].filter((id) => !muted.has(id))), locations)
-          await exec(command, [content.summary, content.body, content.key, content.sessionID, socketPath(process.pid)], { signal: timeout })
+          await exec(command, [
+            content.summary, content.body, content.key, content.sessionID, socketPath(process.pid), content.browser, browseCommand ?? "",
+          ], { signal: timeout })
         }, connected, report)
         shared.request = queue.request
         queue.request()

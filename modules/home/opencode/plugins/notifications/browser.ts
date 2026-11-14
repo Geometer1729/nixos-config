@@ -69,9 +69,10 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
-/** Browse's implicit session IDs, mapped back to their OpenCode sessions. */
+/** Browse's implicit session IDs, mapped back to their OpenCode sessions: the MCP server's, and the CLI's
+ * (`oc-` + the lowercased OPENCODE_SESSION_ID, browse's cli/context.ts). */
 export function implicitSessions(sessionIDs: Iterable<string>): Map<string, string> {
-  return new Map([...sessionIDs].map((id) => [browseSession(id), id]))
+  return new Map([...sessionIDs].flatMap((id) => [[browseSession(id), id], [`oc-${id.toLowerCase()}`, id]] as const))
 }
 
 /**

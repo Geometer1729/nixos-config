@@ -67,6 +67,7 @@ test("named sessions belong to the running browse call that quotes their name", 
   assert.deepEqual(owners("loom"), ["ses_direct"])
   assert.deepEqual(owners("github"), [], "A name must match whole, not as part of another")
   assert.deepEqual(owners(browseSession("ses_unrelated")), ["ses_unrelated"], "Implicit sessions need no running call")
+  assert.deepEqual(owners("oc-ses_unrelated"), ["ses_unrelated"], "The CLI's implicit session is the lowercased ID")
   assert.deepEqual(owners("elsewhere"), [])
 })
 

@@ -8,6 +8,14 @@ target_file="$XDG_RUNTIME_DIR/opencode-notify.target"
 if [[ "${1-}" == "--focus" ]]; then
   target=$(jq -e --argjson id "${2?Expected a notification ID}" 'select(.id == $id)' "$target_file")
   flock -u 9
+  # An agent blocked in a browse handoff needs the browser tab, not its terminal.
+  # browse brings the tab's window forward; Hyprland's focus_on_activate follows it.
+  browser=$(jq -r '.browser // ""' <<<"$target")
+  browse=$(jq -r '.browse // ""' <<<"$target")
+  if [[ -n "$browser" && -n "$browse" ]] \
+    && OPENCODE_BROWSER_AUTOSTART=false timeout 10 "$browse" session show "$browser" >/dev/null; then
+    exit 0
+  fi
   jq -c '.sessionID' <<<"$target" | socat -T 2 - "UNIX-CONNECT:$(jq -r '.socket' <<<"$target")"
   exit 0
 fi
@@ -17,6 +25,8 @@ body="${2-}"
 key="${3-}"
 session="${4-}"
 socket="${5-}"
+browser="${6-}"
+browse="${7-}"
 # Delivery receipt only: the waiting list is still rebuilt from OpenCode. Keeping
 # this in /run makes dismissal survive refreshes/reloads, but not a new login.
 receipt="$XDG_RUNTIME_DIR/opencode-notify.last"
@@ -47,5 +57,5 @@ if [[ ! -f "$receipt" || "$(<"$receipt")" != "$fingerprint" ]]; then
 fi
 
 # Refresh the socket address after service restarts even if the popup is unchanged.
-jq -n --argjson id "$id" --arg sessionID "$session" --arg socket "$socket" \
-  '{id: $id, sessionID: $sessionID, socket: $socket}' >"$target_file"
+jq -n --argjson id "$id" --arg sessionID "$session" --arg socket "$socket" --arg browser "$browser" --arg browse "$browse" \
+  '{id: $id, sessionID: $sessionID, socket: $socket, browser: $browser, browse: $browse}' >"$target_file"

@@ -8,7 +8,7 @@ import type { Handoff, PendingHandoff } from "./browser.ts"
 import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
 
-const empty = { summary: "", body: "", key: "[]", sessionID: "" }
+const empty = { summary: "", body: "", key: "[]", sessionID: "", browser: "" }
 const notification = (state: Snapshot) => render(state, new Set(state.sessions.map((session) => session.id)))
 
 function session(id: string, overrides: Partial<Session> = {}): Session {
@@ -267,4 +267,12 @@ test("snapshots read browse only while a session runs and attribute its handoffs
   listed = []
   await snapshot(client, signal, async () => pending.slice(0, 1))
   assert.deepEqual(listed, [], "Implicit sessions need no message reads")
+})
+
+test("a click shows the waiting tab only when a browser handoff is the top row", () => {
+  const sessions = [session("ses_open", { time: { created: 1, updated: 2 } })]
+  const waiting = handoff("ses_open", { session: "billing-login" })
+  assert.equal(notification(state(sessions, { handoffs: [waiting] })).browser, "billing-login")
+  assert.equal(notification(state(sessions, { handoffs: [waiting], permissions: [{ sessionID: "ses_open", id: "per" }] })).browser, "")
+  assert.equal(notification(state([...sessions, session("ses_asking")], { handoffs: [waiting], permissions: [{ sessionID: "ses_asking", id: "per" }] })).browser, "")
 })
