@@ -69,3 +69,14 @@ test("named sessions belong to the running browse call that quotes their name", 
   assert.deepEqual(owners(browseSession("ses_unrelated")), ["ses_unrelated"], "Implicit sessions need no running call")
   assert.deepEqual(owners("elsewhere"), [])
 })
+
+test("a session browse renamed after session_delete is found by the handoff message in the running call", () => {
+  const running = new Map<string, RunningTool[]>([
+    ["ses_agent", [{ name: "execute", input: { code: `await tools.browse.execute({ code: "await handoff('Approve the payment in the bank app')" })` } }]],
+    ["ses_other", [{ name: "execute", input: { code: `await tools.browse.execute({ code: "await handoff('Sign in')" })` } }]],
+  ])
+  const owners = (message: string) => attribute([{ session: "mcp-1a2b3c4d", message, startedAt: "t" }], new Map(), running)
+    .map((handoff) => handoff.sessionID)
+  assert.deepEqual(owners("Approve the payment in the bank app"), ["ses_agent"])
+  assert.deepEqual(owners("Sign in"), [], "Short messages are too common to attribute")
+})

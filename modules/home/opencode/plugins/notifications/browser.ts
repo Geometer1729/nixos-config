@@ -63,6 +63,8 @@ function strings(value: unknown): string[] {
   return record(value) ? Object.values(value).flatMap(strings) : []
 }
 
+const minimumMessage = 12
+
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
@@ -73,9 +75,10 @@ export function implicitSessions(sessionIDs: Iterable<string>): Map<string, stri
 }
 
 /**
- * The implicit session ID identifies its agent exactly. A session the agent named
- * (`session_new`) is attributed to an active session whose running browse call
- * names it, directly or as a quoted string in Code Mode's script.
+ * The implicit session ID identifies its agent exactly. Other sessions, named by the
+ * agent (`session_new`) or random after `session_delete`, are attributed to an active
+ * session whose running browse call names the session (directly or as a quoted string
+ * in Code Mode's script) or contains the handoff's message.
  */
 export function attribute(
   pending: readonly PendingHandoff[],
@@ -86,10 +89,12 @@ export function attribute(
     const owner = implicit.get(handoff.session)
     if (owner) return [{ ...handoff, sessionID: owner }]
     const quoted = new RegExp(`["'\`]${escapeRegExp(handoff.session)}["'\`]`)
+    // Short messages ("Sign in") are too common to identify a call.
+    const message = handoff.message.length >= minimumMessage ? handoff.message : undefined
     return [...running].filter(([, tools]) => tools.some((tool) => {
       const values = strings(tool.input)
       return (tool.name.includes("browse") || values.some((value) => value.includes("browse")))
-        && values.some((value) => value === handoff.session || quoted.test(value))
+        && values.some((value) => value === handoff.session || quoted.test(value) || (message !== undefined && value.includes(message)))
     })).map(([sessionID]) => ({ ...handoff, sessionID }))
   })
 }
