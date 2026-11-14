@@ -71,6 +71,18 @@
     "browse-npm": {
       "flake": false,
       "locked": {
+        "narHash": "sha256-forw2D2AqbedXxs0I9NzmS13Ogh8BKZ28quJR7pktv0=",
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
+      }
+    },
+    "browse-npm-latest": {
+      "flake": false,
+      "locked": {
         "narHash": "sha256-wJX3CyXujbD0LMjae1PLyxij3bGs2c351rzbAiizq2E=",
         "type": "file",
         "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/latest"
@@ -641,6 +653,7 @@
     "root": {
       "inputs": {
         "browse-npm": "browse-npm",
+        "browse-npm-latest": "browse-npm-latest",
         "claude-code": "claude-code",
         "claude-icon": "claude-icon",
         "disko": "disko",

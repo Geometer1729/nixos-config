@@ -65,6 +65,7 @@ let
   };
   # browse lets agents drive Brave through its extension; the relay starts on demand.
   browseNpm = builtins.fromJSON (builtins.readFile inputs.browse-npm);
+  browseStable = (builtins.fromJSON (builtins.readFile inputs.browse-npm-latest)).version;
   browse = pkgs.stdenv.mkDerivation {
     pname = "browse";
     inherit (browseNpm) version;
@@ -110,6 +111,11 @@ in
 {
   # The speech plugin's server voices its messages with speak-synthesize and speak-play.
   imports = [ ../speech ];
+
+  # browse-npm tracks the dev tag only for pending handoffs in `browse session list`
+  # (anomalyco/browse#250), first released in 0.0.17.
+  warnings = lib.optional (lib.versionAtLeast browseStable "0.0.17")
+    "browse ${browseStable} is stable: point the browse-npm flake input back at latest and remove browse-npm-latest";
 
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [

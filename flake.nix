@@ -61,8 +61,11 @@
     zsh-nix-shell.flake = false;
     opencode2-npm.url = "file+https://registry.npmjs.org/@opencode/cli-linux-x64/latest";
     opencode2-npm.flake = false;
-    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
+    # dev until a stable release reports pending handoffs (0.0.17); modules/home/opencode warns once one does.
+    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/dev";
     browse-npm.flake = false;
+    browse-npm-latest.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
+    browse-npm-latest.flake = false;
     kokoro.url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2";
     kokoro.flake = false;
     claude-icon.url = "file+https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
