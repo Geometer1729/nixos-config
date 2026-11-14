@@ -10,16 +10,41 @@ import { Plugin } from "@opencode/plugin"
 
 import { refreshQueue } from "./refresh.ts"
 import { confirmedSnapshot, notification, relevantEvent, snapshot } from "./snapshot.ts"
+import { pendingHandoffs } from "./browser.ts"
+import type { PendingHandoff } from "./browser.ts"
 import { presenceServer, socketPath } from "./presence.ts"
 import { inside, muteFile, mutedUntil } from "./mute.ts"
 
 const exec = promisify(execFile)
 const report = (error: unknown) => console.error("OpenCode waiting notification:", error)
 const moduleID = Symbol("notification plugin generation")
+// browse's relay has no events; poll it while an agent could be blocked in handoff().
+const handoffPollMs = 3000
 
-async function run(command: string, focusCommand: string, workDirectory: string | undefined, shared: Shared): Promise<void> {
+interface Options {
+  command: string
+  focusCommand: string
+  browseCommand?: string
+  workDirectory?: string
+}
+
+async function run({ command, focusCommand, browseCommand, workDirectory }: Options, shared: Shared): Promise<void> {
   const signal = shared.controller.signal
   if (signal.aborted) return
+  // A broken browse must not hide other rows or log every poll.
+  let browseError = ""
+  const readHandoffs = browseCommand === undefined ? undefined : async (timeout: AbortSignal): Promise<PendingHandoff[]> => {
+    try {
+      const handoffs = await pendingHandoffs(browseCommand, timeout)
+      browseError = ""
+      return handoffs
+    } catch (error) {
+      if (timeout.aborted) throw error
+      if (String(error) !== browseError) report(error)
+      browseError = String(error)
+      return []
+    }
+  }
   const presence = await presenceServer(socketPath(process.pid), () => shared.request())
   const mute = muteFile()
   const muteWatcher = watch(dirname(mute), (_, name) => { if (name === basename(mute)) shared.request() })
@@ -40,9 +65,11 @@ async function run(command: string, focusCommand: string, workDirectory: string 
         // A standalone server must never render another server's waiting sessions.
         if (health.pid !== process.pid) return
 
+        let busy = false
         const queue = refreshQueue(async () => {
           const timeout = AbortSignal.any([connected, AbortSignal.timeout(15_000)])
-          const state = await confirmedSnapshot(() => snapshot(client, timeout), timeout, shared.request)
+          const state = await confirmedSnapshot(() => snapshot(client, timeout, readHandoffs), timeout, shared.request)
+          busy = Object.keys(state.active).length > 0
           const attached = presence.sessions()
           const workspaces = new Map(await Promise.all([...new Set(attached.values())].filter(Boolean).map(async (pane) => {
             const workspace = await exec(focusCommand, ["--workspace", pane], { signal: timeout })
@@ -62,6 +89,18 @@ async function run(command: string, focusCommand: string, workDirectory: string 
         }, connected, report)
         shared.request = queue.request
         queue.request()
+        // Only a change in browse's pending handoffs needs a refresh.
+        const poll = readHandoffs && (async () => {
+          let seen = ""
+          while (!connected.aborted) {
+            await sleep(handoffPollMs, undefined, { signal: connected })
+            if (!busy) continue
+            const current = await readHandoffs(AbortSignal.any([connected, AbortSignal.timeout(15_000)]))
+              .then((handoffs) => JSON.stringify(handoffs), () => seen)
+            if (current !== seen) queue.request()
+            seen = current
+          }
+        })().catch(() => undefined)
         try {
           // Each connection marker also invalidates state after a reconnect.
           for await (const event of client.event.subscribe({ signal: connected })) {
@@ -72,6 +111,7 @@ async function run(command: string, focusCommand: string, workDirectory: string 
           shared.request = () => undefined
           connection.abort()
           await queue.settled()
+          await poll
         }
       } catch (error) {
         if (!signal.aborted) {
@@ -103,7 +143,13 @@ export default Plugin.define({
     const command = context.options.command
     const focusCommand = context.options.focusCommand
     const workDirectory = typeof context.options.workDirectory === "string" ? context.options.workDirectory : undefined
+    const browseCommand = typeof context.options.browseCommand === "string" ? context.options.browseCommand : undefined
     if (typeof command !== "string" || typeof focusCommand !== "string" || !process.env.DBUS_SESSION_BUS_ADDRESS || !process.env.XDG_RUNTIME_DIR) return
+    const options: Options = {
+      command, focusCommand,
+      ...(browseCommand === undefined ? {} : { browseCommand }),
+      ...(workDirectory === undefined ? {} : { workDirectory }),
+    }
 
     // Global plugins are instantiated once per location. They share one reader
     // and renderer; a code reload replaces that reader. No session state is cached.
@@ -120,7 +166,7 @@ export default Plugin.define({
       const state: Shared = {
         moduleID, owners, controller: new AbortController(), task: Promise.resolve(), request: () => undefined,
       }
-      state.task = previous.then(() => run(command, focusCommand, workDirectory, state)).catch(report)
+      state.task = previous.then(() => run(options, state)).catch(report)
       return state
     })()
     const owner = Symbol()

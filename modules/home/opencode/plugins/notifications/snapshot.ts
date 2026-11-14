@@ -2,6 +2,9 @@ import type { OpenCodeClient } from "@opencode/client"
 import { basename } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
+import { attribute, implicitSessions } from "./browser.ts"
+import type { Handoff, PendingHandoff, RunningTool } from "./browser.ts"
+
 type SessionInfo = Awaited<ReturnType<OpenCodeClient["session"]["get"]>>
 export type Session = Pick<SessionInfo, "id" | "parentID" | "title" | "location" | "time" | "outcome">
 
@@ -10,6 +13,7 @@ export interface Snapshot {
   active: Readonly<Record<string, unknown>>
   permissions: readonly { sessionID: string; id?: string }[]
   forms: readonly { sessionID: string; id?: string }[]
+  handoffs: readonly Handoff[]
 }
 
 export interface Notification {
@@ -19,7 +23,21 @@ export interface Notification {
   sessionID: string
 }
 
-export async function snapshot(client: OpenCodeClient, signal: AbortSignal): Promise<Snapshot> {
+async function runningTools(client: OpenCodeClient, sessionIDs: readonly string[], signal: AbortSignal) {
+  return new Map(await Promise.all(sessionIDs.map(async (sessionID) => {
+    // A running tool call belongs to the session's latest assistant message.
+    const page = await client.message.list({ sessionID, limit: 1, order: "desc", type: "assistant" }, { signal })
+    const tools: RunningTool[] = page.data.flatMap((message) => message.type === "assistant" ? message.content : [])
+      .flatMap((part) => part.type === "tool" && part.state.status === "running" ? [{ name: part.name, input: part.state.input }] : [])
+    return [sessionID, tools] as const
+  })))
+}
+
+export async function snapshot(
+  client: OpenCodeClient,
+  signal: AbortSignal,
+  readHandoffs?: (signal: AbortSignal) => Promise<PendingHandoff[]>,
+): Promise<Snapshot> {
   const options = { signal }
   const sessions = new Map<string, Session>()
   let cursor: string | undefined
@@ -33,21 +51,31 @@ export async function snapshot(client: OpenCodeClient, signal: AbortSignal): Pro
     client.session.active(options),
     client.debug.location.list(options),
   ])
-  // Pending forms and permissions live in location-scoped memory. Inspect loaded
-  // locations rather than activating every historical worktree to look for them.
-  const requests = await Promise.all(locations.map(async (location) => {
-    const [permissions, forms] = await Promise.all([
-      client.permission.request.list({ location }, options),
-      client.form.list({ location }, options),
-    ])
-    return { permissions: permissions.data, forms: forms.data }
-  }))
+  const busy = Object.keys(active)
+  const [requests, pending] = await Promise.all([
+    // Pending forms and permissions live in location-scoped memory. Inspect loaded
+    // locations rather than activating every historical worktree to look for them.
+    Promise.all(locations.map(async (location) => {
+      const [permissions, forms] = await Promise.all([
+        client.permission.request.list({ location }, options),
+        client.form.list({ location }, options),
+      ])
+      return { permissions: permissions.data, forms: forms.data }
+    })),
+    // An agent blocked in handoff() is still running its tool call.
+    readHandoffs && busy.length ? readHandoffs(signal) : [],
+  ])
+  const implicit = pending.length ? implicitSessions(sessions.keys()) : new Map<string, string>()
+  const running = pending.some((handoff) => !implicit.has(handoff.session))
+    ? await runningTools(client, busy, signal)
+    : new Map<string, RunningTool[]>()
 
   return {
     sessions: [...sessions.values()],
     active,
     permissions: requests.flatMap((request) => request.permissions),
     forms: requests.flatMap((request) => request.forms),
+    handoffs: attribute(pending, implicit, running),
   }
 }
 
@@ -73,14 +101,19 @@ export async function confirmedSnapshot(
 
 const statuses = {
   permission: { order: 0, icon: "🔐", label: "approval needed" },
-  question: { order: 1, icon: "❓", label: "question" },
-  failed: { order: 2, icon: "!", label: "failed" },
-  ready: { order: 3, icon: "✓", label: "ready" },
+  browser: { order: 1, icon: "🌐", label: "browser" },
+  question: { order: 2, icon: "❓", label: "question" },
+  failed: { order: 3, icon: "!", label: "failed" },
+  ready: { order: 4, icon: "✓", label: "ready" },
 } as const
 type Kind = keyof typeof statuses
 
 function text(value: string): string {
   return value.replace(/[\x00-\x1f\x7f]/g, " ").replace(/\s+/g, " ").trim()
+}
+
+function truncate(value: string, length = 80): string {
+  return value.length > length ? value.slice(0, length - 1) + "…" : value
 }
 
 function escape(value: string): string {
@@ -89,7 +122,7 @@ function escape(value: string): string {
 
 export function notification(state: Snapshot, attached: ReadonlySet<string>, workspaces: ReadonlyMap<string, string> = new Map()): Notification {
   const sessions = new Map(state.sessions.map((session) => [session.id, session]))
-  const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string> }>()
+  const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string>; detail?: string }>()
   const root = (id: string): Session | undefined => {
     let session = sessions.get(id)
     const visited = new Set<string>()
@@ -101,13 +134,13 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
     }
     return session
   }
-  const add = (session: Session | undefined, kind: Kind, reason: string) => {
+  const add = (session: Session | undefined, kind: Kind, reason: string, detail?: string) => {
     if (!session || !attached.has(session.id) || session.time.archived !== undefined) return
     const previous = waiting.get(session.id)
     const reasons = previous?.reasons ?? new Set<string>()
     reasons.add(reason)
     if (!previous || statuses[kind].order < statuses[previous.kind].order) {
-      waiting.set(session.id, { session, kind, reasons })
+      waiting.set(session.id, { session, kind, reasons, ...(detail === undefined ? {} : { detail }) })
     }
   }
 
@@ -119,12 +152,17 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
   }
   // Child requests need the user's attention too, but belong on their parent's row.
   for (const form of state.forms) add(root(form.sessionID), "question", `form:${form.id}`)
+  // The earliest handoff names the row; each one is its own delivery.
+  const handoffs = state.handoffs.toSorted((a, b) => a.startedAt.localeCompare(b.startedAt) || a.session.localeCompare(b.session))
+  for (const handoff of handoffs) {
+    add(root(handoff.sessionID), "browser", `handoff:${handoff.session}:${handoff.startedAt}`, handoff.message)
+  }
   for (const permission of state.permissions) add(root(permission.sessionID), "permission", `permission:${permission.id}`)
 
-  const rows = [...waiting.values()].map(({ session, kind, reasons }) => {
+  const rows = [...waiting.values()].map(({ session, kind, reasons, detail }) => {
     const project = text(basename(session.location.directory) || session.location.directory)
     const title = text(session.title ?? session.id)
-    return { id: session.id, kind, reasons: [...reasons].sort(), label: `${project} · ${title}` }
+    return { id: session.id, kind, reasons: [...reasons].sort(), label: `${project} · ${title}`, detail }
   }).sort((a, b) => statuses[a.kind].order - statuses[b.kind].order || a.label.localeCompare(b.label) || a.id.localeCompare(b.id))
   const labels = new Map<string, number>()
   for (const row of rows) labels.set(row.label, (labels.get(row.label) ?? 0) + 1)
@@ -138,7 +176,8 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
       const suffix = labels.get(row.label)! > 1 ? ` (${row.id.slice(-6)})` : ""
       const workspace = workspaces.get(row.id)
       const prefix = workspace ? `ws ${text(workspace)} · ` : ""
-      return `${status.icon} ${escape(prefix + row.label + suffix)} — ${status.label}`
+      const detail = row.detail === undefined ? "" : `: ${truncate(text(row.detail))}`
+      return `${status.icon} ${escape(prefix + row.label + suffix)} — ${escape(status.label + detail)}`
     }).join("\n"),
   }
 }

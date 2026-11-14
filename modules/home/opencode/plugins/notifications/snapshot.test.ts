@@ -3,6 +3,8 @@ import test from "node:test"
 import { setTimeout as sleep } from "node:timers/promises"
 import type { OpenCodeClient } from "@opencode/client"
 
+import { browseSession } from "./browser.ts"
+import type { Handoff, PendingHandoff } from "./browser.ts"
 import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
 
@@ -21,7 +23,11 @@ function session(id: string, overrides: Partial<Session> = {}): Session {
 }
 
 function state(sessions: Session[], overrides: Partial<Snapshot> = {}): Snapshot {
-  return { sessions, active: {}, permissions: [], forms: [], ...overrides }
+  return { sessions, active: {}, permissions: [], forms: [], handoffs: [], ...overrides }
+}
+
+function handoff(sessionID: string, overrides: Partial<Handoff> = {}): Handoff {
+  return { sessionID, session: "mcp-00000000", message: "Sign in", startedAt: "2026-11-13T23:59:53.961Z", ...overrides }
 }
 
 test("a viewed response disappears, but viewing does not dismiss a pending request", () => {
@@ -191,4 +197,74 @@ test("new completions and requests have distinct delivery identities even with i
   assert.equal(first.key, notification(state([session("ses_open"), session("ses_running")], {
     active: { ses_running: { type: "running" } },
   })).key, "unrelated activity does not reset dismissal")
+})
+
+test("a browser handoff shows its message on its root's row, ranked below approvals only", () => {
+  const sessions = [session("ses_root", { title: "Login" }), session("ses_child", { parentID: "ses_root" })]
+  const waiting = state(sessions, { active: { ses_root: {}, ses_child: {} }, handoffs: [handoff("ses_child", { message: "Complete the <2FA> & continue" })] })
+  const content = notification(waiting)
+  assert.equal(content.summary, "OpenCode · 1 session waiting")
+  assert.equal(content.body, "🌐 conf · Login — browser: Complete the &lt;2FA&gt; &amp; continue")
+  assert.equal(content.sessionID, "ses_root")
+  assert.match(notification({ ...waiting, forms: [{ sessionID: "ses_child", id: "frm" }] }).body, /— browser: /)
+  assert.match(notification({ ...waiting, permissions: [{ sessionID: "ses_root", id: "per" }] }).body, /— approval needed$/)
+  const long = notification(state(sessions, { handoffs: [handoff("ses_root", { message: "x".repeat(200) })] }))
+  assert.equal(long.body, `🌐 conf · Login — browser: ${"x".repeat(79)}…`)
+})
+
+test("each handoff is its own delivery, and the earliest names the row", () => {
+  const sessions = [session("ses_open", { time: { created: 1, updated: 2 } })]
+  const first = handoff("ses_open", { session: "named", message: "First", startedAt: "2026-11-13T10:00:00.000Z" })
+  const second = handoff("ses_open", { message: "Second", startedAt: "2026-11-13T11:00:00.000Z" })
+  const both = notification(state(sessions, { handoffs: [second, first] }))
+  assert.equal(both.body, "🌐 conf · ses_open — browser: First")
+  assert.deepEqual(both, notification(state(sessions, { handoffs: [first, second] })))
+  const again = notification(state(sessions, { handoffs: [{ ...first, startedAt: "2026-11-13T12:00:00.000Z" }] }))
+  assert.notEqual(notification(state(sessions, { handoffs: [first] })).key, again.key)
+  assert.deepEqual(notification(state(sessions)), empty)
+})
+
+test("snapshots read browse only while a session runs and attribute its handoffs", async () => {
+  const sessions = [session("ses_implicit"), session("ses_named"), session("ses_other")]
+  let active: Record<string, unknown> = {}
+  let reads = 0
+  let listed: string[] = []
+  const pending: PendingHandoff[] = [
+    { session: browseSession("ses_implicit"), message: "Implicit", startedAt: "1" },
+    { session: "billing-login", message: "Named", startedAt: "2" },
+    { session: "unknown", message: "Unattributed", startedAt: "3" },
+  ]
+  const tools: Record<string, unknown[]> = {
+    ses_named: [{ type: "tool", name: "execute", state: { status: "running", input: {
+      code: `await tools.browse.execute({ session: "billing-login", code: "await handoff('Named')" })`,
+    } } }],
+    // A finished call is not what the session is blocked on.
+    ses_other: [{ type: "tool", name: "browse_execute", state: { status: "completed", input: { session: "unknown" } } }],
+  }
+  const client = {
+    session: {
+      list: async () => ({ data: sessions, cursor: {} }),
+      active: async () => active,
+    },
+    message: { list: async ({ sessionID }: { sessionID: string }) => {
+      listed.push(sessionID)
+      return { data: [{ type: "assistant", content: tools[sessionID] ?? [] }], cursor: {} }
+    } },
+    debug: { location: { list: async () => [] } },
+  } as unknown as OpenCodeClient
+  const signal = new AbortController().signal
+  const read = async () => { reads++; return pending }
+
+  assert.deepEqual((await snapshot(client, signal, read)).handoffs, [])
+  assert.equal(reads, 0, "Without a running session nothing can be blocked in handoff()")
+
+  active = { ses_implicit: {}, ses_named: {}, ses_other: {} }
+  const handoffs = (await snapshot(client, signal, read)).handoffs
+  assert.equal(reads, 1)
+  assert.deepEqual(handoffs.map(({ sessionID, message }) => [sessionID, message]), [["ses_implicit", "Implicit"], ["ses_named", "Named"]])
+  assert.deepEqual(listed.toSorted(), ["ses_implicit", "ses_named", "ses_other"])
+
+  listed = []
+  await snapshot(client, signal, async () => pending.slice(0, 1))
+  assert.deepEqual(listed, [], "Implicit sessions need no message reads")
 })
