@@ -69,3 +69,9 @@ Finish with `session_delete` on every session you created; it closes that
 session's tabs. Don't call `tabs_cleanup({ idleMinutes: 0 })`, even though the
 MCP instructions suggest it: it closes every idle agent tab, including other
 agents' sessions, and once closed a tab the user was about to sign in to.
+
+`files.dir` (`/tmp/opencode-browser-files-<pid>-<rand>`) belongs to the relay
+and every agent shares it while the relay runs. Never delete it. The relay
+creates it only at startup. If it's gone, every `execute` fails with
+`ENOENT ... lstat '/tmp/opencode-browser-files-...'`. Recreate it with
+`mkdir -m 700` and the exact path from the error.

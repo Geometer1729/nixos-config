@@ -401,6 +401,14 @@ in
         value = "allow";
       })
       allowedBashCommands
+    ++ [
+      {
+        # browse's per-relay files dir is shared by every agent; deleting it
+        # breaks every execute until the relay restarts.
+        name = "rm *opencode-browser-files-*";
+        value = "deny";
+      }
+    ]
   );
   edit = {
     "*" = "ask";

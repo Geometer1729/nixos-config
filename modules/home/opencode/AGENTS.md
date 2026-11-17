@@ -5,6 +5,8 @@ Your shell uses direnv automagically.
 
 Feel free to use `nix-shell -p` when you want a new tool.
 
+Don't clean up `/tmp`, not even your own scratch files. Reboots wipe it, and other agents and tools keep live state there.
+
 gh and linearis are usefull clis, for slack you have an mcp server.
 
 Do not be afraid to raise limitations or possible mistakes I missed.
