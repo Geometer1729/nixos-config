@@ -34,10 +34,17 @@ in
     foundryvtt
     # nginx is off: bbrian.xyz isn't worth the NGINX2Root exposure (2026-11-18).
     # Re-adding this import restores the site, Foundry's proxy, ACME and ports 80/443.
+    # The warning below fires once nixpkgs ships the fix.
     taskchampion
     useBuilders
     ./hardware.nix
   ];
+
+  # NGINX2Root is fixed in nginx 1.30.7 (stable) and 1.31.9 (mainline).
+  warnings =
+    let v = config.services.nginx.package.version;
+    in lib.optional (lib.versionAtLeast v "1.31.9" || (lib.versions.majorMinor v == "1.30" && lib.versionAtLeast v "1.30.7"))
+      "nixpkgs nginx ${v} fixes NGINX2Root: re-add the nginx import in configurations/nixos/narvi/default.nix and delete this warning";
 
   networking.hostName = "narvi";
   networking.useDHCP = true;
