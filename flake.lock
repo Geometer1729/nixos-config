@@ -198,13 +198,13 @@
     "foundryvtt-image": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-NL5Jp6rzNfkzvMmlhDT7pfoaZuxjzg+RfUVRk7a1FaE=",
+        "narHash": "sha256-h4XdXYKlRUNnlnFo9i/OUdOiB/Wcw1gGZdmf6lF4rlY=",
         "type": "file",
-        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release"
+        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/13"
       },
       "original": {
         "type": "file",
-        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release"
+        "url": "https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/13"
       }
     },
     "fromYaml": {
@@ -612,6 +612,18 @@
         "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/latest"
       }
     },
+    "pf1-system": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-O1phhq9PiH4O/EEDF7UtnHiKguTaRh7jrTN4yV7RBnw=",
+        "type": "file",
+        "url": "https://gitlab.com/foundryvtt_pathfinder1e/foundryvtt-pathfinder1/-/releases/permalink/latest/downloads/system.json"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://gitlab.com/foundryvtt_pathfinder1e/foundryvtt-pathfinder1/-/releases/permalink/latest/downloads/system.json"
+      }
+    },
     "prismlauncher": {
       "inputs": {
         "libnbtplusplus": "libnbtplusplus",
@@ -677,6 +689,7 @@
         "nvim-luaref": "nvim-luaref",
         "ocaml-nvim": "ocaml-nvim",
         "opencode2-npm": "opencode2-npm",
+        "pf1-system": "pf1-system",
         "prismlauncher": "prismlauncher",
         "recover-vim": "recover-vim",
         "shuck": "shuck",

@@ -1,8 +1,14 @@
 { flake, config, lib, ... }:
 let
   release = builtins.fromJSON (builtins.readFile flake.inputs.foundryvtt-image);
+  pf1 = builtins.fromJSON (builtins.readFile flake.inputs.pf1-system);
+  pf1Max = pf1.compatibility.maximum or "999";
 in
 {
+  # The image is held on felddy's `13` tag because pf1 (the WOTLK world) refuses to load on v14.
+  warnings = lib.optional (lib.versionAtLeast pf1Max "14")
+    "pf1 ${pf1.version} supports Foundry ${pf1Max}: move the foundryvtt-image input in flake.nix back to tags/release and update pf1 in Foundry";
+
   # TODO why not "https://github.com/reckenrode/nix-foundryvtt"
   virtualisation.oci-containers.containers.foundryvtt = {
     # Pinned by digest so `nix flake update` moves it; a bare tag is pulled once and never again.

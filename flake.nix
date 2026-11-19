@@ -71,8 +71,11 @@
     claude-icon.url = "file+https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
     claude-icon.flake = false;
     # Docker Hub metadata for the image tag; its digest pins the container.
-    foundryvtt-image.url = "file+https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/release";
+    # Held on v13 until the pf1 system supports v14; modules/nixos/foundryvtt.nix warns once it does.
+    foundryvtt-image.url = "file+https://hub.docker.com/v2/repositories/felddy/foundryvtt/tags/13";
     foundryvtt-image.flake = false;
+    pf1-system.url = "file+https://gitlab.com/foundryvtt_pathfinder1e/foundryvtt-pathfinder1/-/releases/permalink/latest/downloads/system.json";
+    pf1-system.flake = false;
 
     # Work
     linearis.url = "github:linearis-oss/linearis";
