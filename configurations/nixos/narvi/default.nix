@@ -32,7 +32,8 @@ in
     base
     cache
     foundryvtt
-    nginx
+    # nginx is off: bbrian.xyz isn't worth the NGINX2Root exposure (2026-11-18).
+    # Re-adding this import restores the site, Foundry's proxy, ACME and ports 80/443.
     taskchampion
     useBuilders
     ./hardware.nix
