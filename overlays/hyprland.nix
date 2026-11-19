@@ -13,4 +13,10 @@ in
       unstable.hyprland;
   # Keep the portal in sync with the compositor it talks to.
   inherit (unstable) xdg-desktop-portal-hyprland;
+  # Waybar 0.15 sends legacy `dispatch workspace N`, which the Lua config
+  # rejects, so clicking a workspace does nothing. 0.16 speaks hl.dsp.
+  waybar =
+    final.lib.warnIf (final.lib.versionAtLeast prev.waybar.version "0.16")
+      "nixpkgs waybar is ${prev.waybar.version}; drop the waybar override in overlays/hyprland.nix"
+      unstable.waybar;
 }
