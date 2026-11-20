@@ -36,7 +36,7 @@ if [[ ${1:-} == login ]]; then
   flock -n 8 || exit 0
   case $target in
     codex) signed_in() { opencode auth login openai --method chatgpt-token-sharing; } ;;
-    claude-*) signed_in() { CLAUDE_CONFIG_DIR="$HOME/.$target" claude auth login; } ;;
+    claude) signed_in() { claude auth login; } ;;
   esac
   if signed_in; then
     echo "Updating the usage bar..."
@@ -67,24 +67,19 @@ sign_in() {
 
 valid() {
   jq -e --argjson now "$(date +%s)" '.claudeAiOauth.expiresAt / 1000 > $now + 60' \
-    "$1/.credentials.json" >/dev/null 2>&1
+    "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.credentials.json" >/dev/null 2>&1
 }
 
-# The profile directories zsh/direnv.nix and claude-agent.sh switch between.
-for dir in "$HOME"/.claude-*/; do
-  dir=${dir%/}
-  name=${dir##*/.claude-}
-  if valid "$dir"; then
-    summary+=("Claude $name: signed in")
-    continue
+if valid; then
+  summary+=("Claude: signed in")
+else
+  timeout 60 claude auth status --json >/dev/null 2>&1 || true
+  if valid; then
+    summary+=("Claude: renewed")
+  else
+    sign_in claude Claude
   fi
-  CLAUDE_CONFIG_DIR="$dir" timeout 60 claude auth status --json >/dev/null 2>&1 || true
-  if valid "$dir"; then
-    summary+=("Claude $name: renewed")
-    continue
-  fi
-  sign_in "claude-$name" "Claude $name"
-done
+fi
 
 # Codex's state is only known from the plugin, so act on a fresh snapshot only.
 if refresh; then

@@ -90,38 +90,18 @@ export function claudeUsage(value: unknown, label: string, now: number): Usage {
   return { label, windows, fetchedAt: now }
 }
 
-export interface ClaudeProfile {
-  name: string
-  credentials: unknown
-  config: unknown
-}
+export type ClaudeAccount = { id: string } & ({ token: string } | { error: string })
 
-export type ClaudeAccount = { label: string; id: string } & ({ token: string } | { error: string })
-
-// Profiles signed into the same account share one quota, so they are read
-// once, with whichever token Claude Code renewed last. Renewal is left to
-// Claude Code: refreshing here could race its refresh-token rotation.
-export function claudeAccounts(profiles: ClaudeProfile[], now: number): ClaudeAccount[] {
-  const groups = new Map<string, { names: string[]; token?: string; expiresAt: number }>()
-  for (const profile of profiles) {
-    const oauth = object(object(profile.credentials).claudeAiOauth)
-    const account = object(object(profile.config).oauthAccount).accountUuid
-    const token = typeof oauth.accessToken === "string" ? oauth.accessToken : undefined
-    const id = token && typeof account === "string" ? account : `signed-out:${profile.name}`
-    const group = groups.get(id) ?? { names: [], expiresAt: 0 }
-    group.names.push(profile.name)
-    if (token && number(oauth.expiresAt) && oauth.expiresAt > group.expiresAt) {
-      group.token = token
-      group.expiresAt = oauth.expiresAt
-    }
-    groups.set(id, group)
+// Reads Claude Code's sign-in from its config directory files. Renewal is left
+// to Claude Code: refreshing here could race its refresh-token rotation.
+export function claudeAccount(credentials: unknown, config: unknown, now: number): ClaudeAccount {
+  const oauth = object(object(credentials).claudeAiOauth)
+  const account = object(object(config).oauthAccount).accountUuid
+  if (typeof oauth.accessToken !== "string" || typeof account !== "string") {
+    return { id: "signed-out", error: "Not signed in to Claude Code; click the bar to sign in" }
   }
-  return [...groups].map(([id, group]) => {
-    const label = `Claude ${group.names.join(" + ")}`
-    if (id.startsWith("signed-out:")) return { label, id, error: "Not signed in to Claude Code; click the bar to sign in" }
-    if (!group.token || group.expiresAt <= now) return { label, id, error: "Sign-in expired; click the bar to renew" }
-    return { label, id, token: group.token }
-  })
+  if (!number(oauth.expiresAt) || oauth.expiresAt <= now) return { id: account, error: "Sign-in expired; click the bar to renew" }
+  return { id: account, token: oauth.accessToken }
 }
 
 // Errors whose message is safe to show. `signIn` marks failures that only a

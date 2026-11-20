@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
-import { claudeAccounts, claudeUsage, codexUsage, FetchError, forceSpacing, interval, render, Source, staleAfter, Unavailable } from "./usage.ts"
+import { claudeAccount, claudeUsage, codexUsage, FetchError, forceSpacing, interval, render, Source, staleAfter, Unavailable } from "./usage.ts"
 import type { Usage } from "./usage.ts"
 
 const now = Date.parse("2026-09-14T17:00:00Z")
@@ -16,14 +16,13 @@ test("the bar shows the fullest window across all accounts and the tooltip names
     },
   }, now)
   const result = render([
-    { label: "Claude work", usage: usage("Claude work", 84) },
-    { label: "Claude personal", usage: usage("Claude personal", 21) },
+    { label: "Claude", usage: usage("Claude", 84) },
     { label: "Codex", usage: codex },
   ], now, "America/New_York")
   assert.equal(result.text, "AI 84%")
   assert.equal(result.percentage, 84)
   assert.deepEqual(result.class, ["warning"])
-  assert.match(result.tooltip, /Most used: Claude work — Weekly \(84%\)/)
+  assert.match(result.tooltip, /Most used: Claude — Weekly \(84%\)/)
   assert.match(result.tooltip, /5-hour: 18% used/)
   assert.match(result.tooltip, /2:00 PM EDT/)
 })
@@ -54,55 +53,47 @@ test("Claude percentages and model-scoped weekly limits are read; unset windows 
       { kind: "weekly_scoped", percent: 2, resets_at: resetsAt, scope: { model: { display_name: "Fable" } } },
       { kind: "weekly_scoped", percent: 41, scope: { model: { display_name: "Opus" } } },
     ],
-  }, "Claude work", now)
+  }, "Claude", now)
   assert.deepEqual(result.windows, [
     { label: "Weekly", used: 9, resetsAt: reset },
     { label: "Weekly · opus", used: 40, resetsAt: null },
     { label: "Weekly · Fable", used: 2, resetsAt: reset },
   ])
-  assert.throws(() => claudeUsage({ five_hour: null, limits: [] }, "Claude work", now), /No usage windows/)
+  assert.throws(() => claudeUsage({ five_hour: null, limits: [] }, "Claude", now), /No usage windows/)
 })
 
-test("Claude profiles on one account are read once with the freshest token", () => {
-  const profile = (name: string, account: string, token: string, expiresAt: number) => ({
-    name,
-    credentials: { claudeAiOauth: { accessToken: token, expiresAt } },
-    config: { oauthAccount: { accountUuid: account } },
-  })
-  assert.deepEqual(claudeAccounts([
-    profile("work", "a", "stale", now - 1),
-    profile("personal", "a", "fresh", now + 1),
-    profile("other", "b", "expired", now),
-    { name: "new", credentials: undefined, config: { oauthAccount: { accountUuid: "c" } } },
-  ], now), [
-    { label: "Claude work + personal", id: "a", token: "fresh" },
-    { label: "Claude other", id: "b", error: "Sign-in expired; click the bar to renew" },
-    { label: "Claude new", id: "signed-out:new", error: "Not signed in to Claude Code; click the bar to sign in" },
-  ])
+test("the Claude sign-in is read from its credentials and account files", () => {
+  const credentials = (expiresAt: number) => ({ claudeAiOauth: { accessToken: "token", expiresAt } })
+  const config = { oauthAccount: { accountUuid: "a" } }
+  assert.deepEqual(claudeAccount(credentials(now + 1), config, now), { id: "a", token: "token" })
+  assert.deepEqual(claudeAccount(credentials(now), config, now), { id: "a", error: "Sign-in expired; click the bar to renew" })
+  const signedOut = { id: "signed-out", error: "Not signed in to Claude Code; click the bar to sign in" }
+  assert.deepEqual(claudeAccount(undefined, config, now), signedOut)
+  assert.deepEqual(claudeAccount(credentials(now + 1), undefined, now), signedOut)
 })
 
 test("a failed account cannot make a partial result look complete", () => {
-  const result = render([{ label: "Work", error: "Unavailable" }, { label: "Codex", usage: usage("Codex", 18) }], now, "America/New_York")
+  const result = render([{ label: "Claude", error: "Unavailable" }, { label: "Codex", usage: usage("Codex", 18) }], now, "America/New_York")
   assert.equal(result.text, "AI 18% ?")
-  assert.match(result.tooltip, /Work\n  Unavailable/)
+  assert.match(result.tooltip, /Claude\n  Unavailable/)
   assert.equal(render([{ label: "Codex", error: "Unavailable" }], now, "America/New_York").text, "AI ?")
 })
 
 test("stale readings keep the last known maximum with a warning", () => {
-  const readings = [{ label: "Work", usage: usage("Work", 99) }]
+  const readings = [{ label: "Claude", usage: usage("Claude", 99) }]
   assert.equal(render(readings, now + staleAfter, "America/New_York").text, "AI 99%")
   assert.equal(render(readings, now + staleAfter + 1, "America/New_York").text, "AI 99% ?")
 })
 
 test("a recent reading with a fresh error is shown without the incomplete marker", () => {
-  const result = render([{ label: "Work", usage: usage("Work", 40), error: "Sign-in expired; click the bar to renew" }], now + interval, "America/New_York")
+  const result = render([{ label: "Claude", usage: usage("Claude", 40), error: "Sign-in expired; click the bar to renew" }], now + interval, "America/New_York")
   assert.equal(result.text, "AI 40%")
   assert.match(result.tooltip, /Sign-in expired; click the bar to renew — showing last known values/)
   assert.match(result.tooltip, /Click: renew sign-ins and refresh/)
 })
 
 test("an elapsed reset counts as empty rather than incomplete", () => {
-  const readings = [{ label: "Work", usage: { ...usage("Work", 99), windows: [
+  const readings = [{ label: "Claude", usage: { ...usage("Claude", 99), windows: [
     { label: "5-hour", used: 99, resetsAt: now + 60_000 },
     { label: "Weekly", used: 30, resetsAt: reset },
   ] } }]

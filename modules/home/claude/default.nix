@@ -13,7 +13,17 @@ in
   # Use home-manager's official Claude Code module
   programs.claude-code = {
     enable = true;
-    package = inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default; # native binary
+    # The native binary. Claude keeps .claude.json in CLAUDE_CONFIG_DIR when it
+    # is set and otherwise in ~/.claude.json, which impermanence would wipe.
+    package = pkgs.symlinkJoin {
+      name = "claude-code";
+      paths = [ inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/claude --set-default CLAUDE_CONFIG_DIR ${config.programs.claude-code.configDir}
+      '';
+      meta.mainProgram = "claude";
+    };
 
     # Settings for ~/.claude/settings.json
     settings = {
@@ -171,21 +181,7 @@ in
     pkgs.sox
   ];
 
-  # Claude account isolation: separate config directories for work/personal
-  # Direnv sets CLAUDE_CONFIG_DIR based on current directory (see zsh/direnv.nix)
-  # These symlink the managed settings/memory into both config directories
-  # force=true: these live in persisted directories, so stale files survive reboot
-  # and would block HM activation (which is all-or-nothing)
-  home.file = {
-    ".claude-work/settings.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
-      force = true;
-    };
-    ".claude-personal/settings.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/settings.json";
-      force = true;
-    };
-  } // lib.optionalAttrs machine.hasGui {
+  home.file = lib.optionalAttrs machine.hasGui {
     ".local/share/icons/claude-icon.svg".source = inputs.claude-icon;
   };
 }

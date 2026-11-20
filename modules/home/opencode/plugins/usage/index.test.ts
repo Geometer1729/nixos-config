@@ -78,7 +78,7 @@ test("renewed credentials and the Waybar click poll early instead of waiting for
     for (let i = 0; i < 50 && polls < count; i++) await new Promise((resolve) => setTimeout(resolve, 100))
     assert.equal(polls, count)
   }
-  const cleanup = await usage.setup({ options: { claude: { work: profile } } } as unknown as Plugin.Context)
+  const cleanup = await usage.setup({ options: { claude: profile } } as unknown as Plugin.Context)
   try {
     await waitFor(1)
     await writeFile(join(runtime, "unrelated"), "")

@@ -6,7 +6,7 @@ import { OpenCode } from "@opencode/client"
 import { Service } from "@opencode/client/service"
 import { Plugin } from "@opencode/plugin"
 
-import { claudeAccounts, claudeUsage, codexUsage, FetchError, fetchJSON, interval, render, Source, Unavailable } from "./usage.ts"
+import { claudeAccount, claudeUsage, codexUsage, FetchError, fetchJSON, interval, render, Source, Unavailable } from "./usage.ts"
 
 const readJSON = (file: string): Promise<unknown> => readFile(file, "utf8").then(JSON.parse).catch(() => undefined)
 
@@ -19,11 +19,11 @@ interface Shared {
 }
 const host = globalThis as typeof globalThis & { __confAIUsage?: Shared }
 
-async function run(shared: Shared, runtime: string, timezone: string, profiles: Record<string, string>) {
+async function run(shared: Shared, runtime: string, timezone: string, claudeDirectory: string | undefined) {
   const signal = shared.controller.signal
   const file = join(runtime, "opencode-ai-usage.json")
   const codex = new Source("Codex")
-  const claude = new Map<string, Source>()
+  const claude = new Source("Claude")
 
   // Poll early, past backoff, when Claude Code renews a token or the Waybar
   // click (ai-usage-renew) touches the refresh file. Debounced because one
@@ -42,10 +42,10 @@ async function run(shared: Shared, runtime: string, timezone: string, profiles: 
       watcher.on("error", () => watcher.close())
       signal.addEventListener("abort", () => watcher.close(), { once: true })
     } catch {
-      // A missing profile directory just means no early refresh for it.
+      // A missing directory just means no early refresh for it.
     }
   }
-  for (const directory of Object.values(profiles)) watchFor(directory, ".credentials.json")
+  if (claudeDirectory) watchFor(claudeDirectory, ".credentials.json")
   watchFor(runtime, "opencode-ai-usage.refresh")
 
   async function update() {
@@ -62,11 +62,11 @@ async function run(shared: Shared, runtime: string, timezone: string, profiles: 
     if ((await client.server.info({ signal: timeout })).pid !== process.pid) return
     // Tokens come from the files Claude Code keeps current. No raw credentials
     // or upstream responses go into the cache.
-    const accounts = claudeAccounts(await Promise.all(Object.entries(profiles).map(async ([name, directory]) => ({
-      name,
-      credentials: await readJSON(join(directory, ".credentials.json")),
-      config: await readJSON(join(directory, ".claude.json")),
-    }))), Date.now())
+    const account = claudeDirectory && claudeAccount(
+      await readJSON(join(claudeDirectory, ".credentials.json")),
+      await readJSON(join(claudeDirectory, ".claude.json")),
+      Date.now(),
+    )
     const readings = await Promise.all([
       (async () => {
         const connection = await context.integration.connection.active("openai")
@@ -93,19 +93,15 @@ async function run(shared: Shared, runtime: string, timezone: string, profiles: 
           return codexUsage(raw, Date.now())
         }, Date.now(), force)
       })().catch(() => ({ label: "Codex", error: "OpenCode connection unavailable" })),
-      ...accounts.map((account) => {
-        const source = claude.get(account.label) ?? new Source(account.label)
-        claude.set(account.label, source)
-        return source.read(account.id, async () => {
-          if ("error" in account) throw new Unavailable(account.error)
-          const raw = await fetchJSON("https://api.anthropic.com/api/oauth/usage", timeout, {
-            Authorization: `Bearer ${account.token}`,
-            "anthropic-beta": "oauth-2025-04-20",
-            Accept: "application/json",
-          })
-          return claudeUsage(raw, account.label, Date.now())
-        }, Date.now(), force)
-      }),
+      ...(account ? [claude.read(account.id, async () => {
+        if ("error" in account) throw new Unavailable(account.error)
+        const raw = await fetchJSON("https://api.anthropic.com/api/oauth/usage", timeout, {
+          Authorization: `Bearer ${account.token}`,
+          "anthropic-beta": "oauth-2025-04-20",
+          Accept: "application/json",
+        })
+        return claudeUsage(raw, claude.label, Date.now())
+      }, Date.now(), force)] : []),
     ])
     if (signal.aborted) return
     const temporary = `${file}.${process.pid}.tmp`
@@ -140,10 +136,8 @@ export default Plugin.define({
     const runtime = process.env.XDG_RUNTIME_DIR
     if (!runtime || !process.env.DBUS_SESSION_BUS_ADDRESS) return
     const timezone = typeof context.options.timezone === "string" ? context.options.timezone : "America/New_York"
-    const claude = context.options.claude
-    // Profile name -> CLAUDE_CONFIG_DIR.
-    const profiles = claude !== null && typeof claude === "object" && !Array.isArray(claude)
-      ? Object.fromEntries(Object.entries(claude).filter((entry): entry is [string, string] => typeof entry[1] === "string")) : {}
+    // Claude Code's config directory, which holds its sign-in.
+    const claude = typeof context.options.claude === "string" ? context.options.claude : undefined
     // Ownership spans code generations: a short-lived location can load a new
     // copy while older projects remain open. Keep their contexts, and let their
     // cleanup release the current poller rather than the retired generation.
@@ -156,7 +150,7 @@ export default Plugin.define({
     }
     const shared = host.__confAIUsage ??= (() => {
       const state: Shared = { generation, contexts, controller: new AbortController(), task: Promise.resolve() }
-      state.task = previous.then(() => run(state, runtime, timezone, profiles))
+      state.task = previous.then(() => run(state, runtime, timezone, claude))
         .catch(() => console.error("AI usage monitor stopped; Waybar will mark its last reading stale"))
       return state
     })()

@@ -33,14 +33,6 @@
           fi
         fi
 
-        # Claude Code account isolation
-        # ~/Code/work/* uses work config, everything else uses personal
-        if [[ "$PWD" == "$HOME/Code/work"* ]]; then
-          export CLAUDE_CONFIG_DIR="$HOME/.claude-work"
-        else
-          export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
-        fi
-
         export CLAUDE_ENV_FILE=${../claude/lib/claude-env.sh}
       '';
   };
