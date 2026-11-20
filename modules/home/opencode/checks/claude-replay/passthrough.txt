@@ -1,0 +1,7 @@
+{"type":"control_request","request_id":"r1","request":{"subtype":"interrupt"}}
+{"type":"control_response","response":{"subtype":"success","request_id":"r2","response":{"mcp_response":{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"Attached media from tool result:"},{"type":"image","data":"iVBORw0KGgo=","mimeType":"image/png"}]}}}}}
+{"type":"user", "n":1.50, "big":12345678901234567890, "message":{"role":"user","content":[{"type":"text","text":"Attached media from tool result:"},{"type":"image","source":{"type":"base64","media_type":"image/png","data":"iVBORw0KGgo="}}]},"parent_tool_use_id":null}
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"<user>"},{"type":"text","text":"Attached media from tool result:"},{"type":"text","text":"café ünïcode ✓"},{"type":"text","text":"</user>"}]}}
+{"type":"user","message":{"role":"user","content":"Attached media from tool result: as a plain string"}}
+not json, but it mentions Attached media from tool result:
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"hi"}]}}

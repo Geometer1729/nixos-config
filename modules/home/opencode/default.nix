@@ -131,6 +131,11 @@ in
   home.checks = [
     pluginBuild.check
     (import ./checks/load.nix { inherit lib pkgs; home = config; plugins = pluginBuild; })
+    (import ./checks/claude-replay.nix {
+      inherit pkgs;
+      opencode = opencode2;
+      filter = ../claude/lib/strip-replayed-tool-media.jq;
+    })
   ];
 
   home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify browse ] ++ [
