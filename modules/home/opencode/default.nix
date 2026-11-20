@@ -43,9 +43,12 @@ let
       # and Bun extracts its copy at runtime where autoPatchelfHook never sees it.
       # OpenTUI disables OSC 8 links under tmux, so wrapped URLs only open their
       # clicked row; tmux forwards them via the hyperlinks terminal feature.
+      # The embedded @parcel/watcher addon needs libstdc++ the same way; without it
+      # directory watches fail as "watcher backend not supported" and config
+      # changes from a switch are never noticed.
       wrapProgram $out/bin/opencode2 \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
-        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland ]} \
+        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland pkgs.stdenv.cc.cc.lib ]} \
         --set NPM_CONFIG_FORCE true \
         --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
