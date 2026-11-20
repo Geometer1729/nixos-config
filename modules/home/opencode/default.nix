@@ -285,6 +285,16 @@ in
         build.model = "claude-agent/opus#xhigh";
         explore.model = "claude-agent/sonnet#xhigh";
         title.model = "openai/gpt-6-luna";
+        # The phone apps' session delegator; the voice plugin moves their "Voice" session onto it.
+        voice = {
+          description = "Runs phone voice calls: answers aloud and steers the other sessions.";
+          mode = "primary";
+          system = builtins.concatStringsSep " " [
+            "You are the user's voice assistant, reached through a phone call."
+            "You keep track of and steer their OpenCode coding sessions on this computer, and answer quick questions."
+            "Be brief and accurate; the voice call instructions say how."
+          ];
+        };
         expert = {
           description = "Handles architecture, difficult diagnosis, and independent code review. Helps simplify overengineered plans.";
           mode = "subagent";
@@ -308,6 +318,13 @@ in
         # Pushes to the iOS app paired through opencode-serve: when a run it prompted (or a session
         # with Always Notify) ends, and from the notify_phone tool. The desktop plugins don't see it.
         "file://${plugins}/mobile-notifications"
+        # Session tools, a live session overview, and the phone-side ios_voice_* tools for the phone
+        # apps' OpenCode Session Delegator (Settings › Experimental). Fast model: replies are spoken.
+        {
+          package = "file://${plugins}/voice";
+          options.agent = "voice";
+          options.model = "openai/gpt-6-luna#low";
+        }
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";
