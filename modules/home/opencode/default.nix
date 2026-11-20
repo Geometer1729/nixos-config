@@ -3,7 +3,14 @@
 # Delete them in favor of equivalent native features as those land; they are not compatibility requirements.
 let
   inherit (flake) inputs;
-  pluginBuild = import ./plugins/package.nix { inherit lib pkgs; };
+  pluginBuild = import ./plugins/package.nix {
+    inherit lib pkgs;
+    # The OpenCode iOS app's push notifications, sent through Anomaly's relay.
+    # Alerts arrive generic ("New activity"): the app never calls the plugin's
+    # pair RPC (anomalyco/opencode#61549). Exporting ./rpc so /api/plugin reports
+    # features.rpc did not make it pair (tried 2026-11-19, OpenCode 2.3.0).
+    npmPlugins.mobile-notifications = builtins.fromJSON (builtins.readFile inputs.opencode-mobile-notifications-npm);
+  };
   plugins = pluginBuild.package;
   notify = pkgs.writeShellApplication {
     name = "opencode-notify";
@@ -120,7 +127,7 @@ in
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [
     pluginBuild.check
-    (import ./checks/load.nix { inherit lib pkgs; home = config; })
+    (import ./checks/load.nix { inherit lib pkgs; home = config; plugins = pluginBuild; })
   ];
 
   home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify browse ] ++ [
@@ -290,6 +297,9 @@ in
           package = "file://${plugins}/lsp";
           options.servers = lspServers;
         }
+        # Pushes to the iOS app paired through opencode-serve: when a run it prompted (or a session
+        # with Always Notify) ends, and from the notify_phone tool. The desktop plugins don't see it.
+        "file://${plugins}/mobile-notifications"
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
         options.command = "${notify}/bin/opencode-notify";

@@ -1,6 +1,5 @@
-{ lib, pkgs, home }:
+{ lib, pkgs, home, plugins }:
 let
-  plugins = import ../plugins/package.nix { inherit lib pkgs; };
   files = lib.filterAttrs (name: _: lib.hasPrefix "opencode/plugins/" name) home.xdg.configFile;
   # Find definitions independently of their filenames, so a misplaced plugin
   # fails the check instead of silently disappearing from the expected list.
@@ -12,7 +11,8 @@ let
       path = lib.removePrefix "${toString ../plugins}/" (toString source);
       server = !(lib.hasInfix "plugin/tui\"" (builtins.readFile source));
     })
-    entrypoints));
+    entrypoints
+  ++ map (path: { inherit path; server = true; }) plugins.npmEntrypoints));
   opencode = lib.findFirst (package: (package.pname or "") == "opencode2")
     (throw "OpenCode plugin load check requires the deployed opencode2 package")
     home.home.packages;

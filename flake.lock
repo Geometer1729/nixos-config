@@ -600,6 +600,18 @@
         "type": "github"
       }
     },
+    "opencode-mobile-notifications-npm": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-WJsBFd7u3O2GJjbvHKtYVbMrmGGnKCAyu3Babkh6GkE=",
+        "type": "file",
+        "url": "https://registry.npmjs.org/opencode-mobile-notifications/latest"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.npmjs.org/opencode-mobile-notifications/latest"
+      }
+    },
     "opencode2-npm": {
       "flake": false,
       "locked": {
@@ -688,6 +700,7 @@
         "nur": "nur",
         "nvim-luaref": "nvim-luaref",
         "ocaml-nvim": "ocaml-nvim",
+        "opencode-mobile-notifications-npm": "opencode-mobile-notifications-npm",
         "opencode2-npm": "opencode2-npm",
         "pf1-system": "pf1-system",
         "prismlauncher": "prismlauncher",

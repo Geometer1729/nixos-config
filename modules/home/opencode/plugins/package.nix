@@ -1,5 +1,15 @@
-{ lib, pkgs }:
+# npmPlugins: plugin directory -> registry metadata of a published TypeScript
+# plugin. It is unpacked beside the local plugins and resolves its dependencies
+# from their node_modules, so it runs against the same plugin API version.
+{ lib, pkgs, npmPlugins ? { } }:
 let
+  npmSources = lib.mapAttrs
+    (_: metadata: pkgs.fetchurl {
+      url = metadata.dist.tarball;
+      hash = metadata.dist.integrity;
+    })
+    npmPlugins;
+
   filesIn = directory:
     builtins.concatMap
       (name:
@@ -30,6 +40,10 @@ let
 in
 {
   inherit sourceFiles;
+  # Entry files of npmPlugins, relative to the package, for the load check.
+  npmEntrypoints = lib.mapAttrsToList
+    (name: metadata: "${name}/${lib.removePrefix "./" (metadata.exports.".".import or metadata.exports.".")}")
+    npmPlugins;
 
   check = pkgs.buildNpmPackage (common // {
     pname = "opencode-plugins-check";
@@ -65,6 +79,10 @@ in
           mkdir -p "$out/$(dirname '${relative}')"
           cp '${relative}' "$out/${relative}"
         '') sourceFiles}
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: source: ''
+        mkdir "$out/${name}"
+        tar -xzf ${source} -C "$out/${name}" --strip-components=1
+      '') npmSources)}
       # Keep dependency lookup valid through Home Manager's directory symlinks,
       # including when OpenCode hot-loads a plugin using its config-directory path.
       for plugin in "$out"/*/; do

@@ -66,6 +66,8 @@
     browse-npm.flake = false;
     browse-npm-latest.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
     browse-npm-latest.flake = false;
+    opencode-mobile-notifications-npm.url = "file+https://registry.npmjs.org/opencode-mobile-notifications/latest";
+    opencode-mobile-notifications-npm.flake = false;
     kokoro.url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2";
     kokoro.flake = false;
     claude-icon.url = "file+https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.svg";
