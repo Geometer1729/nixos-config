@@ -6,7 +6,7 @@ import { attribute, implicitSessions } from "./browser.ts"
 import type { Handoff, PendingHandoff, RunningTool } from "./browser.ts"
 
 type SessionInfo = Awaited<ReturnType<OpenCodeClient["session"]["get"]>>
-export type Session = Pick<SessionInfo, "id" | "parentID" | "title" | "location" | "time" | "outcome">
+export type Session = Pick<SessionInfo, "id" | "parentID" | "title" | "location" | "time" | "outcome" | "agent">
 
 export interface Snapshot {
   sessions: readonly Session[]
@@ -122,7 +122,16 @@ function escape(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
 }
 
-export function notification(state: Snapshot, attached: ReadonlySet<string>, workspaces: ReadonlyMap<string, string> = new Map()): Notification {
+/**
+ * `quietAgents` run sessions nobody reads at a screen, such as the phone's voice
+ * delegator: their replies are not news, but their approvals and questions are.
+ */
+export function notification(
+  state: Snapshot,
+  attached: ReadonlySet<string>,
+  workspaces: ReadonlyMap<string, string> = new Map(),
+  quietAgents: ReadonlySet<string> = new Set(),
+): Notification {
   const sessions = new Map(state.sessions.map((session) => [session.id, session]))
   const waiting = new Map<string, { session: Session; kind: Kind; reasons: Set<string>; handoff?: Handoff }>()
   const root = (id: string): Session | undefined => {
@@ -148,6 +157,7 @@ export function notification(state: Snapshot, attached: ReadonlySet<string>, wor
 
   for (const session of sessions.values()) {
     if (session.parentID || state.active[session.id] || session.outcome === "interrupted") continue
+    if (session.agent !== undefined && quietAgents.has(session.agent)) continue
     if (session.time.idle !== undefined && session.time.idle > (session.time.viewed ?? 0)) {
       add(session, session.outcome === "failed" ? "failed" : "ready", `idle:${session.time.idle}`)
     }

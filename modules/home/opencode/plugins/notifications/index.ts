@@ -26,9 +26,11 @@ interface Options {
   focusCommand: string
   browseCommand?: string
   workDirectory?: string
+  /** Agents whose sessions only notify for approvals and questions, not finished replies. */
+  quietAgents: ReadonlySet<string>
 }
 
-async function run({ command, focusCommand, browseCommand, workDirectory }: Options, shared: Shared): Promise<void> {
+async function run({ command, focusCommand, browseCommand, workDirectory, quietAgents }: Options, shared: Shared): Promise<void> {
   const signal = shared.controller.signal
   if (signal.aborted) return
   // A broken browse must not hide other rows or log every poll.
@@ -84,7 +86,7 @@ async function run({ command, focusCommand, browseCommand, workDirectory }: Opti
           }
           const muted = new Set(until === undefined ? [] : state.sessions
             .filter((session) => inside(session.location.directory, workDirectory!)).map((session) => session.id))
-          const content = notification(state, new Set([...attached.keys()].filter((id) => !muted.has(id))), locations)
+          const content = notification(state, new Set([...attached.keys()].filter((id) => !muted.has(id))), locations, quietAgents)
           await exec(command, [
             content.summary, content.body, content.key, content.sessionID, socketPath(process.pid), content.browser, browseCommand ?? "",
           ], { signal: timeout })
@@ -147,8 +149,11 @@ export default Plugin.define({
     const workDirectory = typeof context.options.workDirectory === "string" ? context.options.workDirectory : undefined
     const browseCommand = typeof context.options.browseCommand === "string" ? context.options.browseCommand : undefined
     if (typeof command !== "string" || typeof focusCommand !== "string" || !process.env.DBUS_SESSION_BUS_ADDRESS || !process.env.XDG_RUNTIME_DIR) return
+    const quietAgents = new Set(Array.isArray(context.options.quietAgents)
+      ? context.options.quietAgents.filter((agent): agent is string => typeof agent === "string")
+      : [])
     const options: Options = {
-      command, focusCommand,
+      command, focusCommand, quietAgents,
       ...(browseCommand === undefined ? {} : { browseCommand }),
       ...(workDirectory === undefined ? {} : { workDirectory }),
     }

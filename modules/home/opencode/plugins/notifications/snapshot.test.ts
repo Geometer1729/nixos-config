@@ -40,6 +40,16 @@ test("a viewed response disappears, but viewing does not dismiss a pending reque
   assert.match(notification(state([{ ...viewed, time: { ...viewed.time, idle: 20 } }])).body, /— ready/)
 })
 
+test("quiet agents' replies are not news, but their requests are", () => {
+  const voice = session("ses_voice", { agent: "voice" })
+  const attached = new Set([voice.id])
+  const quiet = new Set(["voice"])
+  assert.deepEqual(render(state([voice]), attached, new Map(), quiet), empty)
+  assert.deepEqual(render(state([{ ...voice, outcome: "failed" }]), attached, new Map(), quiet), empty)
+  assert.match(render(state([voice], { permissions: [{ sessionID: voice.id }] }), attached, new Map(), quiet).body, /— approval needed/)
+  assert.match(render(state([voice]), attached).body, /— ready/)
+})
+
 test("running, archived, interrupted and child completions do not become ready rows", () => {
   const content = notification(state([
     session("ses_running"),

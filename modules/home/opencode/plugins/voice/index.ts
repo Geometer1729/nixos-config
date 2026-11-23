@@ -3,6 +3,7 @@ import { Plugin } from "@opencode/plugin"
 import { automaticTitle, isDelegation, parseModel, VoiceSessions } from "./delegation.ts"
 import { excerpts, type MessageLike, minutesAgo, overview, type Row, search } from "./overview.ts"
 import { client, readState, rowFor } from "./state.ts"
+import { monitor } from "./monitor.ts"
 import { settles, waitUntil } from "./wait.ts"
 
 // Gives the phone apps' OpenCode Session Delegator what their built-in delegator
@@ -17,7 +18,8 @@ You manage the user's other OpenCode sessions on this computer. Coding work happ
 - The "voice-sessions" context lists every session that is working, waiting on the user, or finished, as of the user's latest words. Answer status questions from it, call voice_sessions to search or list more, and voice_read_session for what a session actually said.
 - After sending work, or when the user wants to hear when a session finishes, call ios_voice_watch_session for it and end your turn: the phone announces its reply when it lands.
 - Call voice_wait only when you must act on a result in this turn ("when it's done, tell the other one to…"), or the user wants to know when a session needs them (an approval or question, which the phone doesn't announce). Say what you're waiting for with ios_voice_say first. If voice_wait returns because the user spoke, answer them first; wait again only if they still want it.
-- Always end your turn with a short spoken reply, even after ios_voice_say.
+- Always end your turn with a short spoken reply, even after ios_voice_say, except after a [Session update].
+- A [Session update] message is not from the user: it says another session finished or needs the user. Tell them right away with ios_voice_say in one or two short sentences, then end your turn without another reply. If it interrupted a voice_wait the user still wants, call voice_wait again after speaking.
 - Send with delivery "queue" when the work should start after the session's current work ("when it's done, also…"); otherwise steer.
 - A session that needs approval or asked a question is blocked until the user answers it on a screen; tell them which one.
 - To put a session on the phone's screen, use the phone's open-session tool when it is available.
@@ -97,6 +99,7 @@ export default Plugin.define({
     await ctx.session.hook("prompt", async (event) => {
       if (!isDelegation(event.prompt.text)) return
       voiceSessions.mark(event.sessionID)
+      monitor().heard(event.sessionID)
       // Admission waits for these; a slow server must not hold the user's words.
       await bounded(Promise.all([adopt(event.sessionID).catch(report), announce(event.sessionID).catch(report)]), 3000)
     })
@@ -137,7 +140,12 @@ export default Plugin.define({
           required: ["session_id"],
           additionalProperties: false,
         },
-        execute: async () => ({ content: "The phone will announce that session's reply when it finishes." }),
+        execute: async (raw) => {
+          // The phone announces it, so the session-update monitor stays quiet about its next result.
+          const id = text(raw as Input, "session_id")
+          if (id) monitor().watch(id)
+          return { content: "The phone will announce that session's reply when it finishes." }
+        },
       })
       add({
         name: "ios_voice_pin_session",
@@ -154,7 +162,10 @@ export default Plugin.define({
         name: "ios_voice_end_call",
         description: "Hang up the voice call after your current reply, when the user says goodbye or asks to end the call.",
         input: { type: "object", properties: {}, additionalProperties: false },
-        execute: async () => ({ content: "The call ends after your reply." }),
+        execute: async () => {
+          monitor().hungUp()
+          return { content: "The call ends after your reply." }
+        },
       })
 
       add({
@@ -311,6 +322,8 @@ export default Plugin.define({
           const ran = new Set<string>()
           let last: Row[] = []
           await context.progress({ status: `Waiting for ${ids.length === 1 ? "a session" : `${ids.length} sessions`}` })
+          // This wait reports these sessions itself; the monitor's updates would repeat it.
+          const release = monitor().wait(ids)
 
           const outcome = await waitUntil<string[]>({
             signal: context.signal,
@@ -323,7 +336,8 @@ export default Plugin.define({
               ] as const
               for await (const event of api.event.subscribe({ types, signal })) {
                 if (event.type === "server.connected") continue
-                wake(event.type === "session.inbox.enqueued" && event.data.sessionID === context.sessionID)
+                if (event.type !== "session.inbox.enqueued" || event.data.sessionID !== context.sessionID) wake()
+                else wake(event.data.item.type === "user" ? "user_spoke" : "update")
               }
             },
             check: async () => {
@@ -342,7 +356,7 @@ export default Plugin.define({
               })
               return settled.length ? settled : undefined
             },
-          })
+          }).finally(release)
 
           const now = Date.now()
           const sessions = await Promise.all(last.map(async (row) => ({
@@ -352,10 +366,14 @@ export default Plugin.define({
               : {}),
           })))
           const missing = ids.filter((id) => !last.some((row) => row.id === id))
+          const reasons = {
+            result: "a session changed",
+            user_spoke: "the user spoke; answer them, and wait again only if they still want it",
+            update: "a [Session update] about another session arrived; speak it, then call voice_wait again",
+            timeout: "timed out; the sessions are still working",
+          }
           return json({
-            stopped_because: outcome.type === "result" ? "a session changed" : outcome.type === "user_spoke"
-              ? "the user spoke; answer them, and wait again only if they still want it"
-              : "timed out; the sessions are still working",
+            stopped_because: reasons[outcome.type],
             waited_seconds: Math.round((now - started) / 1000),
             sessions,
             ...(missing.length ? { unknown_session_ids: missing } : {}),

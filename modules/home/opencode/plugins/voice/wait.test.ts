@@ -41,12 +41,30 @@ test("stops when the user speaks", async () => {
     timeoutMs: 5000,
     pollMs: 5000,
     wakes: async (signal, wake) => {
-      setTimeout(() => wake(true), 10)
+      setTimeout(() => {
+        wake("update")
+        wake("user_spoke")
+        wake("update")
+      }, 10)
       await never(signal)
     },
     check: async () => undefined,
   })
   assert.deepEqual(outcome, { type: "user_spoke" })
+})
+
+test("stops for a session update", async () => {
+  const outcome = await waitUntil({
+    signal: new AbortController().signal,
+    timeoutMs: 5000,
+    pollMs: 5000,
+    wakes: async (signal, wake) => {
+      setTimeout(() => wake("update"), 10)
+      await never(signal)
+    },
+    check: async () => undefined,
+  })
+  assert.deepEqual(outcome, { type: "update" })
 })
 
 test("times out after a last check, and passes first only once", async () => {

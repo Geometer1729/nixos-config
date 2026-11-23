@@ -324,11 +324,13 @@ in
         # with Always Notify) ends, and from the notify_phone tool. The desktop plugins don't see it.
         "file://${plugins}/mobile-notifications"
         # Session tools, a live session overview, and the phone-side ios_voice_* tools for the phone
-        # apps' OpenCode Session Delegator (Settings › Experimental). Fast model: replies are spoken.
+        # apps' OpenCode Session Delegator (Settings › Experimental). Replies are spoken, so latency
+        # matters: on 2026-11-23 Sol took ~3.6s a short turn and Sol Fast ~2.5s, but Fast uses
+        # twice the ChatGPT plan allowance; turns are short, so standard speed costs little time.
         {
           package = "file://${plugins}/voice";
           options.agent = "voice";
-          options.model = "openai/gpt-6-luna#low";
+          options.model = "openai/gpt-6.2-sol#low";
         }
       ] ++ lib.optionals machine.hasGui [{
         package = "file://${plugins}/notifications";
@@ -338,6 +340,8 @@ in
         options.browseCommand = lib.getExe browse;
         # Sessions here are hidden while `notification-center work` mutes them.
         options.workDirectory = "${config.home.homeDirectory}/Code/work";
+        # The phone's voice delegator session: its replies were already spoken on the call.
+        options.quietAgents = [ "voice" ];
       }
         {
           package = "file://${plugins}/usage";

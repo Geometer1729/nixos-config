@@ -1,6 +1,9 @@
 import type { Status } from "./overview.ts"
 
-export type Outcome<T> = { type: "result"; result: T } | { type: "user_spoke" } | { type: "timeout" }
+export type Outcome<T> = { type: "result"; result: T } | { type: "user_spoke" } | { type: "update" } | { type: "timeout" }
+
+/** Something arrived in the waiting session's own inbox: the user's words, or a [Session update]. */
+export type Interruption = "user_spoke" | "update"
 
 /** How long work sent just before a wait may take to start before an idle session counts as done. */
 export const sendGraceMs = 60_000
@@ -34,7 +37,7 @@ export function settles(status: Status | undefined, at: {
  */
 export async function waitUntil<T>(options: {
   check: (first: boolean) => Promise<T | undefined>
-  wakes: (signal: AbortSignal, wake: (user?: boolean) => void) => Promise<void>
+  wakes: (signal: AbortSignal, wake: (interruption?: Interruption) => void) => Promise<void>
   timeoutMs: number
   pollMs: number
   signal: AbortSignal
@@ -42,10 +45,11 @@ export async function waitUntil<T>(options: {
   const stop = new AbortController()
   const signal = AbortSignal.any([options.signal, stop.signal])
   let dirty = true
-  let spoke = false
+  let interrupted: Interruption | undefined
   let release: (() => void) | undefined
-  const wake = (user = false) => {
-    if (user) spoke = true
+  const wake = (interruption?: Interruption) => {
+    // The user's words win over an update that arrived alongside them.
+    if (interruption && interrupted !== "user_spoke") interrupted = interruption
     dirty = true
     release?.()
   }
@@ -55,7 +59,7 @@ export async function waitUntil<T>(options: {
   try {
     while (true) {
       options.signal.throwIfAborted()
-      if (spoke) return { type: "user_spoke" }
+      if (interrupted) return { type: interrupted }
       if (dirty) {
         dirty = false
         const result = await options.check(first)
