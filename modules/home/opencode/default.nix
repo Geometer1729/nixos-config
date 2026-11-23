@@ -32,23 +32,28 @@ let
     };
     sourceRoot = "package";
 
-    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
     dontBuild = true;
     dontStrip = true; # Stripping removes Bun's embedded application payload.
     installPhase = ''
       runHook preInstall
 
       install -Dm755 bin/opencode $out/bin/opencode2
-      # OpenTUI dlopens libwayland-client.so.0 by soname for host clipboard reads,
-      # and Bun extracts its copy at runtime where autoPatchelfHook never sees it.
+      # Bun extracts native libraries at runtime, where a build-time rpath can't
+      # reach them: OpenTUI dlopens libwayland-client.so.0 for host clipboard reads,
+      # and the @parcel/watcher addon needs libstdc++ (without it directory watches
+      # fail as "watcher backend not supported" and a switch goes unnoticed).
+      # Adding an rpath to Bun's binary makes it segfault. nix-ld as the loader
+      # hands NIX_LD_LIBRARY_PATH to ld.so as LD_LIBRARY_PATH, then hides it again
+      # before main, so children don't inherit it: an older libstdc++ there broke
+      # hyprctl, which links a newer one.
+      patchelf --set-interpreter ${pkgs.nix-ld}/libexec/nix-ld $out/bin/opencode2
       # OpenTUI disables OSC 8 links under tmux, so wrapped URLs only open their
       # clicked row; tmux forwards them via the hyperlinks terminal feature.
-      # The embedded @parcel/watcher addon needs libstdc++ the same way; without it
-      # directory watches fail as "watcher backend not supported" and config
-      # changes from a switch are never noticed.
       wrapProgram $out/bin/opencode2 \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep ]} \
-        --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland pkgs.stdenv.cc.cc.lib ]} \
+        --set NIX_LD ${pkgs.stdenv.cc.bintools.dynamicLinker} \
+        --prefix NIX_LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [ pkgs.wayland pkgs.stdenv.cc.cc.lib ]} \
         --set NPM_CONFIG_FORCE true \
         --set DIRENV_NO_TMUX_RENAME true \
         --set OPENCODE_DISABLE_AUTOUPDATE true \
