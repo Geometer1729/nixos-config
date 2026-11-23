@@ -160,7 +160,8 @@ in
 
     # Global context file (~/CLAUDE.md)
     context = ''
-      NixOS. Direnv loads devshells. nix-shell -p if needed.
+      NixOS. Direnv loads devshells. `nix shell nixpkgs#<pkg> -c <cmd>` if needed, not `nix-shell -p`
+      (it runs the direnv-exported shellHook in whatever repo you cd to).
       CLIs: gh, linearis
       Test fixes. Be skeptical.
       Do not be afraid to raise limitations or possible mistakes I missed.

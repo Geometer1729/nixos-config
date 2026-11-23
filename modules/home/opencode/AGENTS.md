@@ -3,7 +3,8 @@
 This machine uses NixOS.
 Your shell uses direnv automagically.
 
-Feel free to use `nix-shell -p` when you want a new tool.
+Feel free to use `nix shell nixpkgs#<pkg> -c <cmd>` when you want a new tool.
+Don't use `nix-shell -p`: it runs the `shellHook` direnv exported, so a hook from the repo you started in runs in whatever repo you `cd` to.
 
 Don't clean up `/tmp`, not even your own scratch files. Reboots wipe it, and other agents and tools keep live state there.
 
