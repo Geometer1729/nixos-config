@@ -47,6 +47,8 @@ interface Client {
   diagnosticWaiters: Map<string, DiagnosticWaiter[]>
   diagnostics: Map<string, Diagnostic[]>
   documents?: Map<string, { text: string; version: number }>
+  // Rejects once the server has exited, so a wait for something it will never send can end.
+  exited: Promise<never>
   name?: string
   notify(method: string, params?: unknown): void
   process: ChildProcessWithoutNullStreams
@@ -61,6 +63,7 @@ class TimeoutError extends Error {}
 interface ClientEntry {
   idleTimer?: NodeJS.Timeout
   promise: Promise<Client>
+  uses: number
 }
 
 interface LspInput {
@@ -181,9 +184,15 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
   const diagnosticVersions = new Map<string, number>()
   const diagnosticWaiters = new Map<string, DiagnosticWaiter[]>()
   const readiness: Readiness = { waiters: [] }
+  const exited = Promise.withResolvers<never>()
+  // A server can exit while nothing waits on it, which must not be an unhandled rejection.
+  exited.promise.catch(() => undefined)
   process.stderr.resume()
+  // A write that races the server's exit fails with EPIPE; the exit handler reports the exit itself.
+  process.stdin.on("error", () => undefined)
 
   const send = (message: RpcMessage): void => {
+    if (stopped || !process.stdin.writable) throw new Error(`${server.command[0]} has exited`)
     const body = JSON.stringify(message)
     process.stdin.write(`Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`)
   }
@@ -194,6 +203,8 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
   const request = <Result = unknown>(method: string, params?: unknown, timeout = 30_000): Promise<Result> =>
     new Promise<Result>((resolve, reject) => {
       const id = nextID++
+      // Answers arrive on a later tick, and a send that throws leaves no timer or pending entry behind.
+      send(params === undefined ? { jsonrpc: "2.0", id, method } : { jsonrpc: "2.0", id, method, params })
       const timer = setTimeout(() => {
         pending.delete(id)
         reject(new TimeoutError(`${method} timed out`))
@@ -208,7 +219,6 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
           reject(error)
         },
       })
-      send(params === undefined ? { jsonrpc: "2.0", id, method } : { jsonrpc: "2.0", id, method, params })
     })
 
   const publishDiagnostics = (params: { diagnostics?: Diagnostic[]; uri?: string }): void => {
@@ -289,14 +299,16 @@ function rpc(server: Server, root: string, env: NodeJS.ProcessEnv, onStop: () =>
     stopped = true
     for (const waiter of pending.values()) waiter.reject(error)
     pending.clear()
+    exited.reject(error)
     onStop()
   }
   process.on("error", fail)
-  process.on("exit", (code) => fail(new Error(`${server.command[0]} exited with status ${code}`)))
+  process.on("exit", (code, signal) => fail(new Error(`${server.command[0]} exited with status ${code ?? signal}`)))
 
   return {
     request,
     notify,
+    exited: exited.promise,
     diagnostics,
     diagnosticVersions,
     diagnosticWaiters,
@@ -408,7 +420,7 @@ async function rootFor(server: Server, file: string, boundary: string): Promise<
 async function ready(client: Client, deadline: number): Promise<void> {
   const readiness = client.readiness
   if (readiness.quiescent !== false) return
-  const loaded = await new Promise<boolean>((resolve) => {
+  const loading = new Promise<boolean>((resolve) => {
     const done = (): void => {
       clearTimeout(timer)
       resolve(true)
@@ -422,6 +434,7 @@ async function ready(client: Client, deadline: number): Promise<void> {
     )
     readiness.waiters.push(done)
   })
+  const loaded = await Promise.race([loading, client.exited])
   if (!loaded) throw new Error(`${client.name} was still loading the workspace, so there is no result yet`)
 }
 
@@ -547,11 +560,21 @@ export default Plugin.define({
       return [{ ...configured, command: command as [string, ...string[]], id, extensions, roots: rootsFor(extensions) }]
     })
 
-    const clientFor = async (server: Server, root: string): Promise<Client> => {
+    const stopWhenIdle = (key: string, entry: ClientEntry): void => {
+      entry.idleTimer = setTimeout(() => {
+        if (clients.get(key) !== entry) return
+        clients.delete(key)
+        void entry.promise.then(stop).catch(() => undefined)
+      }, idleTimeoutMs)
+      entry.idleTimer.unref()
+    }
+
+    // The idle timer runs only while nothing uses the server, so it cannot stop one mid-request.
+    const withClient = async <T>(server: Server, root: string, use: (client: Client) => Promise<T>): Promise<T> => {
       const key = `${server.id}\0${root}`
       let entry = clients.get(key)
       if (!entry) {
-        const created = {} as ClientEntry
+        const created = { uses: 0 } as ClientEntry
         entry = created
         const remove = () => {
           if (clients.get(key) !== created) return
@@ -564,14 +587,14 @@ export default Plugin.define({
         })
         clients.set(key, created)
       }
+      entry.uses++
       clearTimeout(entry.idleTimer)
-      entry.idleTimer = setTimeout(() => {
-        if (clients.get(key) !== entry) return
-        clients.delete(key)
-        void entry.promise.then(stop).catch(() => undefined)
-      }, idleTimeoutMs)
-      entry.idleTimer.unref()
-      return entry.promise
+      try {
+        return await use(await entry.promise)
+      } finally {
+        // A server that exited or failed to start has already left the map.
+        if (--entry.uses === 0 && clients.get(key) === entry) stopWhenIdle(key, entry)
+      }
     }
 
     const diagnosticsFor = async (directory: string, value: string): Promise<string> => {
@@ -579,14 +602,14 @@ export default Plugin.define({
       const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
       if (!server) return ""
       const root = await rootFor(server, file, directory)
-      const client = await clientFor(server, root)
-      const { uri, changed, diagnosticVersion } = await open(client, file)
-      // Pull servers may still push results that lag the text, such as rust-analyzer's cargo check.
-      const diagnostics = client.pullDiagnostics
-        ? await pullDiagnostics(client, uri, diagnosticTimeoutMs)
-        : changed || !client.diagnostics.has(uri)
-          ? await waitForDiagnostics(client, uri, diagnosticVersion, diagnosticTimeoutMs)
-          : (client.diagnostics.get(uri) ?? [])
+      const diagnostics = await withClient(server, root, async (client) => {
+        const { uri, changed, diagnosticVersion } = await open(client, file)
+        // Pull servers may still push results that lag the text, such as rust-analyzer's cargo check.
+        if (client.pullDiagnostics) return pullDiagnostics(client, uri, diagnosticTimeoutMs)
+        if (!changed && client.diagnostics.has(uri)) return client.diagnostics.get(uri) ?? []
+        // Without the race, a server that exits before publishing would look clean once the wait times out.
+        return Promise.race([waitForDiagnostics(client, uri, diagnosticVersion, diagnosticTimeoutMs), client.exited])
+      })
       return diagnostics.length > 0 ? formatDiagnostics(value, diagnostics) : ""
     }
 
@@ -646,26 +669,20 @@ export default Plugin.define({
           const server = servers.find((candidate) => candidate.extensions.includes(path.extname(file)))
           if (!server) throw new Error(`No configured language server for: ${file}`)
           const root = await rootFor(server, file, directory)
-          const client = await clientFor(server, root)
-          const { uri } = await open(client, file)
-          await ready(client, Date.now() + diagnosticTimeoutMs)
-          let result
-
-          if (input.operation === "hover") {
-            result = await client.request("textDocument/hover", {
-              textDocument: { uri },
-              position: position(input),
-            })
-          } else if (input.operation === "definition") {
-            result = await client.request("textDocument/definition", {
-              textDocument: { uri },
-              position: position(input),
-            })
-          } else if (input.operation === "document_symbols") {
-            result = await client.request("textDocument/documentSymbol", { textDocument: { uri } })
-          } else {
-            result = await client.request("workspace/symbol", { query: input.query ?? "" })
-          }
+          const result = await withClient(server, root, async (client) => {
+            const { uri } = await open(client, file)
+            await ready(client, Date.now() + diagnosticTimeoutMs)
+            if (input.operation === "hover") {
+              return client.request("textDocument/hover", { textDocument: { uri }, position: position(input) })
+            }
+            if (input.operation === "definition") {
+              return client.request("textDocument/definition", { textDocument: { uri }, position: position(input) })
+            }
+            if (input.operation === "document_symbols") {
+              return client.request("textDocument/documentSymbol", { textDocument: { uri } })
+            }
+            return client.request("workspace/symbol", { query: input.query ?? "" })
+          })
 
           return { content: JSON.stringify(result ?? null, null, 2) }
         },

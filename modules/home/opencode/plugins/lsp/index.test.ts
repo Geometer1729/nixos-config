@@ -250,6 +250,74 @@ process.stdin.on("data", (chunk) => {
   })
 })
 
+test("servers are not stopped as idle while still in use", async (t) => {
+  const { directory } = await sandbox(t)
+  const source = path.join(directory, "example.fake")
+  const log = path.join(directory, "server.log")
+  const server = path.join(directory, "server.mjs")
+  await writeFile(source, "broken\n")
+  // Each step outlasts the idle timeout, as any step can on a loaded machine.
+  await writeFile(
+    server,
+    `${serverPrelude}
+import { appendFileSync } from "node:fs"
+process.on("exit", () => appendFileSync(process.argv[2], "exit\\n"))
+listen(({ id, method, params }) => {
+  if (method === "initialize") setTimeout(() => send({ jsonrpc: "2.0", id, result: { capabilities: {} } }), 300)
+  if (method === "textDocument/didOpen") {
+    const diagnostics = [{ message: "broken", severity: 1, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } } }]
+    const publish = { uri: params.textDocument.uri, diagnostics }
+    setTimeout(() => send({ jsonrpc: "2.0", method: "textDocument/publishDiagnostics", params: publish }), 300)
+  }
+})
+`,
+  )
+  const tool = await setupTool(t, directory, {
+    diagnosticTimeoutMs: 5_000,
+    idleTimeoutMs: 50,
+    servers: { fake: { command: [process.execPath, server, log], extensions: [".fake"] } },
+  })
+
+  assert.deepEqual(await tool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" }), {
+    content: `${source}:1:1: error: broken`,
+  })
+  await eventually(async () => (await readFile(log, "utf8").catch(() => "")) === "exit\n")
+})
+
+for (const mode of ["push", "loading"]) {
+  test(`a ${mode === "push" ? "push" : "loading rust-analyzer"} server that exits mid-request is an error, not clean`, async (t) => {
+    const { directory } = await sandbox(t)
+    const source = path.join(directory, "example.fake")
+    const server = path.join(directory, "server.mjs")
+    await writeFile(source, "broken\n")
+    await writeFile(
+      server,
+      `${serverPrelude}
+listen(({ id, method }) => {
+  if (method === "initialize") {
+    const result =
+      process.argv[2] === "loading"
+        ? { capabilities: { diagnosticProvider: { interFileDependencies: true } }, serverInfo: { name: "rust-analyzer" } }
+        : { capabilities: {} }
+    send({ jsonrpc: "2.0", id, result })
+  }
+  if (method === "textDocument/didOpen") process.exit(3)
+})
+`,
+    )
+    // A timeout ends the wait with an empty result or a loading error, never the exit status.
+    const tool = await setupTool(t, directory, {
+      diagnosticTimeoutMs: 10_000,
+      servers: { fake: { command: [process.execPath, server, mode], extensions: [".fake"] } },
+    })
+
+    await assert.rejects(
+      tool.execute({ operation: "diagnostics", file: source }, { sessionID: "test" }),
+      /exited with status 3/,
+    )
+  })
+}
+
 for (const mode of ["push", "pull"]) {
   test(`${mode} diagnostics clear once a broken file is fixed`, async (t) => {
     const directory = await mkdtemp(path.join(tmpdir(), "opencode-lsp-test-"))
