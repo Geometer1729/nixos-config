@@ -1,4 +1,7 @@
 # Resolve the supplied pane, or the calling TUI's pane, to its terminal window.
+# OpenCode's wrapper puts nixpkgs' libstdc++ on LD_LIBRARY_PATH for its embedded
+# addons, and it is older than the one hyprctl is built against.
+unset LD_LIBRARY_PATH
 pane="${2:-${TMUX_PANE:?OpenCode notification focus requires tmux}}"
 session=$(tmux display-message -p -t "$pane" '#{session_name}')
 # The OpenCode server and tmux outlive Hyprland restarts, so their
