@@ -14,7 +14,9 @@ let
   github = {
     service = "github";
     login = "Geometer1729";
-    token = "@oracle:eval:cat /run/secrets/github_read_token";
+    # gh's own login token. A narrower one buys nothing: narvi can already
+    # SSH into every host as root.
+    token = "@oracle:eval:cat /run/secrets/github_token";
     include_user_repos = false;
     include_user_issues = false;
     default_priority = "";

@@ -18,7 +18,7 @@ in
       gcloud_client_id = owned;
       gcloud_secret = owned;
       linear_api_key = owned;
-      github_read_token = owned;
+      github_token = owned;
       gitea = owned;
       slack_token = owned;
       slack_mcp_client_id = owned;
