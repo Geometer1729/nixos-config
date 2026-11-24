@@ -9,7 +9,7 @@ in
 
   scripts.systemd-failures = {
     directory = ./.;
-    extras = [ config.programs.opencode.package pkgs.mako ];
+    extras = [ config.scripts.opencode-launch.packages.opencode-start pkgs.mako ];
   };
 
   services.mako.settings."app-name=systemd-failures".on-button-left =

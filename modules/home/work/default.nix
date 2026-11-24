@@ -54,15 +54,14 @@ in
     directory = ./.;
     extras = with pkgs; [
       linearis
-      config.programs.opencode.package
+      config.scripts.opencode-launch.packages.opencode-start
       config.programs.rofi.package
-      direnv
       gh
-      ghostty
       mako
-      tmux
     ];
   };
+  # Linear tickets get their worktree and session through opencode-start.
+  scripts.opencode-launch.extras = [ linearis ];
 
   # start-ticket nudges about worktrees idle for a week; clicking reviews them.
   services.mako.settings."app-name=stale-worktree".on-button-left =

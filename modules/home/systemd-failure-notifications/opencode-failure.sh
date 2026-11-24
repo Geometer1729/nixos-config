@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-# Mako click action: hand currently failed units to an OpenCode tab group in ~/conf.
-fail() {
-  notify-send -u critical "OpenCode failure" "$*"
-  echo "$*" >&2
-  exit 1
-}
+# Mako click action: hand currently failed units to an OpenCode session in ~/conf.
 
 # A custom click action replaces mako's default dismissal.
 if [[ -n "${1-}" ]]; then
@@ -20,15 +15,8 @@ if [[ -z "$user" && -z "$system" ]]; then
   exit 0
 fi
 
-directory=$(realpath "$HOME/conf")
-body=$(jq -nc --arg directory "$directory" '{location: {directory: $directory}, agent: "plan"}')
-session=$(opencode api post /api/session --data "$body" | jq -er '.data.id') ||
-  fail "Could not create the OpenCode session."
-
 text="Investigate these failed systemd units.
 User units: ${user:-none}
 System units: ${system:-none}
 Check \`systemctl [--user] status\` and \`journalctl [--user] -b -u\` for each, compare against failures.md, and report the cause and a proposed fix."
-body=$(jq -nc --arg text "$text" '{text: $text}')
-opencode api post "/api/session/$session/prompt" --data "$body" >/dev/null ||
-  fail "Session $session was created, but its prompt could not be sent."
+opencode-start --dir "$HOME/conf" --agent plan --prompt "$text" >/dev/null

@@ -11,6 +11,11 @@
         type = "string";
         label = "Page";
       };
+      # Linked sessions, as space-separated <host>:<session ID>; see opencode-start.
+      uda.opencode = {
+        type = "string";
+        label = "OpenCode";
+      };
     };
   };
 

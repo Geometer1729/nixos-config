@@ -147,6 +147,21 @@ in
   home.packages = with pkgs; lib.optionals machine.hasGui [ libnotify notify browse ] ++ [
     opencode2
   ];
+
+  # opencode-start: every launcher opens its session through this one script.
+  # The work module adds linearis for Linear tickets.
+  scripts.opencode-launch = {
+    directory = ./launch;
+    extras = [
+      opencode
+      focus
+      pkgs.direnv
+      pkgs.gh
+      pkgs.socat
+      config.programs.taskwarrior.package
+      config.programs.tmux.package
+    ] ++ lib.optional machine.hasGui config.programs.ghostty.package;
+  };
   home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   home.sessionVariables.OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
 

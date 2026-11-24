@@ -8,7 +8,7 @@ in
 
   scripts.dependabot-alerts = {
     directory = ./.;
-    extras = [ config.programs.gh.package config.programs.opencode.package pkgs.mako ];
+    extras = [ config.programs.gh.package config.scripts.opencode-launch.packages.opencode-start pkgs.mako ];
     runtimeEnv.DEPENDABOT_REPOS = "Geometer1729/nixos-config";
   };
 

@@ -31,9 +31,23 @@ function messages(socket: Socket, receive: (message: unknown) => void) {
 interface Presence {
   sessions: readonly string[]
   pane: string
+  directory?: string
 }
 
-// Objects report a TUI's tab inventory and tmux pane; a session ID requests focus.
+function focusRequest(message: unknown): { session: string, directory?: string } | undefined {
+  if (typeof message === "string" && message.startsWith("ses_")) return { session: message }
+  if (message && typeof message === "object" && "session" in message && typeof message.session === "string"
+    && message.session.startsWith("ses_")
+    && (!("directory" in message) || typeof message.directory === "string")) {
+    return { session: message.session, ...("directory" in message ? { directory: message.directory as string } : {}) }
+  }
+  return undefined
+}
+
+// Objects report a TUI's tab inventory, tmux pane and directory. A session ID,
+// or {session, directory}, requests focus: the TUI with that tab gets it, else
+// the first TUI started in that directory, which opens it as a tab. The
+// requester gets back whether any TUI took it.
 // EOF (including a killed TUI) removes its inventory.
 export async function presenceServer(path: string, changed: () => void) {
   const clients = new Map<Socket, Presence>()
@@ -43,14 +57,22 @@ export async function presenceServer(path: string, changed: () => void) {
   const server = createServer((socket) => {
     sockets.add(socket)
     messages(socket, (message) => {
-      if (typeof message === "string" && message.startsWith("ses_")) {
-        const owner = [...clients].find(([, { sessions }]) => sessions.includes(message))?.[0]
-        owner?.write(JSON.stringify(message) + "\n")
-        socket.end()
+      const request = focusRequest(message)
+      if (request) {
+        const entries = [...clients]
+        const owner = entries.find(([, { sessions }]) => sessions.includes(request.session))?.[0]
+          ?? (request.directory === undefined ? undefined
+            : entries.find(([, { directory }]) => directory === request.directory)?.[0])
+        owner?.write(JSON.stringify(request.session) + "\n")
+        socket.end(JSON.stringify(owner !== undefined) + "\n")
       } else if (message && typeof message === "object" && "sessions" in message && "pane" in message
         && Array.isArray(message.sessions) && message.sessions.every((id) => typeof id === "string" && id.startsWith("ses_"))
-        && typeof message.pane === "string") {
-        clients.set(socket, { sessions: message.sessions, pane: message.pane })
+        && typeof message.pane === "string"
+        && (!("directory" in message) || typeof message.directory === "string")) {
+        clients.set(socket, {
+          sessions: message.sessions, pane: message.pane,
+          ...("directory" in message ? { directory: message.directory as string } : {}),
+        })
       } else {
         socket.destroy()
         return
@@ -96,8 +118,10 @@ export function presenceClient(path: () => Promise<string>, focus: (sessionID: s
         if (controller.signal.aborted) break
         await new Promise<void>((resolve) => {
           socket = createConnection(address)
+          // The server only routes a session here if this TUI has its tab or
+          // shares its directory.
           messages(socket, (message) => {
-            if (typeof message === "string" && JSON.parse(payload).sessions.includes(message)) focus(message)
+            if (typeof message === "string" && message.startsWith("ses_")) focus(message)
           })
           socket.once("connect", () => { connected = true; socket!.write(payload) })
           socket.on("error", () => socket?.destroy())
@@ -110,8 +134,10 @@ export function presenceClient(path: () => Promise<string>, focus: (sessionID: s
     }
   })()
   return {
-    update(ids: readonly string[], pane = "") {
-      const next = JSON.stringify({ sessions: [...new Set(ids)].sort(), pane }) + "\n"
+    update(ids: readonly string[], pane = "", directory?: string) {
+      const next = JSON.stringify({
+        sessions: [...new Set(ids)].sort(), pane, ...(directory === undefined ? {} : { directory }),
+      }) + "\n"
       if (next === payload) return
       payload = next
       if (connected) socket!.write(payload)

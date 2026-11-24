@@ -76,6 +76,7 @@ test("clicks focus only an attached owner and stop routing after its tab closes"
   const click = async () => {
     const socket = createConnection(path)
     socket.end('"ses_target"\n')
+    socket.resume() // Drain the delivery reply, or the socket never closes.
     await once(socket, "close")
   }
   try {
@@ -92,6 +93,42 @@ test("clicks focus only an attached owner and stop routing after its tab closes"
   } finally {
     await first.close()
     await second.close()
+    await server.close()
+    await rm(directory, { recursive: true })
+  }
+})
+
+test("a session no TUI has open goes to the TUI in its directory, and the requester learns who took it", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
+  const path = join(directory, "server.sock")
+  const server = await presenceServer(path, () => undefined)
+  const focused: string[] = []
+  const conf = presenceClient(async () => path, (id) => focused.push(id))
+  const other = presenceClient(async () => path, () => assert.fail("Wrong TUI received focus"))
+  const request = async (message: unknown) => {
+    const socket = createConnection(path)
+    let reply = ""
+    socket.setEncoding("utf8")
+    socket.on("data", (chunk) => { reply += chunk })
+    socket.end(JSON.stringify(message) + "\n")
+    await once(socket, "close")
+    return JSON.parse(reply)
+  }
+  try {
+    conf.update(["ses_open"], "%1", "/home/me/conf")
+    other.update([], "%2", "/home/me/wt")
+    await until(() => server.sessions().size === 1)
+    assert.equal(await request({ session: "ses_new", directory: "/home/me/conf" }), true)
+    await until(() => focused.length === 1)
+    assert.deepEqual(focused, ["ses_new"])
+    assert.equal(await request({ session: "ses_lost", directory: "/elsewhere" }), false)
+    assert.equal(await request("ses_unknown"), false)
+    assert.equal(await request("ses_open"), true)
+    await until(() => focused.length === 2)
+    assert.deepEqual(focused, ["ses_new", "ses_open"])
+  } finally {
+    await conf.close()
+    await other.close()
     await server.close()
     await rm(directory, { recursive: true })
   }

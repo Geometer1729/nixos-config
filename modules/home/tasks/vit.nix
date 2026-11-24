@@ -1,11 +1,13 @@
 { pkgs, config, lib, ... }:
 let
+  opencodeStart = "${config.scripts.opencode-launch.packages.opencode-start}/bin/opencode-start";
   # vit's :help only lists its defaults, so key help shows these too.
   binds = {
     o = { action = ":!wr taskopen {TASK_UUID}<Enter>"; description = "Open task note"; };
     s = { action = ":!wr task-steps {TASK_UUID}<Enter>"; description = "Edit task steps"; };
     x = { action = ":!r task-promote {TASK_UUID}<Enter>"; description = "Promote task"; };
-    O = { action = ":! ${config.scripts.tasks.packages.opencode-task}/bin/opencode-task {TASK_UUID}<Enter>"; description = "Work on task with opencode"; };
+    O = { action = ":! ${opencodeStart} --task {TASK_UUID} --route notes --new<Enter>"; description = "New OpenCode session on the task's notes"; };
+    go = { action = ":! ${opencodeStart} --task {TASK_UUID}<Enter>"; description = "Go to the task's OpenCode session"; };
     i = { action = ":!wr task {TASK_UUID} info<Enter>"; description = "Show task info"; };
     r = { action = "{ACTION_REFRESH}"; description = "Refresh"; };
     gi = { action = ":inbox<Enter>"; description = "Inbox report"; };
@@ -29,10 +31,6 @@ in
       })
       binds;
   };
-
-  scripts.tasks.overrides.opencode-task.extras = [
-    config.programs.opencode.package
-  ];
 
   home.packages = [
     pkgs.vit
