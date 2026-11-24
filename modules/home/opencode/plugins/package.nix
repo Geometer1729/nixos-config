@@ -40,10 +40,16 @@ let
 in
 {
   inherit sourceFiles;
-  # Entry files of npmPlugins, relative to the package, for the load check.
-  npmEntrypoints = lib.mapAttrsToList
-    (name: metadata: "${name}/${lib.removePrefix "./" (metadata.exports.".".import or metadata.exports.".")}")
-    npmPlugins;
+  # Entry files of npmPlugins, relative to the package, for the load check:
+  # the "." export is a server plugin, "./tui" a TUI one.
+  npmEntrypoints = lib.concatLists (lib.mapAttrsToList
+    (name: metadata:
+      let
+        entry = target: "${name}/${lib.removePrefix "./" (target.import or target)}";
+      in
+      lib.optional (metadata.exports ? ".") { path = entry metadata.exports."."; server = true; }
+      ++ lib.optional (metadata.exports ? "./tui") { path = entry metadata.exports."./tui"; server = false; })
+    npmPlugins);
 
   check = pkgs.buildNpmPackage (common // {
     pname = "opencode-plugins-check";

@@ -4,7 +4,7 @@ import path from "node:path"
 import { pathToFileURL } from "node:url"
 
 // Run inside the pinned OpenCode loader, so import failures (including TUI
-// dependencies) fail the check. Vim's editing engine has separate unit tests.
+// dependencies) fail the check.
 export default {
   id: "test.plugin-load",
   async setup() {

@@ -12,7 +12,7 @@ let
       server = !(lib.hasInfix "plugin/tui\"" (builtins.readFile source));
     })
     entrypoints
-  ++ map (path: { inherit path; server = true; }) plugins.npmEntrypoints));
+  ++ plugins.npmEntrypoints));
   opencode = lib.findFirst (package: (package.pname or "") == "opencode2")
     (throw "OpenCode plugin load check requires the deployed opencode2 package")
     home.home.packages;

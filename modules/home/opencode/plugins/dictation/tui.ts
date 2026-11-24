@@ -32,8 +32,8 @@ export default Plugin.define({
         const text = Buffer.concat(chunks).toString("utf8")
         const input = editor()
         if (!input || !text) return socket.end("unavailable\n")
-        // The Vim plugin shows a status on the prompt outside insert mode.
-        const normal = Boolean(input.traits.status)
+        // The Vim plugin draws a block cursor only outside insert mode.
+        const normal = input.cursorStyle?.style === "block"
         input.cursorOffset = insertionPoint(input.plainText, input.cursorOffset, normal)
         input.insertText(insertion(input.plainText.slice(0, input.cursorOffset), text))
         context.renderer.requestRender()

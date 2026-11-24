@@ -10,6 +10,7 @@ let
     # pair RPC (anomalyco/opencode#61549). Exporting ./rpc so /api/plugin reports
     # features.rpc did not make it pair (tried 2026-11-19, OpenCode 2.3.0).
     npmPlugins.mobile-notifications = builtins.fromJSON (builtins.readFile inputs.opencode-mobile-notifications-npm);
+    npmPlugins.vim = builtins.fromJSON (builtins.readFile inputs.opencode-vim-plugin-npm);
   };
   plugins = pluginBuild.package;
   notify = pkgs.writeShellApplication {
@@ -196,8 +197,21 @@ in
         animations = true;
         attention.sound = true;
         attention.notifications = !machine.hasGui;
-        plugins = [ "file://${plugins}/vim" "file://${plugins}/auto-tabs" ]
-          ++ lib.optionals machine.hasGui [
+        # ctrl+o opens the external editor, as the old local vim plugin bound it;
+        # the recent sessions menu it shadowed stays in the command palette.
+        keybinds = {
+          "prompt.editor" = "ctrl+o,<leader>e";
+          "open.menu" = "none";
+        };
+        plugins = [
+          # No gt/gT: a "g t" normal_keybinds sequence swallows the g of gg, g$ and the rest.
+          {
+            package = "file://${plugins}/vim";
+            options.enter_submit = true;
+          }
+          "file://${plugins}/auto-tabs"
+        ]
+        ++ lib.optionals machine.hasGui [
           {
             package = "file://${plugins}/notifications";
             options.focusCommand = "${focus}/bin/opencode-focus";
