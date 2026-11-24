@@ -2,7 +2,7 @@ import type { OpenCodeClient } from "@opencode/client"
 import { basename } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
-import { attribute, implicitSessions } from "./browser.ts"
+import { attribute } from "./browser.ts"
 import type { Handoff, PendingHandoff, RunningTool } from "./browser.ts"
 
 type SessionInfo = Awaited<ReturnType<OpenCodeClient["session"]["get"]>>
@@ -21,8 +21,8 @@ export interface Notification {
   body: string
   key: string
   sessionID: string
-  /** The browse session whose waiting tab a click shows, when the top row is a browser handoff. */
-  browser: string
+  /** The browse tab a click shows, when the top row is a browser handoff. */
+  tab: string
 }
 
 async function runningTools(client: OpenCodeClient, sessionIDs: readonly string[], signal: AbortSignal) {
@@ -67,17 +67,14 @@ export async function snapshot(
     // An agent blocked in handoff() is still running its tool call.
     readHandoffs && busy.length ? readHandoffs(signal) : [],
   ])
-  const implicit = pending.length ? implicitSessions(sessions.keys()) : new Map<string, string>()
-  const running = pending.some((handoff) => !implicit.has(handoff.session))
-    ? await runningTools(client, busy, signal)
-    : new Map<string, RunningTool[]>()
+  const running = pending.length ? await runningTools(client, busy, signal) : new Map<string, RunningTool[]>()
 
   return {
     sessions: [...sessions.values()],
     active,
     permissions: requests.flatMap((request) => request.permissions),
     forms: requests.flatMap((request) => request.forms),
-    handoffs: attribute(pending, implicit, running),
+    handoffs: attribute(pending, running),
   }
 }
 
@@ -165,9 +162,9 @@ export function notification(
   // Child requests need the user's attention too, but belong on their parent's row.
   for (const form of state.forms) add(root(form.sessionID), "question", `form:${form.id}`)
   // The earliest handoff names the row; each one is its own delivery.
-  const handoffs = state.handoffs.toSorted((a, b) => a.startedAt.localeCompare(b.startedAt) || a.session.localeCompare(b.session))
+  const handoffs = state.handoffs.toSorted((a, b) => a.startedAt.localeCompare(b.startedAt) || a.tab - b.tab)
   for (const handoff of handoffs) {
-    add(root(handoff.sessionID), "browser", `handoff:${handoff.session}:${handoff.startedAt}`, handoff)
+    add(root(handoff.sessionID), "browser", `handoff:${handoff.tab}:${handoff.startedAt}`, handoff)
   }
   for (const permission of state.permissions) add(root(permission.sessionID), "permission", `permission:${permission.id}`)
 
@@ -181,7 +178,7 @@ export function notification(
 
   return {
     sessionID: rows[0]?.id ?? "",
-    browser: rows[0]?.handoff?.session ?? "",
+    tab: rows[0]?.handoff === undefined ? "" : String(rows[0].handoff.tab),
     key: JSON.stringify(rows.map(({ id, reasons }) => [id, reasons])),
     summary: rows.length ? `OpenCode · ${rows.length} session${rows.length === 1 ? "" : "s"} waiting` : "",
     body: rows.map((row) => {

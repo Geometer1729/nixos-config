@@ -88,7 +88,7 @@ async function run({ command, focusCommand, browseCommand, workDirectory, quietA
             .filter((session) => inside(session.location.directory, workDirectory!)).map((session) => session.id))
           const content = notification(state, new Set([...attached.keys()].filter((id) => !muted.has(id))), locations, quietAgents)
           await exec(command, [
-            content.summary, content.body, content.key, content.sessionID, socketPath(process.pid), content.browser, browseCommand ?? "",
+            content.summary, content.body, content.key, content.sessionID, socketPath(process.pid), content.tab, browseCommand ?? "",
           ], { signal: timeout })
         }, connected, report)
         shared.request = queue.request

@@ -9,11 +9,14 @@ if [[ "${1-}" == "--focus" ]]; then
   target=$(jq -e --argjson id "${2?Expected a notification ID}" 'select(.id == $id)' "$target_file")
   flock -u 9
   # An agent blocked in a browse handoff needs the browser tab, not its terminal.
-  # browse brings the tab's window forward; Hyprland's focus_on_activate follows it.
-  browser=$(jq -r '.browser // ""' <<<"$target")
+  # Hyprland's focus_on_activate follows the window browse raises. browse only
+  # warns where it can't raise a tab (before anomalyco/browse#337), and refuses
+  # a tab whose handoff() runs inside an execute as busy; both fall through.
+  tab=$(jq -r '.tab // ""' <<<"$target")
   browse=$(jq -r '.browse // ""' <<<"$target")
-  if [[ -n "$browser" && -n "$browse" ]] \
-    && OPENCODE_BROWSER_AUTOSTART=false timeout 10 "$browse" session show "$browser" >/dev/null; then
+  if [[ -n "$tab" && -n "$browse" ]] \
+    && raised=$(OPENCODE_BROWSER_AUTOSTART=false timeout 10 "$browse" execute --tab "$tab" --code 'await page.bringToFront()' 2>&1) \
+    && [[ "$raised" != *Warnings:* ]]; then
     exit 0
   fi
   jq -c '.sessionID' <<<"$target" | socat -T 2 - "UNIX-CONNECT:$(jq -r '.socket' <<<"$target")"
@@ -25,7 +28,7 @@ body="${2-}"
 key="${3-}"
 session="${4-}"
 socket="${5-}"
-browser="${6-}"
+tab="${6-}"
 browse="${7-}"
 # Delivery receipt only: the waiting list is still rebuilt from OpenCode. Keeping
 # this in /run makes dismissal survive refreshes/reloads, but not a new login.
@@ -57,5 +60,5 @@ if [[ ! -f "$receipt" || "$(<"$receipt")" != "$fingerprint" ]]; then
 fi
 
 # Refresh the socket address after service restarts even if the popup is unchanged.
-jq -n --argjson id "$id" --arg sessionID "$session" --arg socket "$socket" --arg browser "$browser" --arg browse "$browse" \
-  '{id: $id, sessionID: $sessionID, socket: $socket, browser: $browser, browse: $browse}' >"$target_file"
+jq -n --argjson id "$id" --arg sessionID "$session" --arg socket "$socket" --arg tab "$tab" --arg browse "$browse" \
+  '{id: $id, sessionID: $sessionID, socket: $socket, tab: $tab, browse: $browse}' >"$target_file"

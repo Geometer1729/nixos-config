@@ -71,13 +71,13 @@
     "browse-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-forw2D2AqbedXxs0I9NzmS13Ogh8BKZ28quJR7pktv0=",
+        "narHash": "sha256-MluC1Kcqed+Z5AMCxqzyXin1IySi3cyYFKgpHOaDCU8=",
         "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/0.0.17-dev.184"
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
       },
       "original": {
         "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/0.0.17-dev.184"
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
       }
     },
     "browse-npm-latest": {

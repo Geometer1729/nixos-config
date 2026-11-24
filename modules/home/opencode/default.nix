@@ -93,16 +93,19 @@ let
 
     nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
     dontBuild = true;
-    dontStrip = true; # Stripping removes Bun's embedded application payload.
+    dontStrip = true; # Upstream ships it stripped; keep it byte-identical.
     installPhase = ''
       runHook preInstall
 
       install -Dm755 bin/browse $out/bin/browse
       # The flake input updates browse; its own updater would reinstall into ~/.local/bin.
       # Recordings shell out to ffmpeg.
+      # The relay takes its OPENCODE_BROWSER_* from whichever browse starts it. ALLOW_FOREGROUND lets
+      # a notification click raise a waiting tab (and agents raise theirs, which the user accepted).
       wrapProgram $out/bin/browse \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ffmpeg ]} \
-        --set OPENCODE_BROWSER_AUTO_UPDATE off
+        --set OPENCODE_BROWSER_AUTO_UPDATE off \
+        --set OPENCODE_BROWSER_ALLOW_FOREGROUND 1
 
       runHook postInstall
     '';
@@ -128,10 +131,10 @@ in
   # The speech plugin's server voices its messages with speak-synthesize and speak-play.
   imports = [ ../speech ];
 
-  # browse-npm is held on 0.0.17-dev.184 because 0.1 removed `browse session list/show`.
-  # 0.1.6 reports pending handoffs in `browse status --json` instead (anomalyco/browse#379).
-  warnings = lib.optional (lib.versionOlder browseNpm.version browseStable)
-    "browse ${browseStable} is out but browse-npm is held on ${browseNpm.version}: port the notifications plugin, notify.sh and skills/browse from `browse session list/show` to `browse status --json`, then point browse-npm back at latest and remove browse-npm-latest";
+  # browse-npm tracks the dev channel until a stable release lists waiting handoffs in `browse tabs`
+  # (anomalyco/browse#379, merged after 0.1.5).
+  warnings = lib.optional (!lib.versionOlder browseStable "0.1.6")
+    "browse ${browseStable} lists waiting handoffs: point browse-npm in flake.nix back at latest and remove browse-npm-latest";
 
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [

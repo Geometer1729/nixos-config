@@ -12,7 +12,6 @@ nixpkgs 0dc498b). Evaluation and check builds passed on x86_64-linux; the follow
 
 - **Custom flake output**: `unknown flake output 'nixos-unified'` — an intentional framework output whose schema Nix's checker does not recognize. No configuration change is needed.
 - **Omitted systems**: `The check omitted these incompatible systems: aarch64-darwin, aarch64-linux, x86_64-darwin` — the framework advertises four platforms by default. Decide whether to narrow the supported systems to x86_64-linux or validate the other platforms with `--all-systems`.
-- **browse hold, newly recorded 2026-11-24**: `bbrian profile: browse 0.1.5 is out but browse-npm is held on 0.0.17-dev.184: port the notifications plugin, notify.sh and skills/browse …` (desktop Home Manager profiles). Intentional: browse 0.1 dropped `browse session list/show`, which those three use, so `flake.nix` pins the last 0.0.x build. Remove by porting them to `browse status --json` (handoffs reported since the 0.1.6 dev builds, anomalyco/browse#379) and moving `browse-npm` back to `latest`.
 
 - **Nix database contention during concurrent evaluations**: the 2026-09-20 flake check warned `SQLite database '/nix/var/nix/db/db.sqlite' is busy`; the September 14 plugin checks reported the analogous warning for `…/.cache/nix/eval-cache-v6/….sqlite`. Both runs ultimately passed; the final update checks emitted only the two warnings above. Recheck if contention recurs without concurrent evaluations; no database repair or deletion was needed.
 

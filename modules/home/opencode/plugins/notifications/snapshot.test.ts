@@ -3,12 +3,11 @@ import test from "node:test"
 import { setTimeout as sleep } from "node:timers/promises"
 import type { OpenCodeClient } from "@opencode/client"
 
-import { browseSession } from "./browser.ts"
 import type { Handoff, PendingHandoff } from "./browser.ts"
 import { confirmedSnapshot, notification as render, relevantEvent, snapshot } from "./snapshot.ts"
 import type { Session, Snapshot } from "./snapshot.ts"
 
-const empty = { summary: "", body: "", key: "[]", sessionID: "", browser: "" }
+const empty = { summary: "", body: "", key: "[]", sessionID: "", tab: "" }
 const notification = (state: Snapshot) => render(state, new Set(state.sessions.map((session) => session.id)))
 
 function session(id: string, overrides: Partial<Session> = {}): Session {
@@ -27,7 +26,7 @@ function state(sessions: Session[], overrides: Partial<Snapshot> = {}): Snapshot
 }
 
 function handoff(sessionID: string, overrides: Partial<Handoff> = {}): Handoff {
-  return { sessionID, session: "mcp-00000000", message: "Sign in", startedAt: "2026-11-13T23:59:53.961Z", ...overrides }
+  return { sessionID, tab: 1000, message: "Sign in", startedAt: "2026-11-13T23:59:53.961Z", ...overrides }
 }
 
 test("a viewed response disappears, but viewing does not dismiss a pending request", () => {
@@ -224,7 +223,7 @@ test("a browser handoff shows its message on its root's row, ranked below approv
 
 test("each handoff is its own delivery, and the earliest names the row", () => {
   const sessions = [session("ses_open", { time: { created: 1, updated: 2 } })]
-  const first = handoff("ses_open", { session: "named", message: "First", startedAt: "2026-11-13T10:00:00.000Z" })
+  const first = handoff("ses_open", { tab: 2000, message: "First", startedAt: "2026-11-13T10:00:00.000Z" })
   const second = handoff("ses_open", { message: "Second", startedAt: "2026-11-13T11:00:00.000Z" })
   const both = notification(state(sessions, { handoffs: [second, first] }))
   assert.equal(both.body, "🌐 conf · ses_open — browser: First")
@@ -235,21 +234,22 @@ test("each handoff is its own delivery, and the earliest names the row", () => {
 })
 
 test("snapshots read browse only while a session runs and attribute its handoffs", async () => {
-  const sessions = [session("ses_implicit"), session("ses_named"), session("ses_other")]
+  const sessions = [session("ses_direct"), session("ses_code"), session("ses_other")]
   let active: Record<string, unknown> = {}
   let reads = 0
   let listed: string[] = []
   const pending: PendingHandoff[] = [
-    { session: browseSession("ses_implicit"), message: "Implicit", startedAt: "1" },
-    { session: "billing-login", message: "Named", startedAt: "2" },
-    { session: "unknown", message: "Unattributed", startedAt: "3" },
+    { tab: 1001, message: "Direct", startedAt: "1" },
+    { tab: 1002, id: "billing-login", message: "Code", startedAt: "2" },
+    { tab: 1003, message: "Unattributed", startedAt: "3" },
   ]
   const tools: Record<string, unknown[]> = {
-    ses_named: [{ type: "tool", name: "execute", state: { status: "running", input: {
-      code: `await tools.browse.execute({ session: "billing-login", code: "await handoff('Named')" })`,
+    ses_direct: [{ type: "tool", name: "browse_handoff", state: { status: "running", input: { message: "Direct", tab: 1001 } } }],
+    ses_code: [{ type: "tool", name: "execute", state: { status: "running", input: {
+      code: `await tools.browse.execute({ tab: "billing-login", code: "await handoff('Code')" })`,
     } } }],
     // A finished call is not what the session is blocked on.
-    ses_other: [{ type: "tool", name: "browse_execute", state: { status: "completed", input: { session: "unknown" } } }],
+    ses_other: [{ type: "tool", name: "browse_handoff", state: { status: "completed", input: { tab: 1003 } } }],
   }
   const client = {
     session: {
@@ -268,21 +268,21 @@ test("snapshots read browse only while a session runs and attribute its handoffs
   assert.deepEqual((await snapshot(client, signal, read)).handoffs, [])
   assert.equal(reads, 0, "Without a running session nothing can be blocked in handoff()")
 
-  active = { ses_implicit: {}, ses_named: {}, ses_other: {} }
+  active = { ses_direct: {}, ses_code: {}, ses_other: {} }
   const handoffs = (await snapshot(client, signal, read)).handoffs
   assert.equal(reads, 1)
-  assert.deepEqual(handoffs.map(({ sessionID, message }) => [sessionID, message]), [["ses_implicit", "Implicit"], ["ses_named", "Named"]])
-  assert.deepEqual(listed.toSorted(), ["ses_implicit", "ses_named", "ses_other"])
+  assert.deepEqual(handoffs.map(({ sessionID, message }) => [sessionID, message]), [["ses_direct", "Direct"], ["ses_code", "Code"]])
+  assert.deepEqual(listed.toSorted(), ["ses_code", "ses_direct", "ses_other"])
 
   listed = []
-  await snapshot(client, signal, async () => pending.slice(0, 1))
-  assert.deepEqual(listed, [], "Implicit sessions need no message reads")
+  await snapshot(client, signal, async () => [])
+  assert.deepEqual(listed, [], "Without a waiting handoff no messages are read")
 })
 
 test("a click shows the waiting tab only when a browser handoff is the top row", () => {
   const sessions = [session("ses_open", { time: { created: 1, updated: 2 } })]
-  const waiting = handoff("ses_open", { session: "billing-login" })
-  assert.equal(notification(state(sessions, { handoffs: [waiting] })).browser, "billing-login")
-  assert.equal(notification(state(sessions, { handoffs: [waiting], permissions: [{ sessionID: "ses_open", id: "per" }] })).browser, "")
-  assert.equal(notification(state([...sessions, session("ses_asking")], { handoffs: [waiting], permissions: [{ sessionID: "ses_asking", id: "per" }] })).browser, "")
+  const waiting = handoff("ses_open", { tab: 1651470557 })
+  assert.equal(notification(state(sessions, { handoffs: [waiting] })).tab, "1651470557")
+  assert.equal(notification(state(sessions, { handoffs: [waiting], permissions: [{ sessionID: "ses_open", id: "per" }] })).tab, "")
+  assert.equal(notification(state([...sessions, session("ses_asking")], { handoffs: [waiting], permissions: [{ sessionID: "ses_asking", id: "per" }] })).tab, "")
 })
