@@ -61,8 +61,9 @@
     zsh-nix-shell.flake = false;
     opencode2-npm.url = "file+https://registry.npmjs.org/@opencode/cli-linux-x64/latest";
     opencode2-npm.flake = false;
-    # dev until a stable release reports pending handoffs (0.0.17); modules/home/opencode warns once one does.
-    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/dev";
+    # Held on the last 0.0.x build we run: 0.1 (a Rust rewrite) drops `browse session list/show`, which the
+    # notifications plugin, notify.sh and skills/browse use. modules/home/opencode warns while latest is ahead.
+    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/0.0.17-dev.184";
     browse-npm.flake = false;
     browse-npm-latest.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
     browse-npm-latest.flake = false;
