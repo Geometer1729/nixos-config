@@ -15,6 +15,8 @@
       uda.opencode = {
         type = "string";
         label = "OpenCode";
+        # Marks linked tasks in reports' opencode.indicator column.
+        indicator = "◆";
       };
     };
   };

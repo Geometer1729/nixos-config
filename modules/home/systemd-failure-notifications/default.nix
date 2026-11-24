@@ -1,23 +1,39 @@
-{ config, pkgs, ... }:
+{ config, lib, machine, pkgs, ... }:
 let
   inherit (config.scripts.systemd-failures) packages;
+  uda = label: { type = "string"; inherit label; };
 in
 {
-  # Simple systemd failure notification via periodic checking
-  # Checks every 5 minutes for failed services and sends notifications
-  # Clicking a notification hands the failures to OpenCode in ~/conf.
+  # Every 5 minutes on every host, each failed unit becomes a Taskwarrior task
+  # (see check-failed-services.sh). Desktops also get a popup; clicking it opens
+  # an OpenCode session on those tasks through opencode-start.
+
+  programs.taskwarrior.config.uda = {
+    # Space-separated <host>/<scope>/<unit>/<InvocationID>, one per failure seen.
+    failure = uda "Failures";
+    failurehost = uda "Failed host";
+    failurescope = uda "Failed scope";
+    failureunit = uda "Failed unit";
+  };
 
   scripts.systemd-failures = {
     directory = ./.;
-    extras = [ config.scripts.opencode-launch.packages.opencode-start pkgs.mako ];
+    extras = [ config.programs.taskwarrior.package ];
+    runtimeEnv = lib.optionalAttrs machine.hasGui { FAILURE_NOTIFY = "1"; };
+    overrides.opencode-failure = {
+      enable = machine.hasGui;
+      extras = [ config.scripts.opencode-launch.packages.opencode-start pkgs.mako ];
+    };
   };
 
-  services.mako.settings."app-name=systemd-failures".on-button-left =
-    "exec ${packages.opencode-failure}/bin/opencode-failure \"$id\"";
+  services.mako.settings = lib.mkIf machine.hasGui {
+    "app-name=systemd-failures".on-button-left =
+      "exec ${packages.opencode-failure}/bin/opencode-failure \"$id\"";
+  };
 
   systemd.user.services.check-failed-services = {
     Unit = {
-      Description = "Check for failed systemd services and notify";
+      Description = "File tasks for failed systemd units, and notify";
     };
     Service = {
       Type = "oneshot";
@@ -27,7 +43,7 @@ in
 
   systemd.user.timers.check-failed-services = {
     Unit = {
-      Description = "Check for failed services every 5 minutes";
+      Description = "Check for failed units every 5 minutes";
     };
     Timer = {
       OnBootSec = "1min";

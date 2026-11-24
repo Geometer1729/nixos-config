@@ -28,6 +28,7 @@ in
     ssh
     syncthing
     tasks
+    systemd-failure-notifications
     tea
     tmux
     zsh
@@ -36,7 +37,6 @@ in
   ]) ++ lib.optionals machine.hasGui (with self.homeModules; [
     ghostty
     notify-sync
-    systemd-failure-notifications
     dependabot-notifications
     desktop
     media

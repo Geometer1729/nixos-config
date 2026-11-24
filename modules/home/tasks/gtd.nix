@@ -14,6 +14,7 @@ let
     tags = "Tags";
     urgency = "Urg";
     annotations = "Waiting For";
+    "opencode.indicator" = "S";
   };
 
   # Helper function to generate taskwarrior report configuration
@@ -32,8 +33,26 @@ let
     lib.foldl' lib.mergeAttrs { }
       (lib.mapAttrsToList (name: cfg: mkReport (cfg // { inherit name; })) reports);
 
-  # Define all reports
-  reports = {
+  # Every report marks tasks that have a linked OpenCode session, after the ID.
+  reports = lib.mapAttrs
+    (_: report: report // { columns = [ "id" "opencode.indicator" ] ++ lib.remove "id" report.columns; })
+    gtdReports;
+
+  gtdReports = {
+    # Everything with a linked OpenCode session (see opencode-start).
+    agents = {
+      description = "Tasks with an OpenCode session";
+      columns = [ "id" "project" "description.count" "tags" "urgency" ];
+      filter = "status:pending opencode.any:";
+      sort = "urgency-";
+    };
+    # What could be handed to an agent: the inbox and +agent tasks, without a session yet.
+    startable = {
+      description = "Inbox and agent tasks without an OpenCode session";
+      columns = [ "id" "entry.age" "project" "description.count" "tags" "urgency" ];
+      filter = "status:pending -BLOCKED -waiting opencode.none: ( ( -next -someday ) or +agent )";
+      sort = "urgency-";
+    };
     inbox = {
       description = "GTD Inbox - items to process";
       columns = [ "id" "entry.age" "description" ];

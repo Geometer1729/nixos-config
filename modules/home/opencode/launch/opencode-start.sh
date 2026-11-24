@@ -1,4 +1,4 @@
-# Usage: opencode-start [--task UUID] [--route ticket|pr|notes] [--new]
+# Usage: opencode-start [--task UUID] [--route ticket|pr|failure|notes] [--new]
 #                       [--linear ID] [--repo DIR]
 #                       [--dir DIR] [--title TITLE] [--agent AGENT] [--skill SKILL]...
 #                       [--prompt TEXT | --command NAME [ARGS...]]
@@ -9,6 +9,7 @@
 # --dir creates a session there. Without it, --task or --linear picks a route:
 #   ticket  a Linear issue: its worktree, In Progress, /start-ticket
 #   pr      my PR or a review request: a worktree on the PR's branch
+#   failure a failed unit (check-failed-services): a plan session in ~/conf
 #   notes   anything else: a plan session in ~/conf that reads the task's notes
 # A routed task resumes its live session instead, unless --new.
 # --task links the session to the task: <host>:<session> in its opencode UDA.
@@ -223,6 +224,21 @@ route_pr() {
   fi
 }
 
+route_failure() {
+  local failure unit scope where flag='' ssh=''
+  failure=$(task_json)
+  unit=$(jq -er .failureunit <<<"$failure")
+  scope=$(jq -er .failurescope <<<"$failure")
+  where=$(jq -er .failurehost <<<"$failure")
+  [[ $scope == system ]] || flag=' --user'
+  [[ $where == "$host" ]] || ssh=" (over \`ssh $where\`)"
+  dir=$(realpath "$HOME/conf")
+  agent=plan
+  title=$(jq -r .description <<<"$failure")
+  prompt="Investigate the failed $scope unit $unit on $where. Check \`systemctl$flag status $unit\` and \`journalctl$flag -b -u $unit\`$ssh, compare against failures.md, and report the cause and a proposed fix.
+Taskwarrior task $task_uuid tracks it; its annotations list any repeat failures."
+}
+
 route_notes() {
   dir=$(realpath "$HOME/conf")
   agent=plan
@@ -266,6 +282,7 @@ if [[ -z $dir ]]; then
     if [[ -z $route ]]; then
       if task_json | jq -e .linearidentifier >/dev/null; then route='ticket'
       elif task_json | jq -e .githuburl >/dev/null; then route='pr'
+      elif task_json | jq -e .failureunit >/dev/null; then route='failure'
       else route='notes'
       fi
     fi
@@ -273,7 +290,7 @@ if [[ -z $dir ]]; then
     fail "opencode-start needs --dir, --task or --linear."
   fi
   case $route in
-  ticket | pr | notes) "route_$route" ;;
+  ticket | pr | failure | notes) "route_$route" ;;
   *) fail "opencode-start: unknown route $route" ;;
   esac
 fi

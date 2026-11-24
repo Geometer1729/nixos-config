@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
 
-# Mako click action: hand currently failed units to an OpenCode session in ~/conf.
+# Mako click action: open an OpenCode session for each failure task the popup
+# lists, as "<unit> (task <short uuid>)" lines. Mirrored popups from another
+# desktop work too, once its task has synced.
+fail() {
+  notify-send -u critical "OpenCode failure" "$*"
+  echo "$*" >&2
+  exit 1
+}
 
+id=${1:?usage: opencode-failure <mako notification id>}
+
+# Expired notifications are only in history.
+body=$(jq -sr --argjson id "$id" 'add | map(select(.id == $id))[0].body // empty' \
+  <(makoctl list -j) <(makoctl history -j)) ||
+  fail "Could not read notification $id."
 # A custom click action replaces mako's default dismissal.
-if [[ -n "${1-}" ]]; then
-  makoctl dismiss -n "$1" || true
-fi
+makoctl dismiss -n "$id" || true
 
-# Re-query rather than trusting the popup: units may have recovered since.
-user=$(systemctl --user list-units --state=failed --no-legend --plain | awk 'NF {print $1}' | paste -sd ' ')
-system=$(systemctl list-units --state=failed --no-legend --plain | awk 'NF {print $1}' | paste -sd ' ')
-if [[ -z "$user" && -z "$system" ]]; then
-  notify-send "OpenCode failure" "No failed units remain."
-  exit 0
-fi
+mapfile -t short < <(grep -oE '\(task [[:xdigit:]]{8}\)' <<<"$body" | grep -oE '[[:xdigit:]]{8}')
+((${#short[@]})) || fail "Notification $id names no failure task."
 
-text="Investigate these failed systemd units.
-User units: ${user:-none}
-System units: ${system:-none}
-Check \`systemctl [--user] status\` and \`journalctl [--user] -b -u\` for each, compare against failures.md, and report the cause and a proposed fix."
-opencode-start --dir "$HOME/conf" --agent plan --prompt "$text" >/dev/null
+task sync >/dev/null 2>&1 || true
+for prefix in "${short[@]}"; do
+  uuid=$(task rc.verbose=nothing rc.context= "$prefix" _uuids | head -n1)
+  if [[ -z $uuid ]]; then
+    notify-send "OpenCode failure" "Task $prefix hasn't synced here yet; try again in a few minutes."
+    continue
+  fi
+  opencode-start --task "$uuid" >/dev/null || true
+done

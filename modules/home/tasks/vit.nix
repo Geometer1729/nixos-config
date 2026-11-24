@@ -6,13 +6,15 @@ let
     o = { action = ":!wr taskopen {TASK_UUID}<Enter>"; description = "Open task note"; };
     s = { action = ":!wr task-steps {TASK_UUID}<Enter>"; description = "Edit task steps"; };
     x = { action = ":!r task-promote {TASK_UUID}<Enter>"; description = "Promote task"; };
-    O = { action = ":! ${opencodeStart} --task {TASK_UUID} --route notes --new<Enter>"; description = "New OpenCode session on the task's notes"; };
-    go = { action = ":! ${opencodeStart} --task {TASK_UUID}<Enter>"; description = "Go to the task's OpenCode session"; };
+    O = { action = ":!r ${opencodeStart} --task {TASK_UUID} --route notes --new<Enter>"; description = "New OpenCode session on the task's notes"; };
+    go = { action = ":!r ${opencodeStart} --task {TASK_UUID}<Enter>"; description = "Go to the task's OpenCode session"; };
     i = { action = ":!wr task {TASK_UUID} info<Enter>"; description = "Show task info"; };
     r = { action = "{ACTION_REFRESH}"; description = "Refresh"; };
     gi = { action = ":inbox<Enter>"; description = "Inbox report"; };
     gs = { action = ":someday<Enter>"; description = "Someday report"; };
     gn = { action = ":next<Enter>"; description = "Next report"; };
+    ga = { action = ":agents<Enter>"; description = "Tasks with an OpenCode session"; };
+    gt = { action = ":startable<Enter>"; description = "Inbox and agent tasks to start"; };
   };
 in
 {
