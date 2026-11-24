@@ -11,6 +11,11 @@ let
   });
   bugwarrior = py.bugwarrior.override { inherit taskw; };
 
+  # Imports skip the inbox: each lands already triaged into a GTD list.
+  contexts = [ "@computer" "@home" ];
+  # A ready PR waits on its reviewers; a draft is still mine to finish.
+  prTags = contexts ++ [ "{{ 'next' if githubdraft else 'waiting' }}" ];
+
   github = {
     service = "github";
     login = "Geometer1729";
@@ -29,6 +34,7 @@ let
       annotation_comments = false;
       # Set on import only, so triage edits stick.
       static_fields = [ "priority" "project" ];
+      merge_tags = false;
     };
     linear = {
       service = "linear";
@@ -36,23 +42,24 @@ let
       # task-import fills this in; this repo is public.
       only_if_assigned = "@LINEAR_EMAIL@";
       status_types = [ "unstarted" "started" ];
-      add_tags = [ "@work" ];
+      add_tags = [ "@work" "next" ] ++ contexts;
       default_priority = "";
       description_template = "{{linearidentifier}}: {{lineartitle}}";
     };
     # Scoped by owner: author:@me alone also finds stale PRs at old jobs.
     work_prs = github // {
       query = "is:open is:pr author:@me org:geosurge-ai";
-      add_tags = [ "@work" ];
+      add_tags = [ "@work" ] ++ prTags;
     };
     # Completes by itself once reviewed, by dropping out of the query.
     work_reviews = github // {
       query = "is:open is:pr review-requested:@me org:geosurge-ai";
-      add_tags = [ "@work" ];
+      add_tags = [ "@work" "next" ] ++ contexts;
       description_template = "Review ${github.description_template}";
     };
     personal_prs = github // {
       query = "is:open is:pr author:@me user:Geometer1729";
+      add_tags = prTags;
       project_template = "{{ 'conf' if githubrepo == 'Geometer1729/nixos-config' else project }}";
     };
   };
