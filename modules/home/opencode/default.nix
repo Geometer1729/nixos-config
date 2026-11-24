@@ -127,10 +127,10 @@ in
   # The speech plugin's server voices its messages with speak-synthesize and speak-play.
   imports = [ ../speech ];
 
-  # browse-npm tracks the dev tag only for pending handoffs in `browse session list`
-  # (anomalyco/browse#250), first released in 0.0.17.
-  warnings = lib.optional (lib.versionAtLeast browseStable "0.0.17")
-    "browse ${browseStable} is stable: point the browse-npm flake input back at latest and remove browse-npm-latest";
+  # browse-npm is held on 0.0.17-dev.184 because 0.1 removed `browse session list/show`.
+  # 0.1.6 reports pending handoffs in `browse status --json` instead (anomalyco/browse#379).
+  warnings = lib.optional (lib.versionOlder browseNpm.version browseStable)
+    "browse ${browseStable} is out but browse-npm is held on ${browseNpm.version}: port the notifications plugin, notify.sh and skills/browse from `browse session list/show` to `browse status --json`, then point browse-npm back at latest and remove browse-npm-latest";
 
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [
