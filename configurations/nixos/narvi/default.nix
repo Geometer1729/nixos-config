@@ -58,6 +58,7 @@ in
     home.sessionVariables.NH_FLAKE = lib.mkForce "github:Geometer1729/nixos-config";
     programs.git.signing.signByDefault = lib.mkForce false;
     tasks.dailies.enable = true;
+    tasks.import.enable = true;
     # These folders are backup targets on this host.
     services.syncthing.settings.folders = lib.genAttrs [ "documents" "pictures" "memes" ]
       (_: { type = "receiveonly"; });

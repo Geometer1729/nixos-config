@@ -37,7 +37,7 @@ let
     inbox = {
       description = "GTD Inbox - items to process";
       columns = [ "id" "entry.age" "description" ];
-      filter = "status:pending -next -waiting -someday";
+      filter = "status:pending -next -waiting -someday -BLOCKED";
       sort = "entry+";
     };
     next = {

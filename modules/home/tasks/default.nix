@@ -30,5 +30,6 @@
     ./taskchampion-client.nix
     ./gtd.nix
     ./dailies.nix
+    ./import.nix
   ];
 }
