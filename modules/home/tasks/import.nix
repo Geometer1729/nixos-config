@@ -11,8 +11,9 @@ let
   });
   bugwarrior = py.bugwarrior.override { inherit taskw; };
 
-  # Imports skip the inbox: each lands already triaged into a GTD list.
-  contexts = [ "@computer" "@home" ];
+  # Imports skip the inbox: each lands already triaged into a GTD list, with
+  # contexts, and +agent so the startable report offers it to an agent.
+  contexts = [ "agent" "@computer" "@home" ];
   # A ready PR waits on its reviewers; a draft is still mine to finish.
   prTags = contexts ++ [ "{{ 'next' if githubdraft else 'waiting' }}" ];
 
