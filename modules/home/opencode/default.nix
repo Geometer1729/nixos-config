@@ -206,6 +206,19 @@ in
     };
   };
 
+  # A TUI settings change replaces the cli.json symlink with a regular file.
+  # linkGeneration would move that to cli.json.bkp before linking, and an
+  # OpenCode reading in that gap finds no cli.json and writes one migrated from
+  # tui.json and kv.json, without plugins (2026-11-24). ln -T swaps it by rename,
+  # so linkGeneration only replaces a symlink.
+  home.activation.opencodeCliJson = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+    cli=${lib.escapeShellArg "${config.xdg.configHome}/opencode/cli.json"}
+    if [[ -f "$cli" && ! -L "$cli" ]]; then
+      run cp $VERBOSE_ARG "$cli" "$cli.bkp"
+      run ln -sfT $VERBOSE_ARG ${config.xdg.configFile."opencode/cli.json".source} "$cli"
+    fi
+  '';
+
   xdg.configFile = {
     "opencode/AGENTS.md".source = ./AGENTS.md;
     "opencode/cli.json" = {
@@ -229,14 +242,9 @@ in
           }
           "file://${plugins}/auto-tabs"
         ]
-        ++ lib.optionals machine.hasGui [
-          {
-            package = "file://${plugins}/notifications";
-            options.focusCommand = "${focus}/bin/opencode-focus";
-          }
-          # Receives Hex dictation from the dictate script.
-          "file://${plugins}/dictation"
-        ];
+        # The notifications TUI half is discovered through the server's plugin list.
+        # Receives Hex dictation from the dictate script.
+        ++ lib.optional machine.hasGui "file://${plugins}/dictation";
         diffs.wrap = "word";
         session = {
           markdown = "rendered";

@@ -47,9 +47,12 @@ function focusRequest(message: unknown): { session: string, directory?: string }
 // Objects report a TUI's tab inventory, tmux pane and directory. A session ID,
 // or {session, directory}, requests focus: the TUI with that tab gets it, else
 // the first TUI started in that directory, which opens it as a tab. The
-// requester gets back whether any TUI took it.
+// requester gets back whether any TUI took it, and `focus` gets that TUI's pane
+// to raise its window. The server runs it because its plugin options are
+// declared in opencode.json, while the TUI's come from cli.json, which OpenCode
+// and Home Manager rewrite.
 // EOF (including a killed TUI) removes its inventory.
-export async function presenceServer(path: string, changed: () => void) {
+export async function presenceServer(path: string, changed: () => void, focus: (pane: string) => void = () => undefined) {
   const clients = new Map<Socket, Presence>()
   // server.close() waits for every open connection, including ones that have
   // not reported yet. A connection missed here would stall the next generation.
@@ -63,7 +66,10 @@ export async function presenceServer(path: string, changed: () => void) {
         const owner = entries.find(([, { sessions }]) => sessions.includes(request.session))?.[0]
           ?? (request.directory === undefined ? undefined
             : entries.find(([, { directory }]) => directory === request.directory)?.[0])
-        owner?.write(JSON.stringify(request.session) + "\n")
+        if (owner !== undefined) {
+          focus(clients.get(owner)!.pane)
+          owner.write(JSON.stringify(request.session) + "\n")
+        }
         socket.end(JSON.stringify(owner !== undefined) + "\n")
       } else if (message && typeof message === "object" && "sessions" in message && "pane" in message
         && Array.isArray(message.sessions) && message.sessions.every((id) => typeof id === "string" && id.startsWith("ses_"))

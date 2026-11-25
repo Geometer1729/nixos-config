@@ -47,7 +47,10 @@ async function run({ command, focusCommand, browseCommand, workDirectory, quietA
       return []
     }
   }
-  const presence = await presenceServer(socketPath(process.pid), () => shared.request())
+  // An empty pane is a TUI outside tmux; opencode-focus can't place it.
+  const presence = await presenceServer(socketPath(process.pid), () => shared.request(), (pane) => {
+    if (pane) void exec(focusCommand, ["", pane], { timeout: 5000 }).catch(report)
+  })
   const mute = muteFile()
   const muteWatcher = watch(dirname(mute), (_, name) => { if (name === basename(mute)) shared.request() })
   muteWatcher.on("error", report)

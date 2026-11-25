@@ -66,10 +66,11 @@ test("a killed client leaves no stale attached session", async () => {
   }
 })
 
-test("clicks focus only an attached owner and stop routing after its tab closes", async () => {
+test("clicks focus only an attached owner and its pane, and stop routing after its tab closes", async () => {
   const directory = await mkdtemp(join(tmpdir(), "oc-presence-"))
   const path = join(directory, "server.sock")
-  const server = await presenceServer(path, () => undefined)
+  const raised: string[] = []
+  const server = await presenceServer(path, () => undefined, (pane) => raised.push(pane))
   const focused: string[] = []
   const first = presenceClient(async () => path, () => assert.fail("Wrong TUI received focus"))
   const second = presenceClient(async () => path, (id) => focused.push(id))
@@ -80,16 +81,18 @@ test("clicks focus only an attached owner and stop routing after its tab closes"
     await once(socket, "close")
   }
   try {
-    first.update(["ses_other"])
-    second.update(["ses_target"])
+    first.update(["ses_other"], "%1")
+    second.update(["ses_target"], "%2")
     await until(() => server.sessions().size === 2)
     await click()
     await until(() => focused.length === 1)
     assert.deepEqual(focused, ["ses_target"])
-    second.update([])
+    assert.deepEqual(raised, ["%2"])
+    second.update([], "%2")
     await until(() => !server.sessions().has("ses_target"))
     await click()
     assert.deepEqual(focused, ["ses_target"])
+    assert.deepEqual(raised, ["%2"])
   } finally {
     await first.close()
     await second.close()
