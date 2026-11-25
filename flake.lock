@@ -71,25 +71,27 @@
     "browse-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-MluC1Kcqed+Z5AMCxqzyXin1IySi3cyYFKgpHOaDCU8=",
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
+        "lastModified": 499162500,
+        "narHash": "sha256-DTY4cOkJwtjvXjBGUMV88D9L1zK3sx2IaDsFSEsgJzs=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.6-dev.276.tgz"
       },
       "original": {
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/dev"
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.6-dev.276.tgz"
       }
     },
     "browse-npm-latest": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-Bbwgee4kkZfIpybL1LmOjMj4CGyr1zrtLSpiHmF66gk=",
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/latest"
+        "lastModified": 499162500,
+        "narHash": "sha256-wUJOQGOLbrlJ1z1Te3ie4wS2o6jxkffgU4DDxz9Mllw=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.5.tgz"
       },
       "original": {
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/latest"
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.5.tgz"
       }
     },
     "claude-code": {
@@ -603,37 +605,40 @@
     "opencode-mobile-notifications-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-WJsBFd7u3O2GJjbvHKtYVbMrmGGnKCAyu3Babkh6GkE=",
-        "type": "file",
-        "url": "https://registry.npmjs.org/opencode-mobile-notifications/latest"
+        "lastModified": 499162500,
+        "narHash": "sha256-dKRLXcU8Og4KYJklQqNbb9fpqpOCG0VxeS0axl9KIdw=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/opencode-mobile-notifications/-/opencode-mobile-notifications-0.1.2.tgz"
       },
       "original": {
-        "type": "file",
-        "url": "https://registry.npmjs.org/opencode-mobile-notifications/latest"
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/opencode-mobile-notifications/-/opencode-mobile-notifications-0.1.2.tgz"
       }
     },
     "opencode-vim-plugin-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-+x4wAANNQJLJCPgI6a56ga9F2Xorx0ZaX0BZORHZoCQ=",
-        "type": "file",
-        "url": "https://registry.npmjs.org/@leohenon/opencode-vim-plugin/latest"
+        "lastModified": 499162500,
+        "narHash": "sha256-L+0ErPk8CmEBzQXHe1pOEj7/Is5P1tzWfVINGw/R+So=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@leohenon/opencode-vim-plugin/-/opencode-vim-plugin-0.2.0.tgz"
       },
       "original": {
-        "type": "file",
-        "url": "https://registry.npmjs.org/@leohenon/opencode-vim-plugin/latest"
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@leohenon/opencode-vim-plugin/-/opencode-vim-plugin-0.2.0.tgz"
       }
     },
     "opencode2-npm": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-HPmn8OkwDq43Dsg4TL3y0dS1/OIXBetet8GFNT0m1y0=",
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/latest"
+        "lastModified": 499162500,
+        "narHash": "sha256-t8nps0MAw34qJW7GXy6Z8teGZWjC38/aB+7Hu9rSAOM=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/-/cli-linux-x64-2.4.1.tgz"
       },
       "original": {
-        "type": "file",
-        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/latest"
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@opencode/cli-linux-x64/-/cli-linux-x64-2.4.1.tgz"
       }
     },
     "pf1-system": {

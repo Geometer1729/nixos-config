@@ -6,6 +6,7 @@ default:
 
 # Update system configuration and commit changes
 update:
+  flake-npm-update "{{flake}}"
   nh os switch -u "{{flake}}" && nix develop --command "git add . && git commit -m update"
   nix develop "{{flake}}" --command health --local
 
@@ -29,6 +30,10 @@ switch:
   sudo systemd-run --collect --wait --quiet --unit="$unit" "$system/bin/switch-to-configuration" switch || status=$?
   journalctl -u "$unit" -o cat --no-pager | grep -v '^sops-install-secrets: Imported'
   exit "$status"
+
+# Move npm-pinned flake inputs to their tags' current versions (like npm update)
+npm-update:
+  flake-npm-update "{{flake}}"
 
 # Build configuration
 build:

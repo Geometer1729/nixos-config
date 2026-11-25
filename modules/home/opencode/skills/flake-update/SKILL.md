@@ -60,7 +60,7 @@ Run:
 flake-update --output-dir /tmp/flake-update/update-MM-DD-YY /home/bbrian/Code/conf-update-MM-DD-YY
 ```
 
-The command updates `flake.lock`, backs up the old lock file, fetches commit
+The command repins the npm inputs (`flake-npm-update`), updates `flake.lock`, backs up the old lock file, fetches commit
 details, prepares the stable nixpkgs range in `/home/bbrian/Code/nixpkgs`, and
 performs an initial package-name filter. The parent reads only these summaries:
 

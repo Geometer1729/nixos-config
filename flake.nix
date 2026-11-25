@@ -59,17 +59,20 @@
     recover-vim.flake = false;
     zsh-nix-shell.url = "github:chisui/zsh-nix-shell";
     zsh-nix-shell.flake = false;
-    opencode2-npm.url = "file+https://registry.npmjs.org/@opencode/cli-linux-x64/latest";
+    # npm packages, pinned to exact (immutable) tarballs: a lock of a dist-tag URL breaks once the tag
+    # moves and the locked copy isn't in the store. `# npm: <tag>` names the tag `flake-npm-update`
+    # (run by `just update` and `flake-update`) moves each pin to.
+    opencode2-npm.url = "tarball+https://registry.npmjs.org/@opencode/cli-linux-x64/-/cli-linux-x64-2.4.1.tgz"; # npm: latest
     opencode2-npm.flake = false;
     # The dev channel: the notifications plugin reads waiting handoffs from `browse tabs`, which stable
     # 0.1.5 lacks (anomalyco/browse#379). modules/home/opencode warns once latest has them.
-    browse-npm.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/dev";
+    browse-npm.url = "tarball+https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.6-dev.276.tgz"; # npm: dev
     browse-npm.flake = false;
-    browse-npm-latest.url = "file+https://registry.npmjs.org/@opencode/browse-linux-x64/latest";
+    browse-npm-latest.url = "tarball+https://registry.npmjs.org/@opencode/browse-linux-x64/-/browse-linux-x64-0.1.5.tgz"; # npm: latest
     browse-npm-latest.flake = false;
-    opencode-mobile-notifications-npm.url = "file+https://registry.npmjs.org/opencode-mobile-notifications/latest";
+    opencode-mobile-notifications-npm.url = "tarball+https://registry.npmjs.org/opencode-mobile-notifications/-/opencode-mobile-notifications-0.1.2.tgz"; # npm: latest
     opencode-mobile-notifications-npm.flake = false;
-    opencode-vim-plugin-npm.url = "file+https://registry.npmjs.org/@leohenon/opencode-vim-plugin/latest";
+    opencode-vim-plugin-npm.url = "tarball+https://registry.npmjs.org/@leohenon/opencode-vim-plugin/-/opencode-vim-plugin-0.2.0.tgz"; # npm: latest
     opencode-vim-plugin-npm.flake = false;
     kokoro.url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2";
     kokoro.flake = false;

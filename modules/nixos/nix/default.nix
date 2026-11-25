@@ -5,6 +5,7 @@
     extras = [ config.nix.package pkgs.gh pkgs.python3 ];
     overrides.flake-update.extras = [
       config.scripts.nix.packages.flake-changelog
+      config.scripts.nix.packages.flake-npm-update
       config.scripts.nix.packages.nixpkgs-changelog
     ];
   };

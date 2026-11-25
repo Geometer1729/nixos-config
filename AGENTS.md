@@ -16,11 +16,12 @@ Nearly all configuration of this machine should come from this repo.
 
 ## Pinning
 
-Nothing may silently go stale: `nix flake update` must either move every external source or fail until someone updates it.
+Nothing may silently go stale: `nix flake update` must either move every external source or fail until someone updates it. The one exception is npm packages (below), which `flake-npm-update` moves; `just update` and the `flake-update` command run it first.
 
 - Prefer a nixpkgs or `nixpkgs-unstable` package over overriding a package's source.
 - Pin other downloads as flake inputs (`flake = false` for non-flakes), not `fetchurl`/`fetchzip`/`fetchFromGitHub` with a hardcoded hash.
-- Track a branch or a `latest` URL, not a fixed tag or version, unless a check fails the build once it falls behind (like `linearis-npm`'s assertion). Release-branch refs (`26.05`) instead get a warning from `modules/nixos/base.nix` when they need bumping.
+- Never lock a URL whose content changes (an npm dist-tag, a `latest` permalink): Nix locks it by content hash, so once it moves the input can't be fetched again and evaluation fails wherever the locked copy isn't in the store. Pin npm packages to their exact tarball with a trailing `# npm: <tag>` comment (`tarball+https://registry.npmjs.org/<package>/-/<file>.tgz`); `flake-npm-update` moves them to the tag's current version.
+- Track a branch (locked by commit) or, for npm, a dist-tag via `flake-npm-update`, not a fixed tag or version, unless a check fails the build once it falls behind (like `linearis-npm`'s assertion). Release-branch refs (`26.05`) instead get a warning from `modules/nixos/base.nix` when they need bumping.
 - A hardcoded hash is fine only when its source moves with a flake input, so a stale hash breaks the build (e.g. a Go `vendorHash`).
 - Pin container images by digest, read from a registry-metadata flake input (like `foundryvtt-image`); a bare tag is pulled once and never again.
 - Whatever still can't move with the flake (in-repo lockfiles) is covered by the flake-update skill's stale-pin review.

@@ -102,6 +102,13 @@ if $DRY_RUN; then
     fi
   fi
 else
+  # npm inputs are pinned to exact tarballs, which nix flake update can't move.
+  log_info "Running flake-npm-update..."
+  if ! flake-npm-update "$FLAKE_PATH" 2>&1; then
+    log_error "flake-npm-update failed"
+    exit 1
+  fi
+
   # Run nix flake update
   log_info "Running nix flake update..."
   if ! nix flake update --flake "$FLAKE_PATH" 2>&1; then

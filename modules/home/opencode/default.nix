@@ -9,9 +9,11 @@ let
     # Alerts arrive generic ("New activity"): the app never calls the plugin's
     # pair RPC (anomalyco/opencode#61549). Exporting ./rpc so /api/plugin reports
     # features.rpc did not make it pair (tried 2026-11-19, OpenCode 2.3.0).
-    npmPlugins.mobile-notifications = builtins.fromJSON (builtins.readFile inputs.opencode-mobile-notifications-npm);
-    npmPlugins.vim = builtins.fromJSON (builtins.readFile inputs.opencode-vim-plugin-npm);
+    npmPlugins.mobile-notifications = inputs.opencode-mobile-notifications-npm;
+    npmPlugins.vim = inputs.opencode-vim-plugin-npm;
   };
+  # npm flake inputs are unpacked package tarballs.
+  npmVersion = package: (builtins.fromJSON (builtins.readFile "${package}/package.json")).version;
   plugins = pluginBuild.package;
   notify = pkgs.writeShellApplication {
     name = "opencode-notify";
@@ -23,15 +25,10 @@ let
     runtimeInputs = with pkgs; [ coreutils hyprland jq procps tmux ];
     text = builtins.readFile ./focus.sh;
   };
-  opencode2Npm = builtins.fromJSON (builtins.readFile inputs.opencode2-npm);
   opencode2 = pkgs.stdenv.mkDerivation {
     pname = "opencode2";
-    inherit (opencode2Npm) version;
-    src = pkgs.fetchurl {
-      url = opencode2Npm.dist.tarball;
-      hash = opencode2Npm.dist.integrity;
-    };
-    sourceRoot = "package";
+    version = npmVersion inputs.opencode2-npm;
+    src = inputs.opencode2-npm;
 
     nativeBuildInputs = [ pkgs.makeWrapper ];
     dontBuild = true;
@@ -80,16 +77,11 @@ let
     '';
   };
   # browse lets agents drive Brave through its extension; the relay starts on demand.
-  browseNpm = builtins.fromJSON (builtins.readFile inputs.browse-npm);
-  browseStable = (builtins.fromJSON (builtins.readFile inputs.browse-npm-latest)).version;
+  browseStable = npmVersion inputs.browse-npm-latest;
   browse = pkgs.stdenv.mkDerivation {
     pname = "browse";
-    inherit (browseNpm) version;
-    src = pkgs.fetchurl {
-      url = browseNpm.dist.tarball;
-      hash = browseNpm.dist.integrity;
-    };
-    sourceRoot = "package";
+    version = npmVersion inputs.browse-npm;
+    src = inputs.browse-npm;
 
     nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
     dontBuild = true;
@@ -134,7 +126,7 @@ in
   # browse-npm tracks the dev channel until a stable release lists waiting handoffs in `browse tabs`
   # (anomalyco/browse#379, merged after 0.1.5).
   warnings = lib.optional (!lib.versionOlder browseStable "0.1.6")
-    "browse ${browseStable} lists waiting handoffs: point browse-npm in flake.nix back at latest and remove browse-npm-latest";
+    "browse ${browseStable} lists waiting handoffs: mark browse-npm in flake.nix `# npm: latest`, run flake-npm-update and remove browse-npm-latest";
 
   # Plugin typecheck/tests, then load the real plugins under the deployed config.
   home.checks = [
