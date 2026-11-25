@@ -120,7 +120,7 @@ let
   };
   serve = pkgs.writeShellApplication {
     name = "opencode-serve";
-    runtimeInputs = [ opencode2 pkgs.jq pkgs.systemd config.programs.zsh.package ];
+    runtimeInputs = [ opencode2 pkgs.coreutils pkgs.gnugrep pkgs.jq pkgs.systemd pkgs.libnotify config.programs.zsh.package ];
     text = builtins.readFile ./serve.sh;
   };
   # Plugins call Hyprland, so wait for the session environment where there is one.

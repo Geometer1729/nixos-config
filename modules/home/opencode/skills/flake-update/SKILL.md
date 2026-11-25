@@ -206,7 +206,11 @@ needs reconciling, since passing checks can print known warnings.
 `just switch` must activate the update worktree on durin even when no
 configuration fix was needed. It runs activation in a separate systemd unit, so
 an OpenCode or sshd restart cannot kill it; never substitute `nh os switch` or
-`nh os test`. Load the `failures` skill to reconcile the build, evaluation,
+`nh os test`. When the update changes `opencode2`, activation restarts the
+OpenCode server (`modules/home/opencode/serve.sh`), which interrupts your own
+`just switch` call and turn. Redirect its output to a file in the artifacts
+directory. When you're resumed, read that file and the switch unit's journal
+(`journalctl -u 'switch-*'`) instead of rerunning the switch. Load the `failures` skill to reconcile the build, evaluation,
 activation, and local check results with this worktree's `failures.md` before
 deciding whether checks pass.
 
